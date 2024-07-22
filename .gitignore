@@ -9,7 +9,7 @@
 
 /store/node_modules
 
-/store/.env
+# /store/.env
 
 /.pnp
 .pnp.js
