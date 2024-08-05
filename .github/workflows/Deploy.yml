@@ -10,6 +10,7 @@ on:
       - 'main/**'
       - 'domains/**'
       - 'store/**'
+  workflow_dispatch:  # Add this line to enable manual triggering
 
 jobs:
   build_and_deploy:
@@ -102,4 +103,3 @@ jobs:
 #           strategy: basic
 #           manifests: |
 #             k8s/ingress.yaml
-#         if: needs.build_and_deploy.outputs.ingress_changed == 'true'
