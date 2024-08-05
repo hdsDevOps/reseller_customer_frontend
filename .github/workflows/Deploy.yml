@@ -8,7 +8,7 @@ on:
       - '**.yaml'  # Only trigger if YAML files change, including ingress
       - 'auth/**'
       - 'main/**'
-      - 'domains/**'
+      - 'domain/**'
       - 'store/**'
   workflow_dispatch:  # Add this line to enable manual triggering
 
