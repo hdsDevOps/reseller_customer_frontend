@@ -19,7 +19,7 @@ jobs:
         service:
           - auth
           - main
-          - domains
+          - domain
           - store
 
     steps:
