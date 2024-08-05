@@ -39,8 +39,8 @@ jobs:
           file: ./auth/Dockerfile
           push: true
           tags: >
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:${{ github.sha }},
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}/auth:${{ github.sha }},
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}/auth:latest
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v4
