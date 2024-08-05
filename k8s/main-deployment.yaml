@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: frontend-main-service
-        image: hordansodevops/reseller_frontend_main:latest
+        image: hordansodevops/reseller_customer_frontend_main:latest
         ports:
         - containerPort: 3000
           resources:

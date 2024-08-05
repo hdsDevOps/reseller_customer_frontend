@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: frontend-auth-service
-        image: hordansodevops/reseller_frontend_auth:latest
+        image: hordansodevops/reseller_customer_frontend_auth:latest
         ports:
         - containerPort: 3002
         resources:

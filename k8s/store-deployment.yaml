@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: frontend-domain-service
-        image: hordansodevops/reseller_frontend_domain:latest
+        image: hordansodevops/reseller_customer_frontend_store:latest
         ports:
         - containerPort: 3030
         resources:

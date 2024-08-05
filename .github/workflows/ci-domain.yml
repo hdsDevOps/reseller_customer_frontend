@@ -24,7 +24,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            hordansodevops/reseller_frontend_domain
+            hordansodevops/reseller_customer_frontend_domain
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -39,9 +39,8 @@ jobs:
           file: ./domain/Dockerfile
           push: true
           tags: >
-            ${{ secrets.DOCKERHUB_USERNAME }}/domain:${{ github.sha }},
-            ${{ secrets.DOCKERHUB_USERNAME }}/domain:latest
-
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:${{ github.sha }},
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}:latest
       - name: Set up kubectl
         uses: azure/setup-kubectl@v4
         with:
@@ -64,7 +63,7 @@ jobs:
             k8s/domain-deployment.yaml
             k8s/domain-service.yaml
           images: |
-            hordansodevops/reseller_frontend_domain:latest
+            hordansodevops/reseller_customer_frontend_domain:latest
 
       # Uncomment if you have a separate ingress deployment
       # - name: Deploy Ingress
