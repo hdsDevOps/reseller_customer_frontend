@@ -17,7 +17,7 @@ spec:
         image: hordansodevops/reseller_customer_frontend_main:latest
         ports:
         - containerPort: 3000
-          resources:
+        resources:
           limits:
             cpu: "1"
             memory: "512Mi"
