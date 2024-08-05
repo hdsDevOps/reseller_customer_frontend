@@ -1,0 +1,45 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: customer-portal-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+spec:
+  tls:
+  - hosts:
+    - customerportal.gworkspace.withhordanso.com
+    secretName: customer-portal-tls
+  rules:
+  - host: customerportal.gworkspace.withhordanso.com
+    http:
+      paths:
+      - path: /auth
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-auth-service
+            port:
+              number: 80
+      - path: /main
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-main-service
+            port:
+              number: 80
+      - path: /domains
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-domains-service
+            port:
+              number: 80
+      - path: /store
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-store-service
+            port:
+              number: 80
