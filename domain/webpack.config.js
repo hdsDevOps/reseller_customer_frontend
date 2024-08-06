@@ -1,6 +1,6 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
-const Dotenv = require('dotenv-webpack');
+const Dotenv = require("dotenv-webpack");
 const deps = require("./package.json").dependencies;
 module.exports = (_, argv) => ({
 	output: {
@@ -14,7 +14,7 @@ module.exports = (_, argv) => ({
 	devServer: {
 		port: 3001,
 		historyApiFallback: true,
-		allowedHosts: ["customerportal.gworkspace.withhordanso.com"],
+		allowedHosts: ["all"],
 	},
 
 	module: {

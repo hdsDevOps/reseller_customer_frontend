@@ -14,7 +14,7 @@ module.exports = (_, argv) => ({
 	devServer: {
 		port: 3002,
 		historyApiFallback: true,
-		allowedHosts: ["customerportal.gworkspace.withhordanso.com"],
+		allowedHosts: ["all"],
 	},
 
 	module: {
