@@ -45,7 +45,7 @@ module.exports = (_, argv) => ({
 			name: "auth",
 			filename: "remoteEntry.js",
 			remotes: {
-				store: "store@http://localhost:3030/remoteEntry.js",
+				store: "store@https://store.customer.gworkspace.withhordanso.com/remoteEntry.js",
 			},
 			exposes: {
 				"./AuthApp": "./src/pages/index.tsx",
