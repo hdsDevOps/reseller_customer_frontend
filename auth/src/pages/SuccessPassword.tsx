@@ -10,7 +10,7 @@ const SuccessPage: React.FC = () => {
 
   return (
     <div className="flex h-screen items-center justify-center bg-[#F9FAFB]">
-      <div className="w-full max-w-[32rem] text-center bg-white p-8 rounded-lg shadow-md">
+      <div className="w-full max-w-[32rem] text-center bg-white p-8 rounded-lg shadow-sm">
         <div className="mb-8">
           <img src="/src/assets/images/logo.jpeg" alt="logo" className="mx-auto" />
         </div>
@@ -18,7 +18,7 @@ const SuccessPage: React.FC = () => {
         <p className="text-gray-700 mb-6">You can now use your new password to log in to your account!</p>
         <button
           onClick={handleBackToLogin}
-          className="btn-black" // Ensure this matches your custom CSS
+          className="btn-black"
         >
           Back to Login
         </button>
