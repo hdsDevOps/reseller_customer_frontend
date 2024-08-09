@@ -15,14 +15,12 @@ const OTP: React.FC = () => {
   const otp3Ref = useRef<HTMLInputElement>(null);
   const otp4Ref = useRef<HTMLInputElement>(null);
   const otp5Ref = useRef<HTMLInputElement>(null);
-  const otp6Ref = useRef<HTMLInputElement>(null);
 
   const [otp1, setOtp1] = useState<string>("");
   const [otp2, setOtp2] = useState<string>("");
   const [otp3, setOtp3] = useState<string>("");
   const [otp4, setOtp4] = useState<string>("");
   const [otp5, setOtp5] = useState<string>("");
-  const [otp6, setOtp6] = useState<string>("");
 
   useEffect(() => {
     otp1Ref.current?.focus();
@@ -53,10 +51,6 @@ const OTP: React.FC = () => {
           break;
         case 5:
           setOtp5(value);
-          otp6Ref.current?.focus();
-          break;
-        case 6:
-          setOtp6(value);
           break;
         default:
           break;
@@ -102,13 +96,6 @@ const OTP: React.FC = () => {
             setOtp5("");
           }
           break;
-        case 6:
-          if (!otp6) {
-            otp5Ref.current?.focus();
-          } else {
-            setOtp6("");
-          }
-          break;
         default:
           break;
       }
@@ -117,41 +104,47 @@ const OTP: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const otp = `${otp1}${otp2}${otp3}${otp4}${otp5}${otp6}`;
-    if (otp.length === 6) {
+    const otp = `${otp1}${otp2}${otp3}${otp4}${otp5}`;
+    if (otp.length === 5) {
       // Process the OTP login
-      // dispatch(makeUserLoginThunk({ email, otp }))
-      //   .then((response) => {
-      //     // Handle successful login
-      //     toast.success("Login successful!");
-      //     router.push("/dashboard"); // Replace with your desired route
-      //   })
-      //   .catch((error) => {
-      //     // Handle login error
-      //     if (error instanceof CustomError) {
-      //       toast.error(error.message);
-      //     } else {
-      //       toast.error("Login failed. Please try again.");
-      //     }
-      //   });
     } else {
-      //toast.error("Please enter a valid 6-digit OTP.");
+      // Handle OTP length error
     }
   };
 
-  const onGoBackhandler = () => {
-    navigate("/login");
+  const handleEditmail = () => {
+    navigate("/forgotpassword");
   };
 
   return (
-    <div className="flex h-screen items-center justify-center px-5">
-      <div className="w-full max-w-lg">
-        <div className="p-8 bg-gray-100 rounded-lg shadow-lg">
-          <h3 className="text-center mb-4 text-3xl">Sign in your account</h3>
+    <div className="flex h-full items-center justify-center">
+      <div className="w-full max-w-[32rem]">
+        <div className="p-8 xsm-max:px-4 bg-[#F9FAFB] rounded-lg shadow-sm">
+          <div className="mb-12">
+            <img src="/src/assets/images/logo.jpeg" alt="logo" />
+          </div>
+          <h3 className="text-center font-inter font-medium mb-4 text-[28px]">
+            Verify your email
+          </h3>
           <form onSubmit={handleLogin}>
-            <div className="mb-4 text-center">
-              <label className="block text-sm font-medium text-gray-700">OTP Verification</label>
-              <div className="flex justify-center space-x-2 mt-4">
+            <div className="mb-4 text-center xsm-max:text-sm">
+              <p>
+                We have sent an <strong>One Time Passcode</strong> to this
+                Robertclive@gmail.com email address{" "}
+                <button
+                  type="button"
+                  onClick={() => handleEditmail()}
+                  className="font-medium text-green-600 hover:text-gray-500"
+                  data-testid="back-to-login"
+                >
+                  Edit
+                </button>
+              </p>
+              <div className="flex justify-between mt-12">
+                <p className="text-md font-bold">OTP verification</p>
+                <span className="text-red-600">01:19</span>
+              </div>
+              <div className="grid grid-cols-5 gap-2 mt-4">
                 <input
                   type="text"
                   maxLength={1}
@@ -159,8 +152,8 @@ const OTP: React.FC = () => {
                   value={otp1}
                   onChange={(e) => handleInputChange(e, 1)}
                   onKeyDown={(e) => handleKeyDown(e, 1)}
-                  className="w-10 h-10 border-2 bg-transparent focus:border-green-500 rounded-lg text-center text-black otp-input"
-                  data-testid="otp-one"
+                  className="w-full aspect-square  outline-none focus border-2 bg-transparent rounded-lg text-center text-black"
+                  placeholder="0"
                 />
                 <input
                   type="text"
@@ -169,8 +162,8 @@ const OTP: React.FC = () => {
                   value={otp2}
                   onChange={(e) => handleInputChange(e, 2)}
                   onKeyDown={(e) => handleKeyDown(e, 2)}
-                  className="w-10 h-10 border-2 bg-transparent border-green-500 rounded-lg text-center text-black  otp-input"
-                  data-testid="otp-two"
+                  className="w-full aspect-square  outline-none focus border-2 bg-transparent rounded-lg text-center text-black"
+                  placeholder="0"
                 />
                 <input
                   type="text"
@@ -179,8 +172,8 @@ const OTP: React.FC = () => {
                   value={otp3}
                   onChange={(e) => handleInputChange(e, 3)}
                   onKeyDown={(e) => handleKeyDown(e, 3)}
-                  className="w-10 h-10 border-2 bg-transparent focus: rounded-lg text-center text-black  otp-input"
-                  data-testid="otp-three"
+                  className="w-full aspect-square  outline-none focus border-2 bg-transparent rounded-lg text-center text-black"
+                  placeholder="0"
                 />
                 <input
                   type="text"
@@ -189,8 +182,8 @@ const OTP: React.FC = () => {
                   value={otp4}
                   onChange={(e) => handleInputChange(e, 4)}
                   onKeyDown={(e) => handleKeyDown(e, 4)}
-                  className="w-10 h-10 border-2 bg-transparent border-green-500 rounded-lg text-center text-black  otp-input"
-                  data-testid="otp-four"
+                  className="w-full aspect-square  outline-none focus border-2 bg-transparent rounded-lg text-center text-black"
+                  placeholder="0"
                 />
                 <input
                   type="text"
@@ -199,48 +192,27 @@ const OTP: React.FC = () => {
                   value={otp5}
                   onChange={(e) => handleInputChange(e, 5)}
                   onKeyDown={(e) => handleKeyDown(e, 5)}
-                  className="w-10 h-10 border-2 bg-transparent border-green-500 rounded-lg text-center text-black  otp-input"
-                  data-testid="otp-five"
-                />
-                <input
-                  type="text"
-                  maxLength={1}
-                  ref={otp6Ref}
-                  value={otp6}
-                  onChange={(e) => handleInputChange(e, 6)}
-                  onKeyDown={(e) => handleKeyDown(e, 6)}
-                  className="w-10 h-10 border-2 bg-transparent border-green-500 rounded-lg text-center text-black  otp-input"
-                  data-testid="otp-six"
+                  className="w-full aspect-square  outline-none focus border-2 bg-transparent rounded-lg text-center text-black"
+                  placeholder="0"
                 />
               </div>
             </div>
             <div className="text-center mt-4">
-              <button
-                type="submit"
-                className="w-full py-2 bg-green-500 text-white rounded hover:bg-green-700"
-                data-testid="submit"
-              >
-                Submit
+              <button type="submit" className="btn-black" data-testid="submit">
+                Verify and Proceed
               </button>
             </div>
-            <div className="text-center mt-4">
+            <div className="text-center mt-4 xsm-max:text-sm">
               <p>
                 Didn't get an OTP?{" "}
-                <Link data-testid="resend-otp" to="#" className="text-green-500">
+                <Link
+                  data-testid="resend-otp"
+                  to="#"
+                  className="text-red-600 underline ml-4"
+                >
                   Resend OTP
                 </Link>{" "}
-                <span>01:19</span>
               </p>
-            </div>
-            <div className="text-center mt-4">
-              <button
-                type="button"
-                onClick={() => onGoBackhandler()}
-                className="w-full py-2 bg-gray-500 text-white rounded hover:bg-gray-700"
-                data-testid="back-to-login"
-              >
-                Back to login
-              </button>
             </div>
           </form>
         </div>

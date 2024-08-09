@@ -8,15 +8,17 @@ const ForgotPassword: React.FC = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle the login logic here
+    navigate("/otp")
   };
+  
 
   const onGoBackhandler = () => {
     navigate("/login"); // Replace '/login' with your login route path
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-[#F9FAFB] p-10 rounded-2xl shadow-sm">
+    <div className="h-full flex items-center justify-center">
+      <div className="max-w-[32rem] space-y-8 bg-[#F9FAFB] p-10 rounded-2xl shadow-sm xsm-max:px-4">
         <div className="">
           <img src="/src/assets/images/logo.jpeg" alt="logo" />
         </div>
@@ -56,7 +58,7 @@ const ForgotPassword: React.FC = () => {
           <div>
             <button
               type="submit"
-              className="relative w-full flex justify-center px-3 py-[10px] border border-transparent text-sm font-medium rounded-lg text-white bg-black transition-shadow duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 hover:bg-gray-800 hover:shadow-md"
+              className="btn-black"
               data-testid="next"
             >
               Next
