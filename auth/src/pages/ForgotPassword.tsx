@@ -17,7 +17,7 @@ const ForgotPassword: React.FC = () => {
   };
 
   return (
-    <div className="h-full flex items-center justify-center">
+    <div className="h-screen flex items-center justify-center">
       <div className="max-w-[32rem] space-y-8 bg-[#F9FAFB] p-10 rounded-2xl shadow-sm xsm-max:px-4">
         <div className="">
           <img src="/src/assets/images/logo.jpeg" alt="logo" />

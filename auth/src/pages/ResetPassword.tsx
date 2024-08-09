@@ -38,7 +38,7 @@ const ResetPassword: React.FC = () => {
   };
 
   return (
-    <div className="flex h-full items-center justify-center px-1">
+    <div className="w-full flex h-full items-center justify-center px-1">
       <div className="w-full max-w-[32rem]">
         <div className="p-8 rounded-lg bg-[#F9FAFB]">
           <div className="mb-12">
