@@ -105,16 +105,29 @@ const OTP: React.FC = () => {
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const otp = `${otp1}${otp2}${otp3}${otp4}${otp5}`;
+    
     if (otp.length === 5) {
-      // Process the OTP login
+      // Here you would typically verify the OTP with your server
+      // Simulating success for now
+      const isValidOtp = true; // Replace with actual validation logic
+      
+      if (isValidOtp) {
+        navigate("/resetpassword");
+      } else {
+        // Handle invalid OTP error
+        alert("Invalid OTP. Please try again.");
+      }
     } else {
       // Handle OTP length error
+      alert("Please enter all 5 digits.");
     }
   };
+  
 
   const handleEditmail = () => {
     navigate("/forgotpassword");
   };
+
 
   return (
     <div className="flex h-full items-center justify-center">

@@ -7,6 +7,8 @@ const Login = React.lazy(() => import("./Login"));
 const Register = React.lazy(() => import("./Register"));
 const OTP = React.lazy(() => import("./OTP"));
 const ForgotPassword = React.lazy(() => import("./ForgotPassword"));
+const ResetPassword = React.lazy(() => import("./ResetPassword"));
+const SuccessPassword = React.lazy(() => import("./SuccessPassword"));
 
 const AuthApp: React.FC = () => {
   return (
@@ -22,6 +24,8 @@ const AuthApp: React.FC = () => {
               <Route path="/register" element={<Register />} />
               <Route path="/otp" element={<OTP />} />
               <Route path="/forgotpassword" element={<ForgotPassword />} />
+              <Route path="/resetpassword" element={<ResetPassword />} />
+              <Route path="/successpassword" element={<SuccessPassword />} />
             </Routes>
           </main>
         </Suspense>

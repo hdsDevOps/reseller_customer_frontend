@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { HiOutlineEye } from "react-icons/hi";
 import { RiEyeCloseLine } from "react-icons/ri";
 
@@ -7,6 +8,8 @@ const ResetPassword: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+
+  const navigate = useNavigate();
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
@@ -27,19 +30,22 @@ const ResetPassword: React.FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (password === confirmPassword) {
-      // Handle password reset logic here
       console.log("Password reset successfully");
+      navigate("/successpassword"); // Navigate to the success page
     } else {
       console.log("Passwords do not match");
     }
   };
 
   return (
-    <div className="flex h-screen items-center justify-center px-5">
-      <div className="w-full max-w-md">
-        <div className="p-8 bg-gray-100 rounded-lg shadow-lg">
-          <h2 className="text-center text-2xl font-semibold mb-6">Reset your password</h2>
-          <p className="text-gray-500 text-center mb-6">Must be at least 8 characters</p>
+    <div className="flex h-full items-center justify-center px-1">
+      <div className="w-full max-w-[32rem]">
+        <div className="p-8 rounded-lg bg-[#F9FAFB]">
+          <div className="mb-12">
+            <img src="/src/assets/images/logo.jpeg" alt="logo" />
+          </div>
+          <h2 className="text-center font-inter text-2xl font-semibold mb-2">Reset your password</h2>
+          <p className="text-gray-500 text-center mb-6 text-md">Must be at least 8 characters</p>
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
@@ -48,8 +54,9 @@ const ResetPassword: React.FC = () => {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={handlePasswordChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="custom-input"
                   minLength={8}
+                  placeholder=".........."
                   required
                 />
                 <button
@@ -58,9 +65,9 @@ const ResetPassword: React.FC = () => {
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
                 >
                   {showPassword ? (
-                    <RiEyeCloseLine className="h-5 w-5" aria-hidden="true" />
-                  ) : (
                     <HiOutlineEye className="h-5 w-5" aria-hidden="true" />
+                  ) : (
+                    <RiEyeCloseLine className="h-5 w-5" aria-hidden="true" />
                   )}
                 </button>
               </div>
@@ -73,7 +80,8 @@ const ResetPassword: React.FC = () => {
                   type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={handleConfirmPasswordChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="custom-input"
+                  placeholder=".........."
                   minLength={8}
                   required
                 />
@@ -83,7 +91,7 @@ const ResetPassword: React.FC = () => {
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
                 >
                   {showConfirmPassword ? (
-                    <RiEyeCloseLine className="h-5 w-5" aria-hidden="true" />
+                    <HiOutlineEye className="h-5 w-5" aria-hidden="true" />
                   ) : (
                     <RiEyeCloseLine className="h-5 w-5" aria-hidden="true" />
                   )}
@@ -94,9 +102,9 @@ const ResetPassword: React.FC = () => {
             <div className="text-center">
               <button
                 type="submit"
-                className="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+                className="btn-black"
               >
-                Reset Password
+                Confirm Password
               </button>
             </div>
           </form>

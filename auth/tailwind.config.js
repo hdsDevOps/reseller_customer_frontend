@@ -8,7 +8,7 @@ module.exports = {
       },
       screens:{
       'xsm-max': {'min':'320px', 'max': '767px'},
-      }
+      },
     },
   },
   plugins: [require("daisyui")],
