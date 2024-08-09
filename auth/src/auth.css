@@ -1,6 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .custom-input {
+    @apply appearance-none outline-none rounded-lg bg-transparent relative block w-full px-3 py-[10px] border border-gray-300 placeholder-gray-500 text-gray-900 transition-all duration-300 ease-in-out focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 sm:text-sm;
+  }
+}
 
 
 body {
