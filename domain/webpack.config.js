@@ -12,7 +12,7 @@ module.exports = (_, argv) => ({
 	},
 
 	devServer: {
-		port: 3030,
+		port: 3001,
 		historyApiFallback: true,
 		allowedHosts: ["all"],
 	},
@@ -42,15 +42,13 @@ module.exports = (_, argv) => ({
 
 	plugins: [
 		new ModuleFederationPlugin({
-			name: "store",
+			name: "domains",
 			filename: "remoteEntry.js",
-			remotes: {},
+			remotes: {
+				store: "store@https://store.customer.gworkspace.withhordanso.com/remoteEntry.js",
+			},
 			exposes: {
-				"./ReduxProvider": "./src/provider/index.tsx",
-				"./user.storage": "./src/localStorage/user.storage.tsx",
-				"./hooks": "./src/hooks.ts",
-				"./user.thunk": "./src/thunks/user.thunk.tsx",
-				"./authSlice": "./src/slices/authSlice.ts",
+				"./DomainApp": "./src/pages/index.tsx",
 			},
 			shared: {
 				...deps,
