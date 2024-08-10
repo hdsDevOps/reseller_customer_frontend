@@ -16,7 +16,7 @@ const AuthApp: React.FC = () => {
       <div className="max-w-full mx-auto ">
         <Suspense fallback={<div>Loading...</div>}>
           <Header />
-          <main className="py-10 lg:px-8 px-4 flex items-center justify-center h-screen">
+          <main className="py-10 lg:px-8 px-2 flex items-center justify-center h-screen">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/home" element={<Home />} />
