@@ -1,0 +1,21 @@
+/* cumtel.css */
+.react-tel-input {
+  width: 100% !important;
+}
+
+.react-tel-input input {
+  border-radius: 0.4rem;
+  padding:1.4rem 1.5rem;
+  border: 2px solid #d1d5db !important;
+  background-color: transparent;
+}
+
+.react-tel-input input:focus {
+  border-color: #3b82f6 !important;
+  outline: none;
+}
+
+.react-tel-input input::placeholder {
+  color: #a0aec0; /* Tailwind's placeholder-gray-400 */
+  opacity: 1; /* Ensure the placeholder is visible */
+}

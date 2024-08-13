@@ -17,6 +17,10 @@
   .focus{
     @apply transition-all duration-300 ease-in-out focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500
   }
+  .form-input{
+    @apply border-2 border-gray-300 rounded-md p-2 bg-transparent w-full placeholder-transparent focus:border-blue-500 focus:outline-none
+  }
+  
 }
 
 
@@ -172,3 +176,4 @@ body {
   background: none !important;
   color: #000000 !important;
 }
+
