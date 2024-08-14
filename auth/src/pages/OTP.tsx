@@ -225,10 +225,10 @@ const OTP: React.FC = () => {
             </div>
             <div className="text-center mt-4">
               <p>
-                Didn't get an OTP?{" "}
+                Didn't get an OTP?
                 <Link data-testid="resend-otp" to="#" className="text-green-500">
                   Resend OTP
-                </Link>{" "}
+                </Link>
                 <span>01:19</span>
               </p>
             </div>

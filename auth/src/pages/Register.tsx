@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { IoIosArrowBack } from "react-icons/io";
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -18,6 +19,10 @@ const Register: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl w-full space-y-8">
+        <div className="flex gap-1">
+        <IoIosArrowBack className="w-4 h-4"/>
+        <p>Back to previous page</p>
+        </div>
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Welcome to Hordanso LLC
@@ -155,6 +160,7 @@ const Register: React.FC = () => {
       )}
     </div>
   );
+   
 };
 
 export default Register;

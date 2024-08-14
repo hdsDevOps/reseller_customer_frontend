@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,6 +7,14 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
+p {
+  color: #000000;
+}
+
+input[type="text"]:focus ~ .input-text {
+  @apply text-greenbase text-xl bg-white transform -translate-y-7 -translate-x-4 scale-75;
+}
+
 .container {
   font-size: 3rem;
   margin: auto;
@@ -122,6 +131,11 @@ body {
   font-size: 18px;
   color: #cecece;
 }
+.otp-input:focus {
+  border-color: #12a833;
+  outline:8px #12a833;
+}
+
 .auth-otp-footer p {
   color: #000000;
   font-size: 14px;
