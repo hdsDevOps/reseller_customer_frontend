@@ -6,7 +6,7 @@
 .react-tel-input input {
   border-radius: 0.4rem;
   padding:1.4rem 1.5rem;
-  border: 2px solid #d1d5db !important;
+  border: 2px solid #d1d5db8a !important;
   background-color: transparent;
 }
 

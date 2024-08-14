@@ -122,7 +122,7 @@ const OTP: React.FC = () => {
 
     const handleCloseModal = () => {
         setShowModal(false);
-        navigate("/dashboard"); // Navigate to the dashboard after closing the modal
+        navigate("/businessinfo");
     };
 
     return (

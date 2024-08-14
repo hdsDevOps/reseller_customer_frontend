@@ -90,7 +90,7 @@ const Subscribe: React.FC = () => {
 
       {step === 1 && (
         <form action="" className="flex items-center justify-between flex-col w-full gap-20 xsm-max:flex xsm-max:flex-col xsm-max:gap-4">
-          <div className="flex items-center gap-10 justify-center w-3/5 xsm-max:flex-col">
+          <div className="flex items-center gap-10 justify-center w-3/5 xsm-max:flex-col xsm-max:w-full">
           <div className="relative w-full">
             <input
               id="businessName"
@@ -98,7 +98,7 @@ const Subscribe: React.FC = () => {
               placeholder=" "
               value={formData.businessName}
               onChange={handleChange}
-              className="peer border-2 border-gray-300 rounded-md p-[.63rem] bg-transparent w-full placeholder-transparent focus:border-blue-500 focus:outline-none"
+              className="peer border-2 border-gray-200 rounded-md p-[.63rem] bg-transparent w-full placeholder-transparent focus:border-blue-500 focus:outline-none"
             />
             <label
               htmlFor="businessName"
@@ -113,7 +113,7 @@ const Subscribe: React.FC = () => {
               id="country"
               value={formData.country}
               onChange={handleChange}
-              className="peer border-2 border-gray-300 rounded-md p-[.8rem] bg-transparent w-full focus:border-blue-500 focus:outline-none uppercase"
+              className="peer border-2 border-gray-200 rounded-md p-[.8rem] bg-transparent w-full focus:border-blue-500 focus:outline-none uppercase"
             >
               {countries.map((country, index) => (
                 <option key={index} value={country}>
@@ -130,9 +130,9 @@ const Subscribe: React.FC = () => {
           </div>
           </div>
 
-          <div className="flex items-center w-3/5 gap-20 xsm-max:flex-col xsm-max:gap-10 ">
+          <div className="flex items-center w-3/5 gap-20 xsm-max:flex-col xsm-max:gap-10 xsm-max:w-full">
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-medium">
+            <h1 className="text-2xl font-semibold xsm-max:text-[18px]">
               Number of employees, including you
             </h1>
             <p className="text-sm">
@@ -181,13 +181,13 @@ const Subscribe: React.FC = () => {
       {step === 2 && (
         <form
           action=""
-          className="flex flex-col items-center justify-center gap-4 bg-white shadow-sm border-gray-300 rounded-lg border-2 p-7"
+          className="mt-4 flex flex-col items-center justify-center gap-4 bg-white border-gray-200 rounded-lg border-2 p-7"
         >
-          <div className="py-4">
-            <h1 className="text-2xl font-semibold">
+          <div className="pb-4">
+            <h1 className="text-2xl font-semibold xsm-max:text-[18px]">
               What's your contact info?
             </h1>
-            <p>
+            <p className="xsm-max:text-sm">
               You'll be the Google workspace account admin since you are
               creating the account.
             </p>
