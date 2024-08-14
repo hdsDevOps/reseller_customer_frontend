@@ -14,6 +14,7 @@ const Subscribe = React.lazy(() => import("./Subscribe"));
 const SubscribeOTP = React.lazy(() => import("./SubscribeOTP"));
 const BusinessInfo = React.lazy(() => import("./BusinessInfo"));
 const DomainDetails = React.lazy(() => import("./DomainDetails"));
+const DomainList = React.lazy(() => import("./DomainList"));
 
 const AuthApp: React.FC = () => {
   return (
@@ -36,6 +37,7 @@ const AuthApp: React.FC = () => {
               <Route path="/subscribeotp" element={<SubscribeOTP />} />
               <Route path="/businessinfo" element={<BusinessInfo />} />
               <Route path="/adddomain" element={<DomainDetails />} />
+              <Route path="/domainlist" element={<DomainList />} />
             </Routes>
           </main>
         </Suspense>
