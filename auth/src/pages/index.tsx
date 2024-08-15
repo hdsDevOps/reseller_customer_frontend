@@ -15,6 +15,8 @@ const SubscribeOTP = React.lazy(() => import("./SubscribeOTP"));
 const BusinessInfo = React.lazy(() => import("./BusinessInfo"));
 const DomainDetails = React.lazy(() => import("./DomainDetails"));
 const DomainList = React.lazy(() => import("./DomainList"));
+const SelectedDomain = React.lazy(() => import("./SelectedDomain"));
+const SignToDomain = React.lazy(() => import("./SignToDomain"));
 
 const AuthApp: React.FC = () => {
   return (
@@ -38,6 +40,8 @@ const AuthApp: React.FC = () => {
               <Route path="/businessinfo" element={<BusinessInfo />} />
               <Route path="/adddomain" element={<DomainDetails />} />
               <Route path="/domainlist" element={<DomainList />} />
+              <Route path="/selected-domain" element={<SelectedDomain />} />
+              <Route path="/signin-domain" element={<SignToDomain />} />
             </Routes>
           </main>
         </Suspense>

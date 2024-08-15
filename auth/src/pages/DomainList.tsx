@@ -2,11 +2,11 @@ import React from "react";
 import { GoArrowRight } from "react-icons/go";
 import { useNavigate } from "react-router-dom";
 import { IoChevronBackSharp } from "react-icons/io5";
-import "./cumtel.css";
 
 const DomainList: React.FC = () => {
   const navigate = useNavigate();
 
+  // Array of domains with their prices
   const domains = [
     { name: "domain.co.in", price: "₹648.00/year" },
     { name: "domain.website", price: "₹2,069.00/year" },
@@ -16,6 +16,10 @@ const DomainList: React.FC = () => {
     { name: "domain.net", price: "₹5,069.00/year" },
     { name: "domain.net", price: "₹5,069.00/year" },
   ];
+
+  const handleDomainClick = (domain: { name: string; price: string }) => {
+    navigate('/selected-domain', { state: { selectedDomain: domain } });
+  };
 
   return (
     <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative">
@@ -68,7 +72,10 @@ const DomainList: React.FC = () => {
                     <td className="py-2 px-4">{domain.name}</td>
                     <td className="py-2 px-4">{domain.price}</td>
                     <td className="py-2 px-4 text-right">
-                      <GoArrowRight className="text-green-500 cursor-pointer text-xl" />
+                      <GoArrowRight
+                        className="text-green-500 cursor-pointer text-xl"
+                        onClick={() => handleDomainClick(domain)}
+                      />
                     </td>
                   </tr>
                 ))}
