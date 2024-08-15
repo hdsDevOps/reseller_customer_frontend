@@ -161,7 +161,7 @@ const PlanCard: React.FC = () => {
                 </div>
               </div>
             )}
-            {/* Render the card without the background for other plans */}
+            {/* Rendering the card without the background for other plans */}
             {index !== 1 && (
               <div className="bg-white border border-gray-200 rounded-lg md:w-[380px] xsm-max:w-[340px] xsm-max:h-[550px] mb-1 md:h-[610px] md:mt-7 relative z-10">
                 <div className="p-4 sm:p-6">

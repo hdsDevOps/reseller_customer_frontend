@@ -9,6 +9,7 @@ const SelectedDomain: React.FC = () => {
   const { state } = location;
   const domain = state?.selectedDomain;
 
+
   if (!domain) {
     return <div>No domain selected.</div>;
   }
@@ -52,7 +53,7 @@ const SelectedDomain: React.FC = () => {
 
         <button
           className="self-start bg-green-600 text-white py-2 px-4 rounded-lg mt-4"
-          onClick={() => navigate('/signin-domain')}
+          onClick={() => navigate('/signin-domain', { state: { selectedDomain: domain } })}
         >
           Next
         </button>

@@ -17,6 +17,9 @@ const DomainDetails = React.lazy(() => import("./DomainDetails"));
 const DomainList = React.lazy(() => import("./DomainList"));
 const SelectedDomain = React.lazy(() => import("./SelectedDomain"));
 const SignToDomain = React.lazy(() => import("./SignToDomain"));
+const FreeTrial = React.lazy(() => import("./FreeTrial"));
+const Gemini = React.lazy(() => import("./Gemini"));
+const Summary = React.lazy(() => import("./Summary"));
 
 const AuthApp: React.FC = () => {
   return (
@@ -24,7 +27,7 @@ const AuthApp: React.FC = () => {
       <div className="max-w-full mx-auto ">
         <Suspense fallback={<div>Loading...</div>}>
           <Header />
-          <main className="py-10 lg:px-8 px-2 flex items-center justify-center">
+          <main className="py-10 lg:px-8 flex items-center justify-center">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/home" element={<Home />} />
@@ -42,6 +45,9 @@ const AuthApp: React.FC = () => {
               <Route path="/domainlist" element={<DomainList />} />
               <Route path="/selected-domain" element={<SelectedDomain />} />
               <Route path="/signin-domain" element={<SignToDomain />} />
+              <Route path="/free-trial" element={<FreeTrial />} />
+              <Route path="/gemini-add" element={<Gemini />} />
+              <Route path="/summary" element={<Summary />} />
             </Routes>
           </main>
         </Suspense>

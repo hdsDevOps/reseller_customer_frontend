@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
 import { HiOutlineEye } from "react-icons/hi";
 import { RiEyeCloseLine } from "react-icons/ri";
@@ -10,13 +10,17 @@ const RECAPTCHA_SITE_KEY = "YOUR_RECAPTCHA_SITE_KEY";
 
 const SignInForm: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Retrieve the domain from the location state
+  const domain = location.state?.selectedDomain;
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  // const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [charCount, setCharCount] = useState({
     username: 0,
     password: 0,
@@ -38,18 +42,17 @@ const SignInForm: React.FC = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleRecaptcha = (token: string | null) => {
-    setRecaptchaToken(token);
-  };
+  // const handleRecaptcha = (token: string | null) => {
+  //   setRecaptchaToken(token);
+  // };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
-    if (recaptchaToken) {
-      console.log("Form submitted with:", formData, recaptchaToken);
-    } else {
-      console.log("Please complete the reCAPTCHA.");
-    }
+    // if (recaptchaToken) {
+    //   console.log("Form submitted with:", formData, recaptchaToken);
+    // } else {
+    //   console.log("Please complete the reCAPTCHA.");
+    // }
   };
 
   return (
@@ -62,7 +65,7 @@ const SignInForm: React.FC = () => {
       </p>
 
       <form
-        className="w-full max-w-2xl p-6 border border-gray-300 rounded-xl bg-white shadow-sm mt-8"
+        className="w-full max-w-2xl p-6 border border-gray-300 rounded-xl bg-white mt-8"
         onSubmit={handleSubmit}
       >
         {/* Username Input */}
@@ -76,9 +79,10 @@ const SignInForm: React.FC = () => {
           <input
             id="username"
             type="text"
-            placeholder="johndoe"
+            placeholder="demo"
             value={formData.username}
             onChange={handleChange}
+            required
             className="peer w-full px-2 py-[.8rem] border border-gray-300 rounded-lg form-input focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
           />
           <label
@@ -90,16 +94,20 @@ const SignInForm: React.FC = () => {
           <span className="absolute right-3 -bottom-4 text-xs text-gray-500">
             {charCount.username}/64
           </span>
+          <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">
+            {domain ? `@${domain.name}` : "@domain.co.in"}
+          </span>
         </div>
 
         {/* Password Input */}
         <div className="relative w-full mb-10">
           <input
             id="password"
-            type={showPassword ? "text" : "password"} // Update type based on showPassword state
+            type={showPassword ? "text" : "password"}
             placeholder="********"
             value={formData.password}
             onChange={handleChange}
+            required
             className="peer w-full px-2 py-[.8rem] border border-gray-300 rounded-lg form-input focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
           />
           <label
@@ -114,22 +122,26 @@ const SignInForm: React.FC = () => {
             className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
           >
             {showPassword ? (
-              <HiOutlineEye className="h-5 w-5" aria-hidden="true" />
+              <HiOutlineEye className="h-5 w-5 text-black" aria-hidden="true" />
             ) : (
-              <RiEyeCloseLine className="h-5 w-5" aria-hidden="true" />
+              <RiEyeCloseLine className="h-5 w-5 text-black" aria-hidden="true" />
             )}
           </button>
           <span className="absolute right-3 -bottom-4 text-xs text-gray-500">
             {charCount.password}/100
           </span>
         </div>
+        <p className="tex">
+          We know you are probably not a robot, but we just have to ask.
+          <br/>Are you a robot?
+        </p>
 
         {/* reCAPTCHA */}
         <div className="relative my-4">
           <ReCAPTCHA
             sitekey={RECAPTCHA_SITE_KEY}
-            onChange={handleRecaptcha}
-            className="w-full"
+            // onChange={handleRecaptcha}
+            className=""
           />
           <div className="absolute left-0 top-1/2 transform -translate-y-1/2 flex items-center ml-2">
             <input
@@ -166,7 +178,7 @@ const SignInForm: React.FC = () => {
 
         <button
           type="submit"
-          className="bg-green-600 text-sm text-white p-[10px] px-4 rounded-lg mt-4"
+          className="bg-green-600 text-sm text-white p-[10px] px-4 rounded-lg mt-4" onClick={()=>navigate('/free-trial')}
         >
           Agree and Continue
         </button>
