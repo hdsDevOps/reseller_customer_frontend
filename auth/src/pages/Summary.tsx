@@ -20,7 +20,18 @@ const Summary: React.FC = () => {
           <h1>Plan</h1>
         </div>
         <div>
-          <h1>Summary</h1>
+          <h1 className="text-3xl text-black font-bold">Summary</h1>
+          <div className="flex">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <h1 className="text-2xl text-black font-bold">Busines Standard <span className="text-gray-400 font-light font-inter text-[20px]">(Google Workspace)</span> </h1>
+              </div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl text-black font-bold">₹1,520</h1>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
