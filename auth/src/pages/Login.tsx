@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "store/hooks";
+import { HiOutlineEye } from "react-icons/hi";
+import { RiEyeCloseLine } from "react-icons/ri";
 import { makeUserLoginThunk } from "store/user.thunk";
 
 const Login: React.FC = () => {
@@ -10,9 +12,11 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState("biswajit@yopmail.com");
   const [password, setPassword] = useState("Admin@1234");
   const [show, setShow] = useState(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    navigate("/otp?mode=signin");
 
     try {
       const result = await dispatch(
@@ -23,10 +27,14 @@ const Login: React.FC = () => {
         })
       ).unwrap();
       console.log("result....", result);
-      navigate("/dashboard");
+      navigate("/otp?mode=signin");
     } catch (error) {
       console.error("Login error:", error);
     }
+  };
+  
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
   };
 
   const handleOpen = () => {
@@ -37,13 +45,19 @@ const Login: React.FC = () => {
     setShow(false);
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
-    <div className="flex justify-center items-center h-screen px-5">
-      <div className="w-full max-w-md bg-gray-50 p-12 rounded-3xl">
+    <div className="w-full flex flex-col justify-center items-center h-screen xsm-max:px-1">
+      <div className="w-full max-w-[32rem] bg-gray-50 p-12 rounded-3xl xsm-max:px-4">
         <div className="w-full">
           <div className="text-center">
-            {/* <img src={imageAssets.logo_small} alt="hordanso" className="w-28 h-22 mx-auto" /> */}
-            <h3 className="text-2xl font-medium pt-4">Sign in your account</h3>
+          <div className="flex items-center justify-center">
+          <img src="/src/assets/images/logo.jpeg" alt="logo" />
+        </div>
+            <h3 className="text-2xl font-semibold text-[#0D121F] pt-4">Sign in your account</h3>
             <p className="mt-2">
               New to Hordanso?{" "}
               <Link to="/register" className="text-green-600">
@@ -63,37 +77,48 @@ const Login: React.FC = () => {
                   placeholder="Enter email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full h-12 rounded-md p-1.5 border border-gray-300 bg-gray-50 text-gray-600 text-base"
+                  className="custom-input"
                   data-testid="email"
                 />
               </div>
-              <div className="mb-3">
-                <label className="block text-gray-900 text-base font-bold mb-1" htmlFor="formBasicPassword">
-                  Password
-                </label>
+              <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <div className="relative">
                 <input
-                  type="password"
-                  id="formBasicPassword"
-                  placeholder="Password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full h-12 rounded-md p-1.5 border border-gray-300 bg-gray-50 text-gray-600 text-base"
-                  data-testid="password"
+                  onChange={handlePasswordChange}
+                  className="custom-input"
+                  minLength={8}
+                  placeholder=".........."
+                  required
                 />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
+                >
+                  {showPassword ? (
+                    <HiOutlineEye className="h-5 w-5" aria-hidden="true" />
+                  ) : (
+                    <RiEyeCloseLine className="h-5 w-5" aria-hidden="true" />
+                  )}
+                </button>
               </div>
+            </div>
               <div className="mt-4">
                 <button
                   type="submit"
                   data-testid="log-in"
-                  className="w-full h-11 rounded-lg text-base font-semibold text-gray-100 bg-green-600"
+                  className="btn-green"
                 >
-                  Log in
+                  Submit
                 </button>
               </div>
               <div className="text-right mt-2">
                 <Link
                   to="/forgotpassword"
-                  className="text-sm font-normal text-green-600"
+                  className="text-sm font-normal text-red-600"
                   data-testid="forgot-password"
                 >
                   Forgot Password
@@ -129,6 +154,17 @@ const Login: React.FC = () => {
           )}
         </div>
       </div>
+
+      <div className="mt-6 mb-10 text-center">
+        <p className="mb-3">Or</p>
+          <button
+            type="button"
+            className="flex items-center justify-center w-full px-4 py-[.7rem] border border-gray-300 rounded-md shadow-sm bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+          >
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google logo" className="h-5 w-5 mr-2" />
+            <span className="text-gray-900 text-sm">Sign in with Google</span>
+          </button>
+        </div>
     </div>
   );
 };

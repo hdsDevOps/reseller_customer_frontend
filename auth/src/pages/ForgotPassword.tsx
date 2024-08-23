@@ -8,31 +8,37 @@ const ForgotPassword: React.FC = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle the login logic here
+    navigate("/otp")
   };
+  
 
   const onGoBackhandler = () => {
     navigate("/login"); // Replace '/login' with your login route path
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 ">
-      <div className="max-w-md w-full space-y-8 bg-gray-100 p-10 rounded-lg shadow-md">
+    <div className="h-screen flex items-center justify-center">
+      <div className="max-w-[32rem] space-y-8 bg-[#F9FAFB] p-10 rounded-2xl shadow-sm xsm-max:px-4">
+        <div className="">
+          <img src="/src/assets/images/logo.jpeg" alt="logo" />
+        </div>
         <div>
-          {/* You can add your logo here */}
-          {/* <img className="mx-auto h-12 w-auto" src="/path-to-your-logo.png" alt="Logo" /> */}
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-left text-[28px] font-inter font-medium text-gray-900">
             Forgot password?
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Enter the email address associated with your account and we'll
-            send you a link to reset your password.
+          <p className="mt-2 text-left text-sm text-gray-600">
+            Enter the email address associated with your account and we’ll send
+            you an OTP to reset your password.
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email-address" className="sr-only">
-                Email address
+          <div className="">
+            <div className="space-y-1">
+              <label
+                htmlFor="email-address"
+                className="block text-sm font-bold text-black"
+              >
+                Email
               </label>
               <input
                 id="email-address"
@@ -40,8 +46,8 @@ const ForgotPassword: React.FC = () => {
                 type="email"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-none bg-transparent relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
+                className="custom-input"
+                placeholder="Robertclive@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 data-testid="email"
@@ -52,7 +58,7 @@ const ForgotPassword: React.FC = () => {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              className="btn-black"
               data-testid="next"
             >
               Next
@@ -64,7 +70,7 @@ const ForgotPassword: React.FC = () => {
           <button
             type="button"
             onClick={onGoBackhandler}
-            className="font-medium text-green-500 hover:text-green-800"
+            className="font-medium hover:text-green-600"
             data-testid="back-to-login"
           >
             ← Back to login
