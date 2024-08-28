@@ -1,13 +1,13 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/auth/node_modules
+auth/node_modules
 
-/domains/node_modules
+domains/node_modules
 
-/main/node_modules
+main/node_modules
 
-/store/node_modules
+store/node_modules
 
 # /store/.env
 

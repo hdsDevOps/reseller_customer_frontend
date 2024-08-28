@@ -23,7 +23,7 @@ export default function Header() {
               <Link to="/home">Home</Link>
             </li>
             <li>
-              <Link to="#">Plan & Price</Link>
+              <Link to="/plans">Plan & Price</Link>
             </li>
             <li>
               <Link to="#">About Us</Link>
@@ -43,7 +43,7 @@ export default function Header() {
             <Link to="/home">Home</Link>
           </li>
           <li>
-            <Link to="#">Plan & Price</Link>
+            <Link to="/plans">Plan & Price</Link>
           </li>
           <li>
             <Link to="#">About Us</Link>

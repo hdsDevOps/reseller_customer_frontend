@@ -9,7 +9,7 @@ services:
       - dev_network
 
   domains:
-    build: ./domains
+    build: ./domain
     container_name: microfrontend_customer_domains
     ports:
       - 3001:3001
