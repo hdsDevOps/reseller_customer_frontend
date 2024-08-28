@@ -1,12 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { RxHamburgerMenu } from "react-icons/rx";
+// import logo from "../images/hordansologo 1.png";
 
 export default function Header() {
   return (
-    <nav className="navbar bg-gray-100 w-full flex px-4 !py-4">
+    <nav className="navbar bg-gray-100 !w-full flex px-4 !py-4">
       <div className="navbar-start !w-0">
         <a className="text-xl font-bold" href="#">
+          {/* <img src={logo} alt="logo"/> */}
           Hordanso
         </a>
         <div className="dropdown">

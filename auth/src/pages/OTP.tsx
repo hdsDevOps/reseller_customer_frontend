@@ -123,6 +123,105 @@ const OTP: React.FC = () => {
         navigate("/forgotpassword");
     };
 
+  return (
+    <div className="flex h-screen items-center justify-center px-5">
+      <div className="w-full max-w-lg">
+        <div className="p-8 bg-gray-100 rounded-lg shadow-lg">
+          <h3 className="text-center mb-4 text-3xl">Sign in your account</h3>
+          <form onSubmit={handleLogin}>
+            <div className="mb-4 text-center">
+              <label className="block text-sm font-medium text-gray-700">OTP Verification</label>
+              <div className="flex justify-center space-x-2 mt-4">
+                <input
+                  type="text"
+                  maxLength={1}
+                  ref={otp1Ref}
+                  value={otp1}
+                  onChange={(e) => handleInputChange(e, 1)}
+                  onKeyDown={(e) => handleKeyDown(e, 1)}
+                  className="w-10 h-10 border-2 bg-transparent focus:border-green-500 rounded-lg text-center text-black otp-input"
+                  data-testid="otp-one"
+                />
+                <input
+                  type="text"
+                  maxLength={1}
+                  ref={otp2Ref}
+                  value={otp2}
+                  onChange={(e) => handleInputChange(e, 2)}
+                  onKeyDown={(e) => handleKeyDown(e, 2)}
+                  className="w-10 h-10 border-2 bg-transparent border-green-500 rounded-lg text-center text-black  otp-input"
+                  data-testid="otp-two"
+                />
+                <input
+                  type="text"
+                  maxLength={1}
+                  ref={otp3Ref}
+                  value={otp3}
+                  onChange={(e) => handleInputChange(e, 3)}
+                  onKeyDown={(e) => handleKeyDown(e, 3)}
+                  className="w-10 h-10 border-2 bg-transparent focus: rounded-lg text-center text-black  otp-input"
+                  data-testid="otp-three"
+                />
+                <input
+                  type="text"
+                  maxLength={1}
+                  ref={otp4Ref}
+                  value={otp4}
+                  onChange={(e) => handleInputChange(e, 4)}
+                  onKeyDown={(e) => handleKeyDown(e, 4)}
+                  className="w-10 h-10 border-2 bg-transparent border-green-500 rounded-lg text-center text-black  otp-input"
+                  data-testid="otp-four"
+                />
+                <input
+                  type="text"
+                  maxLength={1}
+                  ref={otp5Ref}
+                  value={otp5}
+                  onChange={(e) => handleInputChange(e, 5)}
+                  onKeyDown={(e) => handleKeyDown(e, 5)}
+                  className="w-10 h-10 border-2 bg-transparent border-green-500 rounded-lg text-center text-black  otp-input"
+                  data-testid="otp-five"
+                />
+                <input
+                  type="text"
+                  maxLength={1}
+                  ref={otp6Ref}
+                  value={otp6}
+                  onChange={(e) => handleInputChange(e, 6)}
+                  onKeyDown={(e) => handleKeyDown(e, 6)}
+                  className="w-10 h-10 border-2 bg-transparent border-green-500 rounded-lg text-center text-black  otp-input"
+                  data-testid="otp-six"
+                />
+              </div>
+            </div>
+            <div className="text-center mt-4">
+              <button
+                type="submit"
+                className="w-full py-2 bg-green-500 text-white rounded hover:bg-green-700"
+                data-testid="submit"
+              >
+                Submit
+              </button>
+            </div>
+            <div className="text-center mt-4">
+              <p>
+                Didn't get an OTP?
+                <Link data-testid="resend-otp" to="#" className="text-green-500">
+                  Resend OTP
+                </Link>
+                <span>01:19</span>
+              </p>
+            </div>
+            <div className="text-center mt-4">
+              <button
+                type="button"
+                onClick={() => onGoBackhandler()}
+                className="w-full py-2 bg-gray-500 text-white rounded hover:bg-gray-700"
+                data-testid="back-to-login"
+              >
+                Back to login
+              </button>
+              
     const message = mode === "signin"
         ? 'We have sent an <strong>One Time Passcode</strong> to this your email address'
         : 'We have sent an <strong>One Time Passcode</strong> to this Robertclive@gmail.com email address';
