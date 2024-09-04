@@ -1,17 +1,11 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "store/hooks";
-import { resetUserSlice } from "store/authSlice"; // Adjust the import path if necessary
+//import { resetUserSlice } from "store/authSlice"; // Adjust the import path if necessary
 
 export default function Header() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
-  const onLogoutHandler = () => {
-    dispatch(resetUserSlice());
-    localStorage.clear();
-    navigate("/login");
-  };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
