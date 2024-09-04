@@ -5,6 +5,30 @@ import { RxHamburgerMenu } from "react-icons/rx";
 
 export default function Header() {
   return (
+<<<<<<< HEAD:auth/src/components/Header.tsx
+    <nav className="navbar navbar-expand-lg navbar-light bg-light">
+      <Link className="navbar-brand" to="/home">
+        Hordanso
+      </Link>
+      <button
+        className="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span className="navbar-toggler-icon"></span>
+      </button>
+
+      <div className="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul className="navbar-nav mr-auto w-100">
+          <li className="nav-item">
+            <Link to="#" className="nav-link">
+              Plan & Price
+            </Link>
+=======
     <nav className="navbar bg-gray-100 !w-full flex px-4 !py-4">
       <div className="navbar-start !w-0">
         <a className="text-xl font-bold" href="#">
@@ -44,6 +68,7 @@ export default function Header() {
           </li>
           <li>
             <Link to="/plans">Plan & Price</Link>
+>>>>>>> main:auth/src/components/Heaader.tsx
           </li>
           <li>
             <Link to="#">About Us</Link>
@@ -51,8 +76,25 @@ export default function Header() {
           <li>
             <Link to="#">FAQ's</Link>
           </li>
+<<<<<<< HEAD:auth/src/components/Header.tsx
+          <li className="nav-item">
+            <Link to="#" className="nav-link">
+              Resources
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link to="#" className="nav-link">
+              AI
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link to="#" className="nav-link">
+              Contact Us
+            </Link>
+=======
           <li>
             <Link to="#">Services</Link>
+>>>>>>> main:auth/src/components/Heaader.tsx
           </li>
         </ul>
       </div>

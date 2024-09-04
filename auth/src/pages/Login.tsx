@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "store/hooks";
+<<<<<<< HEAD
+// import { makeUserLoginThunk } from "store/user.thunk";
+import { setTokenDetails } from "store/authSlice"; 
+import { Row, Col, Button, Form, Modal } from "react-bootstrap";
+=======
 import { HiOutlineEye } from "react-icons/hi";
 import { RiEyeCloseLine } from "react-icons/ri";
 import { makeUserLoginThunk } from "store/user.thunk";
+>>>>>>> main
 
 const Login: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -16,6 +22,23 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+<<<<<<< HEAD
+    dispatch(setTokenDetails("usy6767jshs688ytmbqa88654sgsgs5sgs6sgs6q"));
+    navigate("/dashboard");
+    // try {
+    //   const result = await dispatch(
+    //     makeUserLoginThunk({
+    //       email: email,
+    //       password: password,
+    //       login_user_type: 0,
+    //     })
+    //   ).unwrap();
+    //   console.log("result....", result);
+    //   navigate("/dashboard");
+    // } catch (error) {
+    //   console.error("Login error:", error);
+    // }
+=======
     navigate("/otp?mode=signin");
 
     try {
@@ -31,6 +54,7 @@ const Login: React.FC = () => {
     } catch (error) {
       console.error("Login error:", error);
     }
+>>>>>>> main
   };
   
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,9 +69,44 @@ const Login: React.FC = () => {
     setShow(false);
   };
 
+<<<<<<< HEAD
+  return (
+    <Row className="full-height justify-content-center align-items-center px-5">
+      <Col sm={3}></Col>
+      <Col sm={6}>
+        <div className="auth-section secondary-background">
+          <div className="sign-in">
+            <div className="auth-header">
+              {/* <Image
+          src={imageAssets.logo_small} // Replace with your image path
+          alt="hordanso"
+          className="auth-logo"
+        /> */}
+              <h3>Sign in your account</h3>
+              <p className="text-center">
+                New to Hordanso? <Link to="/register">Register Now</Link>
+              </p>
+            </div>
+            <div className="auth-container">
+              <Form onSubmit={handleSubmit}>
+                <Form.Group controlId="formBasicEmail" className="mb-4">
+                  <Form.Label className="auth-form-label mb-1">
+                    Email
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Enter email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="form-control auth-form-control"
+                    data-testid="email"
+                  />
+                </Form.Group>
+=======
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+>>>>>>> main
 
   return (
     <div className="w-full flex flex-col justify-center items-center h-screen xsm-max:px-1">

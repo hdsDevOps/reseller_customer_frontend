@@ -1,3 +1,20 @@
+<<<<<<< HEAD
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  ChangeEvent,
+  KeyboardEvent,
+} from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Row, Col, Button, Form } from "react-bootstrap";
+import { useAppDispatch } from "store/hooks";
+import { setTokenDetails } from "store/authSlice"; 
+
+const OTP: React.FC = () => {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+=======
 import React, { useEffect, useState, useRef, ChangeEvent, KeyboardEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
@@ -6,6 +23,7 @@ const OTP: React.FC = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const mode = queryParams.get("mode");
+>>>>>>> main
 
     const otp1Ref = useRef<HTMLInputElement>(null);
     const otp2Ref = useRef<HTMLInputElement>(null);
@@ -96,6 +114,33 @@ const OTP: React.FC = () => {
         }
     };
 
+<<<<<<< HEAD
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    dispatch(setTokenDetails("usy6767jshs688ytmbqa88654sgsgs5sgs6sgs6q"));
+    navigate("/dashboard");
+    //const otp = `${otp1}${otp2}${otp3}${otp4}${otp5}${otp6}`;
+    //if (otp.length === 6) {
+      // Process the OTP login
+      // dispatch(makeUserLoginThunk({ email, otp }))
+      //   .then((response) => {
+      //     // Handle successful login
+      //     toast.success("Login successful!");
+      //     router.push("/dashboard"); // Replace with your desired route
+      //   })
+      //   .catch((error) => {
+      //     // Handle login error
+      //     if (error instanceof CustomError) {
+      //       toast.error(error.message);
+      //     } else {
+      //       toast.error("Login failed. Please try again.");
+      //     }
+      //   });
+    //} else {
+      //toast.error("Please enter a valid 6-digit OTP.");
+    //}
+  };
+=======
     const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const otp = `${otp1}${otp2}${otp3}${otp4}${otp5}`;
@@ -118,6 +163,7 @@ const OTP: React.FC = () => {
             alert("Please enter all 5 digits.");
         }
     };
+>>>>>>> main
 
     const handleEditmail = () => {
         navigate("/forgotpassword");

@@ -1,7 +1,13 @@
 import React, { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
+<<<<<<< HEAD
+import { Container } from "react-bootstrap";
+const Header = React.lazy(() => import("../components/Header"));
+const Footer = React.lazy(() => import("../components/Footer"));
+=======
 
 const Header = React.lazy(() => import("../components/Header"));
+>>>>>>> main
 const Home = React.lazy(() => import("./Home"));
 const Plans = React.lazy(() => import("./Plans"));
 const Login = React.lazy(() => import("./Login"));
@@ -24,10 +30,17 @@ const Summary = React.lazy(() => import("./Summary"));
 
 const AuthApp: React.FC = () => {
   return (
+<<<<<<< HEAD
+    <Container fluid>
+      <div className="main-wrapper">
+        <Header />
+        <div className="content-body">
+=======
     <div className="min-h-screen bg-white w-full">
       <Suspense fallback={<div>Loading...</div>}>
         <Header />
         <main className="py-10 lg:px-8 flex items-center justify-center max-w-full">
+>>>>>>> main
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
@@ -50,9 +63,16 @@ const AuthApp: React.FC = () => {
             <Route path="/gemini-add" element={<Gemini />} />
             <Route path="/summary" element={<Summary />} />
           </Routes>
+<<<<<<< HEAD
+        </div>
+        <Footer />
+      </div>
+    </Container>
+=======
         </main>
       </Suspense>
     </div>
+>>>>>>> main
   );
 };
 

@@ -40,6 +40,38 @@ module.exports = (_, argv) => ({
 		],
 	},
 
+<<<<<<< HEAD
+  plugins: [
+    new ModuleFederationPlugin({
+      name: "main",
+      filename: "remoteEntry.js",
+      remotes: {
+        store:"store@http://localhost:3030/remoteEntry.js",
+        auth: "auth@http://localhost:3002/remoteEntry.js",
+        domains: "domains@http://localhost:3001/remoteEntry.js",
+      },
+      exposes: {
+        "./Navbar": "./src/components/Navbar.tsx",
+        "./Header": "./src/components/Header.tsx",
+      },
+      shared: {
+        ...deps,
+        react: {
+          singleton: true,
+          requiredVersion: deps.react,
+        },
+        "react-dom": {
+          singleton: true,
+          requiredVersion: deps["react-dom"],
+        },
+      },
+    }),
+    new HtmlWebPackPlugin({
+      template: "./src/index.html",
+    }),
+    new Dotenv(),
+  ],
+=======
 	plugins: [
 		new ModuleFederationPlugin({
 			name: "main",
@@ -70,4 +102,5 @@ module.exports = (_, argv) => ({
 		}),
 		new Dotenv(),
 	],
+>>>>>>> main
 });

@@ -14,3 +14,12 @@ declare module "store/ReduxProvider" {
     import { createAsyncThunk } from '@reduxjs/toolkit';
     export const makeUserLoginThunk: import("@reduxjs/toolkit").AsyncThunk<any, { email: string, password: string, login_user_type: string }, {}>;
   }
+
+  declare module 'store/authSlice' {
+    import { PayloadAction, Slice } from '@reduxjs/toolkit';
+    import { UserDetailsState } from 'store/authSlice';
+  
+    export const setTokenDetails: (payload: string) => PayloadAction<string>;
+    // Other exports
+  }
+
