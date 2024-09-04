@@ -1,0 +1,37 @@
+version: "3.8"
+services:
+  main:
+    build: ./main
+    container_name: microfrontend_customer_main
+    ports:
+      - 3000:3000
+    networks:
+      - dev_network
+
+  domains:
+    build: ./domain
+    container_name: microfrontend_customer_domains
+    ports:
+      - 3001:3001
+    networks:
+      - dev_network
+
+  auth:
+    build: ./auth
+    container_name: microfrontend_customer_auth
+    ports:
+      - 3002:3002
+    networks:
+      - dev_network
+
+  store:
+    build: ./store
+    container_name: microfrontend_customer_store
+    ports:
+      - 3030:3030
+    networks:
+      - dev_network
+
+networks:
+  dev_network:
+    driver: bridge
