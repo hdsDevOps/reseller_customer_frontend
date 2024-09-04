@@ -7,7 +7,6 @@ const DomainApp: React.FC = () => {
   return (
     <div>
       <Routes>
-        <Route path="/" element={<DomainList />} />
         <Route path="/domain" element={<DomainList />} />
         <Route path="/adddomain" element={<AddDomain />} />
       </Routes>

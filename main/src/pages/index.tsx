@@ -1,22 +1,20 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import Header from "../components/Header";
 import DomainApp from "domains/DomainApp";
 
 const Dashboard = React.lazy(() => import("./Dashboard"));
-const Setting = React.lazy(() => import("./Setting"));
 
 const routes = [
   { path: "/", element: <Dashboard /> },
   { path: "/dashboard", element: <Dashboard /> },
-  { path: "/setting", element: <Setting /> },
   // { path: "/domain/*", element: <DomainApp /> },
 ];
 
 const MainApp: React.FC = () => (
   <div className="main-wrapper">
-    <Navbar />
+    <Header />
     <div className="content-body">
       <Routes>
         {routes.map((route, index) => (
@@ -25,7 +23,7 @@ const MainApp: React.FC = () => (
       </Routes>
       <DomainApp />
     </div>
-    <Footer />
+    <Navbar />
   </div>
 );
 

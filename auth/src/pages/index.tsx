@@ -1,7 +1,8 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import { Container } from "react-bootstrap";
-const Heaader = React.lazy(() => import("../components/Heaader"));
+const Header = React.lazy(() => import("../components/Header"));
+const Footer = React.lazy(() => import("../components/Footer"));
 const Home = React.lazy(() => import("./Home"));
 const Login = React.lazy(() => import("./Login"));
 const Register = React.lazy(() => import("./Register"));
@@ -12,7 +13,7 @@ const AuthApp: React.FC = () => {
   return (
     <Container fluid>
       <div className="main-wrapper">
-        <Heaader />
+        <Header />
         <div className="content-body">
           <Routes>
             <Route path="/" element={<Home />} />
@@ -23,6 +24,7 @@ const AuthApp: React.FC = () => {
             <Route path="/forgotpassword" element={<ForgotPassword />} />
           </Routes>
         </div>
+        <Footer />
       </div>
     </Container>
   );
