@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "store/hooks";
-import { makeUserLoginThunk } from "store/user.thunk";
+// import { makeUserLoginThunk } from "store/user.thunk";
+import { setTokenDetails } from "store/authSlice"; 
 import { Row, Col, Button, Form, Modal } from "react-bootstrap";
 
 const Login: React.FC = () => {
@@ -14,20 +15,21 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
-    try {
-      const result = await dispatch(
-        makeUserLoginThunk({
-          email: email,
-          password: password,
-          login_user_type: 0,
-        })
-      ).unwrap();
-      console.log("result....", result);
-      navigate("/dashboard");
-    } catch (error) {
-      console.error("Login error:", error);
-    }
+    dispatch(setTokenDetails("usy6767jshs688ytmbqa88654sgsgs5sgs6sgs6q"));
+    navigate("/dashboard");
+    // try {
+    //   const result = await dispatch(
+    //     makeUserLoginThunk({
+    //       email: email,
+    //       password: password,
+    //       login_user_type: 0,
+    //     })
+    //   ).unwrap();
+    //   console.log("result....", result);
+    //   navigate("/dashboard");
+    // } catch (error) {
+    //   console.error("Login error:", error);
+    // }
   };
 
   const handleOpen = () => {
@@ -52,12 +54,7 @@ const Login: React.FC = () => {
         /> */}
               <h3>Sign in your account</h3>
               <p className="text-center">
-                New to Hordanso?{" "}
-                <Link
-                  to="/register"
-                >
-                  Register Now
-                </Link>
+                New to Hordanso? <Link to="/register">Register Now</Link>
               </p>
             </div>
             <div className="auth-container">
