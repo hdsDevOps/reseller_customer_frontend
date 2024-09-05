@@ -1,0 +1,7 @@
+export const apiError = {
+    DATA_NOT_FOUND: 'DATA_NOT_FOUND',
+    API_CALL_FAILED: 'API_CALL_FAILED',
+    TOKEN_EXPIRED: 'TOKEN_EXPIRED',
+    NO_INTERNET: 'NO_INTERNET',
+  };
+  
