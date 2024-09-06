@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import {
   ChartLine,
   Mail,
-  NotebookText,
+  ClipboardList,
   Users,
   Ticket,
-  ShoppingCart,
+  CreditCard,
+  PanelLeftClose,
+  ShieldCheck,
   Settings,
   LogOut,
   CircleChevronLeft,
@@ -13,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { CiCreditCard1 } from "react-icons/ci";
 
 const links = [
   {
@@ -23,7 +26,7 @@ const links = [
   {
     path: "/dashboard/domain",
     label: "Domain",
-    icon: <NotebookText className="w-5 h-5" />,
+    icon: <ClipboardList className="w-5 h-5" />,
   },
   {
     path: "/dashboard/email",
@@ -37,28 +40,18 @@ const links = [
   },
   {
     path: "/dashboard/billing",
-    label: "Billing",
-    icon: <ShoppingCart className="w-5 h-5" />,
-  },
-  {
-    path: "/dashboard/history",
-    label: "History",
-    icon: <Ticket className="w-5 h-5" />,
+    label: "Billing History",
+    icon: <ShieldCheck className="w-5 h-5" />,
   },
   {
     path: "/dashboard/payment",
-    label: "Payment",
-    icon: <ShoppingCart className="w-5 h-5" />,
-  },
-  {
-    path: "/dashboard/subscriptions",
-    label: "Subscriptions",
-    icon: <Ticket className="w-5 h-5" />,
+    label: "Payment Subscription",
+    icon: <CreditCard className="w-5 h-5" />,
   },
   {
     path: "/dashboard/payment-method",
     label: "Payment Method",
-    icon: <ShoppingCart className="w-5 h-5" />,
+    icon: <CiCreditCard1 className="w-5 h-5" />,
   },
   {
     path: "/dashboard/my-staff",
@@ -110,37 +103,48 @@ const Sidebar = () => {
   return (
     <aside
       className={`fixed h-full sm:max-h-screen top-0 left-0 transition-all duration-300 ease-in-out bg-[#F0F0F0] text-black shadow-md flex flex-col ${
-        isOpen ? "max-w-64 sm:max-w-[14rem]" : "max-w-20"
+        isOpen ? "max-w-64 sm:max-w-64" : "max-w-20"
       } lg:max-w-64 w-full z-40`}
     >
       <div className="flex items-center relative p-4">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="lg:hidden text-black absolute top-4 -right-2"
+          className="lg:hidden text-black absolute top-24 -right-1"
         >
-          {isOpen ? <CircleChevronLeft /> : <CircleChevronRight />}
+          {isOpen ? (
+            <CircleChevronLeft className="size-3" />
+          ) : (
+            <CircleChevronRight className="size-3" />
+          )}
         </button>
       </div>
       <div className="p-[14px] flex-1 mt-6">
-      <div className="bg-[#DAE8FF] shadow-sm p-[6px] rounded-md flex items-center gap-2 my-[10px]">
-          <label className="flex items-center cursor-pointer relative">
+        <div className="bg-[#DAE8FF] shadow-sm p-[6px] rounded-md flex items-center gap-2 my-[10px]">
+          <div className="relative">
             <input
               type="file"
               accept="image/*"
               onChange={handleImageUpload}
               className="hidden"
+              id="profileImageUpload"
             />
-            <img
-              src={image ? (image as string) : "/default-profile.png"}
-              alt="Profile"
-              className="w-10 h-10 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full border-2 border-gray-300 object-cover"
-            />
-            <div className="hidden md:flex flex-col text-xs ml-2">
+            <label htmlFor="profileImageUpload">
+              <img
+                src={image ? (image as string) : "/default-profile.png"}
+                alt="Profile"
+                className="w-10 h-10 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full border-2 border-gray-300 object-cover cursor-pointer"
+              />
+            </label>
+          </div>
+          <div className={`flex items-center gap-2 ${isOpen ? "" : "sm:hidden lg:flex"}`}>
+            <div className="flex flex-col text-xs ml-2">
               <span className="font-medium text-gray-600">{username}</span>
               <span className="text-gray-400">{email}</span>
             </div>
-            
-          </label>
+            <div className="text-gray-400 text-sm">
+              <PanelLeftClose className="w-4 h-4" />
+            </div>
+          </div>
         </div>
         <nav>
           <ul className="relative flex flex-col gap-2">
@@ -154,14 +158,16 @@ const Sidebar = () => {
                 )}
                 <Link to={path} className="flex items-center gap-2 w-full">
                   {React.cloneElement(icon, {
-                    className: `w-4 h-4 ${isOpen ? "w-5 h-5" : "w-4 h-4"} ${
+                    className: `w-4 h-4 text-black ${
+                      isOpen ? "w-5 h-5" : "w-4 h-4 text-black"
+                    } ${
                       location.pathname === path
                         ? "text-gray-600"
                         : "text-gray-500"
                     }`,
                   })}
                   <span
-                    className={`text-xs ${
+                    className={`text-sm ${
                       isOpen ? "block" : "hidden"
                     } lg:block`}
                   >
