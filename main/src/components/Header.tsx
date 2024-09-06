@@ -15,10 +15,10 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white text-black p-4 flex items-center justify-between z-50 fixed top-0 left-0 right-0">
-      <a href="#" className="text-2xl font-bold flex items-center">
+    <header className="bg-white flex text-black p-4 items-center justify-between z-50 fixed top-0 left-0 right-0">
+      <a href="#" className="text-2xl font-bold flex items-center justify-center">
+        <img src="" alt="" />
         <span className="mr-2">Hordanso</span>
-        Logo
       </a>
 
       <div className="flex items-center space-x-4">
