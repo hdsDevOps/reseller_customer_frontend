@@ -103,7 +103,7 @@ const Sidebar = () => {
   return (
     <aside
       className={`fixed h-full sm:max-h-screen top-0 left-0 transition-all duration-300 ease-in-out bg-[#F0F0F0] text-black shadow-md flex flex-col ${
-        isOpen ? "max-w-64 sm:max-w-64" : "max-w-20"
+        isOpen ? "max-w-64 sm-max:max-w-64" : "max-w-20"
       } lg:max-w-64 w-full z-40`}
     >
       <div className="flex items-center relative p-4">
@@ -136,7 +136,7 @@ const Sidebar = () => {
               />
             </label>
           </div>
-          <div className={`flex items-center gap-2 ${isOpen ? "" : "sm:hidden lg:flex"}`}>
+          <div className={`flex items-center gap-2 ${isOpen ? "" : "sm-max:hidden md:hidden lg:flex"}`}>
             <div className="flex flex-col text-xs ml-2">
               <span className="font-medium text-gray-600">{username}</span>
               <span className="text-gray-400">{email}</span>
