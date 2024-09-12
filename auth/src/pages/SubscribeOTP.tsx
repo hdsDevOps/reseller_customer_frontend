@@ -1,11 +1,9 @@
 import React, { useEffect, useState, useRef, ChangeEvent, KeyboardEvent } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { IoChevronBackSharp } from "react-icons/io5";
+import { Link, useNavigate } from "react-router-dom";
 
 const OTP: React.FC = () => {
     const navigate = useNavigate();
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const mode = queryParams.get("mode");
 
     const otp1Ref = useRef<HTMLInputElement>(null);
     const otp2Ref = useRef<HTMLInputElement>(null);
@@ -18,6 +16,7 @@ const OTP: React.FC = () => {
     const [otp3, setOtp3] = useState<string>("");
     const [otp4, setOtp4] = useState<string>("");
     const [otp5, setOtp5] = useState<string>("");
+    const [showModal, setShowModal] = useState<boolean>(false);
 
     useEffect(() => {
         otp1Ref.current?.focus();
@@ -101,16 +100,10 @@ const OTP: React.FC = () => {
         const otp = `${otp1}${otp2}${otp3}${otp4}${otp5}`;
         
         if (otp.length === 5) {
-            const isValidOtp = true;
+            const isValidOtp = true; // Replace this with actual OTP validation logic
             
             if (isValidOtp) {
-                if (mode === "signin") {
-                    
-                    navigate("/dashboard");
-                } else {
-                    
-                    navigate("/resetpassword");
-                }
+                setShowModal(true);
             } else {
                 alert("Invalid OTP. Please try again.");
             }
@@ -123,33 +116,43 @@ const OTP: React.FC = () => {
         navigate("/forgotpassword");
     };
 
+    const handleBack = () => {
+        navigate("/subscribe");
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        navigate("/businessinfo");
+    };
+
     return (
-        <div className="flex h-full items-center justify-center">
-            <div className="w-full max-w-[32rem]">
+        <div className="w-full flex flex-col justify-center items-center relative">
+            <p className="flex items-center gap-1 text-green-600 cursor-pointer absolute left-4 top-2" onClick={handleBack}>
+                <IoChevronBackSharp /> Back to previous page
+            </p>
+            <div className="w-[32rem] mt-10">
                 <div className="p-8 xsm-max:px-4 bg-[#F9FAFB] rounded-lg shadow-sm">
-                <div className={`mb-12 ${mode === "signin" ? "flex items-center justify-center" : ""}`}>
+                    <div className="mb-12 flex items-center justify-center">
                         <img
                             src="/src/assets/images/logo.jpeg"
                             alt="logo"
-                            className={mode === "signin" ? "mx-auto" : ""}
+                            className="mx-auto"
                         />
                     </div>
                     <h3 className="text-center font-inter font-medium mb-4 text-[28px]">
-                        {mode === "signin" ? "Sign in your account" : "Verify your email"}
+                        Verify your email
                     </h3>
                     <form onSubmit={handleLogin}>
                         <div className="mb-4 text-center xsm-max:text-sm">
-                            {/* <p dangerouslySetInnerHTML={{ __html: message }} /> */}
-                            {mode !== "signin" && (
-                                <button
-                                    type="button"
-                                    onClick={() => handleEditmail()}
-                                    className="font-medium text-green-600 hover:text-gray-500"
-                                    data-testid="back-to-login"
-                                >
-                                    Edit
-                                </button>
-                            )}
+                            <p>We have sent an <strong>One Time Passcode</strong> to your email address</p>
+                            <button
+                                type="button"
+                                onClick={() => handleEditmail()}
+                                className="font-medium text-green-600 hover:text-gray-500"
+                                data-testid="back-to-login"
+                            >
+                                Edit
+                            </button>
                         </div>
                         <div className="flex justify-between mt-12">
                             <p className="text-md font-bold">OTP verification</p>
@@ -208,8 +211,8 @@ const OTP: React.FC = () => {
                             />
                         </div>
                         <div className="text-center mt-4">
-                            <button type="submit" data-testid="submit">
-                                Submit
+                            <button type="submit" className="btn-green" data-testid="submit">
+                                Verify and Proceed
                             </button>
                         </div>
                         <div className="text-center mt-4 xsm-max:text-sm">
@@ -227,6 +230,24 @@ const OTP: React.FC = () => {
                     </form>
                 </div>
             </div>
+
+            {showModal && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-[32rem]">
+                        <h3 className="text-lg font-semibold mb-4">Verified!</h3>
+                        <p className="text-sm">Your email is verified successfully!</p>
+                        <p className="text-sm">We have sent the auto-generated password to your email address robertclive@gmail to logon to the Hordanso portal.</p>
+                        <div className="mt-4 text-center">
+                            <button
+                                onClick={handleCloseModal}
+                                className="bg-green-600 text-white px-4 py-2 rounded"
+                            >
+                                Continue
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

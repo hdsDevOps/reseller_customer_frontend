@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Row, Col, Button, Form } from "react-bootstrap";
 
 const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -9,77 +8,76 @@ const ForgotPassword: React.FC = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle the login logic here
+    navigate("/otp")
   };
+  
 
   const onGoBackhandler = () => {
     navigate("/login"); // Replace '/login' with your login route path
   };
 
   return (
-    <Row className="full-height justify-content-center align-items-center px-5">
-      <Col sm={3}></Col>
-      <Col sm={6}>
-        <div className="auth-section secondary-background">
-          <div className="sign-in">
-            <div className="forgot-pws-header mb-4">
-              {/* <Image
-          src={imageAssets.logo_small} // Replace with your image path
-          alt="hordanso"
-          className="forgot-pws-logo"
-        /> */}
-              <h3>Forgot password?</h3>
-              <p>
-                Enter the email address associated with your account and we’ll
-                send you a link to reset your password.
-              </p>
-            </div>
-            <div className="auth-container">
-              <Form onSubmit={handleLogin}>
-                <Form.Group controlId="formBasicEmail" className="mb-4">
-                  <Form.Label className="auth-form-label mb-1">
-                    Email
-                  </Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="form-control auth-form-control"
-                    data-testid="email"
-                  />
-                </Form.Group>
-                <div className="auth-btn-container mt-3">
-                  <Button
-                    type="submit"
-                    className="primary-btn black-background"
-                    data-testid="next"
-                  >
-                    Next
-                  </Button>
-                </div>
-
-                <div className="text-center mt-4">
-                  <Button
-                    type="button"
-                    onClick={onGoBackhandler}
-                    data-testid="back-to-login"
-                    className="auth-back-btn"
-                  >
-                    {/* <Image
-                src={imageAssets.back_arrow} // Replace with your image path
-                alt="back arrow"
-                className="auth-back-arrow"
-              /> */}
-                    <span className="ps-1">Back to login</span>
-                  </Button>
-                </div>
-              </Form>
+    <div className="h-screen flex items-center justify-center">
+      <div className="max-w-[32rem] space-y-8 bg-[#F9FAFB] p-10 rounded-2xl shadow-sm xsm-max:px-4">
+        <div className="">
+          <img src="/src/assets/images/logo.jpeg" alt="logo" />
+        </div>
+        <div>
+          <h2 className="mt-6 text-left text-[28px] font-inter font-medium text-gray-900">
+            Forgot password?
+          </h2>
+          <p className="mt-2 text-left text-sm text-gray-600">
+            Enter the email address associated with your account and we’ll send
+            you an OTP to reset your password.
+          </p>
+        </div>
+        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+          <div className="">
+            <div className="space-y-1">
+              <label
+                htmlFor="email-address"
+                className="block text-sm font-bold text-black"
+              >
+                Email
+              </label>
+              <input
+                id="email-address"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                className="custom-input"
+                placeholder="Robertclive@gmail.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                data-testid="email"
+              />
             </div>
           </div>
+
+          <div>
+            <button
+              type="submit"
+              className="btn-black"
+              data-testid="next"
+            >
+              Next
+            </button>
+          </div>
+        </form>
+
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={onGoBackhandler}
+            className="font-medium hover:text-green-600"
+            data-testid="back-to-login"
+          >
+            ← Back to login
+          </button>
         </div>
-      </Col>
-      <Col sm={3}></Col>
-    </Row>
+      </div>
+    </div>
   );
 };
 
