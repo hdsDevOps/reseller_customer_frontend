@@ -9,8 +9,8 @@ const Login: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("biswajit@yopmail.com");
-  const [password, setPassword] = useState("Admin@1234");
+  const [email, setEmail] = useState("test@yopmail.com");
+  const [password, setPassword] = useState("customer@1234");
   const [show, setShow] = useState(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
@@ -18,19 +18,19 @@ const Login: React.FC = () => {
     event.preventDefault();
     navigate("/otp?mode=signin");
 
-    try {
-      const result = await dispatch(
-        makeUserLoginThunk({
-          email: email,
-          password: password,
-          login_user_type: 0,
-        })
-      ).unwrap();
-      console.log("result....", result);
-      navigate("/otp?mode=signin");
-    } catch (error) {
-      console.error("Login error:", error);
-    }
+    // try {
+    //   const result = await dispatch(
+    //     makeUserLoginThunk({
+    //       email: email,
+    //       password: password,
+    //       login_user_type: 0,
+    //     })
+    //   ).unwrap();
+    //   console.log("result....", result);
+    //   navigate("/otp?mode=signin");
+    // } catch (error) {
+    //   console.error("Login error:", error);
+    // }
   };
   
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -1,7 +1,7 @@
-import React from 'react';
-import { Route, Routes } from 'react-router-dom';
-const AddDomain = React.lazy(() => import('./AddDomain'));
-const DomainList = React.lazy(() => import('./DomainList'));
+import React from "react";
+import { Route, Routes } from "react-router-dom";
+const AddDomain = React.lazy(() => import("./AddDomain"));
+const DomainList = React.lazy(() => import("./DomainList"));
 
 const DomainApp: React.FC = () => {
   return (

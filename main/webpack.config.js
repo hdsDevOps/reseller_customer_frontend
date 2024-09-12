@@ -45,13 +45,13 @@ module.exports = (_, argv) => ({
 			name: "main",
 			filename: "remoteEntry.js",
 			remotes: {
-				store: "store@https://store.customer.gworkspace.withhordanso.com/remoteEntry.js",
-				auth: "auth@https://auth.customer.gworkspace.withhordanso.com/remoteEntry.js",
-				domains: "domains@https://domain.customer.gworkspace.withhordanso.com/remoteEntry.js",
+				store:"store@http://localhost:3030/remoteEntry.js",
+				auth: "auth@http://localhost:3002/remoteEntry.js",
+				domains: "domains@http://localhost:3001/remoteEntry.js",
 			},
 			exposes: {
 				"./Navbar": "./src/components/Navbar.tsx",
-				"./Footer": "./src/components/Footer.tsx",
+				"./Header": "./src/components/Header.tsx",
 			},
 			shared: {
 				...deps,
