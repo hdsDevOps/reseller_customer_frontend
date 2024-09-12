@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { RxHamburgerMenu } from "react-icons/rx";
-//import logo from "../images/hordansologo 1.png";
+// import logo from "../images/hordansologo 1.png";
 
 export default function Header() {
   return (
@@ -56,7 +56,7 @@ export default function Header() {
           </li>
         </ul>
       </div>
-      <div className="navbar-end">
+      <div className="navbar-end !w-0">
         <Link to="/login" className="btn bg-gray-100 text-lg text-green-500 hover:bg-green-500 hover:text-white border-none ">
           Login
         </Link>
