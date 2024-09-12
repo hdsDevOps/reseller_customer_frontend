@@ -56,7 +56,8 @@ export default function Header() {
           </li>
         </ul>
       </div>
-      <div className="navbar-end !w-0">
+      <div className="navbar-end">
+      {/* <div className="navbar-end !w-0"> */}
         <Link to="/login" className="btn bg-gray-100 text-lg text-green-500 hover:bg-green-500 hover:text-white border-none ">
           Login
         </Link>
