@@ -9,8 +9,8 @@ const Login: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("biswajit@yopmail.com");
-  const [password, setPassword] = useState("Admin@1234");
+  const [email, setEmail] = useState("test@yopmail.com");
+  const [password, setPassword] = useState("Test@1234");
   const [show, setShow] = useState(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
