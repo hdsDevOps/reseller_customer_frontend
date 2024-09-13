@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from 'axios';
 import store from '../store'; // Ensure this path is correct
 
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_BASE_URL + 'api/',
+  baseURL: process.env.BASE_URL + 'api/',
   timeout: 10000, // Adjust as needed
   headers: {
     'Content-Type': 'application/json',
