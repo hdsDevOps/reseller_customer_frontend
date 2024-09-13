@@ -118,7 +118,7 @@ const Sidebar = () => {
           )}
         </button>
       </div>
-      <div className="p-[14px] flex-1 mt-6">
+      <div className="p-[14px] flex-1 mt-2">
         <div className="bg-[#DAE8FF] shadow-sm p-[6px] rounded-md flex items-center gap-2 my-[10px]">
           <div className="relative">
             <input
@@ -190,7 +190,7 @@ const Sidebar = () => {
               isOpen ? "w-6 h-6" : "w-5 h-5"
             } text-green-500`}
           />
-          <span className={`${isOpen ? "block" : "hidden"} lg:block text-xs`}>
+          <span className={`${isOpen ? "block" : "hidden"} lg:block text-sm`}>
             Logout
           </span>
         </button>
