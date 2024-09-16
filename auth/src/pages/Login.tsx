@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "store/hooks";
+<<<<<<< HEAD
+// import { makeUserLoginThunk } from "store/user.thunk";
+import { setTokenDetails } from "store/authSlice"; 
+import { Row, Col, Button, Form, Modal } from "react-bootstrap";
+=======
 import { HiOutlineEye } from "react-icons/hi";
 import { RiEyeCloseLine } from "react-icons/ri";
 import { makeUserLoginThunk } from "store/user.thunk";
+>>>>>>> 4c81a841910644d93d1783872fd23b88e39b0c46
 
 const Login: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -12,12 +18,16 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState("test@yopmail.com");
   const [password, setPassword] = useState("Test@1234");
   const [show, setShow] = useState(false);
-  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+<<<<<<< HEAD
+    dispatch(setTokenDetails("usy6767jshs688ytmbqa88654sgsgs5sgs6sgs6q"));
+    navigate("/dashboard");
+=======
     navigate("/otp?mode=signin");
 
+>>>>>>> 4c81a841910644d93d1783872fd23b88e39b0c46
     // try {
     //   const result = await dispatch(
     //     makeUserLoginThunk({
@@ -31,10 +41,13 @@ const Login: React.FC = () => {
     // } catch (error) {
     //   console.error("Login error:", error);
     // }
+<<<<<<< HEAD
+=======
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
+>>>>>>> 4c81a841910644d93d1783872fd23b88e39b0c46
   };
 
   const handleOpen = () => {
@@ -45,6 +58,59 @@ const Login: React.FC = () => {
     setShow(false);
   };
 
+<<<<<<< HEAD
+  return (
+    <Row className="full-height justify-content-center align-items-center px-5">
+      <Col sm={3}></Col>
+      <Col sm={6}>
+        <div className="auth-section secondary-background">
+          <div className="sign-in">
+            <div className="auth-header">
+              {/* <Image
+          src={imageAssets.logo_small} // Replace with your image path
+          alt="hordanso"
+          className="auth-logo"
+        /> */}
+              <h3>Sign in your account</h3>
+              <p className="text-center">
+                New to Hordanso? <Link to="/register">Register Now</Link>
+              </p>
+            </div>
+            <div className="auth-container">
+              <Form onSubmit={handleSubmit}>
+                <Form.Group controlId="formBasicEmail" className="mb-4">
+                  <Form.Label className="auth-form-label mb-1">
+                    Email
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Enter email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="form-control auth-form-control"
+                    data-testid="email"
+                  />
+                </Form.Group>
+
+                <Form.Group controlId="formBasicPassword" className="mb-3">
+                  <Form.Label className="auth-form-label mb-1">
+                    Password
+                  </Form.Label>
+                  <Form.Control
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="form-control auth-form-control"
+                    data-testid="password"
+                  />
+                </Form.Group>
+                <div className="auth-btn-container">
+                  <Button
+                    type="submit"
+                    data-testid="log-in"
+                    className="primary-btn"
+=======
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -142,27 +208,57 @@ const Login: React.FC = () => {
                     onClick={handleOpen}
                     className="text-green-600"
                     data-testid="terms-conditions"
+>>>>>>> 4c81a841910644d93d1783872fd23b88e39b0c46
                   >
-                    Terms and conditions
-                  </button>
-                </p>
-              </div>
-            </form>
-          </div>
-          {show && (
-            <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-              <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-                <div className="flex justify-between items-center pb-3">
-                  <p className="text-lg font-bold">Terms of Services</p>
-                  <button onClick={handleClose} className="text-black">
-                    &times;
-                  </button>
+                    Log in
+                  </Button>
                 </div>
-                <p>Woohoo, you are reading this text in a modal!</p>
-              </div>
+                <div className="text-right">
+                  <Link
+                    to="/forgotpassword"
+                    className="forgot-pws-link primary-text"
+                    data-testid="forgot-password"
+                  >
+                    Forgot Password
+                  </Link>
+                </div>
+                <div className="text-center auth-footer">
+                  <p>
+                    By signing in, you agree to our{" "}
+                    <Link
+                      to="#"
+                      onClick={handleOpen}
+                      className="terms-conditions-text primary-text"
+                      data-testid="terms-conditions"
+                    >
+                      Terms and conditions
+                    </Link>
+                  </p>
+                </div>
+              </Form>
             </div>
-          )}
+            <Modal
+              show={show}
+              onHide={handleClose}
+              backdrop="static"
+              keyboard={false}
+              size="lg"
+              aria-labelledby="contained-modal-title-vcenter"
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Terms of Services</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                Woohoo, you are reading this text in a modal!
+              </Modal.Body>
+            </Modal>
+          </div>
         </div>
+<<<<<<< HEAD
+      </Col>
+      <Col sm={3}></Col>
+    </Row>
+=======
       </div>
 
       <div className="mt-6 mb-10 text-center">
@@ -180,6 +276,7 @@ const Login: React.FC = () => {
         </button>
       </div>
     </div>
+>>>>>>> 4c81a841910644d93d1783872fd23b88e39b0c46
   );
 };
 

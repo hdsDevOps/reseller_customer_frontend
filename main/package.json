@@ -40,6 +40,8 @@
     "@reduxjs/toolkit": "^2.2.5",
     "@types/react-redux": "^7.1.33",
     "axios": "^1.7.2",
+    "lucide-react": "^0.438.0",
+    "react-flagkit": "^2.0.4",
     "lucide-react": "^0.439.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
