@@ -8,7 +8,7 @@ const DomainApp: React.FC = () => {
     <div>
       <Routes>
         <Route path="/domain" element={<DomainList />} />
-        <Route path="/adddomain" element={<AddDomain />} />
+        <Route path="/add-domain" element={<AddDomain />} />
       </Routes>
     </div>
   );

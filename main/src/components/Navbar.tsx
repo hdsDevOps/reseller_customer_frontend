@@ -24,12 +24,12 @@ const links = [
     icon: <ChartLine className="w-5 h-5" />,
   },
   {
-    path: "/dashboard/domain",
+    path: "/domain",
     label: "Domain",
     icon: <ClipboardList className="w-5 h-5" />,
   },
   {
-    path: "/dashboard/email",
+    path: "/email",
     label: "Email",
     icon: <Mail className="w-5 h-5" />,
   },
