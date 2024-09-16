@@ -15,11 +15,17 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white flex text-black p-4 items-center justify-between z-50 fixed top-0 left-0 right-0">
-      <a href="#" className="text-2xl font-bold flex items-center justify-center">
-        <img src="" alt="" />
-        <span className="mr-2">Hordanso</span>
-      </a>
+    <header className="bg-white flex text-black px-2 items-center justify-between z-50 fixed top-0 left-0 right-0">
+    <a
+      href="#"
+      className="flex items-center justify-center"
+    >
+      <img 
+        src={process.env.BASE_URL + "/images/logo.jpeg"} 
+        alt="logo" 
+        className="w-16 h-16 object-cover" 
+      />
+    </a>
 
       <div className="flex items-center space-x-4">
         <button className="relative p-2 bg-[#DCEBDFCC] hover:bg-opacity-90 rounded-md">
@@ -37,8 +43,8 @@ export default function Header() {
         </button>
         <div className="flex items-center justify-center space-x-2">
         <button className="relative p-2 bg-[#FF7272] hover:bg-opacity-90 rounded-full">
-          <p className="text-white ">RC</p>
-        </button>
+            <p className="text-white">RC</p>
+          </button>
         <Dropdown />
         </div>
         
