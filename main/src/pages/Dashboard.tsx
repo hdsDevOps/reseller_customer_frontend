@@ -7,7 +7,7 @@ const Dashboard: React.FC = () => {
   return (
     <div>
       <main className="min-h-screen">
-        <h2 className="text-2xl text-green-500">Welcome to your Dashboard</h2>
+        <h2 className="text-2xl text-green-500">Welcome to your Dashboard 111</h2>
         <p>This is your dashboard where you can manage your account.</p>
       </main>
     </div>
