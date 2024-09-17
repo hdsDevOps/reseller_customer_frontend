@@ -10,7 +10,7 @@ const DomainList: React.FC = () => {
       <main>
         <h2>DomainList List</h2>
         <p>This is your Domain where you can manage your account. Status = {userAuthStatus}</p>
-        <Link to="/adddomain">Add Domain</Link>
+        <Link to="/add-domain">Add Domain</Link>
       </main>
     </div>
   );

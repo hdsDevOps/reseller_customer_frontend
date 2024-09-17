@@ -39,7 +39,6 @@ module.exports = (_, argv) => ({
 			},
 		],
 	},
-
 	plugins: [
 		new ModuleFederationPlugin({
 			name: "main",
@@ -70,4 +69,5 @@ module.exports = (_, argv) => ({
 		}),
 		new Dotenv(),
 	],
+
 });
