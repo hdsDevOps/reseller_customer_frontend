@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "domain/**"
+      - "domains/**"
   workflow_dispatch:
 
 env:
@@ -30,8 +30,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./domain
-          file: ./domain/Dockerfile
+          context: ./domains
+          file: ./domains/Dockerfile
           push: true
           tags: ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
 
