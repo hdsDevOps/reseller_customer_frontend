@@ -45,13 +45,16 @@ jobs:
         with:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBECONFIG }}
+      
+      - name: Apply Shared ConfigMap
+        run: |
+          kubectl apply -f k8s/main-configmap.yaml
 
       - name: Deploy to Kubernetes
         uses: Azure/k8s-deploy@v3
         with:
           action: deploy
-          strategy: canary
-          percentage: 100
+          strategy: basic
           manifests: |
             k8s/main-deployment.yaml
             k8s/main-service.yaml

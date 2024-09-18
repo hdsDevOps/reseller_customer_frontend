@@ -48,14 +48,13 @@ jobs:
 
       - name: Apply Shared ConfigMap
         run: |
-          kubectl apply -f k8s/shared-configmap.yaml
+          kubectl apply -f k8s/domain-configmap.yaml
 
       - name: Deploy to Kubernetes
         uses: Azure/k8s-deploy@v3
         with:
           action: deploy
-          strategy: canary
-          percentage: 100
+          strategy: basic
           manifests: |
             k8s/domain-deployment.yaml
             k8s/domain-service.yaml
