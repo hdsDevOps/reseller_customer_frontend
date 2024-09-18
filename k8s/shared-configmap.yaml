@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shared-config
+data:
+  BASE_URL: "https://domain.customer.gworkspace.withhordanso.com/"
+  STORE_BASE_URL: "https://store.customer.gworkspace.withhordanso.com/"
+  AUTH_BASE_URL: "https://auth.customer.gworkspace.withhordanso.com/"
+  DOMAINS_BASE_URL: "https://domain.customer.gworkspace.withhordanso.com/"
+  MAIN_BASE_URL: "https://main.customer.gworkspace.withhordanso.com/"
