@@ -56,7 +56,7 @@ const ContactUs = () => {
             <textarea className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none h-[8.3rem]" />
           </div>
           <div className="flex justify-center row-span-1 col-span-2 h-[3.375rem]">
-            <SmallButton placeholder="Submit" className="w-[47.5rem]" />
+            <SmallButton placeholder="Submit" className="w-[47.5rem] text-white" />
           </div>
         </div>
         <div className="flex flex-col gap-4 mt-8">

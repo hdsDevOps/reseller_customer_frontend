@@ -32,12 +32,12 @@ const PlanandPrice = () => {
             <p className="text-greenbase text-xs font-normal bg-[#e7f6eb] flex justify-center px-2 py-2 w-full">MOST POPULAR</p>
             <div className="px-5 gap-3 flex flex-col">
             <p className="font-normal text-lg">Business Standard</p>
-            <SmallButton placeholder="Start trial" className="bg-[#F0F0F3] text-greenbase"/>
+            <SmallButton placeholder="Start trial" className="!bg-[#F0F0F3] text-greenbase"/>
             </div>
         </div>
         <div className="flex flex-col gap-3 px-5 pt-5 border-[#8c8c8c] border-2">
             <p className="font-normal text-lg">Business Plus</p>
-            <SmallButton placeholder="Start trial" className="bg-[#F0F0F3] text-greenbase"/>
+            <SmallButton placeholder="Start trial" className="!bg-[#F0F0F3] text-greenbase"/>
         </div>
       </div>
       <ProductivityAndCollaboration/>
