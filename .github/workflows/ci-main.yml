@@ -46,14 +46,17 @@ jobs:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBECONFIG }}
 
-      - name: Update Kubernetes manifests
-        run: |
-          sed -i 's|${TAG}|${{ github.sha }}|' k8s/main-deployment.yaml
-
       - name: Deploy to Kubernetes
-        run: |
-          kubectl apply -f k8s/main-service.yaml
-          kubectl apply -f k8s/main-deployment.yaml
+        uses: Azure/k8s-deploy@v3
+        with:
+          action: deploy
+          strategy: canary
+          percentage: 100
+          manifests: |
+            k8s/main-deployment.yaml
+            k8s/main-service.yaml
+          images: |
+            ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
 
       - name: Verify deployment
         run: |
