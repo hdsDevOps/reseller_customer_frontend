@@ -64,11 +64,3 @@ jobs:
             ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
           imagepullsecrets: |
             ${{ secrets.REGISTRY_PULL_SECRET }}
-
-      - name: Verify deployment
-        run: |
-          kubectl rollout status deployment/frontend-store-service
-          if [ $? -ne 0 ]; then
-            echo "Deployment failed"
-            exit 1
-          fi

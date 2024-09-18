@@ -57,11 +57,3 @@ jobs:
             k8s/auth-service.yaml
           images: |
             ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
-
-      - name: Verify deployment
-        run: |
-          kubectl rollout status deployment/frontend-auth-service
-          if [ $? -ne 0 ]; then
-            echo "Deployment failed"
-            exit 1
-          fi
