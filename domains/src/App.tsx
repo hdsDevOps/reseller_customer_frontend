@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import { BrowserRouter } from "react-router-dom";
 import DomainApp from "./pages";
 import ReduxProvider from "store/ReduxProvider";
+import "./domain.css"
 
 const App: React.FC = () => {
   return (
