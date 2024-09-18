@@ -35,8 +35,8 @@ jobs:
             - name: Build and push Docker image
               uses: docker/build-push-action@v5
               with:
-                  context: ./domain
-                  file: ./domain/Dockerfile
+                  context: ./domains
+                  file: ./domains/Dockerfile
                   push: true
                   tags: >
                       ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}_domain:${{ github.sha }},
