@@ -145,7 +145,7 @@ const OTP: React.FC = () => {
             }`}
           >
             <img
-              src="/src/assets/images/logo.jpeg"
+              src={process.env.BASE_URL + "/images/logo.jpeg"}
               alt="logo"
               className={mode === "signin" ? "mx-auto" : ""}
             />
