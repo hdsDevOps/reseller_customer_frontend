@@ -160,9 +160,6 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        {/* <div>
-          <img src={image} alt="Footer image"/>
-        </div> */}
         <div className="text-center text-[#EEEEEE]">
           © 2024 Copyright
           <a className="text-[#BDBDBD] pl-1" href="#">
