@@ -58,7 +58,6 @@ jobs:
           manifests: |
             k8s/store-deployment.yaml
             k8s/store-service.yaml
-            k8s/shared-configmap.yaml
           images: |
             ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
           imagepullsecrets: |

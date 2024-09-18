@@ -58,6 +58,5 @@ jobs:
           manifests: |
             k8s/domain-deployment.yaml
             k8s/domain-service.yaml
-            k8s/shared-configmap.yaml
           images: |
             ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
