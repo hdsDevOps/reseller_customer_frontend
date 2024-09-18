@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { BrowserRouter } from "react-router-dom";
 import EmailApp from "./pages";
 import ReduxProvider from "store/ReduxProvider";
-import './index.scss'
+import './index.css'
 const App: React.FC = () => {
   return (
     <>

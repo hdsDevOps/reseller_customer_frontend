@@ -136,7 +136,7 @@ const Sidebar = () => {
               />
             </label>
           </div>
-          <div className={`flex items-center gap-2 ${isOpen ? "flex" : "hidden lg:flex"}`}>
+          <div className={`flex items-center gap-2 overflow-hidden ${isOpen ? "flex" : "hidden  sm:flex"}`}>
             <div className="flex flex-col text-xs ml-2">
               <span className="font-medium text-gray-600">{username}</span>
               <span className="text-gray-400">{email}</span>
