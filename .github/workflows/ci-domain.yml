@@ -1,75 +1,62 @@
-name: CI for domain Service
+name: CI for Domain Service
 
 on:
-    push:
-        branches:
-            - main
-        paths:
-            - "domain/**"
-    workflow_dispatch: # Allow manual triggering
+  push:
+    branches:
+      - main
+    paths:
+      - "domains/**"
+  workflow_dispatch:
+
+env:
+  DOCKER_IMAGE: hordansodevops/reseller_customer_frontend_domain
 
 jobs:
-    build_and_deploy:
-        runs-on: ubuntu-latest
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v3
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-            - name: Extract metadata (tags, labels) for Docker
-              id: meta
-              uses: docker/metadata-action@v5
-              with:
-                  images: |
-                      hordansodevops/reseller_customer_frontend_domain
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./domains
+          file: ./domains/Dockerfile
+          push: true
+          tags: ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
 
-            - name: Log in to Docker Hub
-              uses: docker/login-action@v3
-              with:
-                  username: ${{ secrets.DOCKERHUB_USERNAME }}
-                  password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: "v1.30.0"
 
-            - name: Build and push Docker image
-              uses: docker/build-push-action@v5
-              with:
-                  context: ./domain
-                  file: ./domain/Dockerfile
-                  push: true
-                  tags: >
-                      ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}_domain:${{ github.sha }},
-                      ${{ secrets.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}_domain:latest
-            - name: Set up kubectl
-              uses: azure/setup-kubectl@v4
-              with:
-                  version: "v1.30.0"
+      - name: Kubernetes set context
+        uses: Azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
 
-            - name: Kubernetes set context
-              uses: Azure/k8s-set-context@v3
-              with:
-                  method: kubeconfig
-                  kubeconfig: ${{ secrets.KUBECONFIG }}
+      - name: Apply Shared ConfigMap
+        run: |
+          kubectl apply -f k8s/domain-configmap.yaml
 
-            - name: Deploy to Kubernetes
-              uses: Azure/k8s-deploy@v3
-              with:
-                  action: deploy
-                  strategy: basic
-                  imagepullsecrets: |
-                      ${{ secrets.REGISTRY_PULL_SECRET }}
-                  manifests: |
-                      k8s/domain-deployment.yaml
-                      k8s/domain-service.yaml
-                  images: |
-                      hordansodevops/reseller_customer_frontend_domain:latest
-
-            # Uncomment if you have a separate ingress deployment
-            # - name: Deploy Ingress
-            #   uses: Azure/k8s-deploy@v3
-            #   with:
-            #     action: deploy
-            #     strategy: basic
-            #     manifests: |
-            #       k8s/ingress.yaml
+      - name: Deploy to Kubernetes
+        uses: Azure/k8s-deploy@v3
+        with:
+          action: deploy
+          strategy: basic
+          manifests: |
+            k8s/domain-deployment.yaml
+            k8s/domain-service.yaml
+          images: |
+            ${{ env.DOCKER_IMAGE }}:${{ github.sha }}

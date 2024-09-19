@@ -4,7 +4,7 @@ const Dotenv = require("dotenv-webpack");
 const deps = require("./package.json").dependencies;
 module.exports = (_, argv) => ({
   output: {
-    publicPath: "http://localhost:3000/",
+    publicPath: "auto",
   },
 
   resolve: {
@@ -14,6 +14,7 @@ module.exports = (_, argv) => ({
   devServer: {
     port: 3000,
     historyApiFallback: true,
+    allowedHosts: ["all"],
   },
 
   module: {
@@ -44,10 +45,9 @@ module.exports = (_, argv) => ({
       name: "main",
       filename: "remoteEntry.js",
       remotes: {
-        store:"store@http://localhost:3030/remoteEntry.js",
-        auth: "auth@http://localhost:3002/remoteEntry.js",
-        domains: "domains@http://localhost:3001/remoteEntry.js",
-        email: "email@http://localhost:3003/remoteEntry.js",
+        store: `store@${process.env.STORE_BASE_URL || 'http://localhost:3030'}/remoteEntry.js`,
+        auth: `auth@${process.env.AUTH_BASE_URL || 'http://localhost:3002'}/remoteEntry.js`,
+        domains: `domains@${process.env.DOMAINS_BASE_URL || 'http://localhost:3001'}/remoteEntry.js`,
       },
       exposes: {
         "./Navbar": "./src/components/Navbar.tsx",

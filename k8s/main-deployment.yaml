@@ -17,23 +17,7 @@ spec:
         image: hordansodevops/reseller_customer_frontend_main:latest
         ports:
         - containerPort: 3000
-        resources:
-          limits:
-            cpu: "1"
-            memory: "512Mi"
-          requests:
-            cpu: "0.5"
-            memory: "256Mi"
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 3
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 3
-
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: main-config
