@@ -3,9 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
 import DomainApp from "domains/DomainApp";
-
-
-
+import EmailApp from "email/EmailApp";
 
 const Dashboard = React.lazy(() => import("./Dashboard"));
 
@@ -25,7 +23,7 @@ const MainApp: React.FC = () => (
         ))}
       </Routes>
       <DomainApp />
-
+      <EmailApp />
     </div>
     <Navbar />
   </div>
