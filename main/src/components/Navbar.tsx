@@ -34,32 +34,32 @@ const links = [
     icon: <Mail className="w-5 h-5" />,
   },
   {
-    path: "/dashboard/voucher",
+    path: "/voucher",
     label: "Voucher",
     icon: <Ticket className="w-5 h-5" />,
   },
   {
-    path: "/dashboard/billing",
+    path: "/billing",
     label: "Billing History",
     icon: <ShieldCheck className="w-5 h-5" />,
   },
   {
-    path: "/dashboard/payment",
+    path: "/payment",
     label: "Payment Subscription",
     icon: <CreditCard className="w-5 h-5" />,
   },
   {
-    path: "/dashboard/payment-method",
+    path: "/payment-method",
     label: "Payment Method",
     icon: <CiCreditCard1 className="w-5 h-5" />,
   },
   {
-    path: "/dashboard/my-staff",
+    path: "/my-staff",
     label: "My Staff",
     icon: <Users className="w-5 h-5" />,
   },
   {
-    path: "/dashboard/settings",
+    path: "/settings",
     label: "Settings",
     icon: <Settings className="w-5 h-5" />,
   },

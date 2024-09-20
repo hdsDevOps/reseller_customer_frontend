@@ -33,10 +33,10 @@ const DomainList: React.FC = () => {
     <div>
       <main>
         <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-start sm:justify-between w-full">
-          <div className="text-sm text-green-500 sm:text-2xl">Domain</div>
+          <div className="text-sm text-green-500 sm:text-lg md:text-2xl">Domain</div>
           <div className="flex gap-2 md:gap-8">
             <Link
-              to="add-domain"
+              to="/add-domain"
               className="px-4 py-2 bg-green-600 text-white font-medium rounded-md shadow-sm hover:bg-opacity-90 sm-max:text-xs"
             >
               Add Existing Domain
