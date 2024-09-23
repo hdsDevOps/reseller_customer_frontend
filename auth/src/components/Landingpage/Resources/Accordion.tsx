@@ -1,10 +1,11 @@
-import React from "react";
-import { useState, ReactNode } from "react";
+import React, { useState, ReactNode } from "react";
 
 interface AccordionItemProps {
   title: string;
   children: ReactNode;
   id: string;
+  isOpen: boolean;
+  onToggle: (id: string) => void;
 }
 
 const dottedline = (
@@ -23,13 +24,9 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
   title,
   children,
   id,
+  isOpen,
+  onToggle,
 }) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-
-  const toggleAccordion = () => {
-    setIsOpen(!isOpen);
-  };
-
   return (
     <div>
       <h2 id={`accordion-flush-heading-${id}`}>
@@ -37,7 +34,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
           type="button"
           className={`flex items-center justify-between w-full py-5 font-medium rtl:text-right text-gray-500 dark:text-gray-400 gap-3
             ${isOpen ? "border-b-0" : ""}`}
-          onClick={toggleAccordion}
+          onClick={() => onToggle(id)}
           aria-expanded={isOpen}
           aria-controls={`accordion-flush-body-${id}`}
         >
@@ -74,6 +71,12 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
 };
 
 const Accordion: React.FC = () => {
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  const toggleAccordion = (id: string) => {
+    setOpenId(openId === id ? null : id);
+  };
+
   return (
     <div
       id="accordion-flush"
@@ -81,7 +84,12 @@ const Accordion: React.FC = () => {
       data-active-classes="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
       data-inactive-classes="text-gray-500 dark:text-gray-400"
     >
-      <AccordionItem title="What is Google Workspace?" id="1">
+      <AccordionItem
+        title="What is Google Workspace?"
+        id="1"
+        isOpen={openId === "1"}
+        onToggle={toggleAccordion}
+      >
         <p className="mb-2 text-gray-500 dark:text-gray-400">
           Google Workspace is a cloud-based productivity suite that includes
           everything you need to get work done, like email, calendars, video
@@ -93,7 +101,12 @@ const Accordion: React.FC = () => {
           Google Workspace.
         </p>
       </AccordionItem>
-      <AccordionItem title="How much is Google Workspace?" id="2">
+      <AccordionItem
+        title="How much is Google Workspace?"
+        id="2"
+        isOpen={openId === "2"}
+        onToggle={toggleAccordion}
+      >
         <p className="mb-2 text-gray-500 dark:text-gray-400">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum
@@ -101,7 +114,12 @@ const Accordion: React.FC = () => {
           incididunt ut labore et dolore magna aliqua.
         </p>
       </AccordionItem>
-      <AccordionItem title="What is Google Workspace used for?" id="3">
+      <AccordionItem
+        title="What is Google Workspace used for?"
+        id="3"
+        isOpen={openId === "3"}
+        onToggle={toggleAccordion}
+      >
         <p className="mb-2 text-gray-500 dark:text-gray-400">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum
@@ -109,7 +127,12 @@ const Accordion: React.FC = () => {
           incididunt ut labore et dolore magna aliqua.
         </p>
       </AccordionItem>
-      <AccordionItem title="What does Google Workspace include?" id="3">
+      <AccordionItem
+        title="What does Google Workspace include?"
+        id="4"
+        isOpen={openId === "4"}
+        onToggle={toggleAccordion}
+      >
         <p className="mb-2 text-gray-500 dark:text-gray-400">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum

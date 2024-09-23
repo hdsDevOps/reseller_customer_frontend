@@ -6,7 +6,7 @@ import { SmallButton } from "../../utils/buttons/Button";
 
 const ContactUs = () => {
   return (
-    <section className="w-full max-w-screen-2xl mx-auto px-16 py-8">
+    <section className="w-full max-w-screen-2xl mx-auto px-16 py-14">
       <div className="text-center mb-8">
         <h2 className="text-4xl font-semibold text-greenbase">Contact Us</h2>
         <p className="font-normal text-2xl mt-4">

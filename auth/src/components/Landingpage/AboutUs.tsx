@@ -6,7 +6,7 @@ import FrequentlyAskedQuestions from "./FrequentlyaskedQuestions";
 const AboutUs = () => {
   return (
     <section className="max-w-screen-2xl mx-auto">
-      <div className="w-full h-[19.625rem] relative">
+      <div className="w-full relative">
         <div className="bg-[#12A8334F] absolute inset-0 text-white flex flex-col gap-2 justify-center items-center">
           <h4 className="font-extrabold text-4xl">
             Everyting you need to know
@@ -19,13 +19,9 @@ const AboutUs = () => {
           className="size-full object-cover"
         />
       </div>
-      <div className="w-full h-[160.125rem] relative">
-        <img
-          src={Base_URL + "/images/AboutUsSpiral.png"}
-          alt="AboutusSpiral"
-          className="size-full object-cover"
-        />
-        <div className="absolute inset-0">
+      <div className="w-full bg-cover bg-center"
+      style={{ backgroundImage: `url(${Base_URL}/images/AboutUsSpiral.png)` }}>
+        <div>
           <div className="flex">
             <div className="px-[4.375rem] pt-[10.625rem] pb-11 w-[49.688rem]">
               <h2 className="font-semibold text-3xl text-greenbase">

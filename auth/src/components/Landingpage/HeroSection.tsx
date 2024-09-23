@@ -1,10 +1,15 @@
 import React from "react";
 import { Base_URL } from "../../Constant";
+import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 
 
 const HeroSection = () => {
     return (
         <div className="w-full max-w-screen-2xl mx-auto h-[55.375rem] relative">
+           <div className="flex w-full justify-between px-10 absolute z-10 items-center top-[22rem]">
+            <SlArrowLeft  className=" cursor-pointer" fill="#FEF4EF" size={40} />
+            <SlArrowRight className="cursor-pointer" fill="#FEF4EF" size={40}/>
+          </div>
         <div className="bg-black/50 absolute top-0 left-0 h-full backdrop-blur-lg w-[56.125rem]">
           <div className="px-16 py-24 ">
             <h2 className="font-extrabold text-3xl text-[#ffffff] flex justify-center text-wrap w-[39.125rem]">

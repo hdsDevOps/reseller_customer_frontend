@@ -2,18 +2,17 @@ import React from "react";
 import { ImTwitter } from "react-icons/im";
 import { GrFacebookOption } from "react-icons/gr";
 import { FaPinterestP,FaInstagram, FaYoutube } from "react-icons/fa";
-// import image from "./img-2.png";
-
+import { Base_URL } from "../Constant";
 export default function Footer() {
   return (
     <footer className="bg-black !w-full">
-      <div className=" flex flex-col gap-10 justify-center items-center p-24 mx-auto">
+      <div className=" flex flex-col gap-10 justify-center items-center py-24 px-[20rem] mx-auto">
         <div className="flex gap-10">
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-2">
               <p className="text-white font-semibold">MARKETING</p>
               <progress
-                className="progress w-72 h-0.5"
+                className="progress w-52 h-0.5"
                 value="25"
                 max="100"
               ></progress>
@@ -21,27 +20,27 @@ export default function Footer() {
             <ul className="text-[#BDBDBD] text-base font-medium flex flex-col gap-2">
               <li className="flex flex-col gap-2">
                 <a href="#">Video</a>
-                <hr className="w-72 bg-[#808080] h-[0.15rem] rounded-md"></hr>
+                <hr className="w-52 bg-[#808080] h-[0.15rem] rounded-md"></hr>
               </li>
               <li className="flex flex-col gap-2">
                 <a href="#">SEO</a>
-                <hr className="w-72 bg-[#808080] h-[0.15rem] rounded-md"></hr>
+                <hr className="w-52 bg-[#808080] h-[0.15rem] rounded-md"></hr>
               </li>
               <li className="flex flex-col gap-2">
                 <a href="#">SMO</a>
-                <hr className="w-72 bg-[#808080] h-[0.15rem] rounded-md"></hr>
+                <hr className="w-52 bg-[#808080] h-[0.15rem] rounded-md"></hr>
               </li>
               <li className="flex flex-col gap-2">
                 <a href="#">Mobile</a>
-                <hr className="w-72 bg-[#808080] h-[0.15rem] rounded-md"></hr>
+                <hr className="w-52 bg-[#808080] h-[0.15rem] rounded-md"></hr>
               </li>
               <li className="flex flex-col gap-2">
                 <a href="#">Campaign</a>
-                <hr className="w-72 bg-[#808080] h-[0.15rem] rounded-md"></hr>
+                <hr className="w-52 bg-[#808080] h-[0.15rem] rounded-md"></hr>
               </li>
               <li className="flex flex-col gap-2">
                 <a href="#">Terms and Condition</a>
-                <hr className="w-72 bg-[#808080] h-[0.15rem] rounded-md"></hr>
+                <hr className="w-52 bg-[#808080] h-[0.15rem] rounded-md"></hr>
               </li>
             </ul>
           </div>
@@ -49,7 +48,7 @@ export default function Footer() {
             <div className="flex flex-col gap-2">
               <p className="text-white font-semibold">WEBSITES</p>
               <progress
-                className="progress w-72 h-0.5"
+                className="progress w-52 h-0.5"
                 value="25"
                 max="100"
               ></progress>
@@ -57,27 +56,27 @@ export default function Footer() {
             <ul className="text-[#BDBDBD] text-base font-medium flex flex-col gap-2">
               <li className="flex flex-col gap-2">
                 <a href="#">Domain name</a>
-                <hr className="w-72 bg-[#808080] h-[0.15rem] rounded-md"></hr>
+                <hr className="w-52 bg-[#808080] h-[0.15rem] rounded-md"></hr>
               </li>
               <li className="flex flex-col gap-2">
                 <a href="#">Design</a>
-                <hr className="w-72 bg-[#808080] h-[0.15rem] rounded-md"></hr>
+                <hr className="w-52 bg-[#808080] h-[0.15rem] rounded-md"></hr>
               </li>
               <li className="flex flex-col gap-2">
                 <a href="#">Develop</a>
-                <hr className="w-72 bg-[#808080] h-[0.15rem] rounded-md"></hr>
+                <hr className="w-52 bg-[#808080] h-[0.15rem] rounded-md"></hr>
               </li>
               <li className="flex flex-col gap-2">
                 <a href="#">Hosting</a>
-                <hr className="w-72 bg-[#808080] h-[0.15rem] rounded-md"></hr>
+                <hr className="w-52 bg-[#808080] h-[0.15rem] rounded-md"></hr>
               </li>
               <li className="flex flex-col gap-2">
                 <a href="#">WordPress</a>
-                <hr className="w-72 bg-[#808080] h-[0.15rem] rounded-md"></hr>
+                <hr className="w-52 bg-[#808080] h-[0.15rem] rounded-md"></hr>
               </li>
               <li className="flex flex-col gap-2">
                 <a href="#">Privacy and Policy</a>
-                <hr className="w-72 bg-[#808080] h-[0.15rem] rounded-md"></hr>
+                <hr className="w-52 bg-[#808080] h-[0.15rem] rounded-md"></hr>
               </li>
             </ul>
           </div>
@@ -85,7 +84,7 @@ export default function Footer() {
             <div className="flex flex-col gap-2">
               <p className="text-white font-semibold">CONTACT US</p>
               <progress
-                className="progress w-72 h-0.5"
+                className="progress w-52 h-0.5"
                 value="25"
                 max="100"
               ></progress>
@@ -135,16 +134,16 @@ export default function Footer() {
             <div className="flex flex-col gap-2">
               <p className="text-white font-semibold">OUR NEWSLETTER</p>
               <progress
-                className="progress w-72 h-0.5"
+                className="progress w-52 h-0.5"
                 value="25"
                 max="100"
               ></progress>
             </div>
             <div className="flex flex-col gap-4">
               <p className="text-[#BDBDBD]">Search for: </p>
-              <div className="w-[25.5rem] border-yellow-300 h-14 rounded-full bg-[#BDBDBD] flex items-center px-1.5 py-2 relative">
+              <div className="w-[21.25rem] border-yellow-300 h-14 rounded-full bg-[#BDBDBD] flex items-center px-1.5 py-2 relative">
                 <input
-                  className="w-72 bg-[#F0F0F3] h-12 rounded-full p-2 text-md"
+                  className="w-56 bg-[#F0F0F3] h-12 rounded-full p-2 text-md"
                   placeholder="Search"
                 ></input>
                 <button className="bg-[#12a833] px-3 rounded-full py-2.5 text-white font-semibold text-lg absolute right-1.5">
@@ -160,8 +159,35 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        <div className="text-center text-[#EEEEEE]">
-          © 2024 Copyright
+        <div className="text-center text-[#EEEEEE] w-100%">
+        <div className="flex relative gap-4 mb-4">
+          <button className="bg-greenbase text-white px-4 h-[3rem] text-xl font-bold">Buy Domain/Hosting</button>
+        <img
+          src={Base_URL + "/images/footer1.png"}
+          alt="footerbadge"
+          className="h-[5rem] w-[12rem] object-cover"
+        />
+       
+        <img
+         src={Base_URL + "/images/footer2.png"}
+         alt="footerbadge"
+         className="h-[4.5rem] w-[12rem] object-cover"
+        />
+        <img
+         src={Base_URL + "/images/footer3.webp"}
+         alt="footerbadge"
+         className="h-[7rem] w-[5rem] object-cover absolute right-[6rem]"
+        />
+      
+        <img
+         src={Base_URL + "/images/footer4.jpg"}
+         alt="footerbadge"
+         className="size-20 object-cover ml-14"
+        />
+
+        </div>
+
+         <p>© 2024 Copyright</p>
           <a className="text-[#BDBDBD] pl-1" href="#">
             Hordanso LLC All Rights Reserved 2018 | Web Design & Development by
             HDS Hordanso
