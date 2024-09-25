@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter } from "react-router-dom";
-import EmailApp from "./pages";
+import EmailApp from "./pages/EmailList";
 import ReduxProvider from "store/ReduxProvider";
 import './index.css'
 const App: React.FC = () => {
