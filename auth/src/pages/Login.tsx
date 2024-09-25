@@ -66,7 +66,7 @@ const Login: React.FC = () => {
             <p className="mt-2">
               New to Hordanso?{" "}
               <Link to="/register" className="text-green-600">
-                Register Now
+                Register
               </Link>
             </p>
           </div>
