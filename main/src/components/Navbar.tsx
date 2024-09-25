@@ -16,6 +16,8 @@ import {
 
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { CiCreditCard1 } from "react-icons/ci";
+import { useAppDispatch } from "store/hooks";
+import { setTokenDetails } from "store/authSlice";
 
 const links = [
   {
@@ -34,38 +36,39 @@ const links = [
     icon: <Mail className="w-5 h-5" />,
   },
   {
-    path: "/dashboard/voucher",
+    path: "/voucher",
     label: "Voucher",
     icon: <Ticket className="w-5 h-5" />,
   },
   {
-    path: "/dashboard/billing",
+    path: "/billing",
     label: "Billing History",
     icon: <ShieldCheck className="w-5 h-5" />,
   },
   {
-    path: "/dashboard/payment",
+    path: "/payment",
     label: "Payment Subscription",
     icon: <CreditCard className="w-5 h-5" />,
   },
   {
-    path: "/dashboard/payment-method",
+    path: "/payment-method",
     label: "Payment Method",
     icon: <CiCreditCard1 className="w-5 h-5" />,
   },
   {
-    path: "/dashboard/my-staff",
+    path: "/my-staff",
     label: "My Staff",
     icon: <Users className="w-5 h-5" />,
   },
   {
-    path: "/dashboard/settings",
+    path: "/settings",
     label: "Settings",
     icon: <Settings className="w-5 h-5" />,
   },
 ];
 
 const Sidebar = () => {
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
@@ -76,6 +79,7 @@ const Sidebar = () => {
   const [email] = useState("roberclive@domain.co.in"); // Replace with actual email
 
   const handleLogout = async () => {
+    dispatch(setTokenDetails(""));
     navigate("/login");
   };
 
@@ -83,6 +87,7 @@ const Sidebar = () => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
       const reader = new FileReader();
+
       reader.onloadend = () => {
         const base64String = reader.result as string;
         setImage(base64String);
@@ -135,7 +140,7 @@ const Sidebar = () => {
               />
             </label>
           </div>
-          <div className={`flex items-center gap-2 ${isOpen ? "flex" : "hidden lg:flex"}`}>
+          <div className={`flex items-center gap-2 overflow-hidden ${isOpen ? "flex" : "hidden  sm:flex"}`}>
             <div className="flex flex-col text-xs ml-2">
               <span className="font-medium text-gray-600">{username}</span>
               <span className="text-gray-400">{email}</span>
