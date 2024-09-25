@@ -34,12 +34,12 @@ const links = [
     icon: <Mail className="w-5 h-5" />,
   },
   {
-    path: "/dashboard/voucher",
+    path: "/voucher",
     label: "Voucher",
     icon: <Ticket className="w-5 h-5" />,
   },
   {
-    path: "/dashboard/billing",
+    path: "/billing",
     label: "Billing History",
     icon: <ShieldCheck className="w-5 h-5" />,
   },
