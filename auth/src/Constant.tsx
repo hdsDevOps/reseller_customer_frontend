@@ -1,0 +1,1 @@
+export const Base_URL = process.env.BASE_URL 

@@ -61,12 +61,12 @@ const Login: React.FC = () => {
               />
             </div>
             <h3 className="text-2xl font-semibold text-[#0D121F] pt-4">
-              Sign in your account demo
+              Sign in your account
             </h3>
             <p className="mt-2">
               New to Hordanso?{" "}
               <Link to="/register" className="text-green-600">
-                Register Now
+                Register Now 
               </Link>
             </p>
           </div>
