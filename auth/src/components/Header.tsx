@@ -20,7 +20,7 @@ export default function Header() {
             className="w-16 h-16"
           />
         </Link>
-        <ul className="lg:flex gap-4 hidden">
+        <ul className="lg:flex gap-4">
           <li>
             <Link to="#">Plan & Price</Link>
           </li>
@@ -38,7 +38,7 @@ export default function Header() {
           </li>
         </ul>
       </div>
-      <div className="lg:flex gap-10 items-center hidden">
+      <div className="lg:flex gap-10 items-center">
         <p>
           <Link to="#">Contact Us</Link>
         </p>
