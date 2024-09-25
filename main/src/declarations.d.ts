@@ -9,12 +9,12 @@ declare module "domains/DomainApp" {
   const DomainApp: React.ComponentType<any>; // Adjust props type as per your component
   export default DomainApp;
 }
-declare module "email/EmailApp" {
-  import React from 'react';
-  // Assuming DomainApp is a functional component or class component
-  const DomainApp: React.ComponentType<any>; // Adjust props type as per your component
-  export default EmailApp;
-}
+// declare module "email/EmailApp" {
+//   import React from 'react';
+//   // Assuming DomainApp is a functional component or class component
+//   const DomainApp: React.ComponentType<any>; // Adjust props type as per your component
+//   export default EmailApp;
+// }
 declare module 'store/user.storage' {
   export async function getUserTokenFromLocalStorage(): Promise<string>;
   export async function saveUserTokenToLocalStorage(token: string): Promise<void>;
