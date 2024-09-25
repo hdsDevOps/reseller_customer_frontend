@@ -13,14 +13,14 @@ export default function Header() {
   return (
     <nav className="w-full flex justify-between items-center py-2 px-10">
       <div className="flex lg:gap-6 items-center justify-between">
-        <Link to="#">
+        <Link to="/home">
           <img
             src={process.env.BASE_URL + "/images/logo.jpeg"}
             alt="logo"
             className="w-16 h-16"
           />
         </Link>
-        <ul className="lg:flex gap-4 hidden">
+        <ul className="lg:flex gap-4">
           <li>
             <Link to="#">Plan & Price</Link>
           </li>
@@ -38,7 +38,7 @@ export default function Header() {
           </li>
         </ul>
       </div>
-      <div className="lg:flex gap-10 items-center hidden">
+      <div className="lg:flex gap-10 items-center">
         <p>
           <Link to="#">Contact Us</Link>
         </p>
