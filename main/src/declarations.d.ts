@@ -9,7 +9,12 @@ declare module "domains/DomainApp" {
   const DomainApp: React.ComponentType<any>; // Adjust props type as per your component
   export default DomainApp;
 }
-
+declare module "email/EmailApp" {
+  import React from 'react';
+  // Assuming DomainApp is a functional component or class component
+  const DomainApp: React.ComponentType<any>; // Adjust props type as per your component
+  export default EmailApp;
+}
 declare module 'store/user.storage' {
   export async function getUserTokenFromLocalStorage(): Promise<string>;
   export async function saveUserTokenToLocalStorage(token: string): Promise<void>;
@@ -41,37 +46,9 @@ declare module 'store/user.thunk' {
 
 declare module 'store/authSlice' {
   import { PayloadAction, Slice } from '@reduxjs/toolkit';
+  import { UserDetailsState } from 'store/authSlice';
 
-  export interface UserDetailsState {
-    userAuthStatus: 'AUTHORIZED' | 'UN_AUTHORIZED' | 'PENDING' | 'UPGRADE';
-    userDetails: any;
-    userId: number | null;
-    token: string | null;
-  }
-
-  export const initialState: UserDetailsState;
-
-  export const authSlice: Slice<UserDetailsState>;
-
-  export const setTokenDetails: (state: UserDetailsState, action: PayloadAction<string>) => void;
-  export const setUserDetails: (state: UserDetailsState, action: PayloadAction<any>) => void;
-  export const setUserAuthStatus: (state: UserDetailsState, action: PayloadAction<'AUTHORIZED' | 'UN_AUTHORIZED' | 'PENDING' | 'UPGRADE'>) => void;
-  export const resetUserSlice: () => UserDetailsState;
-
-  export const actions: {
-    setTokenDetails: (payload: string) => PayloadAction<string>;
-    setUserDetails: (payload: any) => PayloadAction<any>;
-    setUserAuthStatus: (payload: 'AUTHORIZED' | 'UN_AUTHORIZED' | 'PENDING' | 'UPGRADE') => PayloadAction<'AUTHORIZED' | 'UN_AUTHORIZED' | 'PENDING' | 'UPGRADE'>;
-    resetUserSlice: () => PayloadAction<void>;
-  }
-
-  export default authSlice.reducer;
-}
-
-declare module 'store/authSlice' {
-  import { PayloadAction } from '@reduxjs/toolkit';
-  import { UserDetailsState } from 'store/authSlice'; // Adjust the import path if necessary
-
-  export const resetUserSlice: () => PayloadAction<void>;
+  export const setTokenDetails: (payload: string) => PayloadAction<string>;
+  // Other exports
 }
 
