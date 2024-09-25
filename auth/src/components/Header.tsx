@@ -13,7 +13,7 @@ export default function Header() {
   return (
     <nav className="w-full flex justify-between items-center py-2 px-10">
       <div className="flex lg:gap-6 items-center justify-between">
-        <Link to="#">
+        <Link to="/home">
           <img
             src={process.env.BASE_URL + "/images/logo.jpeg"}
             alt="logo"
