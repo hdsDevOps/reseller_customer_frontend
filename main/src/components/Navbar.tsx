@@ -16,8 +16,6 @@ import {
 
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { CiCreditCard1 } from "react-icons/ci";
-import { useAppDispatch } from "store/hooks";
-import { setTokenDetails } from "store/authSlice";
 
 const links = [
   {
@@ -68,7 +66,6 @@ const links = [
 ];
 
 const Sidebar = () => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
@@ -79,7 +76,6 @@ const Sidebar = () => {
   const [email] = useState("roberclive@domain.co.in"); // Replace with actual email
 
   const handleLogout = async () => {
-    dispatch(setTokenDetails(""));
     navigate("/login");
   };
 

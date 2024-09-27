@@ -128,7 +128,7 @@ const PlanCard: React.FC = () => {
                     </div>
 
                     {/* Buttons */}
-                    <div className="flex flex-col gap-1">
+                    <div className="flex flex-col">
                       <button className="bg-green-100 text-black py-1 px-2 sm:py-1 sm:px-4 rounded-lg mb-2 sm:mb-0 font-semibold text-[10px] sm:text-[12px]">
                         Gemini add-on available
                       </button>
@@ -140,7 +140,7 @@ const PlanCard: React.FC = () => {
                     </div>
 
                     {/* Next Renewal Date */}
-                    <div className="text-gray-500 text-xs sm:text-xs text-right mt-1">
+                    <div className="text-gray-500 text-xs sm:text-xs text-right">
                       {isYearly
                         ? `Next renewal date: ${plan.nextRenewalDate.yearly}`
                         : `Next renewal date: ${plan.nextRenewalDate.monthly}`}
@@ -206,7 +206,7 @@ const PlanCard: React.FC = () => {
                   </div>
 
                   {/* Buttons */}
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col">
                     <button className="bg-green-100 text-black py-1 px-2 sm:py-1 sm:px-4 rounded-lg mb-2 sm:mb-0 font-semibold text-[10px] sm:text-[12px]">
                       Gemini add-on available
                     </button>
@@ -218,7 +218,7 @@ const PlanCard: React.FC = () => {
                   </div>
 
                   {/* Next Renewal Date */}
-                  <div className="text-gray-500 text-xs sm:text-xs text-right mt-1">
+                  <div className="text-gray-500 text-xs sm:text-xs text-right">
                     {isYearly
                       ? `Next renewal date: ${plan.nextRenewalDate.yearly}`
                       : `Next renewal date: ${plan.nextRenewalDate.monthly}`}
