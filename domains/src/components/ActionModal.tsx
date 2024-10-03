@@ -5,9 +5,10 @@ import ConfirmationModal from "./ConfirmationModal";
 interface ActionModalProps {
   isOpen: boolean;
   onClose: () => void;
+  style: React.CSSProperties; // Accept style for positioning
 }
 
-const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose }) => {
+const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, style }) => {
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [isChangeTypeModalOpen, setIsChangeTypeModalOpen] = useState(false);
@@ -46,21 +47,17 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50 z-50">
-      <div className="bg-gray-100 rounded-xl shadow-md p-4 w-11/12 max-w-xs relative flex flex-col md:fixed md:bottom-12 md:right-6">
-        <button
-          type="button"
-          aria-label="Close"
-          className="absolute top-2 right-2 text-gray-600 hover:text-red-500"
-          onClick={onClose}
-        >
-          <X size={24} />
-        </button>
-        <ul className="flex-grow space-y-2">
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50 z-50" onClick={onClose}>
+      <div
+        className="bg-gray-100 rounded-xl shadow-md px-2 py-3 w-11/12 max-w-[13rem] relative"
+        style={style}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <ul className="space-y-2 flex-grow flex-col items-start justify-center">
           <li>
             <button
               type="button"
-              className="w-full text-left text-black hover:underline"
+              className="w-full text-left text-sm p-1 text-black hover:bg-green-100"
             >
               Update Payment Method
             </button>
@@ -68,7 +65,7 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose }) => {
           <li>
             <button
               type="button"
-              className="w-full text-left text-black hover:underline"
+              className="w-full text-left text-sm p-1 text-black hover:bg-green-100"
               onClick={handleCancelClick}
             >
               Cancel Domain
@@ -77,7 +74,7 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose }) => {
           <li>
             <button
               type="button"
-              className="w-full text-left text-black hover:underline"
+              className="w-full text-left text-sm p-1 text-black hover:bg-green-100"
               onClick={handleTransferClick}
             >
               Transfer Domain
@@ -86,7 +83,7 @@ const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose }) => {
           <li>
             <button
               type="button"
-              className="w-full text-left text-black hover:underline"
+              className="w-full text-left text-sm p-1 text-black hover:bg-green-100"
               onClick={handleChangeTypeClick}
             >
               Change Domain Type
