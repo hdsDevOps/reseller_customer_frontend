@@ -5,7 +5,7 @@ import ConfirmationModal from "./ConfirmationModal";
 interface ActionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  style: React.CSSProperties; // Accept style for positioning
+  style: React.CSSProperties;
 }
 
 const ActionModal: React.FC<ActionModalProps> = ({ isOpen, onClose, style }) => {

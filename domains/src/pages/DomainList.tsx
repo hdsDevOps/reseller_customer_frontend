@@ -35,13 +35,13 @@ const DomainList: React.FC = () => {
     const rect = event.currentTarget.getBoundingClientRect(); // Get button position
     const style: React.CSSProperties = {
       position: 'absolute',
-      top: `${rect.bottom + window.scrollY}px`, // Position below the button
-      right: "10px", // Adjust as needed
+      top: `${rect.bottom + window.scrollY}px`,
+      right: "10px",
     };
 
     setIsActionModalOpen(true);
-    setActionModalStyle(style); // Set the calculated style
-    setSelectedDomain(domain); // Store the selected domain if needed
+    setActionModalStyle(style);
+    setSelectedDomain(domain);
   };
 
   return (
