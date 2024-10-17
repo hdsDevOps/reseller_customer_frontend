@@ -57,7 +57,7 @@ const DropdownMenu = ({onSetShowProfile}:HeaderProps) => {
             >
               <div className="w-4 h-4 rounded-full overflow-hidden flex items-center justify-center">
                 <Flag
-                  code="IN"
+                  code="USA"
                   size={10}
                   className="object-cover w-full h-full"
                 />

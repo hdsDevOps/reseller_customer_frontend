@@ -3,14 +3,19 @@ import { Route, Routes } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
 import DomainApp from "domains/DomainApp";
+
 import SettingsApp from "settings/SettingsApp";
 import HdsProfile from "../components/HdsProfile";
+
+import EmailApp from "email/EmailApp";
+import PlanCard from "./PlanCards";
+
+
 const Dashboard = React.lazy(() => import("./Dashboard"));
 const routes = [
   { path: "/", element: <Dashboard /> },
   { path: "/dashboard", element: <Dashboard /> },
-
-
+  { path: "/upgrade-plan/*", element: <PlanCard /> },
 ];
 
 const MainApp: React.FC = () => {
@@ -29,6 +34,7 @@ const MainApp: React.FC = () => {
       </Routes>
       <DomainApp />
       <SettingsApp/>
+      <EmailApp />
     </div>
     <Navbar />
   
