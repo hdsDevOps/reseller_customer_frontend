@@ -8,6 +8,8 @@ import "../domain.css";
 const DomainList: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState<boolean>(false);
+  const [actionModalStyle, setActionModalStyle] = useState<React.CSSProperties | null>(null);
+  const [, setSelectedDomain] = useState<string | null>(null);
 
   const headers: string[] = ["Domain", "Domain Types", "Business Email", "User Licenses", " "];
   const domainData = {
@@ -27,6 +29,19 @@ const DomainList: React.FC = () => {
         userLicenses: "03/05"
       }
     ]
+  };
+
+  const handleOpenActionModal = (event: React.MouseEvent, domain: string) => {
+    const rect = event.currentTarget.getBoundingClientRect(); // Get button position
+    const style: React.CSSProperties = {
+      position: 'absolute',
+      top: `${rect.bottom + window.scrollY}px`,
+      right: "10px",
+    };
+
+    setIsActionModalOpen(true);
+    setActionModalStyle(style);
+    setSelectedDomain(domain);
   };
 
   return (
@@ -84,7 +99,7 @@ const DomainList: React.FC = () => {
                         <td className="p-2 text-gray-800 sm-max:text-xs">{row.userLicenses}</td>
                         <td className="p-2 text-center">
                           <button className="relative w-6 h-6 rounded-full border-2 border-green-500 flex justify-center items-center">
-                            <p className="mb-2" onClick={() => setIsActionModalOpen(true)}>...</p>
+                            <p className="mb-2" onClick={(e) => handleOpenActionModal(e, row.domain)}>...</p>
                           </button>
                         </td>
                       </tr>
@@ -104,7 +119,16 @@ const DomainList: React.FC = () => {
         </div>
       </main>
       <EmailModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-      <ActionModal isOpen={isActionModalOpen} onClose={() => setIsActionModalOpen(false)} />
+      {isActionModalOpen && actionModalStyle && (
+        <ActionModal
+          isOpen={isActionModalOpen}
+          onClose={() => {
+            setIsActionModalOpen(false);
+            setActionModalStyle(null);
+          }}
+          style={actionModalStyle}
+        />
+      )}
     </div>
   );
 };
