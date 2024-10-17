@@ -40,7 +40,7 @@ export default function Header() {
       </div>
       <div className="lg:flex gap-10 items-center">
         <p>
-          <Link to="#">Contact Us</Link>
+          <Link to="#">Contact Us1</Link>
         </p>
         <button className="bg-gray-100 text-green-500 hover:bg-green-500 hover:text-white border-none px-4 py-2.5 rounded-lg font-semibold text-base">
           <Link to="/login">Login</Link>
