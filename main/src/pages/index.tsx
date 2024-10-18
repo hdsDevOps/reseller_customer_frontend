@@ -3,8 +3,9 @@ import { Route, Routes } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
 import DomainApp from "domains/DomainApp";
-import EmailApp from "email/EmailApp";
+import PaymentApp from "payments/PaymentApp";
 import PlanCard from "./PlanCards";
+import HistoryApp from "history/HistoryApp";
 
 const Dashboard = React.lazy(() => import("./Dashboard"));
 
@@ -24,7 +25,8 @@ const MainApp: React.FC = () => (
         ))}
       </Routes>
       <DomainApp />
-      <EmailApp />
+      <PaymentApp />
+      <HistoryApp />
     </div>
     <Navbar />
   </div>

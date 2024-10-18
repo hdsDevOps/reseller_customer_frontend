@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FilterX } from "lucide-react";
-import EmailModal from "../components/EmailModal";
-import ActionModal from "../components/ActionModal";
+import EmailModal from "./EmailModal";
+import ActionModal from "../components/EmailActionModal";
 import AddLicense from "../components/AddLicense";
-
 import "../index.css";
 
 const EmailList: React.FC = () => {
