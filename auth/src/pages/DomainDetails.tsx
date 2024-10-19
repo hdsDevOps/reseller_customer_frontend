@@ -9,8 +9,16 @@ const DomainDetails: React.FC = () => {
   const [domainName, setDomainName] = useState("");
   const [domainError, setDomainError] = useState(false);
 
+  // State for "Use a Domain You Own" form
+  const [existingDomainName, setExistingDomainName] = useState("");
+  const [existingDomainError, setExistingDomainError] = useState(false);
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDomainName(event.target.value);
+  };
+
+  const handleExistingDomainChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setExistingDomainName(event.target.value);
   };
 
   const handleToDomain = () => {
@@ -22,35 +30,44 @@ const DomainDetails: React.FC = () => {
     navigate('/domainlist');
   };
 
+  const handleExistingDomainSubmit = () => {
+    if (existingDomainName.trim() === "") {
+      setExistingDomainError(true);
+      return;
+    }
+    setExistingDomainError(false);
+    navigate('/signin-domain');
+  };
+
   return (
-    <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative">
+    <div className="relative flex flex-col items-center justify-center w-full h-full gap-6 p-4">
       <p
-        className="flex items-center gap-1 text-green-600 cursor-pointer absolute left-4 top-2"
+        className="absolute flex items-center gap-1 text-green-600 cursor-pointer left-4 top-2"
         onClick={() => navigate(-1)}
       >
         <IoChevronBackSharp /> Back to previous page
       </p>
 
-      <div className="w-full flex flex-col items-center justify-center gap-6 p-7">
+      <div className="flex flex-col items-center justify-center w-full gap-6 p-7">
         <div className="pb-4 text-center">
           <h1 className="text-3xl font-semibold xsm-max:text-[16px]">
             Next, We'll Setup Your Domain
           </h1>
-          <p className="text-gray-600 mt-2 xsm-max:text-xs">
+          <p className="mt-2 text-gray-600 xsm-max:text-xs">
             Your domain will be your website's address.
           </p>
-          <p className="text-gray-600 mt-2 xsm-max:text-xs xsm-max:mt-0">
+          <p className="mt-2 text-gray-600 xsm-max:text-xs xsm-max:mt-0">
             You can create a new domain, use one you already own, or make one later.
           </p>
         </div>
 
-        <div className="w-full max-w-5xl flex gap-12 xsm-max:flex-col">
+        <div className="flex w-full max-w-5xl gap-12 xsm-max:flex-col">
           {/* Form for Creating a New Domain */}
-          <div className="flex-1 bg-white border border-gray-200 rounded-xl flex flex-col">
-            <div className="bg-gray-100 p-3 rounded-t-md">
+          <div className="flex flex-col flex-1 bg-white border border-gray-200 rounded-xl">
+            <div className="p-3 bg-gray-100 rounded-t-md">
               <h2 className="text-xl font-semibold xsm-max:text-sm">Create a New Domain</h2>
             </div>
-            <form className="p-3 mt-8 flex flex-col gap-4 bg-white flex-1">
+            <form className="flex flex-col flex-1 gap-4 p-3 mt-8 bg-white">
               <div className="flex gap-4 xsm-max:flex-col">
                 <input
                   type="text"
@@ -60,24 +77,24 @@ const DomainDetails: React.FC = () => {
                   onChange={handleInputChange}
                 />
                 <select
-                  className="border-2 border-gray-200 bg-transparent rounded-md p-3 focus:border-blue-500 focus:outline-none"
+                  className="p-3 bg-transparent border-2 border-gray-200 rounded-md focus:border-blue-500 focus:outline-none"
                 >
                   <option>.com</option>
                   <option>.cc</option>
                   <option>.org</option>
                 </select>
               </div>
-              <p className="text-gray-400 text-sm">
+              <p className="text-sm text-gray-400">
                 Search a domain name.
               </p>
               {domainError && (
-                <p className="text-red-500 text-sm">Enter your domain</p>
+                <p className="text-sm text-red-500">Enter your domain</p>
               )}
             </form>
-            <div className="p-3 flex flex-start">
+            <div className="flex p-3 flex-start">
               <button
                 type="button"
-                className="py-2 px-4 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 ease-in-out"
+                className="px-4 py-2 text-white transition duration-200 ease-in-out bg-green-600 rounded-md hover:bg-green-700"
                 onClick={handleToDomain}
               >
                 Next
@@ -86,34 +103,40 @@ const DomainDetails: React.FC = () => {
           </div>
 
           {/* Form for Using an Existing Domain */}
-          <div className="flex-1 bg-white border border-gray-200 rounded-xl flex flex-col">
-            <div className="bg-gray-100 p-3 rounded-t-md">
+          <div className="flex flex-col flex-1 bg-white border border-gray-200 rounded-xl">
+            <div className="p-3 bg-gray-100 rounded-t-md">
               <h2 className="text-xl font-semibold xsm-max:text-sm">Use a Domain You Own</h2>
             </div>
-            <form className="p-3 mt-8 flex flex-col gap-4 bg-white flex-1">
+            <form className="flex flex-col flex-1 gap-4 p-3 mt-8 bg-white">
               <input
                 type="text"
-                placeholder=""
-                className="border-2 border-gray-200 bg-transparent rounded-md p-3 focus:border-blue-500 focus:outline-none"
+                placeholder="Enter your existing domain"
+                className={`border-2 ${existingDomainError ? 'border-red-500' : 'border-gray-200'} bg-transparent rounded-md p-3 focus:border-blue-500 focus:outline-none`}
+                value={existingDomainName}
+                onChange={handleExistingDomainChange}
               />
-              <p className="text-gray-400 text-sm">
+              <p className="text-sm text-gray-400">
                 Enter your existing domain name.
               </p>
+              {existingDomainError && (
+                <p className="text-sm text-red-500">Enter your existing domain</p>
+              )}
             </form>
-            <div className="p-4 flex flex-start">
+            <div className="flex p-4 flex-start">
               <button
                 type="button"
-                className="py-2 px-4 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 ease-in-out"
+                className="px-4 py-2 text-white transition duration-200 ease-in-out bg-green-600 rounded-md hover:bg-green-700"
+                onClick={handleExistingDomainSubmit}
               >
                 Next
               </button>
             </div>
           </div>
         </div>
-        <div className="mt-4 w-full max-w-5xl">
-          <p className="text-black xsm-max:text-sm text-md flex items-start gap-1">
-            <FaTriangleExclamation className="text-2xl inline-block text-red-500" />
-            Please note that if you have an existing domain, you won't be charged. but if you don't have a domain, then you have to pay for the domain only for trial version.
+        <div className="w-full max-w-5xl mt-4">
+          <p className="flex items-start gap-1 text-black xsm-max:text-sm text-md">
+            <FaTriangleExclamation className="inline-block text-2xl text-red-500" />
+            Please note that if you have an existing domain, you won't be charged. But if you don't have a domain, then you have to pay for the domain only for trial version.
           </p>
         </div>
       </div>
