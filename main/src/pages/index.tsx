@@ -4,10 +4,10 @@ import Navbar from "../components/Navbar";
 import Header from "../components/Header";
 import DomainApp from "domains/DomainApp";
 
-import SettingsApp from "settings/SettingsApp";
+// import SettingsApp from "settings/SettingsApp";
 import HdsProfile from "../components/HdsProfile";
 
-import EmailApp from "email/EmailApp";
+// import EmailApp from "email/EmailApp";
 import PlanCard from "./PlanCards";
 
 
@@ -33,8 +33,8 @@ const MainApp: React.FC = () => {
         ))}
       </Routes>
       <DomainApp />
-      <SettingsApp/>
-      <EmailApp />
+      {/* <SettingsApp/>
+      <EmailApp /> */}
     </div>
     <Navbar />
   
