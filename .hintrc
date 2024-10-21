@@ -6,8 +6,7 @@
     "axe/forms": [
       "default",
       {
-        "label": "off",
-        "select-name": "off"
+        "label": "off"
       }
     ],
     "axe/name-role-value": [

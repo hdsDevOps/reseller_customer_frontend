@@ -4,7 +4,6 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 import { FaArrowDownLong } from "react-icons/fa6";
 import { SmallButton } from "../../utils/buttons/Button";
 import ProductivityAndCollaboration from "./ProductivityTable";
-import { Link } from "react-router-dom";
 
 const PlanandPrice = () => {
   return (
@@ -13,35 +12,31 @@ const PlanandPrice = () => {
             <div className="relative flex justify-center">
             <input className="bg-transparent border py-6 px-10 w-[69.688rem] rounded-md shadow-md font-normal text-2x" placeholder="Type your desired domain here."/>
             <div className="flex justify-center items-center absolute top-5 right-[2rem]">
-                <p className="text-2xl font-bold text-black">.com</p>
+                <p className="text-black font-bold text-2xl">.com</p>
                 <MdKeyboardArrowDown size={24} />
             </div>
             </div>
-            <Link to="/DomainList">
-            <button className="px-4 py-6 text-lg font-semibold text-white rounded-md bg-greenbase">Search Domain</button>
-            </Link>
+            <button className="py-6 px-4 rounded-md bg-greenbase text-white text-lg font-semibold">Search Domain</button>
         </div>
       <PlanCard />
-      <div className="flex flex-col items-center justify-center mx-auto mt-10">
-        <p className="mb-2 text-xl font-medium text-greenbase">Compare plans in details</p>
+      <div className="flex flex-col justify-center items-center mx-auto mt-10">
+        <p className="text-greenbase text-xl font-medium mb-2">Compare plans in details</p>
         <FaArrowDownLong fill="#12A833"/>
       </div>
-      <div className="flex justify-end px-8 mx-auto py-7">
+      <div className="flex justify-end mx-auto px-8 py-7">
         <div className="flex flex-col gap-3 px-5 pt-5 border-[#8c8c8c] border-2 !border-r-0 ">
-            <p className="text-lg font-normal">Business Starter</p>
-        <Link to="/subscribe">
+            <p className="font-normal text-lg">Business Starter</p>
             <SmallButton placeholder="Start trial" className="text-white"/>
-        </Link>
         </div>
         <div className="flex flex-col gap-3 pb-7 border-[#8c8c8c] border-2 !border-r-0">
             <p className="text-greenbase text-xs font-normal bg-[#e7f6eb] flex justify-center px-2 py-2 w-full">MOST POPULAR</p>
-            <div className="flex flex-col gap-3 px-5">
-            <p className="text-lg font-normal">Business Standard</p>
+            <div className="px-5 gap-3 flex flex-col">
+            <p className="font-normal text-lg">Business Standard</p>
             <SmallButton placeholder="Start trial" className="!bg-[#F0F0F3] text-greenbase"/>
             </div>
         </div>
         <div className="flex flex-col gap-3 px-5 pt-5 border-[#8c8c8c] border-2">
-            <p className="text-lg font-normal">Business Plus</p>
+            <p className="font-normal text-lg">Business Plus</p>
             <SmallButton placeholder="Start trial" className="!bg-[#F0F0F3] text-greenbase"/>
         </div>
       </div>

@@ -22,12 +22,10 @@ const SignToDomain = React.lazy(() => import("./SignToDomain"));
 const FreeTrial = React.lazy(() => import("./FreeTrial"));
 const Gemini = React.lazy(() => import("./Gemini"));
 const Summary = React.lazy(() => import("./Summary"));
-const Review = React.lazy(() => import("./Review"));
-const PaymentGateway = React.lazy(() => import("./PaymentGateway"));
-const Receipt = React.lazy(() => import("./Receipt"));
+
 const AuthApp: React.FC = () => {
   return (
-    <div className="w-full min-h-screen bg-white">
+    <div className="min-h-screen bg-white w-full">
       <Suspense fallback={<div>Loading...</div>}>
         <Header />
         <main className="flex items-center justify-center max-w-full">
@@ -52,10 +50,6 @@ const AuthApp: React.FC = () => {
             <Route path="/free-trial" element={<FreeTrial />} />
             <Route path="/gemini-add" element={<Gemini />} />
             <Route path="/summary" element={<Summary />} />
-            <Route path="/DomainDetails" element={<DomainDetails />} />
-            <Route path="/Review" element={<Review />} />
-            <Route path="/PaymentGateway" element={<PaymentGateway />} />
-            <Route path="/Receipt" element={<Receipt />} />
           </Routes>
         </main>
         <Footer/>
