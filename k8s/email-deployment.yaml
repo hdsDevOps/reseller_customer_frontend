@@ -16,7 +16,7 @@ spec:
       - name: frontend-email-service
         image: hordansodevops/reseller_customer_frontend_email:latest
         ports:
-        - containerPort: 3002
+        - containerPort: 3003
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
