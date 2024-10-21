@@ -33,8 +33,8 @@ const MainApp: React.FC = () => {
         ))}
       </Routes>
       <DomainApp />
-      {/* <SettingsApp/>
-      <EmailApp /> */}
+      <SettingsApp/>
+      <EmailApp />
     </div>
     <Navbar />
   
