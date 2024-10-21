@@ -50,3 +50,10 @@ spec:
             name: frontend-email-service
             port:
               number: 80
+      - path: /settings
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-settings-service
+            port:
+              number: 80
