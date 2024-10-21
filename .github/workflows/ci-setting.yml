@@ -1,4 +1,4 @@
-name: CI for Settings Service
+name: CI for Setting Service
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKER_IMAGE: hordansodevops/reseller_customer_frontend_settings
+  DOCKER_IMAGE: hordansodevops/reseller_customer_frontend_setting
 
 jobs:
   build_and_deploy:
