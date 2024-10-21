@@ -14,6 +14,17 @@ declare module "payments/PaymentApp" {
   const PaymentApp: React.ComponentType<any>;
   export default PaymentApp;
 }
+declare module "settings/SettingsApp" {
+  import React from 'react';
+  // Assuming SettingsApp is a functional component or class component
+  const SettingsApp: React.ComponentType<any>; // Adjust props type as per your component
+  export default SettingsApp;
+
+declare module "email/EmailApp" {
+  import React from 'react';
+  const PaymentApp: React.ComponentType<any>;
+  export default PaymentApp;
+}
 declare module "billinghistory/HistoryApp" {
   import React from 'react';
   const HistoryApp: React.ComponentType<any>;
