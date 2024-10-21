@@ -14,7 +14,7 @@ declare module "payments/PaymentApp" {
   const PaymentApp: React.ComponentType<any>;
   export default PaymentApp;
 }
-declare module "history/HistoryApp" {
+declare module "billinghistory/HistoryApp" {
   import React from 'react';
   const HistoryApp: React.ComponentType<any>;
   export default HistoryApp;

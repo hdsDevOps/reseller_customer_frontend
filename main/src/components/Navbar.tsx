@@ -41,7 +41,7 @@ const links = [
     icon: <Ticket className="w-5 h-5" />,
   },
   {
-    path: "/history",
+    path: "/billing-history",
     label: "Billing History",
     icon: <ShieldCheck className="w-5 h-5" />,
   },

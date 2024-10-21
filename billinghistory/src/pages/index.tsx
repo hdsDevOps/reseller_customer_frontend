@@ -1,7 +1,6 @@
 import React, { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-import "../index.css"
-const BillHistory = React.lazy(() => import("./BillHistory"));
+const BillingHistory = React.lazy(() => import("./BillingHistory"));
 
 
 const HistoryApp: React.FC = () => {
@@ -9,8 +8,7 @@ const HistoryApp: React.FC = () => {
     <div>
       <Suspense fallback={<div>Loading...</div>}>
         <Routes>
-          <Route path="/payment-method" element={<BillHistory />} />
-          
+          <Route path="/billing-history" element={<BillingHistory />} />
         </Routes>
       </Suspense>
       

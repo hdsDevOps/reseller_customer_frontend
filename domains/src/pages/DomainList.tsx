@@ -9,7 +9,7 @@ const DomainList: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState<boolean>(false);
   const [actionModalStyle, setActionModalStyle] = useState<React.CSSProperties | null>(null);
-  const [, setSelectedDomain] = useState<string | null>(null);
+  const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
 
   const headers: string[] = ["Domain", "Domain Types", "Business Email", "User Licenses", " "];
   const domainData = {
