@@ -1,5 +1,4 @@
 name: CI for Setting Service
-
 on:
   push:
     branches:
