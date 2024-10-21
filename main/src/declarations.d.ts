@@ -9,7 +9,11 @@ declare module "domains/DomainApp" {
   const DomainApp: React.ComponentType<any>; // Adjust props type as per your component
   export default DomainApp;
 }
-
+declare module "payments/PaymentApp" {
+  import React from 'react';
+  const PaymentApp: React.ComponentType<any>;
+  export default PaymentApp;
+}
 declare module "settings/SettingsApp" {
   import React from 'react';
   // Assuming SettingsApp is a functional component or class component
@@ -18,8 +22,13 @@ declare module "settings/SettingsApp" {
 
 declare module "email/EmailApp" {
   import React from 'react';
-  const EmailApp: React.ComponentType<any>;
-  export default EmailApp;
+  const PaymentApp: React.ComponentType<any>;
+  export default PaymentApp;
+}
+declare module "billinghistory/HistoryApp" {
+  import React from 'react';
+  const HistoryApp: React.ComponentType<any>;
+  export default HistoryApp;
 }
 declare module 'store/user.storage' {
   export async function getUserTokenFromLocalStorage(): Promise<string>;

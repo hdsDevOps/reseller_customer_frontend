@@ -9,7 +9,7 @@ const printCompilationMessage = require('./compilation.config.js');
 
 module.exports = (_, argv) => ({
   output: {
-    publicPath: "http://localhost:3003/",
+    publicPath: "http://localhost:3010/",
   },
 
   resolve: {
@@ -17,7 +17,7 @@ module.exports = (_, argv) => ({
   },
 
   devServer: {
-    port: 3003,
+    port: 3010,
     historyApiFallback: true,
     watchFiles: [path.resolve(__dirname, 'src')],
     onListening: function (devServer) {
@@ -62,14 +62,12 @@ module.exports = (_, argv) => ({
 
   plugins: [
     new ModuleFederationPlugin({
-      name: "email",
+      name: "billinghistory",
       filename: "remoteEntry.js",
-      remotes: {
-				store: `store@${process.env.STORE_BASE_URL || 'http://localhost:3030'}/remoteEntry.js`,
-			},
-			exposes: {
-				"./EmailApp": "./src/pages/index.tsx",
-			},
+      remotes: {},
+      exposes: {
+        "./HistoryApp": "./src/pages/index.tsx",
+      },
       shared: {
         ...deps,
         react: {

@@ -24,6 +24,6 @@
   },
   "include": [
     "src/**/*" // *** The files TypeScript should type check ***
-, "../domains/src/components/ConfirmationModal.tsx"  ],
+  ],
   "exclude": ["node_modules", "build", "dist"]
 }
