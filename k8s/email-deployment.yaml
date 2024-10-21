@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-email-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend-email-service
+  template:
+    metadata:
+      labels:
+        app: frontend-email-service
+    spec:
+      containers:
+      - name: frontend-email-service
+        image: hordansodevops/reseller_customer_frontend_email:latest
+        ports:
+        - containerPort: 3002
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: email-config
