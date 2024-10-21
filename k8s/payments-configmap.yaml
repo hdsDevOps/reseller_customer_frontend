@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payments-config
+data:
+  BASE_URL: "https://payments.customer.gworkspace.withhordanso.com"
+  STORE_BASE_URL: "https://store.customer.gworkspace.withhordanso.com"
