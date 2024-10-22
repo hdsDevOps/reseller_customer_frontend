@@ -11,13 +11,14 @@ module.exports = (_, argv) => ({
   output: {
     publicPath: "auto",
   },
-
+ 
   resolve: {
     extensions: [".tsx", ".ts", ".jsx", ".js", ".json"],
   },
 
   devServer: {
     port: 3006,
+    allowedHosts: ["all"],
     historyApiFallback: true,
     watchFiles: [path.resolve(__dirname, 'src')],
     onListening: function (devServer) {
