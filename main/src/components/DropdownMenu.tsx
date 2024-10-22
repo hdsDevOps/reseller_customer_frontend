@@ -2,19 +2,12 @@ import React, { useState } from "react";
 import { Settings, ChevronDown } from "lucide-react";
 import Flag from "react-world-flags";
 
-interface HeaderProps{
-  onSetShowProfile:React.Dispatch<React.SetStateAction<boolean>>
-}
-const DropdownMenu = ({onSetShowProfile}:HeaderProps) => {
+const DropdownMenu: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-
   const toggleDropdown = () => {
     setIsOpen((prev) => !prev);
   };
 
-  const onShowProfile =()=>{
-    onSetShowProfile((prev)=>!prev)
-  }
   return (
     <div className="relative">
       <button
@@ -41,7 +34,7 @@ const DropdownMenu = ({onSetShowProfile}:HeaderProps) => {
             </div>
           </li>
           <li className="border-t border-gray-200 my-1"></li>
-          <li onClick={onShowProfile}>
+          <li>
             <a
               href="#"
               className="flex items-center space-x-2 p-2 hover:bg-gray-100 text-xs"
@@ -57,7 +50,7 @@ const DropdownMenu = ({onSetShowProfile}:HeaderProps) => {
             >
               <div className="w-4 h-4 rounded-full overflow-hidden flex items-center justify-center">
                 <Flag
-                  code="USA"
+                  code="IN"
                   size={10}
                   className="object-cover w-full h-full"
                 />
@@ -68,7 +61,6 @@ const DropdownMenu = ({onSetShowProfile}:HeaderProps) => {
           </li>
         </ul>
       )}
-      
     </div>
   );
 };

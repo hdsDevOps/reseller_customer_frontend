@@ -14,7 +14,10 @@ const AddDomain: React.FC = () => {
             <ArrowLeft className="text-sm sm:text-md lg:text-2xl" /> Add existing domains
           </h2>
         </Link>
-        
+        {/* <p>
+          This is your Domain where you can manage your account ={" "}
+          {userAuthStatus}
+        </p> */}
         <div className="flex items-center gap-1 text-sm sm:text-md md:text-lg">
           <Link to="/domain">Domain</Link>
           <ChevronRight />

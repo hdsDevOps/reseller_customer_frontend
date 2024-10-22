@@ -46,7 +46,7 @@ const links = [
     icon: <ShieldCheck className="w-5 h-5" />,
   },
   {
-    path: "/payment-subscription",
+    path: "/payment",
     label: "Payment Subscription",
     icon: <CreditCard className="w-5 h-5" />,
   },

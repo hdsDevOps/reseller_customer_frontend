@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: billinghistory-config
-data:
-  BASE_URL: "https://billinghistory.customer.gworkspace.withhordanso.com"
-  STORE_BASE_URL: "https://store.customer.gworkspace.withhordanso.com"

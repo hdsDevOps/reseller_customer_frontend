@@ -17,7 +17,6 @@ const Login: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     navigate("/otp?mode=signin");
-  
 
     // try {
     //   const result = await dispatch(
