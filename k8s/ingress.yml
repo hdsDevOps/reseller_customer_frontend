@@ -43,10 +43,31 @@ spec:
             name: frontend-store-service
             port:
               number: 80
-      - path: /setting
+      - path: /email
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-email-service
+            port:
+              number: 80
+      - path: /settings
         pathType: Prefix
         backend:
           service:
             name: frontend-settings-service
+            port:
+              number: 80
+      - path: /payments
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-payments-service
+            port:
+              number: 80
+      - path: /billinghistory
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-billinghistory-service
             port:
               number: 80

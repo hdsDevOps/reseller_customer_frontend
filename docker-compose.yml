@@ -9,7 +9,7 @@ services:
       - dev_network
 
   domains:
-    build: ./domain
+    build: ./domains
     container_name: microfrontend_customer_domains
     ports:
       - 3001:3001
@@ -24,6 +24,22 @@ services:
     networks:
       - dev_network
 
+  store:
+    build: ./store
+    container_name: microfrontend_customer_store
+    ports:
+      - 3030:3030
+    networks:
+      - dev_network
+ 
+  email:
+    build: ./email
+    container_name: microfrontend_customer_email
+    ports:
+      - 3003:3003
+    networks:
+      - dev_network
+  
   settings:
     build: ./settings
     container_name: microfrontend_customer_settings
@@ -32,11 +48,19 @@ services:
     networks:
       - dev_network
 
-  store:
-    build: ./store
-    container_name: microfrontend_customer_store
+  payments:
+    build: ./payments
+    container_name: microfrontend_customer_payments
     ports:
-      - 3030:3030
+      - 3007:3007
+    networks:
+      - dev_network
+      
+  billinghistory:
+    build: ./billinghistory
+    container_name: microfrontend_customer_billinghistory
+    ports:
+      - 3010:3010
     networks:
       - dev_network
 
