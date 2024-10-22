@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: email-config
-data:
-  BASE_URL: "https://email.customer.gworkspace.withhordanso.com"
-  STORE_BASE_URL: "https://store.customer.gworkspace.withhordanso.com"
