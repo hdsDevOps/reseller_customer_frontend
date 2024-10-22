@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: main-config
+data:
+  BASE_URL: "https://main.customer.gworkspace.withhordanso.com"
+  STORE_BASE_URL: "https://store.customer.gworkspace.withhordanso.com"
+  AUTH_BASE_URL: "https://auth.customer.gworkspace.withhordanso.com"
+  DOMAINS_BASE_URL: "https://domain.customer.gworkspace.withhordanso.com"
+  SETTINGS_BASE_URL: "https://settings.customer.gworkspace.withhordanso.com"
+  EMAIL_BASE_URL: "https://email.customer.gworkspace.withhordanso.com"
+  BILLINGHISTORY_BASE_URL: "https://billinghistory.customer.gworkspace.withhordanso.com"
+  PAYMENTS_BASE_URL: "https://payments.customer.gworkspace.withhordanso.com"
+

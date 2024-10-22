@@ -30,7 +30,23 @@ services:
     ports:
       - 3030:3030
     networks:
-      - dev_network  
+      - dev_network
+ 
+  email:
+    build: ./email
+    container_name: microfrontend_customer_email
+    ports:
+      - 3003:3003
+    networks:
+      - dev_network
+  
+  settings:
+    build: ./settings
+    container_name: microfrontend_customer_settings
+    ports:
+      - 3006:3006
+    networks:
+      - dev_network
 
 networks:
   dev_network:
