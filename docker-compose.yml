@@ -24,6 +24,14 @@ services:
     networks:
       - dev_network
 
+  settings:
+    build: ./settings
+    container_name: microfrontend_customer_settings
+    ports:
+      - 3006:3006
+    networks:
+      - dev_network
+
   store:
     build: ./store
     container_name: microfrontend_customer_store

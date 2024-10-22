@@ -43,3 +43,10 @@ spec:
             name: frontend-store-service
             port:
               number: 80
+      - path: /setting
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-settings-service
+            port:
+              number: 80
