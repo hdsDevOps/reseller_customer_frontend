@@ -30,6 +30,7 @@ const Login: React.FC = () => {
     mode: "onTouched",
   });
 
+
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     setLoading(true);
     try {
@@ -69,7 +70,7 @@ const Login: React.FC = () => {
             <p className="mt-2">
               New to Hordanso?{" "}
               <Link to="/register" className="text-green-600">
-                Register Now
+                Register Now 
               </Link>
             </p>
           </div>

@@ -1,13 +1,18 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FilterX } from "lucide-react";
 import EmailModal from "../components/EmailModal";
 import ActionModal from "../components/ActionModal";
+import AddLicense from "../components/AddLicense";
+
 import "../index.css";
 
 const EmailList: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState<boolean>(false);
+  const [isLicenseModalOpen, setIsLicenseModalOpen] = useState<boolean>(false);
+  const [selectedUserRole, setSelectedUserRole] = useState<string | undefined>();
+  const [actionModalStyle, setActionModalStyle] = useState<React.CSSProperties>({});
   const [searchTerm, setSearchTerm] = useState("");
 
   const location = useLocation();
@@ -15,9 +20,8 @@ const EmailList: React.FC = () => {
   const domainName = params.get("domain") || "schemaphic.com";
 
   const [emailData, setEmailData] = useState([
-    { name: "Robert Clive > Admin", email: "robertclive@", status: true },
-    { name: "Michel Henry", email: "michelhenry@", status: false },
-    // Add more users as needed or call using API
+    { name: "Robert Clive > Admin", email: "robertclive@", status: true, role: ".Admin" },
+    { name: "Michel Henry", email: "michelhenry@", status: false, role: "" },
   ]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,6 +34,21 @@ const EmailList: React.FC = () => {
     setEmailData(updatedData);
   };
 
+  const navigate = useNavigate();
+
+  const openActionModal = (event: React.MouseEvent<HTMLElement>, role: string) => {
+    const rect = event.currentTarget.getBoundingClientRect(); // Get button position
+    const style: React.CSSProperties = {
+      position: 'absolute',
+      top: `${rect.bottom}px`,
+      right: "10px",
+    };
+  
+    setSelectedUserRole(role);
+    setActionModalStyle(style);
+    setIsActionModalOpen(true);
+  };
+
   return (
     <div>
       <main>
@@ -38,8 +57,7 @@ const EmailList: React.FC = () => {
             <div>
               <h2 className="text-green-500 text-sm sm:text-2xl">Email</h2>
               <p className="text-sm sm:text-md md:text-lg">
-                Set up your email accounts here and you can add users and edit
-                your admin details.
+                Set up your email accounts here and you can add users and edit your admin details.
               </p>
             </div>
           </div>
@@ -61,7 +79,7 @@ const EmailList: React.FC = () => {
             <div className="flex items-start flex-col md:flex-row h-fit sm:h-24">
               <div className="md:mr-4 flex-shrink-0 h-full">
                 <img
-                  src={process.env.BASE_URL + "/images/google.jpg"}
+                  src="/images/google.jpg"
                   alt="Domain"
                   className="h-full w-full sm:w-auto object-cover"
                 />
@@ -70,13 +88,13 @@ const EmailList: React.FC = () => {
                 <p className="text-sm md:text-md lg:text-lg font-semibold text-gray-600">{`${domainName}`}</p>
                 <p className="text-sm md:text-md lg:text-lg font-semibold text-gray-600">
                   3 users@{domainName}.{" "}
-                  <span className="text-xs sm:text-sm text-green-500 ml-3">
+                  <span className="text-xs sm:text-sm text-green-500 ml-3 cursor-pointer" onClick={() => setIsLicenseModalOpen(true)}>
                     Add user license
                   </span>
                 </p>
                 <p className="text-sm md:text-md text-gray-600">
                   Google Workspace Starter.{" "}
-                  <span className="text-xs sm:text-sm text-green-500 ml-3">
+                  <span className="text-xs sm:text-sm text-green-500 ml-3 cursor-pointer" onClick={() => navigate('/upgrade-plan')}>
                     Upgrade plan
                   </span>
                 </p>
@@ -141,7 +159,7 @@ const EmailList: React.FC = () => {
                         <button className="relative w-6 h-6 rounded-full border-2 border-green-500 flex justify-center items-center">
                           <p
                             className="mb-2"
-                            onClick={() => setIsActionModalOpen(true)}
+                            onClick={(e) => openActionModal(e, row.role)}
                           >
                             ...
                           </p>
@@ -158,7 +176,16 @@ const EmailList: React.FC = () => {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
         />
-        <ActionModal isOpen={isActionModalOpen} onClose={() => setIsActionModalOpen(false)} />
+        <ActionModal
+          isOpen={isActionModalOpen}
+          onClose={() => setIsActionModalOpen(false)}
+          userRole={selectedUserRole}
+          style={actionModalStyle} // Pass the calculated style
+        />
+        <AddLicense
+          isOpen={isLicenseModalOpen}
+          onClose={() => setIsLicenseModalOpen(false)}
+        />
       </main>
     </div>
   );

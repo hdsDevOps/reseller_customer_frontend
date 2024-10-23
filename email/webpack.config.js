@@ -65,7 +65,7 @@ module.exports = (_, argv) => ({
       name: "email",
       filename: "remoteEntry.js",
       remotes: {
-				store:"store@http://localhost:3030/remoteEntry.js",
+				store: `store@${process.env.STORE_BASE_URL || 'http://localhost:3030'}/remoteEntry.js`,
 			},
 			exposes: {
 				"./EmailApp": "./src/pages/index.tsx",

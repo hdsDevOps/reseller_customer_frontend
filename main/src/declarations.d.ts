@@ -9,10 +9,16 @@ declare module "domains/DomainApp" {
   const DomainApp: React.ComponentType<any>; // Adjust props type as per your component
   export default DomainApp;
 }
+
+declare module "settings/SettingsApp" {
+  import React from 'react';
+  // Assuming SettingsApp is a functional component or class component
+  const SettingsApp: React.ComponentType<any>; // Adjust props type as per your component
+  export default SettingsApp;
+}
 declare module "email/EmailApp" {
   import React from 'react';
-  // Assuming DomainApp is a functional component or class component
-  const DomainApp: React.ComponentType<any>; // Adjust props type as per your component
+  const EmailApp: React.ComponentType<any>;
   export default EmailApp;
 }
 declare module 'store/user.storage' {
