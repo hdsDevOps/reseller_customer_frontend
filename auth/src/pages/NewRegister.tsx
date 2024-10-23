@@ -8,13 +8,17 @@ import { useNavigate } from "react-router-dom";
 import TermsAndConditions from "./Terms";
 import CheckBox from "../utils/inputs/checkbox";
 import { Link } from "react-router-dom";
+import { useAppDispatch } from "store/hooks";
+import { makeUserRegisterThunk } from "store/user.thunk";
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const [fname, setFname] = useState("");
   const [lname, setLname] = useState("");
   const [email, setEmail] = useState("");
+  const [phoneNo, setPhoneNo] = useState<string>("+91");
   const [business, setBusiness] = useState("");
   const [street, setStreet] = useState("");
   const [state, setState] = useState("");
@@ -27,9 +31,12 @@ const RegisterPage: React.FC = () => {
   const [error, setError] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
+    navigate("/otp?mode=signup");
+    return;
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -39,16 +46,39 @@ const RegisterPage: React.FC = () => {
       setError("You must accept the terms and conditions");
       return;
     }
-    navigate("/verifyemail");
+    setLoading(true);
+    try {
+      const result = await dispatch(
+        makeUserRegisterThunk({
+          first_name: fname,
+          last_name: lname,
+          business_name: business,
+          email: email,
+          state: state,
+          city: city,
+          zipcode: zip,
+          password: password,
+          street_name: street,
+          region: region,
+          phone_no: phoneNo,
+        })
+      ).unwrap();
+      setLoading(false);
+      console.log("result....", result);
+      navigate("/otp?mode=signin");
+    } catch (error) {
+      console.error("Login error:", error);
+      setLoading(false);
+    }
   };
 
   return (
     <section className="w-full mx-auto px-8 pt-3 pb-8">
       <Link to="/login">
-      <div className="flex gap-1 items-center cursor-pointer">
-        <IoIosArrowBack className="w-4 h-4" />
-        <p className="text-greenbase">Back to previous page</p>
-      </div>
+        <div className="flex gap-1 items-center cursor-pointer">
+          <IoIosArrowBack className="w-4 h-4" />
+          <p className="text-greenbase">Back to previous page</p>
+        </div>
       </Link>
 
       <div className="">
@@ -56,7 +86,8 @@ const RegisterPage: React.FC = () => {
           Welcome to Hordanso LLC
         </h1>
         <p className="font-normal text-base flex justify-center md:pt-4 pt-2">
-          To create an account, we need some information for your HORDANSO account.
+          To create an account, we need some information for your HORDANSO
+          account.
         </p>
         <form onSubmit={handleSubmit}>
           <div className="flex xl:flex-row flex-col gap-10 justify-center md:pt-12 pt-8 pb-4">
@@ -133,6 +164,8 @@ const RegisterPage: React.FC = () => {
               <PhoneNumberInput
                 placeholder="Business phone number"
                 className="w-full"
+                phoneNumber={phoneNo}
+                handleChange={(value) => setPhoneNo(value || "")} // Updates phoneNo with the input value
               />
               <Input
                 placeholder="Confirm Password"
@@ -167,9 +200,11 @@ const RegisterPage: React.FC = () => {
               type="submit"
               className="group relative w-full md:max-w-40 flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:!bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
               data-testid="log-in"
-              disabled={!termsAccepted || password !== confirmPassword}
+              disabled={
+                !termsAccepted || password !== confirmPassword || loading
+              }
             >
-              Submit
+              {loading ? "Loading..." : "Submit"}
             </button>
           </div>
         </form>

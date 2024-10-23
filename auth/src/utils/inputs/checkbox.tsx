@@ -14,17 +14,17 @@ const CheckBox: React.FC<CheckBoxProps> = ({ checked, onChange }) => {
     setIsSelected(checked);
   }, [checked]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newChecked = e.target.checked;
+  const handleChange = () => {
+    const newChecked = !isSelected; // Toggle the checkbox state
     setIsSelected(newChecked);
-    onChange(newChecked);
+    onChange(newChecked); // Call the onChange handler passed as a prop
   };
 
   return (
     <div className="flex flex-col gap-2 items-start relative">
       <Checkbox
         isSelected={isSelected}
-        onChange={handleChange}
+        onChange={handleChange} // Use the handleChange
         className="w-6 h-6 bg-transparent border border-black rounded-md"
         style={{
           borderColor: isSelected ? "green" : "black",

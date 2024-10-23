@@ -1,5 +1,4 @@
 import React from "react";
-import { useState } from "react";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 
@@ -7,24 +6,19 @@ interface PhoneNumberInputProps {
   placeholder: string;
   className?: string;
   defaultCountry?: string;
-  onChange?: (value: string | undefined) => void;
+  phoneNumber: string; // Added phoneNumber to props
+  handleChange: (value: string | undefined) => void; // handleChange prop added
 }
 
 export const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
   placeholder,
   className,
   defaultCountry = "ind",
-  onChange,
+  phoneNumber,
+  handleChange,
 }) => {
-  const [phoneNumber, setPhoneNumber] = useState<string | undefined>("+91");
-  const showlabel = phoneNumber != null && phoneNumber.length > 0;
-
-  const handleChange = (value: string | undefined) => {
-    setPhoneNumber(value);
-    if (onChange) {
-      onChange(value);
-    }
-  };
+  // Display the label only when there is a phone number
+  const showlabel = phoneNumber && phoneNumber.length > 0;
 
   return (
     <div className={`relative flex justify-center !m-0 ${className}`}>
