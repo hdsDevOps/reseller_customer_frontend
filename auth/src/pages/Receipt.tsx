@@ -49,7 +49,7 @@ const Receipt = () => {
               <h1 className="text-[12px] text-green-500 hover:text-green-800"><a href="#" className="underline hover:text-green-800 "> Download Invoice </a></h1>
             </div>
           </div>
-          <Link to="/dashboard">
+          <Link to="/dashboard" className="flex items-center justify-center w-full">
           <button className="w-[68%] p-3 flex items-center justify-center bg-green-500 text-white rounded-[10px] my-7">
             Go To DashBoard
           </button>

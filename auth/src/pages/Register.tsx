@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoIosArrowBack } from "react-icons/io";
+import '../Css component/Register.css'
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ const Register: React.FC = () => {
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+
           <div className="-space-y-px rounded-md shadow-sm">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
@@ -68,7 +70,7 @@ const Register: React.FC = () => {
               </div>
               <div>
                 <label htmlFor="email-address" className="sr-only">
-                  Email address
+                 hello testing
                 </label>
                 <input
                   id="email-address"
@@ -104,15 +106,13 @@ const Register: React.FC = () => {
           </div>
 
           <div>
-            <Link to="/otp">
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-500 hover:!bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white testing hover:!bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
               data-testid="log-in"
             >
               Submit
             </button>
-            </Link>
           </div>
         </form>
 

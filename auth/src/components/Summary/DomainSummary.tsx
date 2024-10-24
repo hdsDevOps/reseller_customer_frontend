@@ -3,7 +3,7 @@ import { IoInformationCircleOutline } from "react-icons/io5";
 import { PiLockKeyFill } from "react-icons/pi";
 import { AiFillSafetyCertificate } from "react-icons/ai";
 import VoucherCodeInput from "./VoucherCodeInput";
-import AvailableVoucher from "../Summary/AvailableVoucher"
+import AvailableVoucher from "./AvailableVoucher"
 import { Link } from "react-router-dom";
 const DomainSummary = () => {
   const [showVoucherInput, setShowVoucherInput] = useState(false);
