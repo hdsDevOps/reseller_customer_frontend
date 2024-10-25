@@ -66,39 +66,3 @@ const AvailableVoucher = ({ onClose }) => {
 };
 
 export default AvailableVoucher;
-
-// import React, { useState } from "react";
-// import { IoMdClose } from "react-icons/io";
-// const AvailableVoucher = ({ onClose }) => {
-//     const [voucherCode, setVoucherCode] = useState('');
-//   return (
-//     <>
-//       <div className="flex flex-col items-center justify-center w-full">
-//         <div className="flex items-center justify-between w-full ">
-//           <h2 className="text-2xl font-bold">All Vouchers</h2>
-//           <button
-//             onClick={onClose}
-//             className="text-gray-500 hover:text-gray-700"
-//           >
-//             <IoMdClose size={24} />
-//           </button>
-//         </div>
-
-//         <div className="flex flex-row items-center justify-center mt-5">
-//           <input
-//             type="text"
-//             placeholder="Enter voucher code"
-//             className="w-full p-3 border border-black border-dashed rounded-l-md focus:outline-0 "
-//             value={voucherCode}
-//             onChange={(e) => setVoucherCode(e.target.value)}
-//           />
-//           <button className="px-4 py-2 text-white transition-colors bg-black rounded-r-md hover:bg-gray-800">
-//             Check
-//           </button>
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-
-// export default AvailableVoucher;

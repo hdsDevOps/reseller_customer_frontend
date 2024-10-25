@@ -1,5 +1,3 @@
-import { FaStripe, FaPaypal } from "react-icons/fa";
-import { SiPaystack } from "react-icons/si"; // Uncomment for Paystack
 import React, { useState } from "react";
 import { TbInfoTriangleFilled } from "react-icons/tb";
 import { Link } from "react-router-dom";
