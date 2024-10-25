@@ -23,11 +23,11 @@ const OTP: React.FC = () => {
   const otp4Ref = useRef<HTMLInputElement>(null);
   const otp5Ref = useRef<HTMLInputElement>(null);
 
-  const [otp1, setOtp1] = useState<string>("");
-  const [otp2, setOtp2] = useState<string>("");
-  const [otp3, setOtp3] = useState<string>("");
-  const [otp4, setOtp4] = useState<string>("");
-  const [otp5, setOtp5] = useState<string>("");
+  const [otp1, setOtp1] = useState<string>("1");
+  const [otp2, setOtp2] = useState<string>("1");
+  const [otp3, setOtp3] = useState<string>("1");
+  const [otp4, setOtp4] = useState<string>("1");
+  const [otp5, setOtp5] = useState<string>("1");
 
   useEffect(() => {
     otp1Ref.current?.focus();

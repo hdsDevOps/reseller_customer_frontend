@@ -14,6 +14,11 @@ declare module "payments/PaymentApp" {
   const PaymentApp: React.ComponentType<any>;
   export default PaymentApp;
 }
+declare module "billinghistory/HistoryApp" {
+  import React from 'react';
+  const HistoryApp: React.ComponentType<any>;
+  export default HistoryApp;
+}
 declare module "settings/SettingsApp" {
   import React from 'react';
   // Assuming SettingsApp is a functional component or class component
@@ -25,11 +30,11 @@ declare module "email/EmailApp" {
   const PaymentApp: React.ComponentType<any>;
   export default PaymentApp;
 }
-declare module "billinghistory/HistoryApp" {
-  import React from 'react';
-  const HistoryApp: React.ComponentType<any>;
-  export default HistoryApp;
-}
+// declare module "history/HistoryApp" {
+//   import React from 'react';
+//   const HistoryApp: React.ComponentType<any>;
+//   export default HistoryApp;
+// }
 declare module 'store/user.storage' {
   export async function getUserTokenFromLocalStorage(): Promise<string>;
   export async function saveUserTokenToLocalStorage(token: string): Promise<void>;
@@ -67,3 +72,4 @@ declare module 'store/authSlice' {
   // Other exports
 }
 
+}
