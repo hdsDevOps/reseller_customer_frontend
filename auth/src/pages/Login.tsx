@@ -4,12 +4,23 @@ import { useAppDispatch } from "store/hooks";
 import { HiOutlineEye } from "react-icons/hi";
 import { RiEyeCloseLine } from "react-icons/ri";
 import { makeUserLoginThunk } from "store/user.thunk";
+
+import { useForm, SubmitHandler } from "react-hook-form";
+
+interface IFormInput {
+  email: string;
+  password: string;
+}
+
 import { FcGoogle } from "react-icons/fc";
+
 
 const Login: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
+
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -21,6 +32,20 @@ const Login: React.FC = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
+
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<IFormInput>({
+    defaultValues: {
+      email: "debasis.kayal@schemaphic.com",
+      password: "qwe@K123",
+    },
+    mode: "onTouched",
+  });
+
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();    
@@ -64,8 +89,22 @@ const Login: React.FC = () => {
     setShow(true);
   };
 
-  const handleClose = () => {
-    setShow(false);
+  const onSubmit: SubmitHandler<IFormInput> = async (data) => {
+    setLoading(true);
+    try {
+      const result = await dispatch(
+        makeUserLoginThunk({
+          email: data.email,
+          password: data.password,
+        })
+      ).unwrap();
+      setLoading(false);
+      console.log("result....", result);
+      navigate("/otp?mode=signin");
+    } catch (error) {
+      console.error("Login error:", error);
+      setLoading(false);
+    }
   };
 
   return (
@@ -97,7 +136,7 @@ const Login: React.FC = () => {
             </p>
           </div>
           <div className="mt-6">
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <div className="mb-4">
                 <label
                   className="block mb-1 text-base font-bold text-gray-900"
@@ -109,13 +148,23 @@ const Login: React.FC = () => {
                   type="text"
                   id="formBasicEmail"
                   placeholder="Enter email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
                   className="custom-input"
                   data-testid="email"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: "Invalid email format",
+                    },
+                  })}
                 />
+
+                {errors.email && (
+                  <p className="text-red-600 text-sm">{errors.email.message}</p>
+
                 {emailError && (
                   <p className="mt-1 text-sm text-red-500">{emailError}</p>
+
                 )}
               </div>
               <div className="mb-4">
@@ -125,12 +174,17 @@ const Login: React.FC = () => {
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={handlePasswordChange}
+                    placeholder=".........."
                     className="custom-input"
                     minLength={8}
-                    placeholder=".........."
                     required
+                    {...register("password", {
+                      required: "Password is required",
+                      minLength: {
+                        value: 8,
+                        message: "Password must be at least 8 characters",
+                      },
+                    })}
                   />
                   <button
                     type="button"
@@ -144,19 +198,37 @@ const Login: React.FC = () => {
                     )}
                   </button>
                 </div>
+
+                {errors.password && (
+                  <p className="text-red-600 text-sm">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
+              <div style={{ color: "red" }}>
+                <Link to="/forgotpassword">Forgot Password</Link>
+
                 {passwordError && (
                   <p className="mt-1 text-sm text-red-500">{passwordError}</p>
                 )}
+
               </div>
               <div className="mt-4">
                 <button
                   type="submit"
                   data-testid="log-in"
                   className="btn-green"
+                  disabled={loading}
                 >
-                  Submit
+                  {loading ? "Loading..." : "Submit"}
                 </button>
               </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+
               <div className="mt-2 text-right">
                 <Link
                   to="/forgotpassword"

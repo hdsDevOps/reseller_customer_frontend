@@ -81,6 +81,7 @@ const Sidebar = () => {
   const handleLogout = async () => {
     dispatch(setTokenDetails(""));
     navigate("/login");
+    localStorage.clear();
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {

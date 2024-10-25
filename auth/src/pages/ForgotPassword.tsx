@@ -7,8 +7,7 @@ const ForgotPassword: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle the login logic here
-    navigate("/otp")
+    navigate("/otp?mode=forgotpassword");
   };
   
 
@@ -20,7 +19,9 @@ const ForgotPassword: React.FC = () => {
     <div className="h-screen flex items-center justify-center">
       <div className="max-w-[32rem] space-y-8 bg-[#F9FAFB] p-10 rounded-2xl shadow-sm xsm-max:px-4">
         <div className="">
-          <img src="/src/assets/images/logo.jpeg" alt="logo" />
+          <img 
+           src={process.env.BASE_URL + "/images/logo.jpeg"}
+           alt="logo" />
         </div>
         <div>
           <h2 className="mt-6 text-left text-[28px] font-inter font-medium text-gray-900">

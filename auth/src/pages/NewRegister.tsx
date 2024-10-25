@@ -3,6 +3,9 @@ import { IoIosArrowBack } from "react-icons/io";
 import { PhoneNumberInput } from "../utils/inputs/phonenumber";
 import TermsAndConditions from "./Terms";
 import CheckBox from "../utils/inputs/checkbox";
+import { Link } from "react-router-dom";
+import { useAppDispatch } from "store/hooks";
+import { makeUserRegisterThunk } from "store/user.thunk";
 import { Link, useNavigate } from "react-router-dom";
 
 interface FormData {
@@ -26,6 +29,35 @@ interface FormErrors extends Partial<FormData> {
 
 const NewRegister: React.FC = () => {
   const navigate = useNavigate();
+
+  const dispatch = useAppDispatch();
+
+  const [fname, setFname] = useState("");
+  const [lname, setLname] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNo, setPhoneNo] = useState<string>("+91");
+  const [business, setBusiness] = useState("");
+  const [street, setStreet] = useState("");
+  const [state, setState] = useState("");
+  const [zip, setZip] = useState("");
+  const [region, setRegion] = useState("");
+  const [city, setCity] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [error, setError] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    navigate("/otp?mode=signup");
+    return;
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormData>({
@@ -125,12 +157,36 @@ const NewRegister: React.FC = () => {
         // Handle submission error
       }
     }
+    setLoading(true);
+    try {
+      const result = await dispatch(
+        makeUserRegisterThunk({
+          first_name: fname,
+          last_name: lname,
+          business_name: business,
+          email: email,
+          state: state,
+          city: city,
+          zipcode: zip,
+          password: password,
+          street_name: street,
+          region: region,
+          phone_no: phoneNo,
+        })
+      ).unwrap();
+      setLoading(false);
+      console.log("result....", result);
+      navigate("/otp?mode=signin");
+    } catch (error) {
+      console.error("Login error:", error);
+      setLoading(false);
+    }
   };
 
   return (
     <section className="w-full px-8 pt-3 pb-8 mx-auto">
       <Link to="/login">
-        <div className="flex items-center gap-1 cursor-pointer">
+        <div className="flex gap-1 items-center cursor-pointer">
           <IoIosArrowBack className="w-4 h-4" />
           <p className="text-greenbase">Back to previous page</p>
         </div>
@@ -140,7 +196,7 @@ const NewRegister: React.FC = () => {
         <h1 className="flex justify-center pt-3 text-2xl font-bold md:text-4xl text-greenbase">
           Welcome to Hordanso LLC
         </h1>
-        <p className="flex justify-center pt-2 text-base font-normal md:pt-4">
+        <p className="font-normal text-base flex justify-center md:pt-4 pt-2">
           To create an account, we need some information for your HORDANSO
           account.
         </p>
@@ -269,6 +325,49 @@ const NewRegister: React.FC = () => {
                 )}
               </div>
             </div>
+            <div className="flex flex-col gap-4">
+              <Input
+                placeholder="Last name"
+                type="text"
+                value={lname}
+                onChange={(e) => setLname(e.target.value)}
+              />
+              <Input
+                placeholder="Street number"
+                type="text"
+                icon={IoIosArrowDown}
+                iconColor="#8A8A8A"
+                iconSize="20"
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+              />
+              <Input
+                placeholder="Region"
+                type="text"
+                icon={IoIosArrowDown}
+                iconColor="#8A8A8A"
+                iconSize="20"
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
+              />
+              <Input
+                placeholder="Zip code"
+                type="text"
+                value={zip}
+                onChange={(e) => setZip(e.target.value)}
+              />
+              <PhoneNumberInput
+                placeholder="Business phone number"
+                className="w-full"
+                phoneNumber={phoneNo}
+                handleChange={(value) => setPhoneNo(value || "")} // Updates phoneNo with the input value
+              />
+              <Input
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              {error && <p className="text-red-500">{error}</p>}
 
             {/* Right side form fields */}
             <div className="w-[49%] flex flex-col items-center justify-center">
@@ -421,8 +520,13 @@ const NewRegister: React.FC = () => {
             <button
               className="bg-green-500 p-3 rounded-[10px] text-white font-semibold hover:bg-green-600 transition-colors"
               type="submit"
+              className="group relative w-full md:max-w-40 flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:!bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
+              data-testid="log-in"
+              disabled={
+                !termsAccepted || password !== confirmPassword || loading
+              }
             >
-              Submit
+              {loading ? "Loading..." : "Submit"}
             </button>
           </div>
         </form>

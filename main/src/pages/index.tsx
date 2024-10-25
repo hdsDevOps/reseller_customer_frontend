@@ -4,15 +4,12 @@ import Navbar from "../components/Navbar";
 import Header from "../components/Header";
 import DomainApp from "domains/DomainApp";
 import PaymentApp from "payments/PaymentApp";
-
 import SettingsApp from "settings/SettingsApp";
 import HdsProfile from "../components/HdsProfile";
-
 import EmailApp from "email/EmailApp";
 
 import PlanCard from "./PlanCards";
 import HistoryApp from "billinghistory/HistoryApp";
-
 
 const Dashboard = React.lazy(() => import("./Dashboard"));
 const routes = [

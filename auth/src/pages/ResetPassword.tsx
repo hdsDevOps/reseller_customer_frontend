@@ -42,7 +42,9 @@ const ResetPassword: React.FC = () => {
       <div className="w-full max-w-[32rem]">
         <div className="p-8 rounded-lg bg-[#F9FAFB]">
           <div className="mb-12">
-            <img src="/src/assets/images/logo.jpeg" alt="logo" />
+            <img 
+            src={process.env.BASE_URL + "/images/logo.jpeg"}
+             alt="logo" />
           </div>
           <h2 className="text-center font-inter text-2xl font-semibold mb-2">Reset your password</h2>
           <p className="text-gray-500 text-center mb-6 text-md">Must be at least 8 characters</p>

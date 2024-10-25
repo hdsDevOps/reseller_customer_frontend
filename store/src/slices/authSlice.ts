@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
     getUserAuthTokenFromLSThunk,
     makeUserLoginThunk,
+    verifyOTPUserLoginThunk
 } from '../thunks/user.thunk';
 import { userLocalStorage } from '../localStorage/user.storage';
 
@@ -11,6 +12,7 @@ export interface UserDetailsState {
   userDetails: any;
   userId: number | null;
   token: string | null;
+  customerId: string | null;
 }
 
 const initialState: UserDetailsState = {
@@ -18,6 +20,7 @@ const initialState: UserDetailsState = {
   userDetails: {},
   userId: null,
   token: '',
+  customerId:'',
 };
 
 const authSlice = createSlice({
@@ -41,6 +44,7 @@ const authSlice = createSlice({
     },
   },
   extraReducers: builder => {
+
     builder.addCase(makeUserLoginThunk.pending, state => {
       // state.userAuthStatus = 'PENDING';
     });
@@ -48,16 +52,34 @@ const authSlice = createSlice({
     builder.addCase(
       makeUserLoginThunk.fulfilled,
       (state, action: PayloadAction<any>) => {
-        state.token = action.payload?.data?.token;
-        userLocalStorage.saveUserTokenToLocalStorage(
-          action.payload?.data?.token
-        );
+        state.customerId = action.payload.customer_id;
       },
     );
 
     builder.addCase(makeUserLoginThunk.rejected, state => {
       // state.userAuthStatus = 'UN_AUTHORIZED';
     });
+
+  //-------------
+
+  builder.addCase(verifyOTPUserLoginThunk.pending, state => {
+    // state.userAuthStatus = 'PENDING';
+  });
+
+  builder.addCase(
+    verifyOTPUserLoginThunk.fulfilled,
+    (state, action: PayloadAction<any>) => {
+      state.customerId = action.payload.customer_id;
+      state.token = action.payload?.token;
+      userLocalStorage.saveUserTokenToLocalStorage(action.payload?.token);
+    },
+  );
+
+  builder.addCase(verifyOTPUserLoginThunk.rejected, state => {
+    // state.userAuthStatus = 'UN_AUTHORIZED';
+  });
+
+  //-------------
 
     builder.addCase(getUserAuthTokenFromLSThunk.pending, state => {
       state.userAuthStatus = 'PENDING';

@@ -1,3 +1,4 @@
+import React from "react";
 import React, { useState } from "react";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
@@ -6,15 +7,20 @@ interface PhoneNumberInputProps {
   placeholder: string;
   className?: string;
   defaultCountry?: string;
-  onChange?: (value: string | undefined) => void;
+  phoneNumber: string; // Added phoneNumber to props
+  handleChange: (value: string | undefined) => void; // handleChange prop added
 }
 
 export const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
   placeholder,
   className,
   defaultCountry = "ind",
-  onChange,
+  phoneNumber,
+  handleChange,
 }) => {
+
+  // Display the label only when there is a phone number
+  const showlabel = phoneNumber && phoneNumber.length > 0;
   const [phoneNumber, setPhoneNumber] = useState<string | undefined>("+91");
   const showLabel = phoneNumber != null && phoneNumber.length > 0;
 
