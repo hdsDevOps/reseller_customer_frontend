@@ -6,11 +6,11 @@ export default{
   theme: {
     extend: {
       screens: {
-        "sm-max": { "min": "320px" , "max": "767px" },
+        // "sm-max": { "min": "320px" , "max": "767px" },
       },
     },
   },
   plugins: [
-    require('daisyui'),
+   
   ],
 }

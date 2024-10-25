@@ -41,12 +41,12 @@ const links = [
     icon: <Ticket className="w-5 h-5" />,
   },
   {
-    path: "/billing",
+    path: "/billing-history",
     label: "Billing History",
     icon: <ShieldCheck className="w-5 h-5" />,
   },
   {
-    path: "/payment",
+    path: "/payment-subscription",
     label: "Payment Subscription",
     icon: <CreditCard className="w-5 h-5" />,
   },

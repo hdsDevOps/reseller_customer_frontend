@@ -23,10 +23,10 @@ const Login: React.FC = () => {
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    
+    event.preventDefault();    
     let valid = true;
-
+    navigate("/otp?mode=signin");
+  
     // Email validation
     if (!email) {
       setEmailError("Email is required");
