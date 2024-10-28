@@ -11,14 +11,14 @@ const PaymentMethod = () => {
   return (
     <div>
       <div className="flex flex-col gap-1">
-        <h1 className="text-green-500 text-3xl font-semibold">
+        <h1 className="text-green-500 text-3xl font-medium">
           Payment method
         </h1>
         <p className="text-gray-900 text-sm">
           View & manage the payment method in your account
         </p>
       </div>
-      <div className="flex gap-3 mt-8">
+      <div className="flex flex-col md:flex-row gap-3 mt-8">
         <div
           className="rounded-lg flex flex-col items-center justify-center p-2"
           style={{ width: "20rem", height: "12rem", border: "1px solid gray" }}
