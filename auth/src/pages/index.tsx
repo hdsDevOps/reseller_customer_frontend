@@ -6,7 +6,7 @@ const Header = React.lazy(() => import("../components/Header"));
 const Home = React.lazy(() => import("./Home"));
 const Plans = React.lazy(() => import("./Plans"));
 const Login = React.lazy(() => import("./Login"));
-const Register = React.lazy(() => import("./NewRegister"));
+// const Register = React.lazy(() => import("./NewRegister"));
 const OTP = React.lazy(() => import("./OTP"));
 const ForgotPassword = React.lazy(() => import("./ForgotPassword"));
 const RegisterVerify = React.lazy(() => import("./VerifyEmail"));
@@ -22,10 +22,14 @@ const SignToDomain = React.lazy(() => import("./SignToDomain"));
 const FreeTrial = React.lazy(() => import("./FreeTrial"));
 const Gemini = React.lazy(() => import("./Gemini"));
 const Summary = React.lazy(() => import("./Summary"));
-
+const Review = React.lazy(() => import("./Review"));
+const PaymentGateway = React.lazy(() => import("./PaymentGateway"));
+const Receipt = React.lazy(() => import("./Receipt"));
+const RegisterText = React.lazy(() => import("./RegisterText"));
+const NewRegister = React.lazy(() => import("./NewRegister"));
 const AuthApp: React.FC = () => {
   return (
-    <div className="min-h-screen bg-white w-full">
+    <div className="w-full min-h-screen bg-white">
       <Suspense fallback={<div>Loading...</div>}>
         <Header />
         <main className="flex items-center justify-center max-w-full">
@@ -34,7 +38,7 @@ const AuthApp: React.FC = () => {
             <Route path="/home" element={<Home />} />
             <Route path="/plans" element={<Plans />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            {/* <Route path="/register" element={<Register />} /> */}
             <Route path="/otp" element={<OTP />} />
             <Route path="/forgotpassword" element={<ForgotPassword />} />
             <Route path="/verifyemail" element={<RegisterVerify />} />
@@ -50,6 +54,12 @@ const AuthApp: React.FC = () => {
             <Route path="/free-trial" element={<FreeTrial />} />
             <Route path="/gemini-add" element={<Gemini />} />
             <Route path="/summary" element={<Summary />} />
+            <Route path="/DomainDetails" element={<DomainDetails />} />
+            <Route path="/Review" element={<Review />} />
+            <Route path="/PaymentGateway" element={<PaymentGateway />} />
+            <Route path="/Receipt" element={<Receipt />} />
+            <Route path="/RegisterText" element={<RegisterText />} />
+            <Route path="/NewRegister" element={<NewRegister />} />
           </Routes>
         </main>
         <Footer/>

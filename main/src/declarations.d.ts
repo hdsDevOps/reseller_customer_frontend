@@ -24,7 +24,7 @@ declare module "settings/SettingsApp" {
   // Assuming SettingsApp is a functional component or class component
   const SettingsApp: React.ComponentType<any>; // Adjust props type as per your component
   export default SettingsApp;
-
+}
 declare module "email/EmailApp" {
   import React from 'react';
   const PaymentApp: React.ComponentType<any>;

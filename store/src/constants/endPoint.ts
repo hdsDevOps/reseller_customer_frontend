@@ -1,4 +1,6 @@
 export const endPoints = {
-    login: 'customerservices/login',
+    signup: 'registration',
+    login: 'login',
+    loginOtpverify: 'otpverify',
     checkToken: 'customerservices/checktoken'
 }
