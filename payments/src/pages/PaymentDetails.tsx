@@ -69,7 +69,7 @@ const PaymentDetails: React.FC = () => {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-col gap-1 mb-6">
-        <h1 className="text-green-500 text-3xl font-semibold">
+        <h1 className="text-green-500 text-3xl font-medium">
           Payment Subscription
         </h1>
         <p className="text-gray-900 text-sm">
