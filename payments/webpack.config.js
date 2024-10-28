@@ -9,7 +9,7 @@ const printCompilationMessage = require('./compilation.config.js');
 
 module.exports = (_, argv) => ({
   output: {
-    publicPath: "auto",
+    publicPath: "http://localhost:3007/",
   },
 
   resolve: {
@@ -20,7 +20,6 @@ module.exports = (_, argv) => ({
 
   devServer: {
     port: 3007,
-    allowedHosts: ["all"],
     historyApiFallback: true,
     watchFiles: [path.resolve(__dirname, 'src')],
     onListening: function (devServer) {

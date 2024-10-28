@@ -3,13 +3,13 @@ import { Route, Routes } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
 import DomainApp from "domains/DomainApp";
+import PaymentApp from "payments/PaymentApp";
 
+import HistoryApp from "billinghistory/HistoryApp";
 import SettingsApp from "settings/SettingsApp";
 import HdsProfile from "../components/HdsProfile";
-
-import EmailApp from "email/EmailApp";
+import EmailApp from "email/EmailApp";        
 import PlanCard from "./PlanCards";
-
 
 const Dashboard = React.lazy(() => import("./Dashboard"));
 const routes = [
@@ -34,12 +34,14 @@ const MainApp: React.FC = () => {
       </Routes>
       <DomainApp />
       <SettingsApp/>
-      <EmailApp />
+      <PaymentApp />
+      <HistoryApp />
     </div>
     <Navbar />
   
   </div>
   )
+
 };
 
 export default MainApp;

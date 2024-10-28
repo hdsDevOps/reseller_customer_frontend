@@ -48,6 +48,8 @@ module.exports = (_, argv) => ({
         store: `store@${process.env.STORE_BASE_URL || 'http://localhost:3030'}/remoteEntry.js`,
         auth: `auth@${process.env.AUTH_BASE_URL || 'http://localhost:3002'}/remoteEntry.js`,
         domains: `domains@${process.env.DOMAINS_BASE_URL || 'http://localhost:3001'}/remoteEntry.js`,
+        billinghistory: `billinghistory@${process.env.HISTORY_BASE_URL || 'http://localhost:3010'}/remoteEntry.js`,
+        payments: `payments@${process.env.PAYMENTS_BASE_URL || 'http://localhost:3007'}/remoteEntry.js`,
         settings: `settings@${process.env.SETTINGS_BASE_URL || 'http://localhost:3006'}/remoteEntry.js`,
         email: `email@${process.env.EMAIL_BASE_URL || 'http://localhost:3003'}/remoteEntry.js`,
       },

@@ -46,7 +46,7 @@ export default function Header({ onSetShowProfile}:HeaderProps) {
         {showNotification && <NotificationCenter onClose={closeModal}/> }
        
 
-        <button className="relative p-2 bg-[#DCEBDFCC] hover:bg-opacity-90 rounded-md">
+        <button className="relative p-2 bg-[#DCEBDFCC] hover:bg-opacity-90 rounded-md" onClick={()=> navigate('/add-cart')}>
           <ShoppingCart className="w-6 h-6 text-black" />
           <span className="absolute top-0 right-0 flex items-center justify-center w-3 h-3 bg-black text-white rounded-full text-[8px] font-semibold">
             4

@@ -41,7 +41,7 @@ const links = [
     icon: <Ticket className="w-5 h-5" />,
   },
   {
-    path: "/billing",
+    path: "/billing-history",
     label: "Billing History",
     icon: <ShieldCheck className="w-5 h-5" />,
   },
@@ -81,6 +81,7 @@ const Sidebar = () => {
   const handleLogout = async () => {
     dispatch(setTokenDetails(""));
     navigate("/login");
+    localStorage.clear();
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
