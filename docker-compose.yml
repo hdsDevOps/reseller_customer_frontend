@@ -48,6 +48,22 @@ services:
     networks:
       - dev_network
 
+  payments:
+    build: ./payments
+    container_name: microfrontend_customer_payments
+    ports:
+      - 3007:3007
+    networks:
+      - dev_network
+      
+  billinghistory:
+    build: ./billinghistory
+    container_name: microfrontend_customer_billinghistory
+    ports:
+      - 3010:3010
+    networks:
+      - dev_network
+
 networks:
   dev_network:
     driver: bridge

@@ -9,15 +9,16 @@ const printCompilationMessage = require('./compilation.config.js');
 
 module.exports = (_, argv) => ({
   output: {
-    publicPath: "http://localhost:3006/",
+    publicPath: "auto",
   },
-
+ 
   resolve: {
     extensions: [".tsx", ".ts", ".jsx", ".js", ".json"],
   },
 
   devServer: {
     port: 3006,
+    allowedHosts: ["all"],
     historyApiFallback: true,
     watchFiles: [path.resolve(__dirname, 'src')],
     onListening: function (devServer) {
@@ -65,7 +66,7 @@ module.exports = (_, argv) => ({
       name: "settings",
       filename: "remoteEntry.js",
       remotes: {
-        store:"store@http://localhost:3030/remoteEntry.js"
+        store: `store@${process.env.STORE_BASE_URL || 'http://localhost:3030'}/remoteEntry.js`,
       },
       exposes: {
         "./SettingsApp": "./src/pages/index.tsx", 

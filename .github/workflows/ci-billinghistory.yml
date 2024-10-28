@@ -1,15 +1,15 @@
-name: CI for Setting Service
+name: CI for Billing History Service
 
 on:
   push:
     branches:
       - main
     paths:
-      - "settings/**"
+      - "billinghistory/**"
   workflow_dispatch:
 
 env:
-  DOCKER_IMAGE: hordansodevops/reseller_customer_frontend_settings
+  DOCKER_IMAGE: hordansodevops/reseller_customer_frontend_billinghistory
 
 jobs:
   build_and_deploy:
@@ -30,8 +30,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./settings
-          file: ./settings/Dockerfile
+          context: ./billinghistory
+          file: ./billinghistory/Dockerfile
           push: true
           tags: ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
 
@@ -48,7 +48,7 @@ jobs:
     
       - name: Apply Shared ConfigMap
         run: |
-          kubectl apply -f k8s/settings-configmap.yaml
+          kubectl apply -f k8s/billinghistory-configmap.yaml
 
       - name: Deploy to Kubernetes
         uses: Azure/k8s-deploy@v3
@@ -56,7 +56,7 @@ jobs:
           action: deploy
           strategy: basic
           manifests: |
-            k8s/settings-deployment.yaml
-            k8s/settings-service.yaml
+            k8s/billinghistory-deployment.yaml
+            k8s/billinghistory-service.yaml
           images: |
             ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
