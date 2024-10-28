@@ -59,7 +59,7 @@ const AuthApp: React.FC = () => {
             <Route path="/PaymentGateway" element={<PaymentGateway />} />
             <Route path="/Receipt" element={<Receipt />} />
             <Route path="/RegisterText" element={<RegisterText />} />
-            <Route path="/NewRegister" element={<NewRegister />} />
+            <Route path="/register" element={<NewRegister />} />
           </Routes>
         </main>
         <Footer/>
