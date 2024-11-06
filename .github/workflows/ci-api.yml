@@ -34,9 +34,11 @@ jobs:
           file: ./api/Dockerfile
           push: true
           tags: ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+
       - name: Debug Docker images on Hub
         run: |
-          docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }} || echo "No image found on Docker Hub"
+          docker pull ${DOCKER_IMAGE}:${{ github.sha }} || echo "No image found on Docker Hub"
+
 
       # - name: Set up kubectl
       #   uses: azure/setup-kubectl@v4
