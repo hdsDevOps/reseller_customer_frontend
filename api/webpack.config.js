@@ -17,7 +17,7 @@ module.exports = (_, argv) => ({
   },
   
   devServer: {
-    port: 7000,
+    port: 3011,
     allowedHosts: ["all"],
     historyApiFallback: true,
     watchFiles: [path.resolve(__dirname, 'src')],
