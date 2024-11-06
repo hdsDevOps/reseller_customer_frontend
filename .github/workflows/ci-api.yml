@@ -5,11 +5,11 @@ on:
     branches:
       - main
     paths:
-      - "auth/**"
+      - "api/**"
   workflow_dispatch:
 
 env:
-  DOCKER_IMAGE: hordansodevops/reseller_customer_frontend_auth
+  DOCKER_IMAGE: hordansodevops/reseller_customer_frontend_api
 
 jobs:
   build_and_deploy:
@@ -56,7 +56,7 @@ jobs:
           action: deploy
           strategy: basic
           manifests: |
-            k8s/auth-deployment.yaml
-            k8s/auth-service.yaml
+            k8s/api-deployment.yaml
+            k8s/api-service.yaml
           images: |
             ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
