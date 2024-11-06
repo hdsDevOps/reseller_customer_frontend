@@ -1,5 +1,5 @@
 name: CI for Auth Service
- 
+
 on:
   push:
     branches:
