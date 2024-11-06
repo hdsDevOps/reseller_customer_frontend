@@ -40,28 +40,28 @@ jobs:
           docker pull ${DOCKER_IMAGE}:${{ github.sha }} || echo "No image found on Docker Hub"
 
 
-      # - name: Set up kubectl
-      #   uses: azure/setup-kubectl@v4
-      #   with:
-      #     version: "v1.30.0"
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: "v1.30.0"
 
-      # - name: Kubernetes set context
-      #   uses: Azure/k8s-set-context@v3
-      #   with:
-      #     method: kubeconfig
-      #     kubeconfig: ${{ secrets.KUBECONFIG }}
+      - name: Kubernetes set context
+        uses: Azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
     
-      # - name: Apply Shared ConfigMap
-      #   run: |
-      #     kubectl apply -f k8s/api-configmap.yaml
+      - name: Apply Shared ConfigMap
+        run: |
+          kubectl apply -f k8s/api-configmap.yaml
 
-      # - name: Deploy to Kubernetes
-      #   uses: Azure/k8s-deploy@v3
-      #   with:
-      #     action: deploy
-      #     strategy: basic
-      #     manifests: |
-      #       k8s/api-deployment.yaml
-      #       k8s/api-service.yaml
-      #     images: |
-      #       ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+      - name: Deploy to Kubernetes
+        uses: Azure/k8s-deploy@v3
+        with:
+          action: deploy
+          strategy: basic
+          manifests: |
+            k8s/api-deployment.yaml
+            k8s/api-service.yaml
+          images: |
+            ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
