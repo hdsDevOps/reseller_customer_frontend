@@ -6,7 +6,7 @@ const Dotenv = require('dotenv-webpack');
 const deps = require("./package.json").dependencies;
 
 const printCompilationMessage = require('./compilation.config.js');
-
+  
 module.exports = (_, argv) => ({
   output: {
     publicPath: "auto",
