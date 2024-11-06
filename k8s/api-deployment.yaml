@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-api-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend-api-service
+  template:
+    metadata:
+      labels:
+        app: frontend-api-service
+    spec:
+      containers:
+      - name: frontend-api-service
+        image: hordansodevops/reseller_customer_frontend_api:latest
+        ports:
+        - containerPort: 7000
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: api-config
