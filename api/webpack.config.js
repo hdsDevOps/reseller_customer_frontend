@@ -15,7 +15,7 @@ module.exports = (_, argv) => ({
   resolve: {
     extensions: [".tsx", ".ts", ".jsx", ".js", ".json"],
   },
-  
+    
   devServer: {
     port: 3011,
     allowedHosts: ["all"],
