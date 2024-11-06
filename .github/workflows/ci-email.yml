@@ -1,5 +1,5 @@
 name: CI for Email Service
-
+   
 on:
   push:
     branches:
