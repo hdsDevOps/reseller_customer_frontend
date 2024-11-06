@@ -64,8 +64,8 @@ services:
     networks:
       - dev_network
   
-  api-gateway:
-    build: ./api-gateway
+  api:
+    build: ./api
     container_name: microfrontend_customer_api-gateway
     ports:
       - 7000:7000
