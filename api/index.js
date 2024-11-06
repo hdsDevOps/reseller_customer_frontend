@@ -35,7 +35,7 @@ app.use(function (req, res, next) {
 app.get('/Test', function (req, res) {
     res.send('Welcome to hordanso micro services');
 });
-
+  
 // Start the server and listen on the specified port
 app.listen(PORT,()=>{
     console.log("API GATEWAY SERVICE RUNNING ON PORT "+PORT);
