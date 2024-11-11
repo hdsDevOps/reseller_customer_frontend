@@ -1,15 +1,15 @@
-name: CI for Setting Service
-
+name: CI for API Service
+   
 on:
   push:
     branches:
       - main
     paths:
-      - "settings/**"
+      - "api/**"
   workflow_dispatch:
 
 env:
-  DOCKER_IMAGE: hordansodevops/reseller_customer_frontend_settings
+  DOCKER_IMAGE: hordansodevops/reseller_customer_frontend_api
 
 jobs:
   build_and_deploy:
@@ -30,10 +30,15 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./settings
-          file: ./settings/Dockerfile
+          context: ./api
+          file: ./api/Dockerfile
           push: true
           tags: ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+
+      - name: Debug Docker images on Hub
+        run: |
+          docker pull ${DOCKER_IMAGE}:${{ github.sha }} || echo "No image found on Docker Hub"
+
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v4
@@ -48,7 +53,7 @@ jobs:
     
       - name: Apply Shared ConfigMap
         run: |
-          kubectl apply -f k8s/settings-configmap.yaml
+          kubectl apply -f k8s/api-configmap.yaml
 
       - name: Deploy to Kubernetes
         uses: Azure/k8s-deploy@v3
@@ -56,7 +61,7 @@ jobs:
           action: deploy
           strategy: basic
           manifests: |
-            k8s/settings-deployment.yaml
-            k8s/settings-service.yaml
+            k8s/api-deployment.yaml
+            k8s/api-service.yaml
           images: |
             ${{ env.DOCKER_IMAGE }}:${{ github.sha }}

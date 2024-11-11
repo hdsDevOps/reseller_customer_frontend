@@ -135,7 +135,7 @@ const OTP: React.FC = () => {
     // Concatenate OTP values
     const otp = `${otp1}${otp2}${otp3}${otp4}${otp5}`;
 
-   // Check if OTP length is correct
+    // Check if OTP length is correct
     if (otp.length !== 5) {
       return alert("Please enter all 5 digits.");
     }
@@ -161,19 +161,6 @@ const OTP: React.FC = () => {
       } finally {
         // Set loading state to false after request completes
         setLoading(false);
-        
-    if (otp.length === 5) {
-      const isValidOtp = true;
-
-      if (isValidOtp) {
-        if (mode === "signin") {
-          dispatch(setTokenDetails("usy6767jshs688ytmbqa88654sgsgs5sgs6sgs6q"));
-          navigate("/dashboard");
-        } else {
-          navigate("/dashboard");
-        }
-      } else {
-        alert("Invalid OTP. Please try again.");
       }
     } else if (mode === "signup") {
       // TODO: Handle signup logic here
@@ -189,9 +176,9 @@ const OTP: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full my-7">
-      <div className="flex flex-col items-center justify-center w-[40%]">
-        <div className="flex flex-col items-center justify-center w-full bg-[#F9FAFB] p-8 rounded-lg shadow-sm xsm-max:px-4">
+    <div className="flex h-full items-center justify-center">
+      <div className="w-full max-w-[32rem]">
+        <div className="p-8 xsm-max:px-4 bg-[#F9FAFB] rounded-lg shadow-sm">
           <div
             className={`mb-12 ${
               mode !== "forgotpassword"
@@ -209,48 +196,8 @@ const OTP: React.FC = () => {
             {mode === "forgotpassword"
               ? "Verify your email"
               : "Sign in your account"}
-            className={`mb-3 ${
-              mode === "signin" ? "flex items-center justify-center" : ""
-            }`}
-          >
-            {mode === "signin" ? (
-              <div
-                className="w-24 h-24 bg-center bg-no-repeat bg-contain"
-                style={{ backgroundImage: `url('/images/hordansologo2.png')` }}
-              ></div>
-            ) : (
-              " "
-            )}
-          </div>
-          <h3 className="text-center font-inter font-medium mb-2 text-[28px]">
-            {mode === "signin" ? (
-              <>
-                <h2 className="text-[30px] font-bold mb-3">Sign in your account</h2>
-              </>
-            ) : (
-              <>
-                <h2 className="text-[30px] font-bold mb-3">Verify your email</h2>
-              </>
-            )}
           </h3>
-          <h4 className="text-[16px]">
-            {mode === "signin" ? (
-              <>
-                we have sent a{" "}
-                <span className="font-bold">One Time Passcode</span> to your
-                email address
-              </>
-            ) : (
-              <>
-                <h3 className="text-[18px]">
-                  we have sent a{" "}
-                  <span className="font-bold">One Time Passcode</span> to this
-                </h3>
-              </>
-            )}
-          </h4>
-          <form onSubmit={handleLogin} className="px-[20px]">
-            {/* mood for not signing in  */}
+          <form onSubmit={handleLogin}>
             <div className="mb-4 text-center xsm-max:text-sm">
               {/* <p dangerouslySetInnerHTML={{ __html: message }} /> */}
               {mode === "forgotpassword" && (
@@ -263,16 +210,6 @@ const OTP: React.FC = () => {
                     type="button"
                     onClick={() => handleEditmail()}
                     className="font-medium text-green-600 hover:text-gray-500"
-              {mode !== "signin" && (
-                <div className="flex items-center justify-center gap-1 mt-2">
-                  <h1 className="text-[17px]">
-                    {" "}
-                    Robertclive@gmail.com Email Address{" "}
-                  </h1>
-                  <button
-                    type="button"
-                    onClick={() => handleEditmail()}
-                    className="text-green-600 hover:text-gray-500 text-[17px] font-bold underline"
                     data-testid="back-to-login"
                   >
                     Edit
@@ -283,15 +220,8 @@ const OTP: React.FC = () => {
             <div className="flex justify-between mt-12">
               <p className="text-md font-bold">OTP verification</p>
               <span className="text-red-600">{formatTime(timeLeft)}</span>
-                </div>
-              )}
             </div>
-            <div className="flex items-center justify-between mt-10">
-              <p className="font-bold text-md">OTP verification</p>
-              <span className="font-bold text-red-600">01:19</span>
-            </div>
-            {/* otp buttons */}
-            <div className="grid grid-cols-5 gap-2 mt-5">
+            <div className="grid grid-cols-5 gap-2 mt-4">
               <input
                 type="text"
                 maxLength={1}
@@ -299,7 +229,7 @@ const OTP: React.FC = () => {
                 value={otp1}
                 onChange={(e) => handleInputChange(e, 1)}
                 onKeyDown={(e) => handleKeyDown(e, 1)}
-                className="w-full text-center text-black bg-transparent border-2 rounded-lg outline-none aspect-square focus"
+                className="w-full aspect-square outline-none focus border-2 bg-transparent rounded-lg text-center text-black"
                 placeholder="0"
               />
               <input
@@ -309,7 +239,7 @@ const OTP: React.FC = () => {
                 value={otp2}
                 onChange={(e) => handleInputChange(e, 2)}
                 onKeyDown={(e) => handleKeyDown(e, 2)}
-                className="w-full text-center text-black bg-transparent border-2 rounded-lg outline-none aspect-square focus"
+                className="w-full aspect-square outline-none focus border-2 bg-transparent rounded-lg text-center text-black"
                 placeholder="0"
               />
               <input
@@ -319,7 +249,7 @@ const OTP: React.FC = () => {
                 value={otp3}
                 onChange={(e) => handleInputChange(e, 3)}
                 onKeyDown={(e) => handleKeyDown(e, 3)}
-                className="w-full text-center text-black bg-transparent border-2 rounded-lg outline-none aspect-square focus"
+                className="w-full aspect-square outline-none focus border-2 bg-transparent rounded-lg text-center text-black"
                 placeholder="0"
               />
               <input
@@ -329,7 +259,7 @@ const OTP: React.FC = () => {
                 value={otp4}
                 onChange={(e) => handleInputChange(e, 4)}
                 onKeyDown={(e) => handleKeyDown(e, 4)}
-                className="w-full text-center text-black bg-transparent border-2 rounded-lg outline-none aspect-square focus"
+                className="w-full aspect-square outline-none focus border-2 bg-transparent rounded-lg text-center text-black"
                 placeholder="0"
               />
               <input
@@ -339,15 +269,14 @@ const OTP: React.FC = () => {
                 value={otp5}
                 onChange={(e) => handleInputChange(e, 5)}
                 onKeyDown={(e) => handleKeyDown(e, 5)}
-                className="w-full text-center text-black bg-transparent border-2 rounded-lg outline-none aspect-square focus"
+                className="w-full aspect-square outline-none focus border-2 bg-transparent rounded-lg text-center text-black"
                 placeholder="0"
               />
             </div>
-            {/* submit */}
-            <div className="w-full mt-5 text-center">
+            <div className="text-center mt-4">
               <button
                 type="submit"
-                className="w-full py-3 rounded-[10px] font-bold text-white bg-green-500"
+                //className={btnClass}
                 data-testid="submit"
                 disabled={loading}
               >
@@ -371,16 +300,6 @@ const OTP: React.FC = () => {
                   Resend OTP
                 </button>{" "}
               </p>
-            {/* didnt get an otp  */}
-            <div className="flex items-center justify-center text-center mt-14 xsm-max:text-sm">
-              <p className="font-bold">Didn't get an OTP? </p>
-              <Link
-                data-testid="resend-otp"
-                to="#"
-                className="ml-4 font-bold text-red-600 underline"
-              >
-                Resend OTP
-              </Link>{" "}
             </div>
           </form>
         </div>

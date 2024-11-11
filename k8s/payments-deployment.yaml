@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-payments-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend-payments-service
+  template:
+    metadata:
+      labels:
+        app: frontend-payments-service
+    spec:
+      containers:
+      - name: frontend-payments-service
+        image: hordansodevops/reseller_customer_frontend_payments:latest
+        ports:
+        - containerPort: 3006
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: payments-config

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-billinghistory-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend-billinghistory-service
+  template:
+    metadata:
+      labels:
+        app: frontend-billinghistory-service
+    spec:
+      containers:
+      - name: frontend-billinghistory-service
+        image: hordansodevops/reseller_customer_frontend_billinghistory:latest
+        ports:
+        - containerPort: 3006
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: billinghistory-config

@@ -2,22 +2,23 @@ const HtmlWebPackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 const path = require('path');
 const Dotenv = require('dotenv-webpack');
-
+ 
 const deps = require("./package.json").dependencies;
 
 const printCompilationMessage = require('./compilation.config.js');
 
 module.exports = (_, argv) => ({
   output: {
-    publicPath: "http://localhost:3010/",
+    publicPath: "auto",
   },
 
   resolve: {
     extensions: [".tsx", ".ts", ".jsx", ".js", ".json"],
   },
-
+         
   devServer: {
-    port: 3010,
+    port: 3011,
+    allowedHosts: ["all"],
     historyApiFallback: true,
     watchFiles: [path.resolve(__dirname, 'src')],
     onListening: function (devServer) {
@@ -62,12 +63,14 @@ module.exports = (_, argv) => ({
 
   plugins: [
     new ModuleFederationPlugin({
-      name: "billinghistory",
+      name: "email",
       filename: "remoteEntry.js",
-      remotes: {},
-      exposes: {
-        "./HistoryApp": "./src/pages/index.tsx",
-      },
+      remotes: {
+				store: `store@${process.env.STORE_BASE_URL || 'http://localhost:3030'}/remoteEntry.js`,
+			},
+			exposes: {
+				"./EmailApp": "./src/pages/index.tsx",
+			},
       shared: {
         ...deps,
         react: {

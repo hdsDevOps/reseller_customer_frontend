@@ -1,35 +1,18 @@
 import React, { useState } from "react";
 import { IoIosArrowBack } from "react-icons/io";
+import Input from "../utils/inputs/input";
+import { RiEyeCloseLine } from "react-icons/ri";
+import { IoIosArrowDown } from "react-icons/io";
 import { PhoneNumberInput } from "../utils/inputs/phonenumber";
+import { useNavigate } from "react-router-dom";
 import TermsAndConditions from "./Terms";
 import CheckBox from "../utils/inputs/checkbox";
 import { Link } from "react-router-dom";
 import { useAppDispatch } from "store/hooks";
 import { makeUserRegisterThunk } from "store/user.thunk";
-import { Link, useNavigate } from "react-router-dom";
 
-interface FormData {
-  firstName: string;
-  lastName: string;
-  businessName: string;
-  streetAddress: string;
-  city: string;
-  state: string;
-  region: string;
-  zipCode: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  phone: string;
-}
-
-interface FormErrors extends Partial<FormData> {
-  terms?: string;
-}
-
-const NewRegister: React.FC = () => {
+const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
-
   const dispatch = useAppDispatch();
 
   const [fname, setFname] = useState("");
@@ -57,105 +40,11 @@ const NewRegister: React.FC = () => {
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
-
-  const [isChecked, setIsChecked] = useState<boolean>(false);
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const [formData, setFormData] = useState<FormData>({
-    firstName: "",
-    lastName: "",
-    businessName: "",
-    streetAddress: "",
-    city: "",
-    state: "",
-    region: "",
-    zipCode: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    phone: "",
-  });
-  const [errors, setErrors] = useState<FormErrors>({});
-
-  const handleCheckboxChange = (checked: boolean): void => {
-    setIsChecked(checked);
-    // Clear the terms error when checkbox is checked
-    if (checked && errors.terms) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors.terms;
-        return newErrors;
-      });
-    }
-  };
-  const handlePhoneChange = (value: string | undefined): void => {
-    setFormData((prev) => ({ ...prev, phone: value || "" }));
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^\+?[1-9]\d{1,14}$/;
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-
-    if (!formData.firstName.trim())
-      newErrors.firstName = "First name is required.";
-    if (!formData.lastName.trim())
-      newErrors.lastName = "Last name is required.";
-    if (!formData.businessName.trim())
-      newErrors.businessName = "Business name is required.";
-    if (!formData.streetAddress.trim())
-      newErrors.streetAddress = "Street address is required.";
-    if (!formData.city.trim()) newErrors.city = "City is required.";
-    if (!formData.state.trim()) newErrors.state = "State is required.";
-    if (!formData.region.trim()) newErrors.region = "Region is required.";
-    if (!formData.zipCode.trim()) newErrors.zipCode = "Zip code is required.";
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required.";
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address.";
     }
 
-    if (!formData.password) {
-      newErrors.password = "Password is required.";
-    } else if (!passwordRegex.test(formData.password)) {
-      newErrors.password =
-        "Password must be at least 8 characters long and contain both letters and numbers.";
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match.";
-    }
-
-    if (!formData.phone || !phoneRegex.test(formData.phone)) {
-      newErrors.phone = "Please enter a valid digit phone number.";
-    }
-
-    if (!isChecked) {
-      newErrors.terms = "You must accept the Terms and Conditions.";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
-  ): Promise<void> => {
-    e.preventDefault();
-    if (validateForm()) {
-      try {
-        navigate("/otp");
-        console.log("Form submitted:", formData);
-      } catch (error) {
-        console.error("Registration failed:", error);
-        // Handle submission error
-      }
+    if (!termsAccepted) {
+      setError("You must accept the terms and conditions");
+      return;
     }
     setLoading(true);
     try {
@@ -184,7 +73,7 @@ const NewRegister: React.FC = () => {
   };
 
   return (
-    <section className="w-full px-8 pt-3 pb-8 mx-auto">
+    <section className="w-full mx-auto px-8 pt-3 pb-8">
       <Link to="/login">
         <div className="flex gap-1 items-center cursor-pointer">
           <IoIosArrowBack className="w-4 h-4" />
@@ -192,138 +81,54 @@ const NewRegister: React.FC = () => {
         </div>
       </Link>
 
-      <div>
-        <h1 className="flex justify-center pt-3 text-2xl font-bold md:text-4xl text-greenbase">
+      <div className="">
+        <h1 className="font-bold md:text-4xl text-2xl text-greenbase flex justify-center pt-3">
           Welcome to Hordanso LLC
         </h1>
         <p className="font-normal text-base flex justify-center md:pt-4 pt-2">
           To create an account, we need some information for your HORDANSO
           account.
         </p>
-        <form className="mt-16" onSubmit={handleSubmit}>
-          <div className="flex items-start justify-between w-full px-[20px]">
-            {/* Left side form fields */}
-            <div className="w-[49%] flex flex-col items-center justify-center">
-              <div className="relative w-full mb-5">
-                <input
-                  type="text"
-                  name="firstName"
-                  placeholder="Robert"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  className={`w-full p-[11px] border-2 ${
-                    errors.firstName ? "border-red-500" : "border-gray-300"
-                  } rounded-[10px] outline-0 placeholder-black`}
-                />
-                <label
-                  htmlFor="firstName"
-                  className="absolute text-gray-400 bg-white -top-3 left-5 text-[17px]"
-                >
-                  First name
-                </label>
-                {errors.firstName && (
-                  <p className="text-red-500">{errors.firstName}</p>
-                )}
-              </div>
-              <div className="relative w-full mb-5">
-                <input
-                  type="text"
-                  name="businessName"
-                  placeholder="ABC Business"
-                  value={formData.businessName}
-                  onChange={handleInputChange}
-                  className={`w-full p-[11px] border-2 ${
-                    errors.businessName ? "border-red-500" : "border-gray-300"
-                  } rounded-[10px] outline-0 placeholder-black`}
-                />
-                <label
-                  htmlFor="businessName"
-                  className="absolute text-gray-400 bg-white -top-3 left-5 text-[17px]"
-                >
-                  Business Name
-                </label>
-                {errors.businessName && (
-                  <p className="text-red-500">{errors.businessName}</p>
-                )}
-              </div>
-              <div className="relative w-full mb-5">
-                <input
-                  type="text"
-                  name="state"
-                  placeholder="Maharashtra"
-                  value={formData.state}
-                  onChange={handleInputChange}
-                  className={`w-full p-[11px] border-2 ${
-                    errors.state ? "border-red-500" : "border-gray-300"
-                  } rounded-[10px] outline-0 placeholder-black`}
-                />
-                <label
-                  htmlFor="state"
-                  className="absolute text-gray-400 bg-white -top-3 left-5 text-[17px]"
-                >
-                  State
-                </label>
-                {errors.state && <p className="text-red-500">{errors.state}</p>}
-              </div>
-              <div className="relative w-full mb-5">
-                <input
-                  type="text"
-                  name="city"
-                  placeholder="Mumbai"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                  className={`w-full p-[11px] border-2 ${
-                    errors.city ? "border-red-500" : "border-gray-300"
-                  } rounded-[10px] outline-0 placeholder-black`}
-                />
-                <label
-                  htmlFor="city"
-                  className="absolute text-gray-400 bg-white -top-3 left-5 text-[17px]"
-                >
-                  City
-                </label>
-                {errors.city && <p className="text-red-500">{errors.city}</p>}
-              </div>
-              <div className="relative w-full mb-5">
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="RobertClive@gmail.com"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className={`w-full p-[11px] border-2 ${
-                    errors.email ? "border-red-500" : "border-gray-300"
-                  } rounded-[10px] outline-0 placeholder-black`}
-                />
-                <label
-                  htmlFor="email"
-                  className="absolute text-gray-400 bg-white -top-3 left-5 text-[17px]"
-                >
-                  Email Address
-                </label>
-                {errors.email && <p className="text-red-500">{errors.email}</p>}
-              </div>
-              <div className="relative w-full mb-5">
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="********"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className={`w-full p-[11px] border-2 ${
-                    errors.password ? "border-red-500" : "border-gray-300"
-                  } rounded-[10px] outline-0 placeholder-black`}
-                />
-                <label
-                  htmlFor="password"
-                  className="absolute text-gray-400 bg-white -top-3 left-5 text-[17px]"
-                >
-                  Password
-                </label>
-                {errors.password && (
-                  <p className="text-red-500">{errors.password}</p>
-                )}
-              </div>
+        <form onSubmit={handleSubmit}>
+          <div className="flex xl:flex-row flex-col gap-10 justify-center md:pt-12 pt-8 pb-4">
+            <div className="flex flex-col gap-4">
+              <Input
+                placeholder="First name"
+                type="text"
+                value={fname}
+                onChange={(e) => setFname(e.target.value)}
+              />
+              <Input
+                placeholder="Business name"
+                type="text"
+                value={business}
+                onChange={(e) => setBusiness(e.target.value)}
+              />
+              <Input
+                placeholder="State"
+                type="text"
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+              />
+              <Input
+                placeholder="City*"
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+              />
+              <Input
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <Input
+                placeholder="Password"
+                icon={RiEyeCloseLine}
+                iconColor="black"
+                iconSize="20"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
             <div className="flex flex-col gap-4">
               <Input
@@ -368,157 +173,30 @@ const NewRegister: React.FC = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
               {error && <p className="text-red-500">{error}</p>}
-
-            {/* Right side form fields */}
-            <div className="w-[49%] flex flex-col items-center justify-center">
-              <div className="relative w-full mb-5">
-                <input
-                  type="text"
-                  name="lastName"
-                  placeholder="Clive"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  className={`w-full p-[11px] border-2 ${
-                    errors.lastName ? "border-red-500" : "border-gray-300"
-                  } rounded-[10px] outline-0 placeholder-black`}
-                />
-                <label
-                  htmlFor="lastName"
-                  className="absolute text-gray-400 bg-white -top-3 left-5 text-[17px]"
-                >
-                  Last name
-                </label>
-                {errors.lastName && (
-                  <p className="text-red-500">{errors.lastName}</p>
-                )}
-              </div>
-              <div className="relative w-full mb-5">
-                <input
-                  type="text"
-                  name="streetAddress"
-                  placeholder="123 Street"
-                  value={formData.streetAddress}
-                  onChange={handleInputChange}
-                  className={`w-full p-[11px] border-2 ${
-                    errors.streetAddress ? "border-red-500" : "border-gray-300"
-                  } rounded-[10px] outline-0 placeholder-black`}
-                />
-                <label
-                  htmlFor="streetAddress"
-                  className="absolute text-gray-400 bg-white -top-3 left-5 text-[17px]"
-                >
-                  Street Address
-                </label>
-                {errors.streetAddress && (
-                  <p className="text-red-500">{errors.streetAddress}</p>
-                )}
-              </div>
-              <div className="relative w-full mb-5">
-                <input
-                  type="text"
-                  name="region"
-                  placeholder="Region"
-                  value={formData.region}
-                  onChange={handleInputChange}
-                  className={`w-full p-[11px] border-2 ${
-                    errors.region ? "border-red-500" : "border-gray-300"
-                  } rounded-[10px] outline-0 placeholder-black`}
-                />
-                <label
-                  htmlFor="region"
-                  className="absolute text-gray-400 bg-white -top-3 left-5 text-[17px]"
-                >
-                  Region
-                </label>
-                {errors.region && (
-                  <p className="text-red-500">{errors.region}</p>
-                )}
-              </div>
-              <div className="relative w-full mb-5">
-                <input
-                  type="text"
-                  name="zipCode"
-                  placeholder="123456"
-                  value={formData.zipCode}
-                  onChange={handleInputChange}
-                  className={`w-full p-[11px] border-2 ${
-                    errors.zipCode ? "border-red-500" : "border-gray-300"
-                  } rounded-[10px] outline-0 placeholder-black`}
-                />
-                <label
-                  htmlFor="zipCode"
-                  className="absolute text-gray-400 bg-white -top-3 left-5 text-[17px]"
-                >
-                  Zip Code
-                </label>
-                {errors.zipCode && (
-                  <p className="text-red-500">{errors.zipCode}</p>
-                )}
-              </div>
-              <div className="relative w-full mb-5">
-                <PhoneNumberInput
-                  placeholder="Phone Number"
-                  className="my-custom-class"
-                  defaultCountry="us"
-                  onChange={handlePhoneChange}
-                />
-                {errors.phone && <p className="text-red-500">{errors.phone}</p>}
-              </div>
-              <div className="relative w-full mb-5">
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  placeholder="********"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  className={`w-full p-[11px] border-2 ${
-                    errors.confirmPassword
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  } rounded-[10px] outline-0 placeholder-black`}
-                />
-                <label
-                  htmlFor="confirmPassword"
-                  className="absolute text-gray-400 bg-white -top-3 left-5 text-[17px]"
-                >
-                  Confirm Password
-                </label>
-                {errors.confirmPassword && (
-                  <p className="text-red-500">{errors.confirmPassword}</p>
-                )}
-              </div>
             </div>
           </div>
-
-          {/* checkbox field */}
-          <div className="flex flex-col items-start gap-1 mb-3 ml-10">
-            <div className="flex items-center gap-1">
-              <CheckBox
-                isChecked={isChecked}
-                onChange={handleCheckboxChange}
-                aria-label="Accept terms and conditions"
-              />
-              <p className="text-[15px] font-bold">
-                <span
-                  className="text-green-500 cursor-pointer"
-                  onClick={() => setShowModal(true)}
-                  role="button"
-                  tabIndex={0}
-                >
-                  Terms And Conditions
-                </span>
-              </p>
-            </div>
-            {errors.terms && (
-              <p className="text-sm text-red-500" role="alert">
-                {errors.terms}
-              </p>
-            )}
-          </div>
-
-          <div className="flex items-center justify-center w-full mt-4 text-center">
+          <div className="text-sm flex gap-2 md:pl-28">
+            <CheckBox
+              checked={termsAccepted}
+              onChange={() => setTermsAccepted(!termsAccepted)}
+            />
             <button
-              className="bg-green-500 p-3 rounded-[10px] text-white font-semibold hover:bg-green-600 transition-colors"
+              onClick={() => setShowModal(true)}
+              className="font-medium text-green-500 hover:text-green-800"
+              data-testid="terms-conditions"
+              type="button"
+            >
+              Terms and conditions
+            </button>
+          </div>
+          {showModal && (
+            <TermsAndConditions
+              isOpen={showModal}
+              onClose={() => setShowModal(false)}
+            />
+          )}
+          <div className="mt-4 flex justify-center">
+            <button
               type="submit"
               className="group relative w-full md:max-w-40 flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:!bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
               data-testid="log-in"
@@ -531,15 +209,8 @@ const NewRegister: React.FC = () => {
           </div>
         </form>
       </div>
-
-      {showModal && (
-        <TermsAndConditions
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
-        />
-      )}
     </section>
   );
 };
 
-export default NewRegister;
+export default RegisterPage;
