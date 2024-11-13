@@ -39,4 +39,4 @@ yarn-error.log*
 
 BACKUP_1/
 
-# start-services.sh
+start-services.sh
