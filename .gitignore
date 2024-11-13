@@ -8,6 +8,12 @@ domains/node_modules
 main/node_modules
 
 store/node_modules
+api/node_modules
+billinghistory/node_modules
+email/node_modules
+payments/node_modules
+settings/node_modules
+store/node_modules
 
 # /store/.env
 
@@ -33,4 +39,4 @@ yarn-error.log*
 
 BACKUP_1/
 
-
+# start-services.sh
