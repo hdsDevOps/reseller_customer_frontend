@@ -24,8 +24,8 @@ const Login: React.FC = () => {
     formState: { errors },
   } = useForm<IFormInput>({
     defaultValues: {
-      email: "debasis.kayal@schemaphic.com",
-      password: "qwe@K123",
+      email: "sumon99@gmail.com",
+      password: "123456",
     },
     mode: "onTouched",
   });
@@ -110,13 +110,13 @@ const Login: React.FC = () => {
                     type={showPassword ? "text" : "password"}
                     placeholder=".........."
                     className="custom-input"
-                    minLength={8}
+                    minLength={6}
                     required
                     {...register("password", {
                       required: "Password is required",
                       minLength: {
-                        value: 8,
-                        message: "Password must be at least 8 characters",
+                        value: 6,
+                        message: "Password must be at least 6 characters",
                       },
                     })}
                   />

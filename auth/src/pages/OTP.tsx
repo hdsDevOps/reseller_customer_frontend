@@ -5,7 +5,7 @@ import React, {
   ChangeEvent,
   KeyboardEvent,
 } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { verifyOTPUserLoginThunk } from "store/user.thunk";
 
@@ -22,15 +22,16 @@ const OTP: React.FC = () => {
   const otp3Ref = useRef<HTMLInputElement>(null);
   const otp4Ref = useRef<HTMLInputElement>(null);
   const otp5Ref = useRef<HTMLInputElement>(null);
+  const otp6Ref = useRef<HTMLInputElement>(null);
 
-  const [otp1, setOtp1] = useState<string>("1");
-  const [otp2, setOtp2] = useState<string>("1");
-  const [otp3, setOtp3] = useState<string>("1");
-  const [otp4, setOtp4] = useState<string>("1");
-  const [otp5, setOtp5] = useState<string>("1");
+  const [otp1, setOtp1] = useState<string>("");
+  const [otp2, setOtp2] = useState<string>("");
+  const [otp3, setOtp3] = useState<string>("");
+  const [otp4, setOtp4] = useState<string>("");
+  const [otp5, setOtp5] = useState<string>("");
+  const [otp6, setOtp6] = useState<string>("");
   const [timeLeft, setTimeLeft] = useState<number>(10);
   const [loading, setLoading] = useState(false);
-
 
   useEffect(() => {
     otp1Ref.current?.focus();
@@ -78,6 +79,10 @@ const OTP: React.FC = () => {
           break;
         case 5:
           setOtp5(value);
+          otp5Ref.current?.focus();
+          break;
+        case 6:
+          setOtp6(value);
           break;
         default:
           break;
@@ -120,7 +125,14 @@ const OTP: React.FC = () => {
           if (!otp5) {
             otp4Ref.current?.focus();
           } else {
-            setOtp5("");
+            setOtp4("");
+          }
+          break;
+        case 6:
+          if (!otp6) {
+            otp4Ref.current?.focus();
+          } else {
+            setOtp6("");
           }
           break;
         default:
@@ -131,15 +143,16 @@ const OTP: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+  
     // Concatenate OTP values
-    const otp = `${otp1}${otp2}${otp3}${otp4}${otp5}`;
-
+    const otp = `${otp1}${otp2}${otp3}${otp4}${otp5}${otp6}`;
+    console.log("OTP submitted:", otp);
+  
     // Check if OTP length is correct
-    if (otp.length !== 5) {
-      return alert("Please enter all 5 digits.");
+    if (otp.length !== 6) {
+      return alert("Please enter all 6 digits.");
     }
-
+  
     if (mode === "signin") {
       // Set loading state to true
       setLoading(true);
@@ -151,7 +164,7 @@ const OTP: React.FC = () => {
             otp: otp,
           })
         ).unwrap();
-
+  
         console.log("result....", result);
         // Optionally navigate or do something else after successful login
         // navigate("/otp?mode=signin");
@@ -170,6 +183,7 @@ const OTP: React.FC = () => {
       navigate("/resetpassword");
     }
   };
+
 
   const handleEditmail = () => {
     navigate(-1);
@@ -269,6 +283,16 @@ const OTP: React.FC = () => {
                 value={otp5}
                 onChange={(e) => handleInputChange(e, 5)}
                 onKeyDown={(e) => handleKeyDown(e, 5)}
+                className="w-full aspect-square outline-none focus border-2 bg-transparent rounded-lg text-center text-black"
+                placeholder="0"
+              />
+              <input
+                type="text"
+                maxLength={1}
+                ref={otp6Ref}
+                value={otp6}
+                onChange={(e) => handleInputChange(e, 6)}
+                onKeyDown={(e) => handleKeyDown(e, 6)}
                 className="w-full aspect-square outline-none focus border-2 bg-transparent rounded-lg text-center text-black"
                 placeholder="0"
               />
