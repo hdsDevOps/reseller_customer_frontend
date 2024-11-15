@@ -14,9 +14,9 @@ const FrequentlyAskedQuestions = () => {
     </svg>
   );
   return (
-    <section className="px-16 max-w-screen-2xl mx-auto mt-10">
-      <div className="mb-8">
-        <h2 className="text-greenbase font-semibold text-4xl">FAQ's</h2>
+    <section className="px-8 md:px-16 max-w-screen-2xl mx-auto mt-10">
+      <div className="mb-4 md:mb-8">
+        <h2 className="text-greenbase font-semibold text-2xl md:text-4xl">FAQ's</h2>
         {dottedline}
       </div>
       <Accordion/>

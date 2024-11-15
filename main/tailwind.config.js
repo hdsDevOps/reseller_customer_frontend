@@ -4,9 +4,9 @@ module.exports = {
   ],
   theme: {
     extend: {
-      screens: {
-        "sm-max": { "min": "320px" , "max": "767px" },
-      },
+      // screens: {
+      //   "sm-max": { "min": "320px" , "max": "767px" },
+      // },
     },
   },
   plugins: [

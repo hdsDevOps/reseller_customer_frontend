@@ -12,22 +12,22 @@ export const Connect = () => {
         <img
           src={Base_URL + "/images/gmail.png"}
           alt="google mail"
-          className="size-16"
+          className="md:size-16 size-11"
         />
         <img
           src={process.env.BASE_URL + "/images/calendar.png"}
           alt="google calender"
-          className="size-16"
+          className="md:size-16 size-11"
         />
         <img
           src={process.env.BASE_URL + "/images/googlechat.png"}
           alt="google chat"
-          className="size-16"
+          className="md:size-16 size-11"
         />
         <img
           src={process.env.BASE_URL + "/images/meet.png"}
           alt="google meet"
-          className="size-16"
+          className="md:size-16 size-11"
         />
       </div>
     </div>
@@ -45,27 +45,27 @@ export const Create = () => {
         <img
           src={Base_URL + "/images/sheet1.png"}
           alt="google sheet"
-          className="size-16"
+          className="md:size-16 size-11"
         />
         <img
           src={process.env.BASE_URL + "/images/sheet2.png"}
           alt="google sheet"
-          className="size-16"
+          className="md:size-16 size-11"
         />
         <img
           src={process.env.BASE_URL + "/images/sheet3.png"}
           alt="google sheet"
-          className="size-16"
+          className="md:size-16 size-11"
         />
         <img
           src={process.env.BASE_URL + "/images/sheet4.png"}
           alt="google sheet"
-          className="size-16"
+          className="md:size-16 size-11"
         />
         <img
           src={process.env.BASE_URL + "/images/sheet5.png"}
           alt="google sheet"
-          className="size-16"
+          className="md:size-16 size-11"
         />
       </div>
     </div>
@@ -83,12 +83,12 @@ export const Access = () => {
         <img
           src={Base_URL + "/images/googlecloud.png"}
           alt="google cloud"
-          className="size-16"
+          className="md:size-16 size-11"
         />
         <img
           src={process.env.BASE_URL + "/images/works.png"}
           alt="google work"
-          className="size-16"
+          className="md:size-16 size-11"
         />
       </div>
     </div>
@@ -106,17 +106,17 @@ export const ConnectSecond = () => {
         <img
           src={Base_URL + "/images/googlesecurity.png"}
           alt="google secure"
-          className="size-16"
+          className="md:size-16 size-11"
         />
         <img
           src={process.env.BASE_URL + "/images/goggleconnect.png"}
           alt="google connect"
-          className="size-16"
+          className="md:size-16 size-11"
         />
         <img
           src={process.env.BASE_URL + "/images/googlepoly.png"}
           alt="google poly"
-          className="size-16"
+          className="md:size-16 size-11"
         />
       </div>
     </div>

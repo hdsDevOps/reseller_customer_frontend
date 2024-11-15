@@ -73,7 +73,7 @@ const PlanCard: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex items-center justify-center gap-2 xsm-max:flex-col mt-6">
+      <div className="flex items-center justify-center gap-2 max-md:flex-col mt-6">
         {plans.map((plan, index) => (
           <div
             key={index}
@@ -81,11 +81,11 @@ const PlanCard: React.FC = () => {
           >
             {/* Conditionally render the parent div for the second plan only */}
             {index === 1 && (
-              <div className="bg-green-600 rounded-lg md:w-[380px] xsm-max:w-[350px] xsm-max:h-[580px] mb-1 md:h-[640px] relative flex items-center flex-col justify-center">
+              <div className="bg-green-600 rounded-lg md:w-[380px] max-md:w-[350px] max-md:h-[580px] mb-1 md:h-[640px] relative flex items-center flex-col justify-center">
                 <div className="self-start mb-1 text-white text-md text-left ml-4">
                   <h1>Popular</h1>
                 </div>
-                <div className="bg-white border border-gray-200 rounded-lg md:w-[370px] xsm-max:w-[340px] xsm-max:h-[600px] xsm-max:mb-1 md:h-[605px] relative z-10">
+                <div className="bg-white border border-gray-200 rounded-lg md:w-[370px] max-md:w-[340px] max-md:h-[600px] max-md:mb-1 md:h-[605px] relative z-10">
                   <div className="p-4 sm:p-6">
                     <h1 className="flex items-center gap-2 text-xl sm:text-2xl font-medium text-gray-900 mb-2 uppercase">
                       <FaClover className={plan.iconClass} /> {plan.name}
@@ -163,7 +163,7 @@ const PlanCard: React.FC = () => {
             )}
             {/* Rendering the card without the background for other plans */}
             {index !== 1 && (
-              <div className="bg-white border border-gray-200 rounded-lg md:w-[380px] xsm-max:w-[340px] xsm-max:h-[550px] mb-1 md:h-[610px] md:mt-7 relative z-10">
+              <div className="bg-white border border-gray-200 rounded-lg md:w-[380px] max-md:w-[340px] max-md:h-[550px] mb-1 md:h-[610px] md:mt-7 relative z-10">
                 <div className="p-4 sm:p-6">
                   <h1 className="flex items-center gap-2 text-xl sm:text-2xl font-medium text-gray-900 mb-2 uppercase">
                     <FaClover className={plan.iconClass} /> {plan.name}

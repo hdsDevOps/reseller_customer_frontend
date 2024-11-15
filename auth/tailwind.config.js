@@ -11,9 +11,6 @@ module.exports = {
       fontFamily: {
         inter: ['Inter', 'sans-serif'],
       },
-      // screens: {
-      //   'xsm-max': { 'min': '320px', 'max': '767px' },
-      // },
     },
   },
   plugins: [require('daisyui')],

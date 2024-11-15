@@ -32,8 +32,9 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
       <h2 id={`accordion-flush-heading-${id}`}>
         <button
           type="button"
-          className={`flex items-center justify-between w-full py-5 font-medium rtl:text-right text-gray-500 dark:text-gray-400 gap-3
-            ${isOpen ? "border-b-0" : ""}`}
+          className={`flex items-center justify-between w-full max-md:py-2.5 md:py-5 font-medium rtl:text-right text-gray-500 dark:text-gray-400 gap-3 ${
+            isOpen ? "border-b-0" : ""
+          }`}
           onClick={() => onToggle(id)}
           aria-expanded={isOpen}
           aria-controls={`accordion-flush-body-${id}`}

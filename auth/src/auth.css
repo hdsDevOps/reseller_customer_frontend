@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import "~slick-carousel/slick/slick.css";
+@import "~slick-carousel/slick/slick-theme.css";
 
 
 @tailwind base;
@@ -190,5 +192,15 @@ input[type="text"]:focus ~ .input-text {
 .auth-back-btn:focus {
   background: none !important;
   color: #000000 !important;
+}
+
+/* react-slick should take full height */
+.slick-slider .slick-slide .slick-track .slick-active   {
+  width: auto;
+}
+
+
+.slick-slide > .slick-active > .slick-current {
+  width: auto;
 }
 

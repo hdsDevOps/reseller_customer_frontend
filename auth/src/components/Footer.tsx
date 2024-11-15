@@ -1,13 +1,13 @@
 import React from "react";
 import { ImTwitter } from "react-icons/im";
 import { GrFacebookOption } from "react-icons/gr";
-import { FaPinterestP,FaInstagram, FaYoutube } from "react-icons/fa";
+import { FaPinterestP, FaInstagram, FaYoutube } from "react-icons/fa";
 import { Base_URL } from "../Constant";
 export default function Footer() {
   return (
     <footer className="bg-black !w-full">
-      <div className=" flex flex-col gap-10 justify-center items-center py-24 px-[20rem] mx-auto">
-        <div className="flex gap-10">
+      <div className="flex flex-col gap-10 justify-center items-center max-md:px-10 max-md:py-12 lg:py-24 lg:px-[20rem] mx-auto">
+        <div className="flex max-md:flex-col max-md:justify-start max-md:items-center max-md:gap-5 lg:gap-10">
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-2">
               <p className="text-white font-semibold">MARKETING</p>
@@ -92,7 +92,9 @@ export default function Footer() {
             <div className="flex flex-col gap-10">
               <div className="text-[#BDBDBD] text-base font-medium flex flex-col gap-1">
                 <p className="text-[#BDBDBD]">Hordanso LLC</p>
-                <p className="text-[#BDBDBD]">4364 Western Center Blvd PMB 2012</p>
+                <p className="text-[#BDBDBD]">
+                  4364 Western Center Blvd PMB 2012
+                </p>
                 <p className="text-[#BDBDBD]">Fort Worth, TX 76137-2043</p>
                 <a>
                   Phone: <span>+1 469-893-0678</span>
@@ -103,7 +105,9 @@ export default function Footer() {
               </div>
               <div className="text-[#BDBDBD] text-base font-medium flex flex-col gap-1">
                 <p className="text-[#BDBDBD]">Hordanso LTD</p>
-                <p className="text-[#BDBDBD]">479 Ikorodu Rd, Ketu, Lagos, 100243</p>
+                <p className="text-[#BDBDBD]">
+                  479 Ikorodu Rd, Ketu, Lagos, 100243
+                </p>
                 <a>
                   Phone: <span>+(234)806 044 0510</span>
                 </a>
@@ -126,7 +130,7 @@ export default function Footer() {
                 </div>
                 <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[#951c1b]">
                   <FaYoutube size="28" fill="white" />
-                </div>  
+                </div>
               </div>
             </div>
           </div>
@@ -159,35 +163,36 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        <div className="text-center text-[#EEEEEE] w-100%">
-        <div className="flex relative gap-4 mb-4">
-          <button className="bg-greenbase text-white px-4 h-[3rem] text-xl font-bold">Buy Domain/Hosting</button>
-        <img
-          src={Base_URL + "/images/footer1.png"}
-          alt="footerbadge"
-          className="h-[5rem] w-[12rem] object-cover"
-        />
-       
-        <img
-         src={Base_URL + "/images/footer2.png"}
-         alt="footerbadge"
-         className="h-[4.5rem] w-[12rem] object-cover"
-        />
-        <img
-         src={Base_URL + "/images/footer3.webp"}
-         alt="footerbadge"
-         className="h-[7rem] w-[5rem] object-cover absolute right-[6rem]"
-        />
-      
-        <img
-         src={Base_URL + "/images/footer4.jpg"}
-         alt="footerbadge"
-         className="size-20 object-cover ml-14"
-        />
+        <div className="text-center text-[#EEEEEE] w-full">
+          <div className="flex relative gap-4 mb-4">
+            <button className="bg-greenbase text-white px-4 h-[3rem] text-xl font-bold">
+              Buy Domain/Hosting
+            </button>
+            <img
+              src={Base_URL + "/images/footer1.png"}
+              alt="footerbadge"
+              className="h-[5rem] w-[12rem] object-cover"
+            />
 
-        </div>
+            <img
+              src={Base_URL + "/images/footer2.png"}
+              alt="footerbadge"
+              className="h-[4.5rem] w-[12rem] object-cover"
+            />
+            <img
+              src={Base_URL + "/images/footer3.webp"}
+              alt="footerbadge"
+              className="h-[7rem] w-[5rem] object-cover absolute right-[6rem]"
+            />
 
-         <p>© 2024 Copyright</p>
+            <img
+              src={Base_URL + "/images/footer4.jpg"}
+              alt="footerbadge"
+              className="size-20 object-cover ml-14"
+            />
+          </div>
+
+          <p>© 2024 Copyright</p>
           <a className="text-[#BDBDBD] pl-1" href="#">
             Hordanso LLC All Rights Reserved 2018 | Web Design & Development by
             HDS Hordanso
