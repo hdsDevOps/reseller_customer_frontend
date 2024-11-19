@@ -3,5 +3,18 @@
 @tailwind utilities;
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Inter, Helvetica, sans-serif;
+}
+
+.custom-title{
+  @apply text-[#12A833] text-base font-medium sm:text-xl md:text-[28px];
+}
+.dashboard-table-header{
+  @apply bg-[#F3F4F6];
+}
+.table-header-txt{
+  @apply p-3 text-center text-xs sm:text-sm font-semibold text-[#00163B];
+}
+.primary{
+  @apply text-[#12A833]
 }

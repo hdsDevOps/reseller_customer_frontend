@@ -33,6 +33,7 @@ const MainApp: React.FC = () => {
         ))}
       </Routes>
       <DomainApp />
+      <EmailApp />
       <SettingsApp/>
       <PaymentApp />
       <HistoryApp />

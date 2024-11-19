@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { GoDotFill } from "react-icons/go";
 import EmailModal from "../components/EmailModal";
 import ActionModal from "../components/ActionModal";
 import AddLicense from "../components/AddLicense";
 import "../index.css";
+import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 
 const EmailList: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -57,20 +59,20 @@ const EmailList: React.FC = () => {
         <div className="flex flex-col gap-2 sm:gap-4">
           <div className="flex items-center justify-start">
             <div>
-              <h2 className="text-gray-700 text-sm sm:text-lg lg:text-2xl xl:text-3xl font-semibold">
+              <h3 className="text-gray-700 text-sm sm:text-xl lg:text-[28px] xl:text-3xl font-bold md:font-medium mt-1">
                 Business Email
-              </h2>
-              <p className="text-xs sm:text-sm md:text-md">
+              </h3>
+              <p className="text-xs sm:text-sm md:text-base">
                 Set up your business email accounts right here. You can also add
                 users and edit your admin details.
               </p>
             </div>
           </div>
 
-          <div className="flex flex-col border-2 border-gray-200 rounded-md mt-2">
-            <div className="flex items-start justify-start gap-14 sm:gap-0 md:justify-between flex-col md:flex-row py-4 px-2">
+          <div className="flex flex-col border-2 border-[##D1D5DB] rounded-[10px] mt-2">
+            <div className="flex items-start justify-start gap-3 md:gap-0 md:justify-between flex-col md:flex-row py-4 px-2">
               <div className="flex items-start flex-col md:flex-row h-fit sm:h-24">
-                <div className="md:mr-4 flex-shrink-0 h-full">
+                <div className="md:mr-4 w-ful h-full md:w-[106px] md:h-[70px] flex-shrink-0 mb-2">
                   <img
                     src="/images/google.jpg"
                     alt="Domain"
@@ -78,19 +80,22 @@ const EmailList: React.FC = () => {
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <p className="text-sm md:text-md lg:text-lg font-semibold text-gray-600">
-                    3 users@{domainName}.{" "}
+                  <p className="flex items-center justify-center gap-2 text-xs md:text-sm font-bold">
+                    3 users@{domainName}
+                  <GoDotFill className="hidden md:block text-[#D1D5DB]" size={10} />
                     <span
-                      className="text-xs sm:text-sm text-green-500 ml-3 font-normal cursor-pointer"
+                      className="text-[10px] md:text-sm text-[#12A833] font-medium cursor-pointer"
                       onClick={() => setisLicenseModalOpen(true)}
                     >
                       Add user license
                     </span>
                   </p>
-                  <p className="text-sm md:text-md text-gray-600">
-                    Google Workspace Starter.{" "}
+                  <p className="flex items-center justify-center gap-2 text-xs md:text-sm font-normal text-[#070707] self-start">
+                    Google Workspace Starter
+                  <GoDotFill className="hidden md:block text-[#D1D5DB]" size={10} />
+
                     <span
-                      className="text-xs sm:text-sm text-green-500 ml-3 cursor-pointer"
+                      className="text-[10px] md:text-sm text-[#12A833] font-medium cursor-pointer"
                       onClick={() => navigate("/upgrade-plan")}
                     >
                       Upgrade plan
@@ -100,34 +105,35 @@ const EmailList: React.FC = () => {
               </div>
 
               <div className="flex flex-col md:ml-4">
-                <button className="border-2 border-green-500 text-green-500 bg-white px-4 py-2 rounded-3xl mb-2 transition-transform duration-300 ease-in-out transform hover:scale-105">
+                <button className="border-[1.5px] border-[#12A833] flex items-center justify-between text-[#12A833] px-[10px] text-xs sm:text-base w-[142px] h-[32px] md:h-[42px] rounded-[20px] mb-2 transition-transform duration-300 ease-in-out transform hover:scale-105">
                   Go to Gmail
+                  <FaArrowUpRightFromSquare className="text-[#000000]" size={14} />
                 </button>
                 <button
-                  className="border-2 border-green-500 text-green-500 bg-white px-4 py-2 rounded-3xl mb-2 transition-transform duration-300 ease-in-out transform hover:scale-105"
+                  className="border-[1.5px] border-[#12A833] text-[#12A833] px-[10px] font-semibold text-xs sm:text-sm w-[142px] h-[32px] md:h-[42px] rounded-[20px] mb-2 transition-transform duration-300 ease-in-out transform hover:scale-105"
                   onClick={() => setIsModalOpen(true)}
                 >
                   Add Email
                 </button>
-                <p className="text-sm md:text-md">User Licenses: 03/5</p>
+                <p className="text-sm md:text-base text-[#5A5A5A]">User Licenses: <span className="ml-2">03/5</span> </p>
               </div>
             </div>
 
             <div className="mt-2">
               <div className="w-full overflow-x-auto">
                 <table className="w-full border-collapse">
-                  <thead className="bg-gray-200 mb-4">
+                  <thead className="bg-[#F3F4F6] mb-4">
                     <tr>
-                      <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-semibold">
+                      <th className="p-2 text-left text-xs sm:text-base text-[#777777] font-semibold">
                         Name
                       </th>
-                      <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-semibold">
+                      <th className="p-2 text-center text-xs sm:text-base text-[#777777] font-semibold">
                         Email
                       </th>
-                      <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-semibold">
+                      <th className="p-2 text-left text-xs sm:text-base text-[#777777] font-semibold">
                         Status
                       </th>
-                      <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-semibold">
+                      <th className="p-2 text-left text-xs sm:text-base text-[#777777] font-semibold">
                         Action
                       </th>
                     </tr>
@@ -136,25 +142,25 @@ const EmailList: React.FC = () => {
                     {emailData.map((row, index) => (
                       <tr key={index}>
                         <td
-                          className={`px-2 py-6 ${index === emailData.length - 1 ? "border-b-0" : "border-b border-gray-100"} text-gray-600 font-semibold text-xs sm:text-sm md:text-md`}
+                          className={`px-2 py-6 ${index === emailData.length - 1 ? "border-b-0" : "border-b border-gray-100"} text-gray-600 font-semibold text-xs`}
                         >
                           {row.name}
                           {row.role}
                         </td>
                         <td
-                          className={`px-2 py-6 ${index === emailData.length - 1 ? "border-b-0" : "border-b border-gray-100"} text-gray-500 text-xs sm:text-sm md:text-md`}
+                          className={`px-2 py-6 text-center ${index === emailData.length - 1 ? "border-b-0" : "border-b border-gray-100"} text-black text-xs `}
                         >
                           {row.email}
                           {domainName}
                         </td>
                         <td
-                          className={`px-2 py-6 ${index === emailData.length - 1 ? "border-b-0" : "border-b border-gray-100"} text-gray-800 text-xs sm:text-sm md:text-md`}
+                          className={`px-2 py-6 text-center ${index === emailData.length - 1 ? "border-b-0" : "border-b border-gray-100"} text-black text-xs`}
                         >
                           <button
-                            className={`relative w-24 h-8 rounded-3xl border-2 flex justify-center items-center ${row.status ? "border-green-500 bg-green-500" : "border-red-500 bg-red-500"}`}
+                            className={`relative w-[100px] h-[24px] rounded-[10px] border-2 flex justify-center items-center ${row.status ? "border-[#12A833] bg-[#12A833]" : "border-red-500 bg-red-500"}`}
                             onClick={() => toggleStatus(index)}
                           >
-                            <span className="text-white text-xs">
+                            <span className="text-white text-xs md:text-base">
                               {row.status ? "Active" : "Inactive"}
                             </span>
                           </button>

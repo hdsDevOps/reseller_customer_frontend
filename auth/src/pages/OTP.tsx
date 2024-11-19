@@ -164,10 +164,12 @@ const OTP: React.FC = () => {
             otp: otp,
           })
         ).unwrap();
+        console.log("Customer ID:", customerId);
   
         console.log("result....", result);
         // Optionally navigate or do something else after successful login
         // navigate("/otp?mode=signin");
+        navigate("/dashboard");
       } catch (error) {
         // Handle login error
         console.error("Login error:", error);

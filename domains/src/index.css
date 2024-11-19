@@ -12,3 +12,7 @@ body {
   width: 100%;
   background-color: red;
 }
+
+.custom-title{
+  @apply text-[#12A833] text-base font-medium sm:text-xl md:text-[28px];
+}

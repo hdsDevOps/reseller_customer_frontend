@@ -8,46 +8,47 @@ const Dashboard: React.FC = () => {
   return (
     <div>
       <main className="min-h-screen  pb-32">
-        <h2 className="text-sm sm:text-xl lg:text-4xl font-medium text-green-500">
+        <h3 className="custom-title">
           Welcome to your Dashboard
-        </h2>
+        </h3>
+        <p className="text-xs sm:text-base mt-1">Hi, Robert here's take a look at your analytics</p>
 
         <div className="overflow-x-auto mt-6">
-          <table className="min-w-full  rounded-t-md border-b border-gray-300">
+          <table className="min-w-[1030px] h-[62px] rounded-t-md border-b border-[#E1EFFE]">
             <thead>
-              <tr className="bg-gray-100">
-                <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
+              <tr className="dashboard-table-header">
+                <th className="py-2 text-center text-xs sm:text-sm font-semibold text-[#00163B] text-opacity-60">
                   Product Type
                 </th>
-                <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
+                <th className="py-3 px-2 text-center text-xs sm:text-sm font-semibold text-[#00163B] text-opacity-60">
                   Payment Cycle
                 </th>
-                <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
+                <th className="py-3 px-2 text-center text-xs sm:text-sm font-semibold text-[#00163B] text-opacity-60">
                   Description
                 </th>
-                <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
+                <th className="py-3 px-2 text-center text-xs sm:text-sm font-semibold text-[#00163B] text-opacity-60">
                   Domain
                 </th>
-                <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
+                <th className="py-3 px-2 text-left sm:text-center text-xs sm:text-sm font-semibold text-[#00163B] text-opacity-60">
                   Last Payment
                 </th>
-                <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
+                <th className="py-3 px-2 text-left sm:text-center text-xs sm:text-sm font-semibold text-[#00163B] text-opacity-60">
                   Next Payment
                 </th>
-                <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
+                <th className="py-3 px-2 text-center text-xs sm:text-sm font-semibold text-[#00163B] text-opacity-60">
                   Billing Status
                 </th>
-                <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
+                <th className="py-3 px-2 text-center text-xs sm:text-sm font-semibold text-[#00163B] text-opacity-60">
                   Payment Method
                 </th>
-                <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
+                <th className="py-3 px-2 text-left text-xs sm:text-sm font-semibold text-[#00163B] text-opacity-60">
                   Action
                 </th>
               </tr>
             </thead>
             <tbody>
-              <tr className="text-xs text-gray-400">
-                <td className="px-2 pb-10 pt-3">Google workspace + domain</td>
+              <tr className="text-xs font-normal text-[#434D64] text-opacity-60">
+                <td className="px-2 pb-10 pt-3 text-center">Google workspace + domain</td>
                 <td className="px-2 pb-10 pt-3 text-center">Yearly</td>
                 <td className="px-2 pb-10 pt-3 text-center">
                   Purchase google workspace <br /> standard plan & 2 domains
@@ -58,8 +59,8 @@ const Dashboard: React.FC = () => {
                 <td className="px-2 pb-10 pt-3">Jan 30 2024</td>
                 <td className="px-2 pb-10 pt-3">Jan 30 2025</td>
                 <td className="px-2 pb-10 pt-3">
-                  <button className="text-green-500 border-2 border-green-500 px-2 py-1 rounded hover:bg-green-500 hover:text-white">
-                    Auto-renew
+                  <button className="text-[#12A833] w-[70px] sm:w-[82px] h-[29px] border-2 border-[#12A833] px-[7px] py-[[7px]] rounded-[5px] hover:bg-[#12A833] hover:text-white">
+                    Free trial
                   </button>
                 </td>
                 <td className="px-2 pb-10 pt-3">
