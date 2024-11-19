@@ -165,7 +165,7 @@ export default function Footer() {
         </div>
         <div className="text-center text-[#EEEEEE] w-full">
           <div className="flex relative gap-4 mb-4">
-            <button className="bg-greenbase text-white px-4 h-[3rem] text-xl font-bold">
+            <button className="bg-greenbase text-white px-4 text-xl font-bold">
               Buy Domain/Hosting
             </button>
             <img

@@ -9,7 +9,7 @@ import { BsChatLeftText } from "react-icons/bs";
 const Home: React.FC = () => {
   return (
     <section className="w-full">
-      {/* <div className="px-3 lg:px-20 py-1 w-full justify-center bg-[rgba(18,168,51,0.5)] flex gap-2 text-white ">
+      <div className="px-3 lg:px-20 py-1 w-full justify-center bg-[rgba(18,168,51,0.5)] flex gap-2 text-white ">
         <p className="font-normal lg:text-lg text-white">
           <span>
             Gemini for Workspace: Google's AI-powered assistant seamlessly
@@ -27,7 +27,7 @@ const Home: React.FC = () => {
       <HeroSection />
       <PlanandPrice />
       <AboutUs />
-      <ContactUs /> */}
+      <ContactUs />
     </section>
   );
 };
