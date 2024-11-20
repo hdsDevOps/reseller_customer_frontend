@@ -23,7 +23,7 @@ const Input: React.FC<InputProps> = ({
   value = '',
 }) => {
   return (
-    <div className={`${className} flex justify-center`}>
+    <div className={`${className} flex justify-center w-full`}>
       <label htmlFor="customInput" className="relative md:w-[37.063rem] w-[20rem]">
         {Icon && (
           <div

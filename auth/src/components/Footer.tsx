@@ -164,8 +164,8 @@ export default function Footer() {
           </div>
         </div>
         <div className="text-center text-[#EEEEEE] w-full">
-          <div className="flex relative gap-4 mb-4">
-            <button className="bg-greenbase text-white px-4 text-xl font-bold">
+          <div className="flex relative gap-4 mb-4 max-md:flex-col">
+            <button className="bg-greenbase px-4 text-white text-sm font-bold">
               Buy Domain/Hosting
             </button>
             <img
@@ -182,18 +182,18 @@ export default function Footer() {
             <img
               src={Base_URL + "/images/footer3.webp"}
               alt="footerbadge"
-              className="h-[7rem] w-[5rem] object-cover absolute right-[6rem]"
+              className="h-[7rem] w-[5rem] object-cover"
             />
 
             <img
               src={Base_URL + "/images/footer4.jpg"}
               alt="footerbadge"
-              className="size-20 object-cover ml-14"
+              className="size-20 object-cover"
             />
           </div>
 
           <p>© 2024 Copyright</p>
-          <a className="text-[#BDBDBD] pl-1" href="#">
+          <a className="text-[#BDBDBD] pl-1">
             Hordanso LLC All Rights Reserved 2018 | Web Design & Development by
             HDS Hordanso
           </a>

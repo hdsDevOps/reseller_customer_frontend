@@ -67,7 +67,7 @@ const HeroSection = () => {
               <p className="lg:text-2xl font-extrabold text-white mt-12">
                 Starting at ₹3.00/mth
               </p>
-              <Link to="/NewRegister">
+              <Link to="/register">
                 <button className="px-4 py-3 bg-greenbase text-white rounded-lg font-semibold text-base ">
                   Register now
                 </button>

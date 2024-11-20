@@ -49,7 +49,7 @@ export const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
         className="h-full md:w-[37.163rem] w-[20rem]"
       />
       {showlabel && (
-        <span className="absolute md:left-[8rem] lg:left-[11rem] xl:left-1 left-1 -top-3 text-base text-black text-opacity-80 mx-6 px-2 transition duration-200 input-text bg-white">
+        <span className="absolute md:left-[3.6rem] lg:left-[6.rem] xl:left-1 left-1 -top-3 text-base text-black text-opacity-80 mx-6 px-2 transition duration-200 input-text bg-white">
           {placeholder}
         </span>
       )}
