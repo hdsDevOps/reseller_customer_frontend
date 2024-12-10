@@ -6,8 +6,8 @@ import { Base_URL } from "../Constant";
 export default function Footer() {
   return (
     <footer className="bg-black !w-full">
-      <div className=" flex flex-col gap-10 justify-center items-center py-24 px-[20rem] mx-auto">
-        <div className="flex gap-10">
+      <div className=" flex flex-col gap-10 xl:justify-center xl:items-center py-20 px-[2rem] mx-auto sm:justify-start sm:flex-start">
+        <div className="flex gap-10 xl:flex-row sm:flex-col flex-col ">
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-2">
               <p className="text-white font-semibold">MARKETING</p>
@@ -111,7 +111,7 @@ export default function Footer() {
                   Email: <span>contact@hordanso.ng</span>
                 </a>
               </div>
-              <div className="flex gap-1">
+              <div className="flex gap-1 hidden">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[#1DA1F2]">
                   <ImTwitter size="24" fill="white" />
                 </div>
@@ -159,8 +159,8 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        <div className="text-center text-[#EEEEEE] w-100%">
-        <div className="flex relative gap-4 mb-4">
+        <div className="text-center text-[#EEEEEE] w-100% ">
+        <div className="flex relative gap-4 mb-4 hidden">
           <button className="bg-greenbase text-white px-4 h-[3rem] text-xl font-bold">Buy Domain/Hosting</button>
         <img
           src={Base_URL + "/images/footer1.png"}
@@ -187,11 +187,11 @@ export default function Footer() {
 
         </div>
 
-         <p>© 2024 Copyright</p>
-          <a className="text-[#BDBDBD] pl-1" href="#">
-            Hordanso LLC All Rights Reserved 2018 | Web Design & Development by
+         <p></p>
+          
+            Hordanso LLC All Rights Reserved 2024 | Web Design & Development by
             HDS Hordanso
-          </a>
+          
         </div>
       </div>
     </footer>

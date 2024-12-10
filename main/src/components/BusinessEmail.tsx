@@ -68,9 +68,9 @@ const EmailList: React.FC = () => {
           </div>
 
           <div className="flex flex-col border-2 border-gray-200 rounded-md mt-2">
-            <div className="flex items-start justify-start gap-14 sm:gap-0 md:justify-between flex-col md:flex-row py-4 px-2">
-              <div className="flex items-start flex-col md:flex-row h-fit sm:h-24">
-                <div className="md:mr-4 flex-shrink-0 h-full">
+            <div className="flex items-start justify-start gap-8 sm:gap-0 lg:justify-between flex-col lg:flex-row py-4 px-2">
+              <div className="flex items-start flex-col md:flex-row ">
+                <div className="md:mr-4 flex-shrink-0 h-full sm:h-24">
                   <img
                     src="/images/google.jpg"
                     alt="Domain"
@@ -99,7 +99,7 @@ const EmailList: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col md:ml-4">
+              <div className="flex flex-col  sm:mt-3 lg:mt-0">
                 <button className="border-2 border-green-500 text-green-500 bg-white px-4 py-2 rounded-3xl mb-2 transition-transform duration-300 ease-in-out transform hover:scale-105">
                   Go to Gmail
                 </button>

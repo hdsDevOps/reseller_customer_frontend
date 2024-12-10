@@ -28,7 +28,7 @@ export const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
         onChange={handleChange}
         inputProps={{ required: true }}
         inputStyle={{
-          width: "34.063rem",
+          width: "100%",
           height: "3.5rem",
           borderRadius: "1rem",
           borderTopLeftRadius: "0rem",
@@ -46,10 +46,10 @@ export const PhoneNumberInput: React.FC<PhoneNumberInputProps> = ({
             borderBottomRightRadius: "0rem",
           },
         }}
-        className="h-full md:w-[37.163rem] w-[20rem]"
+        className="h-full w-full"
       />
       {showlabel && (
-        <span className="absolute md:left-[8rem] lg:left-[11rem] xl:left-1 left-1 -top-3 text-base text-black text-opacity-80 mx-6 px-2 transition duration-200 input-text bg-white">
+        <span className="absolute   left-1 -top-3 text-base text-black text-opacity-80 mx-6 px-2 transition duration-200 input-text bg-white">
           {placeholder}
         </span>
       )}

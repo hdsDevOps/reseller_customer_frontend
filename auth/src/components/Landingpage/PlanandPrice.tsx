@@ -10,9 +10,9 @@ const PlanandPrice = () => {
   return (
     <section className="w-full px-[4.375rem] max-w-screen-2xl mx-auto">
         <div className="py-[4.175rem] flex justify-center gap-4 items-center mx-auto">
-            <div className="relative flex justify-center">
-            <input className="bg-transparent border py-6 px-10 w-[69.688rem] rounded-md shadow-md font-normal text-2x" placeholder="Type your desired domain here."/>
-            <div className="flex justify-center items-center absolute top-5 right-[2rem]">
+            <div className="relative flex justify-center flex-1">
+            <input className="bg-transparent border py-6 px-10  w-full rounded-md shadow-md font-normal text-2x" placeholder="Type your desired domain here."/>
+            <div className="flex justify-center items-center absolute top-5 right-[2rem] hidden">
                 <p className="text-2xl font-bold text-black">.com</p>
                 <MdKeyboardArrowDown size={24} />
             </div>
@@ -22,7 +22,7 @@ const PlanandPrice = () => {
             </Link>
         </div>
       <PlanCard />
-      <div className="flex flex-col items-center justify-center mx-auto mt-10">
+      {/* <div className="flex flex-col items-center justify-center mx-auto mt-10">
         <p className="mb-2 text-xl font-medium text-greenbase">Compare plans in details</p>
         <FaArrowDownLong fill="#12A833"/>
       </div>
@@ -45,7 +45,7 @@ const PlanandPrice = () => {
             <SmallButton placeholder="Start trial" className="!bg-[#F0F0F3] text-greenbase"/>
         </div>
       </div>
-      <ProductivityAndCollaboration/>
+      <ProductivityAndCollaboration/> */}
     </section>
   );
 };

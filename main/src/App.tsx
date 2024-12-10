@@ -11,11 +11,15 @@ import "auth/AuthCss";
 import "./index.css";
 
 const App: React.FC = () => {
-  const { token } = useAppSelector((state) => state.auth);
+  // const { token } = useAppSelector((state) => state.auth);
+  const token ="vvggg"
+  console.log(token, "...token");
+  
 
   return (
     <Suspense fallback={<h2>Loading.....</h2>}>
       {token ? <MainApp /> : <AuthApp />}
+      {/* <MainApp /> */}
     </Suspense>
   );
 };
@@ -27,9 +31,9 @@ ReactDOM.render(
   <React.StrictMode>
     <ReduxProvider>
       <BrowserRouter>
-        <UserAuth>
+        {/* <UserAuth> */}
           <App />
-        </UserAuth>
+        {/* </UserAuth> */}
       </BrowserRouter>
     </ReduxProvider>
   </React.StrictMode>,

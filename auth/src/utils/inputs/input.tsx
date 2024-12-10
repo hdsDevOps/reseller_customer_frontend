@@ -23,8 +23,8 @@ const Input: React.FC<InputProps> = ({
   value = '',
 }) => {
   return (
-    <div className={`${className} flex justify-center`}>
-      <label htmlFor="customInput" className="relative md:w-[37.063rem] w-[20rem]">
+    <div className={`    w-full lg:w-1/2`}>
+      <label htmlFor="customInput" className="relative w-full ">
         {Icon && (
           <div
             className="absolute right-4 top-1/2 transform -translate-y-1/2"
@@ -36,7 +36,7 @@ const Input: React.FC<InputProps> = ({
         <input
           type={type}
           id="customInput"
-          className={`h-14 md:w-[37.063rem] w-[20rem] px-6 bg-transparent border rounded-2xl border-graybase border-opacity-50 outline-none focus:border-greenbase focus:text-black transition duration-200 ${
+          className={`h-14 w-full px-6 bg-transparent border rounded-2xl border-graybase border-opacity-50 outline-none focus:border-greenbase focus:text-black transition duration-200 ${
             Icon ? 'pl-12' : ''
           }`}
           value={value}

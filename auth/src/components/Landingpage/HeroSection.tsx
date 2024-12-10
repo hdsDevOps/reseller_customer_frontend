@@ -3,6 +3,7 @@ import { Base_URL } from "../../Constant";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import { Link } from "react-router-dom";
 
+
 const HeroSection = () => {
   return (
     <div className="w-full max-w-screen-2xl mx-auto h-[55.375rem] relative">

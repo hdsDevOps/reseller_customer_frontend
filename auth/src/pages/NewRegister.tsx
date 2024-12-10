@@ -83,61 +83,44 @@ const RegisterPage: React.FC = () => {
 
       <div className="">
         <h1 className="font-bold md:text-4xl text-2xl text-greenbase flex justify-center pt-3">
-          Welcome to Hordanso LLC
+          Welcome to Hordanso LLC 
         </h1>
         <p className="font-normal text-base flex justify-center md:pt-4 pt-2">
           To create an account, we need some information for your HORDANSO
           account.
         </p>
         <form onSubmit={handleSubmit}>
-          <div className="flex xl:flex-row flex-col gap-10 justify-center md:pt-12 pt-8 pb-4">
-            <div className="flex flex-col gap-4">
-              <Input
+          <div className="flex flex-col  gap-10 justify-center md:pt-12 pt-8 pb-4 w-full">
+          <div className="flex   sm:flex-col lg:flex-row gap-4  w-full">
+          <Input
                 placeholder="First name"
                 type="text"
                 value={fname}
                 onChange={(e) => setFname(e.target.value)}
               />
               <Input
-                placeholder="Business name"
-                type="text"
-                value={business}
-                onChange={(e) => setBusiness(e.target.value)}
-              />
-              <Input
-                placeholder="State"
-                type="text"
-                value={state}
-                onChange={(e) => setState(e.target.value)}
-              />
-              <Input
-                placeholder="City*"
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-              />
-              <Input
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <Input
-                placeholder="Password"
-                icon={RiEyeCloseLine}
-                iconColor="black"
-                iconSize="20"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col gap-4">
-              <Input
                 placeholder="Last name"
                 type="text"
                 value={lname}
                 onChange={(e) => setLname(e.target.value)}
               />
-              <Input
+          </div>
+          <div className="flex   sm:flex-col lg:flex-row gap-4  w-full">
+          <Input
+                placeholder="Business name"
+                type="text"
+                value={business}
+                onChange={(e) => setBusiness(e.target.value)}
+              />
+                <Input
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              
+          </div>
+          <div className="flex   sm:flex-col lg:flex-row gap-4  w-full">
+          <Input
                 placeholder="Street number"
                 type="text"
                 icon={IoIosArrowDown}
@@ -146,7 +129,22 @@ const RegisterPage: React.FC = () => {
                 value={street}
                 onChange={(e) => setStreet(e.target.value)}
               />
-              <Input
+          <Input
+                placeholder="State"
+                type="text"
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+              />
+              
+          </div>
+          <div className="flex   sm:flex-col lg:flex-row gap-4  w-full">
+          <Input
+                placeholder="City*"
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+              />
+               <Input
                 placeholder="Region"
                 type="text"
                 icon={IoIosArrowDown}
@@ -155,27 +153,41 @@ const RegisterPage: React.FC = () => {
                 value={region}
                 onChange={(e) => setRegion(e.target.value)}
               />
-              <Input
+          </div>
+          <div className="flex   sm:flex-col lg:flex-row gap-4  w-full">
+          <Input
                 placeholder="Zip code"
                 type="text"
                 value={zip}
                 onChange={(e) => setZip(e.target.value)}
               />
+              
               <PhoneNumberInput
                 placeholder="Business phone number"
                 className="w-full"
                 phoneNumber={phoneNo}
                 handleChange={(value) => setPhoneNo(value || "")} // Updates phoneNo with the input value
               />
-              <Input
+          </div>
+          <div className="flex   sm:flex-col lg:flex-row gap-4  w-full">
+          <Input
+                placeholder="Password"
+                icon={RiEyeCloseLine}
+                iconColor="black"
+                iconSize="20"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+               <Input
                 placeholder="Confirm Password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
-              {error && <p className="text-red-500">{error}</p>}
-            </div>
+               {error && <p className="text-red-500">{error}</p>}
           </div>
-          <div className="text-sm flex gap-2 md:pl-28">
+           
+          </div>
+          <div className="text-sm flex gap-2 ">
             <CheckBox
               checked={termsAccepted}
               onChange={() => setTermsAccepted(!termsAccepted)}

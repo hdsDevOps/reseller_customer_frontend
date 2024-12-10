@@ -22,12 +22,14 @@ const OTP: React.FC = () => {
   const otp3Ref = useRef<HTMLInputElement>(null);
   const otp4Ref = useRef<HTMLInputElement>(null);
   const otp5Ref = useRef<HTMLInputElement>(null);
+  const otp6Ref = useRef<HTMLInputElement>(null);
 
   const [otp1, setOtp1] = useState<string>("1");
   const [otp2, setOtp2] = useState<string>("1");
   const [otp3, setOtp3] = useState<string>("1");
   const [otp4, setOtp4] = useState<string>("1");
   const [otp5, setOtp5] = useState<string>("1");
+  const [otp6, setOtp6] = useState<string>("1");
   const [timeLeft, setTimeLeft] = useState<number>(10);
   const [loading, setLoading] = useState(false);
 
@@ -79,6 +81,9 @@ const OTP: React.FC = () => {
         case 5:
           setOtp5(value);
           break;
+        case 6:
+          setOtp6(value);
+          break;
         default:
           break;
       }
@@ -121,6 +126,13 @@ const OTP: React.FC = () => {
             otp4Ref.current?.focus();
           } else {
             setOtp5("");
+          }
+          break;
+        case 6:
+          if (!otp6) {
+            otp5Ref.current?.focus();
+          } else {
+            setOtp6("");
           }
           break;
         default:
@@ -178,7 +190,7 @@ const OTP: React.FC = () => {
   return (
     <div className="flex h-full items-center justify-center">
       <div className="w-full max-w-[32rem]">
-        <div className="p-8 xsm-max:px-4 bg-[#F9FAFB] rounded-lg shadow-sm">
+        <div className="p-8 xsm-max:px-4 bg-[#F9FAFB] rounded-lg shadow-sm my-5">
           <div
             className={`mb-12 ${
               mode !== "forgotpassword"
@@ -221,7 +233,7 @@ const OTP: React.FC = () => {
               <p className="text-md font-bold">OTP verification</p>
               <span className="text-red-600">{formatTime(timeLeft)}</span>
             </div>
-            <div className="grid grid-cols-5 gap-2 mt-4">
+            <div className="grid grid-cols-6 gap-2 mt-4">
               <input
                 type="text"
                 maxLength={1}
@@ -272,11 +284,22 @@ const OTP: React.FC = () => {
                 className="w-full aspect-square outline-none focus border-2 bg-transparent rounded-lg text-center text-black"
                 placeholder="0"
               />
+              <input
+                type="text"
+                maxLength={1}
+                ref={otp6Ref}
+                value={otp6}
+                onChange={(e) => handleInputChange(e, 6)}
+                onKeyDown={(e) => handleKeyDown(e, 6)}
+                className="w-full aspect-square outline-none focus border-2 bg-transparent rounded-lg text-center text-black"
+                placeholder="0"
+              />
             </div>
             <div className="text-center mt-4">
               <button
                 type="submit"
                 //className={btnClass}
+                className="bg-green-500  text-white border-none px-4 py-2.5 rounded-lg font-semibold w-full"
                 data-testid="submit"
                 disabled={loading}
               >
@@ -295,7 +318,7 @@ const OTP: React.FC = () => {
                 <button
                   disabled={timeLeft == 0 ? false : true}
                   data-testid="resend-otp"
-                  className="text-red-600 underline ml-4"
+                  className="text-red-600 underline ml-4 "
                 >
                   Resend OTP
                 </button>{" "}
