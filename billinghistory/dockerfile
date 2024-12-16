@@ -11,6 +11,9 @@ RUN mkdir -p /billinghistory
 # Set /app as the working directory
 WORKDIR /billinghistory
 
+# Install git and other required tools
+RUN apk add --no-cache git python3 make g++
+
 # Copy package.json and package-lock.json
 # to the /app working directory
 COPY package*.json /billinghistory
