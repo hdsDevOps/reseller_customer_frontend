@@ -9,9 +9,9 @@ const printCompilationMessage = require('./compilation.config.js');
 
 module.exports = (_, argv) => ({
   output: {
-    publicPath: "http://localhost:3010/",
+    publicPath: "auto",
   },
-
+  
   resolve: {
     extensions: [".tsx", ".ts", ".jsx", ".js", ".json"],
   },
