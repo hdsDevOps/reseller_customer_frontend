@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: frontend-billinghistory-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: frontend-billinghistory-service
