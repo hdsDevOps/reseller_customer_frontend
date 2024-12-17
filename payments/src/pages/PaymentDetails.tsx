@@ -76,12 +76,12 @@ const PaymentDetails: React.FC = () => {
           View, manage or cancel your subscriptions and services.
         </p>
       </div>
-      <div className="flex items-center justify-between p-4 bg-gray-100">
-      <div className="flex items-center gap-4">
+      <div className="flex items-start justify-between p-4 bg-gray-100 flex-col sm:flex-row md:flex-row gap-4">
+      <div className="flex flex-col   gap-4 sm:flex-col md:flex-row">
         <DateSearch />
         <div className="relative">
           <select
-            className="border border-transparent bg-transparent text-gray-700 p-2 pr-8 appearance-none focus:outline-none focus:ring-1 focus:ring-green-500 w-80"
+            className="border border-transparent bg-transparent text-gray-700 p-2 pr-8 appearance-none focus:outline-none focus:ring-1 focus:ring-green-500 w-auto"
             onClick={toggleDropdown}
           >
             <option value="" disabled selected hidden>

@@ -69,10 +69,10 @@ const BillingHistory: React.FC = () => {
           admin details.
         </p>
       </div>
-      <div className="flex items-center justify-between p-4 bg-gray-100">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-col md:flex-row  gap-4  justify-between p-4 bg-gray-100">
+        <div className="flex flex-col sm:flex-col md:flex-row   gap-4">
           <DateSearch />
-          <div className="relative">
+          <div className="relative align-self-start">
             <select
               className="border border-transparent bg-transparent text-gray-700 p-2 pr-8 appearance-none focus:outline-none focus:ring-1 focus:ring-green-500 w-80"
               onClick={toggleDropdown}
