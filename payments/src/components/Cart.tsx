@@ -76,10 +76,10 @@ const Cart = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col md:flex-row items-center justify-start md:justify-between mb-6">
+    <div className="flex flex-col gap-6 px-2">
+      <div className="flex flex-col md:flex-row items-center justify-between md:justify-between mb-6">
         <div
-          className="flex items-center gap-1 text-green-500 text-lg cursor-pointer"
+          className="flex items-center gap-1 text-green-500 text-lg cursor-pointer mr-3n whitespace-nowrap mr-2"
           onClick={() => navigate("/dashboard")}
         >
           <GoChevronLeft />

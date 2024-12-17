@@ -4,6 +4,7 @@ import { FaRegCopy } from "react-icons/fa";
 import { GoChevronDown } from "react-icons/go";
 import VoucherModal from './VoucherModal';
 import "./Voucher.css";
+// import '../styles/CustomStyle.css';
 
 const VoucherCard: React.FC = () => {
   const [showTooltip, setShowTooltip] = useState([false, false, false]);
@@ -41,9 +42,10 @@ const VoucherCard: React.FC = () => {
           Use your vouchers to build your brand and drive visitors to your site
         </p>
       </div>
-      <div className="max-card grid grid-cols-2 gap-5 w-full">
+      <div className="grid   sm:grid-cols-1  md:grid-cols-2 gap-5 w-full">
+      {/* <div className="grid flex flex-col sm:flex-col  md:flex-row gap-5 w-full"> */}
         {/* First Card */}
-        <div className="flex items-center card-anime">
+        <div className="flex justify-center card-anime">
           <div className="side-card h-full">
             <h4 className="side-text uppercase font-semibold text-md rotate-90">
               Discount Voucher
@@ -98,7 +100,7 @@ const VoucherCard: React.FC = () => {
         </div>
 
         {/* Second Card */}
-        <div className="flex items-center card-anime">
+        <div className="flex justify-center card-anime">
           <div className="side-card card-lemon-border h-full">
             <h4 className="side-text-lemon uppercase font-semibold text-md rotate-90">
               Discount Voucher
@@ -152,7 +154,7 @@ const VoucherCard: React.FC = () => {
           </div>
         </div>
         {/* Third Card */}
-        <div className="flex items-center card-anime">
+        <div className="flex justify-center card-anime">
           <div className="side-card card-orange-border h-full">
             <h4 className="side-text-orange uppercase font-semibold text-md rotate-90">
               Discount Voucher
@@ -207,7 +209,7 @@ const VoucherCard: React.FC = () => {
         </div>
 
         {/* Fourth Card */}
-        <div className="flex items-center card-anime">
+        <div className="flex justify-center card-anime">
           <div className="side-card card-pink-border h-full">
             <h4 className="side-text-pink uppercase font-semibold text-md rotate-90">
               Discount Voucher
@@ -262,7 +264,7 @@ const VoucherCard: React.FC = () => {
         </div>
 
         {/* Fifth Card */}
-        <div className="flex items-center card-anime">
+        <div className="flex justify-center card-anime">
           <div className="side-card card-gray-border h-full">
             <h4 className="side-text-gray uppercase font-semibold text-md rotate-90">
               Discount Voucher
@@ -319,7 +321,7 @@ const VoucherCard: React.FC = () => {
           </div>
         </div>
         {/* Sixth Card */}
-        <div className="flex items-center card-anime">
+        <div className="flex justify-center card-anime">
           <div className="side-card card-gray-border h-full">
             <h4 className="side-text-gray uppercase font-semibold text-md rotate-90">
               Discount Voucher

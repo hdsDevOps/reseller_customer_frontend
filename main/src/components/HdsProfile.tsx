@@ -47,7 +47,7 @@ const HdsProfile = ({setShowProfile}:HdsProfileProps) => {
         <p className='text-sm text-[#434D64] pt-2 '>User</p>
         <h2 className='text-lg font-bold text-[#14213D] mt-6'>Basic information</h2>
         <div className='max-w-4xl '>
-            <div className='flex items-center justify-between mt-6 w-full'>
+            <div className='flex flex-col sm:flex-col lg:flex-row gap-4 justify-between mt-6 w-full'>
                 <div className="relative w-full ">
                 <input
                     type="text"
@@ -62,7 +62,7 @@ const HdsProfile = ({setShowProfile}:HdsProfileProps) => {
                 First Name
                 </label>
                 </div>
-                <div className="relative w-full ml-12">
+                <div className="relative w-full ">
                 <input
                     type="text"
                     id="userType"
@@ -77,7 +77,7 @@ const HdsProfile = ({setShowProfile}:HdsProfileProps) => {
                 </label>
                 </div>
             </div>
-            <div className='flex items-center justify-between mt-6 w-full'>
+            <div className='flex flex-col sm:flex-col lg:flex-row gap-4   justify-between mt-6 w-full'>
                 <div className="relative w-full ">
                 <input
                     type="text"
@@ -92,7 +92,7 @@ const HdsProfile = ({setShowProfile}:HdsProfileProps) => {
                 Email
                 </label>
                 </div>
-                <div className="relative w-full ml-12">
+                <div className="relative w-full ">
                 <input
                     type="text"
                     id="8777593945"
@@ -107,7 +107,7 @@ const HdsProfile = ({setShowProfile}:HdsProfileProps) => {
                 </label>
                 </div>
             </div>
-            <div className='flex items-center mt-6 w-full justify-between'>
+            <div className='flex flex-col sm:flex-col lg:flex-row gap-4   mt-6 w-full justify-between'>
                 <div className="relative w-full">
                 <input
                     type="text"
@@ -122,7 +122,7 @@ const HdsProfile = ({setShowProfile}:HdsProfileProps) => {
                 Address
                 </label>
                 </div>
-                <div className="relative w-full mx-12">
+                <div className="relative w-full  ">
                 <input
                     type="text"
                     id="State/City"
@@ -151,7 +151,7 @@ const HdsProfile = ({setShowProfile}:HdsProfileProps) => {
                 </label>
                 </div>
             </div>
-            <div className='flex items-center justify-between mt-6 w-full'>
+            <div className='flex flex-col sm:flex-col lg:flex-row gap-4   justify-between mt-6 w-full'>
                 <div className="relative w-full ">
                 <input
                     type="text"
@@ -167,7 +167,7 @@ const HdsProfile = ({setShowProfile}:HdsProfileProps) => {
                 Password
                 </label>
                 </div>
-                <div className="relative w-full ml-12">
+                <div className="relative w-full  ">
                 <input
                     type="text"
                     id="confirm Password"
@@ -185,7 +185,7 @@ const HdsProfile = ({setShowProfile}:HdsProfileProps) => {
         </div>
         <h2 className='text-lg font-bold text-[#14213D] mt-6'>Business information</h2>
         <div className='max-w-4xl'>
-        <div className='flex items-center justify-between mt-6 w-full'>
+        <div className='flex flex-col sm:flex-col lg:flex-row gap-4    justify-between mt-6 w-full'>
                 <div className="relative w-full ">
                 <input
                     type="text"
@@ -200,7 +200,7 @@ const HdsProfile = ({setShowProfile}:HdsProfileProps) => {
                 Business Name
                 </label>
                 </div>
-                <div className="relative w-full ml-12">
+                <div className="relative w-full ">
                 <input
                     type="text"
                     id="userType"
@@ -215,7 +215,7 @@ const HdsProfile = ({setShowProfile}:HdsProfileProps) => {
                 </label>
                 </div>
         </div>
-        <div className='flex items-center justify-between mt-6 w-full'>
+        <div className='flex flex-col sm:flex-col lg:flex-row gap-4    justify-between mt-6 w-full'>
                 <div className="relative w-full ">
                 <input
                     type="text"
@@ -230,7 +230,7 @@ const HdsProfile = ({setShowProfile}:HdsProfileProps) => {
                 City*
                 </label>
                 </div>
-                <div className="relative w-full ml-12">
+                <div className="relative w-full  ">
                 <input
                     type="text"
                     id="Zip code"
@@ -244,6 +244,7 @@ const HdsProfile = ({setShowProfile}:HdsProfileProps) => {
                     Zip code
                 </label>
                 </div>
+                <div className='p-1 lg:hidden'></div>
             </div>
         </div>
       </main>

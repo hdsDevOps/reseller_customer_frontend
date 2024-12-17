@@ -19,7 +19,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps) => {
              <div className='px-6'>
                 <h2 className='text-lg font-bold text-[#14213D] mt-6'>Basic information</h2>
                 <div className='max-w-4xl '>
-                    <div className='flex items-center justify-between mt-6 w-full'>
+                    <div className='flex flex-col sm:flex-col lg:flex-row gap-4    justify-between mt-6 w-full'>
                         <div className="relative w-full ">
                         <input
                             type="text"
@@ -31,10 +31,10 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps) => {
                             htmlFor="userType"
                             className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 left-2"
                         >
-                        First Name
+                        First Name*
                         </label>
                         </div>
-                        <div className="relative w-full ml-12">
+                        <div className="relative w-full  ">
                         <input
                             type="text"
                             id="userType"
@@ -45,11 +45,11 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps) => {
                             htmlFor="userType"
                             className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 left-2"
                         >
-                    Last Name
+                    Last Name*
                         </label>
                         </div>
                     </div>
-                    <div className='flex items-center justify-between mt-6 w-full'>
+                    <div className='flex flex-col sm:flex-col lg:flex-row gap-4    justify-between mt-6 w-full'>
                         <div className="relative w-full ">
                         <input
                             type="text"
@@ -64,7 +64,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps) => {
                         Email
                         </label>
                         </div>
-                        <div className="relative w-full ml-12">
+                        <div className="relative w-full  ">
                         <input
                             type="text"
                             id="8777593945"
@@ -79,7 +79,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps) => {
                         </label>
                         </div>
                     </div>
-                    <div className='flex items-center mt-6 w-full justify-between'>
+                    <div className='flex flex-col sm:flex-col lg:flex-row gap-4    mt-6 w-full justify-between'>
                         <div className="relative w-full">
                         <input
                             type="text"
@@ -91,10 +91,10 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps) => {
                             htmlFor="Address"
                             className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 left-2"
                         >
-                        Address
+                        Address*
                         </label>
                         </div>
-                        <div className="relative w-full mx-12">
+                        <div className="relative w-full ">
                         <input
                             type="text"
                             id="State/City"
@@ -105,7 +105,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps) => {
                             htmlFor="State/City"
                             className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 left-2"
                         >
-                        State/City
+                        State/City*
                         </label>
                         </div>
                         <div className="relative w-full">
@@ -119,11 +119,11 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps) => {
                             htmlFor="Country"
                             className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 left-2"
                         >
-                        Country
+                        Country*
                         </label>
                         </div>
                     </div>
-                    <div className='flex items-center justify-between mt-6 w-full'>
+                    <div className='flex flex-col sm:flex-col lg:flex-row gap-4    justify-between mt-6 w-full'>
                         <div className="relative w-full ">
                         <input
                             type="text"
@@ -139,7 +139,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps) => {
                         Password
                         </label>
                         </div>
-                        <div className="relative w-full ml-12">
+                        <div className="relative w-full ">
                         <input
                             type="text"
                             id="confirm Password"
@@ -157,7 +157,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps) => {
                 </div>
                 <h2 className='text-lg font-bold text-[#14213D] mt-6'>Business information</h2>
                 <div className='max-w-4xl'>
-                <div className='flex items-center justify-between mt-6 w-full'>
+                <div className='flex flex-col sm:flex-col lg:flex-row gap-4    justify-between mt-6 w-full'>
                         <div className="relative w-full ">
                         <input
                             type="text"
@@ -169,10 +169,10 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps) => {
                             htmlFor="ABC Business"
                             className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 left-2"
                         >
-                        Business Name
+                        Business Name*
                         </label>
                         </div>
-                        <div className="relative w-full ml-12">
+                        <div className="relative w-full  ">
                         <input
                             type="text"
                             id="userType"
@@ -183,11 +183,11 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps) => {
                             htmlFor="userType"
                             className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 left-2"
                         >
-                            State
+                            State*
                         </label>
                         </div>
                 </div>
-                <div className='flex items-center justify-between mt-6 w-full'>
+                <div className='flex flex-col sm:flex-col lg:flex-row gap-4    justify-between mt-6 w-full'>
                         <div className="relative w-full ">
                         <input
                             type="text"
@@ -202,7 +202,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps) => {
                         City*
                         </label>
                         </div>
-                        <div className="relative w-full ml-12">
+                        <div className="relative w-full ">
                         <input
                             type="text"
                             id="Zip code"
@@ -213,7 +213,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps) => {
                             htmlFor="Zip code"
                             className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 left-2"
                         >
-                            Zip code
+                            Zip code*
                         </label>
                         </div>
                     </div>
@@ -222,7 +222,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps) => {
              <div className='flex items-center justify-between mt-3 px-6'>
                 <button onClick={handleCloseShowModal} 
                 className='text-white text-center bg-[#12A833] py-2 px-4 rounded-xl w-36  mb-4'>Update</button>
-                <img className='h-28 w-40 object-cover' src='./images/stamp.png'/>
+                
              </div>
         </div>
      </div>
