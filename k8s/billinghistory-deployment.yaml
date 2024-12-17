@@ -16,7 +16,7 @@ spec:
       - name: frontend-billinghistory-service
         image: hordansodevops/reseller_customer_frontend_billinghistory:latest
         ports:
-        - containerPort: 3006
+        - containerPort: 3010
         imagePullPolicy: Always
         envFrom:
         - configMapRef:

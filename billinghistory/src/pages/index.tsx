@@ -1,25 +1,21 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-import EmailList from "./EmailList";
-const AddDomain = React.lazy(() => import("./AddDomain"));
-const DomainList = React.lazy(() => import("./DomainList"));
-const DomainDetail = React.lazy(() => import("./DomainDetail"));
-const BuyDomain = React.lazy(() => import("./BuyDomain"));
-const ChooseDomain = React.lazy(() => import("./ChooseDomain"));
+const BillingHistory = React.lazy(() => import("./BillingHistory"));
+const Voucher = React.lazy(() => import("./Voucher"));
 
-const DomainApp: React.FC = () => {
+
+const HistoryApp: React.FC = () => {
   return (
     <div>
-      <Routes>
-        <Route path="/domain" element={<DomainList />} />
-        <Route path="/add-domain" element={<AddDomain />} />
-        <Route path="/domain-details" element={<DomainDetail/>} />
-        <Route path="/buy-domain" element={<BuyDomain />} />
-        <Route path="/choose-domain" element={<ChooseDomain />} />
-        <Route path="/email" element={<EmailList />} />
-      </Routes>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          <Route path="/billing-history" element={<BillingHistory />} />
+          <Route path="/voucher" element={<Voucher />} />
+        </Routes>
+      </Suspense>
+      
     </div>
-  );
-};
+  )
+}
 
-export default DomainApp;
+export default HistoryApp
