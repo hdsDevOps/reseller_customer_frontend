@@ -16,7 +16,7 @@ const DomainApp: React.FC = () => {
         <Route path="/domain-details" element={<DomainDetail/>} />
         <Route path="/buy-domain" element={<BuyDomain />} />
         <Route path="/choose-domain" element={<ChooseDomain />} />
-        <Route path="/email" element={<EmailList />} />
+        {/* <Route path="/email" element={<EmailList />} /> */}
       </Routes>
     </div>
   );

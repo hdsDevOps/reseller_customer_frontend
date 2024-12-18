@@ -36,6 +36,7 @@ const MainApp: React.FC = () => {
       <SettingsApp/>
       <PaymentApp />
       <HistoryApp />
+      <EmailApp />
     </div>
     <Navbar />
   

@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 import { GoArrowRight } from "react-icons/go";
-import { Link } from "react-router-dom";
-import { useAppSelector } from "store/hooks";
+import { Link, useLocation } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import { checkDomainThunk } from 'store/reseller.thunk';
 
 const BuyDomain: React.FC = () => {
+  const location = useLocation();
+  const dispatch = useAppDispatch();
+  console.log("state...", location.state);
   const { userAuthStatus = "" } = useAppSelector((state: any) => state.auth);
 
   const domains = [
@@ -16,6 +20,34 @@ const BuyDomain: React.FC = () => {
     { name: "domain.net", price: "₹5,069.00/year" },
     { name: "domain.net", price: "₹5,069.00/year" },
   ];
+
+  const [availableDomains, setAvailableDomains] = useState<string[]>([]);
+  console.log("availableDomains...", availableDomains);
+
+  useEffect(() => {
+    const domainName = location.state.domain.domain;
+    const domainLists = ['.com', '.co.in', '.website', '.net', '.in', '.co.uk'];
+
+    const availableList = async() => {
+      const lists: string[] = [];
+      domainLists.map(async(extension) => {
+        const fullDomainName = `${domainName}${extension}`;
+        try {
+          const result = await dispatch(checkDomainThunk(fullDomainName)).unwrap();
+          if(result?.message === "Domain is Still Available for Purchase , doesn't belong to anyone yet"){
+            lists.push(extension);
+          } else {
+            //
+          }
+        } catch (error) {
+          //
+        }
+      });
+      setAvailableDomains(lists);
+    };
+
+    availableList()
+  }, []);
 
   return (
     <div>
@@ -56,11 +88,11 @@ const BuyDomain: React.FC = () => {
             <button className="bg-green-600 text-white p-2 rounded-lg text-sm sm:text-md md:text-lg">
               Search Domain
             </button>
-            <div className="absolute text-red-600 text-sm left-0 lg:left-8 -bottom-16 md:-bottom-12">
-            This domain name is already in use. If you own this domain and would
-            like to use Google Workspace, <br /> please follow the steps <span className="text-green-500 cursor-pointer"> here.</span>
           </div>
-          </div>
+          <div className="text-red-600 text-sm left-0 lg:left-8 -bottom-16 md:-bottom-12">
+              This domain name is already in use. If you own this domain and would
+              like to use Google Workspace, <br /> please follow the steps <span className="text-green-500 cursor-pointer"> here.</span>
+            </div>
 
           
 

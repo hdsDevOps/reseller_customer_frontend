@@ -41,8 +41,6 @@ declare module "store/ReduxProvider" {
     export const makeUserLoginThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserLoginPayload, {}>;
   
     export const makeUserRegisterThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
-
-    export const verifyOTPUserLoginThunk: import("@reduxjs/toolkit").AsyncThunk<any, LoginVerifyOtpPayload, {}>;
   }
   
 

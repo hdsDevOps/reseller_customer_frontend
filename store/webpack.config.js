@@ -51,6 +51,7 @@ module.exports = (_, argv) => ({
 				"./hooks": "./src/hooks.ts",
 				"./user.thunk": "./src/thunks/user.thunk.tsx",
 				"./authSlice": "./src/slices/authSlice.ts",
+				"./reseller.thunk": "./src/thunks/reseller.thunk.tsx",
 			},
 			shared: {
 				...deps,

@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from 'axios';
 import store from '../store'; // Ensure this path is correct
 
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: process.env.BASE_URL,
+  baseURL: process.env.RESELLER_BASE_URL,
   timeout: 10000, // Adjust as needed
   headers: {
     'Content-Type': 'application/json',
@@ -11,9 +11,9 @@ const axiosInstance: AxiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   function (config) {
-    const authToken = store.getState().auth.token; // Adjust to match your auth state structure
-    if (authToken) {
-      config.headers.Authorization = `Bearer ${authToken}`;
+    const resellerToken = store.getState().auth.resellerToken; // Adjust to match your auth state structure
+    if (resellerToken) {
+      config.headers.Authorization = `Bearer ${resellerToken}`;
     }
     return config;
   },
@@ -25,9 +25,9 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   function (response) {
     if (
-      response.data?.status === 410 ||
-      response.data?.status === 401 ||
-      response.data?.status === 403
+      response?.status === 410 ||
+      response?.status === 401 ||
+      response?.status === 403
     ) {
       // Handle logout or other logic
     }

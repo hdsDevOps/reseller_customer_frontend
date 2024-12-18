@@ -9,7 +9,12 @@ import { useForm, SubmitHandler } from "react-hook-form";
 interface IFormInput {
   email: string;
   password: string;
-}
+};
+
+const initialUserDetails = {
+  email: "",
+  password: "",
+};
 
 const Login: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -17,6 +22,15 @@ const Login: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [userDetails, setUserDetails] = useState<IFormInput>(initialUserDetails);
+  // console.log("userDetails...", userDetails);
+
+  const updateUserDetails = e => {
+    setUserDetails({
+      ...userDetails,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const {
     register,
@@ -24,25 +38,21 @@ const Login: React.FC = () => {
     formState: { errors },
   } = useForm<IFormInput>({
     defaultValues: {
-      email: "debasis.kayal@schemaphic.com",
-      password: "qwe@K123",
+      email: "",
+      password: "",
     },
     mode: "onTouched",
   });
 
-
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     setLoading(true);
     try {
-      const result = await dispatch(
-        makeUserLoginThunk({
-          email: data.email,
-          password: data.password,
-        })
-      ).unwrap();
-      setLoading(false);
-      console.log("result....", result);
-      navigate("/otp?mode=signin");
+      const result = await dispatch(makeUserLoginThunk(userDetails)).unwrap();
+      console.log("result...", result);
+      if(result?.message === "Login successful. Please check your email for OTP.") {
+        navigate("/otp?mode=signin", { state: { customer_id: result?.customer_id }});
+      }
+      // navigate("/otp?mode=signin");
     } catch (error) {
       console.error("Login error:", error);
       setLoading(false);
@@ -84,7 +94,7 @@ const Login: React.FC = () => {
                   Email
                 </label>
                 <input
-                  type="text"
+                  type="email"
                   id="formBasicEmail"
                   placeholder="Enter email"
                   className="custom-input"
@@ -96,6 +106,9 @@ const Login: React.FC = () => {
                       message: "Invalid email format",
                     },
                   })}
+                  name="email"
+                  onChange={updateUserDetails}
+                  value={userDetails?.email}
                 />
                 {errors.email && (
                   <p className="text-red-600 text-sm">{errors.email.message}</p>
@@ -108,17 +121,20 @@ const Login: React.FC = () => {
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
-                    placeholder=".........."
+                    placeholder="Enter password"
                     className="custom-input"
-                    minLength={8}
+                    minLength={6}
                     required
                     {...register("password", {
                       required: "Password is required",
                       minLength: {
-                        value: 8,
+                        value: 6,
                         message: "Password must be at least 8 characters",
                       },
                     })}
+                    name="password"
+                    onChange={updateUserDetails}
+                    value={userDetails?.password}
                   />
                   <button
                     type="button"

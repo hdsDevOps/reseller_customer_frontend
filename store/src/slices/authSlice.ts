@@ -2,8 +2,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
     getUserAuthTokenFromLSThunk,
+    getUserIdFromLSThunk,
     makeUserLoginThunk,
-    verifyOTPUserLoginThunk
+    setUserIdToLSThunk
 } from '../thunks/user.thunk';
 import { userLocalStorage } from '../localStorage/user.storage';
 
@@ -13,6 +14,7 @@ export interface UserDetailsState {
   userId: number | null;
   token: string | null;
   customerId: string | null;
+  resellerToken: string | null;
 }
 
 const initialState: UserDetailsState = {
@@ -21,6 +23,7 @@ const initialState: UserDetailsState = {
   userId: null,
   token: '',
   customerId:'',
+  resellerToken: '',
 };
 
 const authSlice = createSlice({
@@ -33,8 +36,14 @@ const authSlice = createSlice({
     setUserDetails: (state, action: PayloadAction<any>) => {
       state.userDetails = action.payload;
     },
+    setCustomerId: (state, action: PayloadAction<any>) => {
+      state.customerId = action.payload;
+    },
     setUserAuthStatus: (state, action: PayloadAction<'AUTHORIZED' | 'UN_AUTHORIZED' | 'PENDING' | 'UPGRADE'>) => {
       state.userAuthStatus = action.payload;
+    },
+    setResellerToken: (state, action: PayloadAction<any>) => {
+      state.resellerToken = action.payload;
     },
     resetUserSlice: (state) => {
       state.userAuthStatus = 'PENDING';
@@ -62,25 +71,6 @@ const authSlice = createSlice({
 
   //-------------
 
-  builder.addCase(verifyOTPUserLoginThunk.pending, state => {
-    // state.userAuthStatus = 'PENDING';
-  });
-
-  builder.addCase(
-    verifyOTPUserLoginThunk.fulfilled,
-    (state, action: PayloadAction<any>) => {
-      state.customerId = action.payload.customer_id;
-      state.token = action.payload?.token;
-      userLocalStorage.saveUserTokenToLocalStorage(action.payload?.token);
-    },
-  );
-
-  builder.addCase(verifyOTPUserLoginThunk.rejected, state => {
-    // state.userAuthStatus = 'UN_AUTHORIZED';
-  });
-
-  //-------------
-
     builder.addCase(getUserAuthTokenFromLSThunk.pending, state => {
       state.userAuthStatus = 'PENDING';
     });
@@ -93,9 +83,24 @@ const authSlice = createSlice({
     builder.addCase(getUserAuthTokenFromLSThunk.rejected, state => {
       state.userAuthStatus = 'UN_AUTHORIZED';
     });
+
+  //-------------
+
+    builder.addCase(getUserIdFromLSThunk.pending, state => {
+      state.userAuthStatus = 'PENDING';
+    });
+
+    builder.addCase(getUserIdFromLSThunk.fulfilled, (state, action: PayloadAction<any>) => {
+      state.userAuthStatus = 'AUTHORIZED';
+      state.customerId = action.payload;
+    });
+
+    builder.addCase(getUserIdFromLSThunk.rejected, state => {
+      state.userAuthStatus = 'UN_AUTHORIZED';
+    });
   },
 });
 
-export const { setTokenDetails, setUserDetails, setUserAuthStatus, resetUserSlice } = authSlice.actions;
+export const { setTokenDetails, setUserDetails, setUserAuthStatus,  setResellerToken, resetUserSlice } = authSlice.actions;
 
 export default authSlice.reducer;

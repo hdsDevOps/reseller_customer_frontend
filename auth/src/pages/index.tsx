@@ -1,6 +1,8 @@
 import React, { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import Footer from "../components/Footer";
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from "react-toastify";
 
 const Header = React.lazy(() => import("../components/Header"));
 const Home = React.lazy(() => import("./Home"));
@@ -30,8 +32,10 @@ const NewRegister = React.lazy(() => import("./NewRegister"));
 const AuthApp: React.FC = () => {
   return (
     <div className="w-full min-h-screen bg-white">
+      <ToastContainer />
       <Suspense fallback={<div>Loading...</div>}>
         <Header />
+        
         <main className="flex items-center justify-center max-w-full">
           <Routes>
             <Route path="/" element={<Home />} />

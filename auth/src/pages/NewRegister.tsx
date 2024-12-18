@@ -10,21 +10,29 @@ import CheckBox from "../utils/inputs/checkbox";
 import { Link } from "react-router-dom";
 import { useAppDispatch } from "store/hooks";
 import { makeUserRegisterThunk } from "store/user.thunk";
+import { HiOutlineEye } from "react-icons/hi";
+
+const initialCustomer = {
+  first_name: "",
+  last_name: "",
+  business_name: "",
+  street_address: "",
+  state: "",
+  region: "",
+  city: "",
+  zip_code: "",
+  email: "",
+  business_phone_number: "",
+  password: "",
+};
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const [fname, setFname] = useState("");
-  const [lname, setLname] = useState("");
-  const [email, setEmail] = useState("");
-  const [phoneNo, setPhoneNo] = useState<string>("+91");
-  const [business, setBusiness] = useState("");
-  const [street, setStreet] = useState("");
-  const [state, setState] = useState("");
-  const [zip, setZip] = useState("");
-  const [region, setRegion] = useState("");
-  const [city, setCity] = useState("");
+  const [customer, setCustomer] = useState(initialCustomer);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showCPassword, setShowCPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -33,10 +41,32 @@ const RegisterPage: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
 
+  const tableHeads = [
+    {name: 'first_name', label: "First name", type: "text", required: false, placeholder: "Enter First name", },
+    {name: 'last_name', label: "Last name", type: "text", required: false, placeholder: "Enter Last name", },
+    {name: 'business_name', label: "Business Name", type: "text", required: false, placeholder: "Enter Business Name", },
+    {name: 'street_address', label: "Street address", type: "select", required: false, placeholder: "Select Street address", },
+    {name: 'state', label: "State", type: "text", required: false, placeholder: "Enter State", },
+    {name: 'region', label: "Region", type: "select", required: false, placeholder: "Select Region", },
+    {name: 'city', label: "City", type: "text", required: false, placeholder: "Enter City", },
+    {name: 'zip_code', label: "Zip code", type: "number", required: false, placeholder: "Enter Zip code", },
+    {name: 'email', label: "Email address", type: "email", required: false, placeholder: "Enter Email address", },
+    {name: 'Business_phone_number', label: "Business phone number", type: "text", required: false, placeholder: "Enter Business phone number", },
+    {name: 'password', label: "Password", type: "password", required: false, placeholder: "Enter Password", },
+    {name: 'c_password', label: "Confirm Password", type: "password", required: false, placeholder: "Enter Confirm Password", },
+  ];
+
+  const updateCustomer = e => {
+    setCustomer({
+      ...customer,
+      [e.target.name]: e.target.value,
+    });
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     navigate("/otp?mode=signup");
-    return;
+    // return;
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -48,23 +78,7 @@ const RegisterPage: React.FC = () => {
     }
     setLoading(true);
     try {
-      const result = await dispatch(
-        makeUserRegisterThunk({
-          first_name: fname,
-          last_name: lname,
-          business_name: business,
-          email: email,
-          state: state,
-          city: city,
-          zipcode: zip,
-          password: password,
-          street_name: street,
-          region: region,
-          phone_no: phoneNo,
-        })
-      ).unwrap();
-      setLoading(false);
-      console.log("result....", result);
+      
       navigate("/otp?mode=signin");
     } catch (error) {
       console.error("Login error:", error);
@@ -75,7 +89,7 @@ const RegisterPage: React.FC = () => {
   return (
     <section className="w-full mx-auto px-8 pt-3 pb-8">
       <Link to="/login">
-        <div className="flex gap-1 items-center cursor-pointer">
+        <div className="flex gap-1 heads-center cursor-pointer">
           <IoIosArrowBack className="w-4 h-4" />
           <p className="text-greenbase">Back to previous page</p>
         </div>
@@ -89,108 +103,127 @@ const RegisterPage: React.FC = () => {
           To create an account, we need some information for your HORDANSO
           account.
         </p>
-        <form onSubmit={handleSubmit}>
-          <div className="flex flex-col  gap-10 justify-center md:pt-12 pt-8 pb-4 w-full">
-          <div className="flex   sm:flex-col lg:flex-row gap-4  w-full">
-          <Input
-                placeholder="First name"
-                type="text"
-                value={fname}
-                onChange={(e) => setFname(e.target.value)}
-              />
-              <Input
-                placeholder="Last name"
-                type="text"
-                value={lname}
-                onChange={(e) => setLname(e.target.value)}
-              />
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-2">
+          <div
+            className="grid grid-cols-2 gap-2"
+          >
+            {
+              tableHeads.map((head, index) => {
+                if(head.name === "password") {
+                  return (
+                    <div
+                      key={index}
+                      className='flex flex-col px-2 mb-2  sm:col-span-1 col-span-2'
+                    >
+                      <label
+                        className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
+                      >{head.label}</label>
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name={head.name}
+                        required={head.required}
+                        className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                        onChange={updateCustomer}
+                        placeholder={head.placeholder}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {setShowPassword(!showPassword)}}
+                        className="relative float-right mt-[-35px] mr-[15px] ml-auto"
+                      >
+                        {showPassword ? (
+                          <HiOutlineEye className="h-[25px] w-[25px]" aria-hidden="true" />
+                        ) : (
+                          <RiEyeCloseLine className="h-[25px] w-[25px]" aria-hidden="true" />
+                        )}
+                      </button>
+                    </div>
+                  )
+                } else if(head.name === "c_password") {
+                  return (
+                    <div
+                      key={index}
+                      className='flex flex-col px-2 mb-2  sm:col-span-1 col-span-2'
+                    >
+                      <label
+                        className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
+                      >{head.label}</label>
+                      <input
+                        type={showCPassword ? "text" : "password"}
+                        name={head.name}
+                        required={head.required}
+                        className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                        onChange={e => {setConfirmPassword(e.target.value)}}
+                        placeholder={head?.placeholder}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {setShowCPassword(!showCPassword)}}
+                        className="relative float-right mt-[-35px] mr-[15px] ml-auto"
+                      >
+                        {showPassword ? (
+                          <HiOutlineEye className="h-[25px] w-[25px]" aria-hidden="true" />
+                        ) : (
+                          <RiEyeCloseLine className="h-[25px] w-[25px]" aria-hidden="true" />
+                        )}
+                      </button>
+                    </div>
+                  )
+                } else if(head.type === "select") {
+                  return (
+                    <div
+                      key={index}
+                      className='flex flex-col px-2 mb-2  sm:col-span-1 col-span-2'
+                    >
+                      <label
+                        className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
+                      >{head.label}</label>
+                      {/* <input
+                        type="text"
+                        name={head.name}
+                        required
+                        className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                        // onChange={updateCustomer}
+                        placeholder={head?.placeholder}
+                      /> */}
+                      <select
+                        name={head.name}
+                        required={head.required}
+                        className="border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2"
+                      >
+                        <option selected disabled>{head.placeholder}</option>
+                        <option>United States</option>
+                      </select>
+                    </div>
+                  )
+                } else {
+                  return (
+                    <div
+                      key={index}
+                      className='flex flex-col px-2 mb-2  sm:col-span-1 col-span-2'
+                    >
+                      <label
+                        className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
+                      >{head.label}</label>
+                      <input
+                        type={head.type}
+                        name={head.name}
+                        required={head.required}
+                        className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                        onChange={updateCustomer}
+                        placeholder={head?.placeholder}
+                      />
+                    </div>
+                  )
+                }
+              })
+            }
           </div>
-          <div className="flex   sm:flex-col lg:flex-row gap-4  w-full">
-          <Input
-                placeholder="Business name"
-                type="text"
-                value={business}
-                onChange={(e) => setBusiness(e.target.value)}
-              />
-                <Input
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              
-          </div>
-          <div className="flex   sm:flex-col lg:flex-row gap-4  w-full">
-          <Input
-                placeholder="Street number"
-                type="text"
-                icon={IoIosArrowDown}
-                iconColor="#8A8A8A"
-                iconSize="20"
-                value={street}
-                onChange={(e) => setStreet(e.target.value)}
-              />
-          <Input
-                placeholder="State"
-                type="text"
-                value={state}
-                onChange={(e) => setState(e.target.value)}
-              />
-              
-          </div>
-          <div className="flex   sm:flex-col lg:flex-row gap-4  w-full">
-          <Input
-                placeholder="City*"
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-              />
-               <Input
-                placeholder="Region"
-                type="text"
-                icon={IoIosArrowDown}
-                iconColor="#8A8A8A"
-                iconSize="20"
-                value={region}
-                onChange={(e) => setRegion(e.target.value)}
-              />
-          </div>
-          <div className="flex   sm:flex-col lg:flex-row gap-4  w-full">
-          <Input
-                placeholder="Zip code"
-                type="text"
-                value={zip}
-                onChange={(e) => setZip(e.target.value)}
-              />
-              
-              <PhoneNumberInput
-                placeholder="Business phone number"
-                className="w-full"
-                phoneNumber={phoneNo}
-                handleChange={(value) => setPhoneNo(value || "")} // Updates phoneNo with the input value
-              />
-          </div>
-          <div className="flex   sm:flex-col lg:flex-row gap-4  w-full">
-          <Input
-                placeholder="Password"
-                icon={RiEyeCloseLine}
-                iconColor="black"
-                iconSize="20"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-               <Input
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-               {error && <p className="text-red-500">{error}</p>}
-          </div>
-           
-          </div>
-          <div className="text-sm flex gap-2 ">
-            <CheckBox
-              checked={termsAccepted}
+          <div className="text-sm flex gap-2 px-3 pt-3 items-center">
+            <input
+              type="checkbox"
               onChange={() => setTermsAccepted(!termsAccepted)}
+              className="w-3 h-3"
             />
             <button
               onClick={() => setShowModal(true)}
@@ -201,12 +234,14 @@ const RegisterPage: React.FC = () => {
               Terms and conditions
             </button>
           </div>
-          {showModal && (
-            <TermsAndConditions
-              isOpen={showModal}
-              onClose={() => setShowModal(false)}
-            />
-          )}
+          <div>
+            {showModal && (
+              <TermsAndConditions
+                isOpen={showModal}
+                onClose={() => setShowModal(false)}
+              />
+            )}
+          </div>
           <div className="mt-4 flex justify-center">
             <button
               type="submit"

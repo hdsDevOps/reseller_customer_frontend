@@ -12,6 +12,11 @@ declare module 'store/hooks' {
   export const useAppSelector: TypedUseSelectorHook<RootState>;
 }
 
+declare module "store/reseller.thunk" {
+  import { createAsyncThunk } from '@reduxjs/toolkit';
+  // export const checkDomainThunk: import("@reduxjs/toolkit").AsyncThunk<any, {domain: string}, {}>;
+}
+
 declare module 'store/authSlice' {
   import { PayloadAction, Slice } from '@reduxjs/toolkit';
   

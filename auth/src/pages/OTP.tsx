@@ -6,15 +6,16 @@ import React, {
   KeyboardEvent,
 } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { verifyOTPUserLoginThunk } from "store/user.thunk";
+import { verifyLoginOtpThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, } from 'store/user.thunk';
 
 const OTP: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const customerId = useAppSelector((state: any) => state.auth.customerId);
+  const customerId = location.state.customer_id;
   const mode = queryParams.get("mode");
 
   const otp1Ref = useRef<HTMLInputElement>(null);
@@ -24,12 +25,12 @@ const OTP: React.FC = () => {
   const otp5Ref = useRef<HTMLInputElement>(null);
   const otp6Ref = useRef<HTMLInputElement>(null);
 
-  const [otp1, setOtp1] = useState<string>("1");
-  const [otp2, setOtp2] = useState<string>("1");
-  const [otp3, setOtp3] = useState<string>("1");
-  const [otp4, setOtp4] = useState<string>("1");
-  const [otp5, setOtp5] = useState<string>("1");
-  const [otp6, setOtp6] = useState<string>("1");
+  const [otp1, setOtp1] = useState<string>("");
+  const [otp2, setOtp2] = useState<string>("");
+  const [otp3, setOtp3] = useState<string>("");
+  const [otp4, setOtp4] = useState<string>("");
+  const [otp5, setOtp5] = useState<string>("");
+  const [otp6, setOtp6] = useState<string>("");
   const [timeLeft, setTimeLeft] = useState<number>(10);
   const [loading, setLoading] = useState(false);
 
@@ -80,6 +81,7 @@ const OTP: React.FC = () => {
           break;
         case 5:
           setOtp5(value);
+          otp6Ref.current?.focus();
           break;
         case 6:
           setOtp6(value);
@@ -145,41 +147,47 @@ const OTP: React.FC = () => {
     e.preventDefault();
 
     // Concatenate OTP values
-    const otp = `${otp1}${otp2}${otp3}${otp4}${otp5}`;
+    const otp = `${otp1}${otp2}${otp3}${otp4}${otp5}${otp6}`;
 
     // Check if OTP length is correct
-    if (otp.length !== 5) {
-      return alert("Please enter all 5 digits.");
-    }
-
-    if (mode === "signin") {
-      // Set loading state to true
-      setLoading(true);
-      try {
-        // Dispatch the OTP verification for signin
-        const result = await dispatch(
-          verifyOTPUserLoginThunk({
+    if (otp.length === 6) {
+      if (mode === "signin") {
+        // Set loading state to true
+        setLoading(true);
+        try {
+          const result = await dispatch(verifyLoginOtpThunk({
             customer_id: customerId,
-            otp: otp,
-          })
-        ).unwrap();
-
-        console.log("result....", result);
-        // Optionally navigate or do something else after successful login
-        // navigate("/otp?mode=signin");
-      } catch (error) {
-        // Handle login error
-        console.error("Login error:", error);
-      } finally {
-        // Set loading state to false after request completes
-        setLoading(false);
+            otp: otp
+          })).unwrap();
+          console.log("result...", result);
+          if(result?.status === 200) {
+            try {
+              await dispatch(setUserAuthTokenToLSThunk({token: result?.token})).unwrap();
+              const setCustomerId = await dispatch(setUserIdToLSThunk(customerId)).unwrap();
+              console.log("customer id...", setCustomerId);
+              navigate('/dashboard', {state: {from: 'otp'}});
+            } catch (error) {
+              console.log("Error on token");
+            }
+          }
+        } catch (error) {
+          // Handle login error
+          console.error("Login error:", error);
+          // toast.error()
+        } finally {
+          // Set loading state to false after request completes
+          setLoading(false);
+        }
+      } else if (mode === "signup") {
+        // TODO: Handle signup logic here
+        console.log("Handle signup process here.");
+      } else {
+        // If it's neither signin nor signup, navigate to reset password
+        navigate("/resetpassword");
       }
-    } else if (mode === "signup") {
-      // TODO: Handle signup logic here
-      console.log("Handle signup process here.");
     } else {
-      // If it's neither signin nor signup, navigate to reset password
-      navigate("/resetpassword");
+      // not entered 6 otps
+      toast.warning("Please enter all 6 otps")
     }
   };
 
