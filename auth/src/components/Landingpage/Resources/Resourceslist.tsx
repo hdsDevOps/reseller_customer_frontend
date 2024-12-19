@@ -3,12 +3,12 @@ import { Base_URL } from "../../../Constant";
 
 export const Connect = () => {
   return (
-    <div>
-      <h1 className="font-medium text-3xl">Connect</h1>
-      <p className="text-[#868686] font-normal text-xl mt-3 mb-6">
+    <div className="flex flex-col items-start lg:block">
+      <h1 className="font-medium text-3xl text-center w-full lg:inline">Connect</h1>
+      <p className="text-[#868686] font-normal text-xl mt-3 mb-6 text-center lg:text-left w-full  ">
         Lorem ipsum dolor sit amet consectetur.{" "}
       </p>
-      <div className="flex gap-4 items-center">
+      <div className="flex gap-4 items-center  justify-center  lg:justify-start">
         <img
           src={Base_URL + "/images/gmail.png"}
           alt="google mail"
@@ -36,12 +36,12 @@ export const Connect = () => {
 
 export const Create = () => {
   return (
-    <div>
-      <h1 className="font-medium text-3xl">Create</h1>
-      <p className="text-[#868686] font-normal text-xl mt-3 mb-6">
+    <div className="flex flex-col items-start lg:block">
+      <h1 className="font-medium text-3xl text-center w-full lg:inline">Create</h1>
+      <p className="text-[#868686] font-normal text-xl mt-3 mb-6 text-center  ">
         Lorem ipsum dolor sit amet consectetur Lacus sollicitudin.{" "}
       </p>
-      <div className="flex gap-4 items-center">
+      <div className="flex gap-4 items-center w-full justify-center lg:justify-start">
         <img
           src={Base_URL + "/images/sheet1.png"}
           alt="google sheet"
@@ -74,12 +74,12 @@ export const Create = () => {
 
 export const Access = () => {
   return (
-    <div>
-      <h1 className="font-medium text-3xl">Access</h1>
-      <p className="text-[#868686] font-normal text-xl mt-3 mb-6">
+    <div className="flex flex-col items-start lg:block">
+      <h1 className="font-medium text-3xl text-center w-full lg:inline">Access</h1>
+      <p className="text-[#868686] font-normal text-xl mt-3 mb-6 text-center  w-full">
         Lorem ipsum dolor sit amet.{" "}
       </p>
-      <div className="flex gap-4 items-center">
+      <div className="flex gap-4 items-center w-full justify-center">
         <img
           src={Base_URL + "/images/googlecloud.png"}
           alt="google cloud"
@@ -97,12 +97,12 @@ export const Access = () => {
 
 export const ConnectSecond = () => {
   return (
-    <div>
-      <h1 className="font-medium text-3xl">Connect</h1>
-      <p className="text-[#868686] font-normal text-xl mt-3 mb-6">
+    <div className="flex flex-col items-start lg:block">
+      <h1 className="font-medium text-3xl text-center w-full lg:inline">Connect</h1>
+      <p className="text-[#868686] font-normal text-xl mt-3 mb-6 text-center  w-full">
         Lorem ipsum dolor sit amet consectetur.{" "}
       </p>
-      <div className="flex gap-4 items-center">
+      <div className="flex gap-4 items-center w-full justify-center">
         <img
           src={Base_URL + "/images/googlesecurity.png"}
           alt="google secure"

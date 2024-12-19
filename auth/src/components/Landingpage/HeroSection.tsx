@@ -68,20 +68,38 @@ const HeroSection = () => {
         alt="Heroimage"
         className="object-cover size-full"
       />
-      <div className="absolute w-[18.688rem] h-[8.063rem] flex justify-center items-center bottom-[23.5rem] right-[35rem]">
-        <img
-          src={Base_URL + "/images/gift50.png"}
-          alt="Coupon 50%"
-          className="size-full"
-        />
+      <div className="background-red absolute bottom-[20px] flex px-16 min-[1280px]:static">
+        <div className=" mr-3 w-[18.688rem] h-[8.063rem] flex justify-center items-center bottom-[23.5rem] right-[35rem] xl:absolute">
+          <img
+            src={Base_URL + "/images/gift50.png"}
+            alt="Coupon 50%"
+            className="size-full"
+          />
+        </div>
+        <div className=" w-[18.688rem] h-[8.063rem] flex justify-center items-center bottom-[13.5rem] right-[28rem]  xl:absolute">
+          <img
+            src={Base_URL + "/images/gist2x1.png"}
+            alt="Coupon 50%"
+            className="size-full"
+          />
+        </div>
       </div>
-      <div className="absolute w-[18.688rem] h-[8.063rem] flex justify-center items-center bottom-[13.5rem] right-[28rem]">
-        <img
-          src={Base_URL + "/images/gist2x1.png"}
-          alt="Coupon 50%"
-          className="size-full"
-        />
-      </div>
+      {/* <div className="absolute flex flex-col bg-white">
+        <div className="w-[18.688rem] h-[8.063rem] flex justify-center items-center bottom-[23.5rem] right-[35rem]">
+          <img
+            src={Base_URL + "/images/gift50.png"}
+            alt="Coupon 50%"
+            className="size-full"
+          />
+        </div>
+        <div className="w-[18.688rem] h-[8.063rem] flex justify-center items-center bottom-[13.5rem] right-[28rem]">
+          <img
+            src={Base_URL + "/images/gist2x1.png"}
+            alt="Coupon 50%"
+            className="size-full"
+          />
+        </div>
+      </div> */}
     </div>
   );
 };

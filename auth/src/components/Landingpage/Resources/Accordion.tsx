@@ -60,7 +60,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
       </h2>
       <div
         id={`accordion-flush-body-${id}`}
-        className={`${isOpen ? "block" : "hidden"} transition-all duration-200`}
+        className={`${isOpen ? "block" : "hidden"} transition-all duration-200 pb-5 -mt-5`}
         aria-labelledby={`accordion-flush-heading-${id}`}
       >
         <div className="text-[#0D121F] font-light text-xl">{children}</div>
