@@ -1,45 +1,53 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { TiArrowSortedDown } from "react-icons/ti";
 
-export default function CustomerNavbar({width}) {
+export default function CustomerNavbar({width, closeNav, navOpen}: { width: number, closeNav: () => void, navOpen: boolean }) {
+  const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [isNavOpen, setIsNavOpen] = useState(false);
+
+  useEffect(() => {
+    if(!navOpen) {
+      setIsDropdownOpen(false);
+    }
+  }, [navOpen]);
   
-    const toggleDropdown = () => {
-      setIsDropdownOpen(!isDropdownOpen);
-    };
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
   return (
-    <div className={`flex lg:flex-row flex-col justify-between w-full bg-white lg:bg-transparent ${width<1024 ? "z-[1000] absolute" : ""}`}>
-        <div className="flex lg:gap-6 items-center justify-between">
-          
-          <ul className="lg:flex gap-4">
-            <li>
-              <Link to="#">Plan & Price</Link>
-            </li>
-            <li>
-              <Link to="#">About Us</Link>
-            </li>
-            <li>
-              <Link to="#">FAQ's</Link>
-            </li>
-            <li>
-              <Link to="#">Resources</Link>
-            </li>
-            <li>
-              <Link to="#">AI</Link>
-            </li>
-          </ul>
-        </div>
-        <div className="lg:flex gap-10 items-center">
-          <p>
+    <div className={`flex lg:flex-row flex-col justify-between lg:gap-0 gap-2 w-full bg-white lg:bg-transparent ${width<1024 ? "z-[1000] absolute" : ""}`}>
+        <ul className="lg:flex lg:gap-4 lg:pl-0 pl-3 items-center justify-between">
+          <li className="py-1 lg:py-0">
+            <Link to="/plans">Plan & Price</Link>
+          </li>
+          <li className="py-1 lg:py-0">
+            <Link to="/about-us">About Us</Link>
+          </li>
+          <li className="py-1 lg:py-0">
+            <Link to="/faqs">FAQ's</Link>
+          </li>
+          <li className="py-1 lg:py-0">
+            <Link to="/resources">Resources</Link>
+          </li>
+          <li className="py-1 lg:py-0">
+            <Link to="#">AI</Link>
+          </li>
+        </ul>
+        <div className="lg:flex lg:gap-10 items-center lg:pl-0 pl-3">
+          <p className="my-2 lg:my-0">
             <Link to="#">Contact Us</Link>
           </p>
-          <button className="bg-gray-100 text-green-500 hover:bg-green-500 hover:text-white border-none px-4 py-2.5 rounded-lg font-semibold text-base">
-            <Link to="/login">Login</Link>
-          </button>
+          <button
+            className="bg-gray-100 text-green-500 hover:bg-green-500 hover:text-white border-none px-4 py-2.5 rounded-lg font-semibold text-base my-2 lg:my-0"
+            type="button"
+            onClick={() => {
+              navigate('/login');
+              closeNav();
+            }}
+          >Login</button>
 
-          <div className="relative flex flex-col">
+          <div className="relative flex flex-col my-2 lg:my-0">
             <div className="flex items-center gap-1.5 cursor-pointer" onClick={toggleDropdown}>
               <img
                 src={process.env.BASE_URL + "/images/usflag.png"}

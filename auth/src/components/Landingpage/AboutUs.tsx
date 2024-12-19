@@ -21,53 +21,49 @@ const AboutUs = () => {
       </div>
       <div className="w-full bg-cover bg-center"
       style={{ backgroundImage: `url(${Base_URL}/images/AboutUsSpiral.png)` }}>
-        <div>
-          <div className="flex items-center flex-col lg:flex-row">
-            <div className="pb-11 lg:w-1/2 w-full sm:pt-8">
-              <h2 className="font-semibold text-3xl text-greenbase">
-                Make decisions faster, face to face.
-              </h2>
-              <p className="text-black text-base font-semibold">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              </p>
-              <p className="text-black text-base font-semibold mt-4">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem
-                ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              </p>
-            </div>
-            <img
-              src={Base_URL + "/images/meetcall.png"}
-              alt="AboutusSpiral"
-              className="lg:w-1/2 w-full object-cover"
-            />
+        <div className="flex items-center flex-col lg:flex-row w-full">
+          <div className="pb-11 lg:w-1/2 w-full sm:pt-8">
+            <h2 className="font-semibold text-3xl text-greenbase">
+              Make decisions faster, face to face.
+            </h2>
+            <p className="text-black text-base font-semibold">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <p className="text-black text-base font-semibold mt-4">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem
+              ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
           </div>
-          <div className="flex flex-col-reverse items-center lg:flex-row">
-            <img
-              src={Base_URL + "/images/dataanalysis.png"}
-              alt="Aboutus"
-              className="lg:w-1/2 w-full object-cover"
-            />
-            <div className="pb-11 lg:w-1/2 w-full sm:pt-8">
-              <h2 className="font-semibold text-3xl text-greenbase">
-                Secure your data and devices.
-              </h2>
-              <p className="text-black text-base font-semibold">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              </p>
-              <p className="text-black text-base font-semibold mt-4">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem
-                ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              </p>
-            </div>
+          <img
+            src={Base_URL + "/images/meetcall.png"}
+            alt="AboutusSpiral"
+            className="lg:w-1/2 w-full object-cover"
+          />
+        </div>
+        <div className="flex flex-col-reverse items-center lg:flex-row w-full">
+          <img
+            src={Base_URL + "/images/dataanalysis.png"}
+            alt="Aboutus"
+            className="lg:w-1/2 w-full object-cover"
+          />
+          <div className="pb-11 lg:w-1/2 w-full sm:pt-8">
+            <h2 className="font-semibold text-3xl text-greenbase">
+              Secure your data and devices.
+            </h2>
+            <p className="text-black text-base font-semibold">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <p className="text-black text-base font-semibold mt-4">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem
+              ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
           </div>
-          <Resources />
-          <FrequentlyAskedQuestions />
         </div>
       </div>
     </section>

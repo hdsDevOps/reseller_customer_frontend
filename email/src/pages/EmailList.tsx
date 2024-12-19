@@ -75,9 +75,9 @@ const EmailList: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-[#F7FAFF] flex items-start justify-start gap-14 sm:gap-0 md:justify-between flex-col md:flex-row mt-2 py-4 px-2">
-            <div className="flex items-start flex-col md:flex-row h-fit sm:h-24">
-              <div className="md:mr-4 flex-shrink-0 h-full">
+          <div className="bg-[#F7FAFF] flex items-start justify-start gap-8 md:gap-0 md:justify-between flex-col md:flex-row mt-2 py-4 px-2">
+            <div className="flex items-start flex-col sm:flex-row h-fit sm:h-24">
+              <div className="mr-4 flex-shrink-0 h-full">
                 <img
                   src="/images/google.jpg"
                   alt="Domain"

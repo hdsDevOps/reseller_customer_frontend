@@ -1,0 +1,22 @@
+@keyframes scroll {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 20s linear infinite;
+}
+
+.resource-align {
+  align-items: center;
+}
+
+@media screen and (min-width: 1280px) {
+  .resource-align {
+    align-items: start;
+  }
+}

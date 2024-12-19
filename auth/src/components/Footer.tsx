@@ -130,7 +130,7 @@ export default function Footer() {
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-2 col-span-4 sm:col-span-2 lg:col-span-1  ">
+          <div className="flex flex-col gap-2 col-span-4 sm:col-span-2 lg:col-span-1">
             <div className="flex flex-col gap-2">
               <p className="text-white font-semibold">OUR NEWSLETTER</p>
               <progress
@@ -160,30 +160,30 @@ export default function Footer() {
           </div>
         </div>
         <div className="text-center text-[#EEEEEE] w-100% ">
-        <div className="flex relative gap-4 mb-4 hidden">
-          <button className="bg-greenbase text-white px-4 h-[3rem] text-xl font-bold">Buy Domain/Hosting</button>
-        <img
-          src={Base_URL + "/images/footer1.png"}
+          <div className="flex relative gap-4 mb-4 hidden">
+            <button className="bg-greenbase text-white px-4 h-[3rem] text-xl font-bold">Buy Domain/Hosting</button>
+          <img
+            src={Base_URL + "/images/footer1.png"}
+            alt="footerbadge"
+            className="h-[5rem] w-[12rem] object-cover"
+          />
+        
+          <img
+          src={Base_URL + "/images/footer2.png"}
           alt="footerbadge"
-          className="h-[5rem] w-[12rem] object-cover"
-        />
-       
-        <img
-         src={Base_URL + "/images/footer2.png"}
-         alt="footerbadge"
-         className="h-[4.5rem] w-[12rem] object-cover"
-        />
-        <img
-         src={Base_URL + "/images/footer3.webp"}
-         alt="footerbadge"
-         className="h-[7rem] w-[5rem] object-cover absolute right-[6rem]"
-        />
-      
-        <img
-         src={Base_URL + "/images/footer4.jpg"}
-         alt="footerbadge"
-         className="size-20 object-cover ml-14"
-        />
+          className="h-[4.5rem] w-[12rem] object-cover"
+          />
+          <img
+          src={Base_URL + "/images/footer3.webp"}
+          alt="footerbadge"
+          className="h-[7rem] w-[5rem] object-cover absolute right-[6rem]"
+          />
+        
+          <img
+          src={Base_URL + "/images/footer4.jpg"}
+          alt="footerbadge"
+          className="size-20 object-cover ml-14"
+          />
 
         </div>
 

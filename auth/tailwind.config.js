@@ -13,6 +13,10 @@ module.exports = {
       },
       screens: {
         'xsm-max': { 'min': '320px', 'max': '767px' },
+        small: '367px',
+        'small-medium': '790px',
+        medium: '900px',
+        big: '1100px',
       },
     },
   },

@@ -7,6 +7,9 @@ import { ToastContainer } from "react-toastify";
 const Header = React.lazy(() => import("../components/Header"));
 const Home = React.lazy(() => import("./Home"));
 const Plans = React.lazy(() => import("./Plans"));
+const AboutUs = React.lazy(() => import("../components/Landingpage/AboutUs"));
+const FrequentlyAskedQuestions = React.lazy(() => import("../components/Landingpage/FrequentlyaskedQuestions"));
+const Resources = React.lazy(() => import("../components/Landingpage/Resources/Resources"));
 const Login = React.lazy(() => import("./Login"));
 // const Register = React.lazy(() => import("./NewRegister"));
 const OTP = React.lazy(() => import("./OTP"));
@@ -31,7 +34,7 @@ const RegisterText = React.lazy(() => import("./RegisterText"));
 const NewRegister = React.lazy(() => import("./NewRegister"));
 const AuthApp: React.FC = () => {
   return (
-    <div className="w-full min-h-screen bg-white">
+    <div className="w-full min-h-screen bg-white relative">
       <ToastContainer />
       <Suspense fallback={<div>Loading...</div>}>
         <Header />
@@ -41,6 +44,9 @@ const AuthApp: React.FC = () => {
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
             <Route path="/plans" element={<Plans />} />
+            <Route path="/about-us" element={<AboutUs />} />
+            <Route path="/faqs" element={<FrequentlyAskedQuestions />} />
+            <Route path="/resources" element={<Resources />} />
             <Route path="/login" element={<Login />} />
             {/* <Route path="/register" element={<Register />} /> */}
             <Route path="/otp" element={<OTP />} />
@@ -66,7 +72,9 @@ const AuthApp: React.FC = () => {
             <Route path="/register" element={<NewRegister />} />
           </Routes>
         </main>
-        <Footer/>
+        <div className="absolute top-100">
+          <Footer/>
+        </div>
       </Suspense>
     </div>
   );

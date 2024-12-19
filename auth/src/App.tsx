@@ -5,6 +5,7 @@ import ReduxProvider from "store/ReduxProvider";
 import AuthApp from "./pages";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./auth.css";
+import './styles/styles.css';
 
 const App: React.FC = () => {
   return (
