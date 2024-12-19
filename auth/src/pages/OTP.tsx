@@ -15,7 +15,7 @@ const OTP: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const customerId = location.state.customer_id;
+  const customerId = location?.state?.customer_id;
   const mode = queryParams.get("mode");
 
   const otp1Ref = useRef<HTMLInputElement>(null);
