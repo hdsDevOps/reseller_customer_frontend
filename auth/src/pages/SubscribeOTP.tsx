@@ -10,12 +10,14 @@ const OTP: React.FC = () => {
     const otp3Ref = useRef<HTMLInputElement>(null);
     const otp4Ref = useRef<HTMLInputElement>(null);
     const otp5Ref = useRef<HTMLInputElement>(null);
+    const otp6Ref = useRef<HTMLInputElement>(null);
 
     const [otp1, setOtp1] = useState<string>("");
     const [otp2, setOtp2] = useState<string>("");
     const [otp3, setOtp3] = useState<string>("");
     const [otp4, setOtp4] = useState<string>("");
     const [otp5, setOtp5] = useState<string>("");
+    const [otp6, setOtp6] = useState<string>("");
     const [showModal, setShowModal] = useState<boolean>(false);
 
     useEffect(() => {
@@ -44,6 +46,10 @@ const OTP: React.FC = () => {
                     break;
                 case 5:
                     setOtp5(value);
+                    otp6Ref.current?.focus();
+                    break;
+                case 6:
+                    setOtp6(value);
                     break;
                 default:
                     break;
@@ -89,6 +95,13 @@ const OTP: React.FC = () => {
                         setOtp5("");
                     }
                     break;
+                case 6:
+                    if (!otp6) {
+                        otp5Ref.current?.focus();
+                    } else {
+                        setOtp6("");
+                    }
+                    break;
                 default:
                     break;
             }
@@ -113,11 +126,11 @@ const OTP: React.FC = () => {
     };
 
     const handleEditmail = () => {
-        navigate("/forgotpassword");
+        navigate(-1);
     };
 
     const handleBack = () => {
-        navigate("/subscribe");
+        navigate(-1);
     };
 
     const handleCloseModal = () => {
@@ -134,7 +147,7 @@ const OTP: React.FC = () => {
                 <div className="p-8 xsm-max:px-4 bg-[#F9FAFB] rounded-lg shadow-sm">
                     <div className="mb-12 flex items-center justify-center">
                         <img
-                            src="/src/assets/images/logo.jpeg"
+                            src="https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899"
                             alt="logo"
                             className="mx-auto"
                         />
@@ -158,7 +171,7 @@ const OTP: React.FC = () => {
                             <p className="text-md font-bold">OTP verification</p>
                             <span className="text-red-600">01:19</span>
                         </div>
-                        <div className="grid grid-cols-5 gap-2 mt-4">
+                        <div className="grid grid-cols-6 gap-2 mt-4">
                             <input
                                 type="text"
                                 maxLength={1}
@@ -206,6 +219,16 @@ const OTP: React.FC = () => {
                                 value={otp5}
                                 onChange={(e) => handleInputChange(e, 5)}
                                 onKeyDown={(e) => handleKeyDown(e, 5)}
+                                className="w-full aspect-square outline-none focus border-2 bg-transparent rounded-lg text-center text-black"
+                                placeholder="0"
+                            />
+                            <input
+                                type="text"
+                                maxLength={1}
+                                ref={otp6Ref}
+                                value={otp6}
+                                onChange={(e) => handleInputChange(e, 6)}
+                                onKeyDown={(e) => handleKeyDown(e, 6)}
                                 className="w-full aspect-square outline-none focus border-2 bg-transparent rounded-lg text-center text-black"
                                 placeholder="0"
                             />

@@ -32,7 +32,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
       <h2 id={`accordion-flush-heading-${id}`}>
         <button
           type="button"
-          className={`flex items-center justify-between w-full py-5 font-medium rtl:text-right text-gray-500 dark:text-gray-400 gap-3
+          className={`flex items-center justify-between w-full py-3 pt-5 font-medium rtl:text-right text-gray-500 dark:text-gray-400 gap-3
             ${isOpen ? "border-b-0" : ""}`}
           onClick={() => onToggle(id)}
           aria-expanded={isOpen}
@@ -41,7 +41,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
           <span className="text-black font-semibold text-2xl">{title}</span>
           <svg
             className={`w-3 h-3 shrink-0 transition-transform duration-200 ${
-              isOpen ? "rotate-180" : ""
+              isOpen ? "" : "rotate-180"
             }`}
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
@@ -60,7 +60,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
       </h2>
       <div
         id={`accordion-flush-body-${id}`}
-        className={`${isOpen ? "block" : "hidden"} transition-all duration-200 pb-5 -mt-5`}
+        className={`${isOpen ? "block" : "hidden"} transition-all duration-200 pb-5 mt-0`}
         aria-labelledby={`accordion-flush-heading-${id}`}
       >
         <div className="text-[#0D121F] font-light text-xl">{children}</div>

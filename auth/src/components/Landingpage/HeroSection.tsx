@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Base_URL } from "../../Constant";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { BsChatLeftText } from "react-icons/bs";
 import '../../styles/styles.css';
@@ -9,13 +9,20 @@ import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
 
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   const googleImages = [
     { name: 'gmail', image: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/gmail.png?alt=media&token=ce4bf445-8280-4c97-9743-e79168a27f11', },
     { name: 'calendar', image: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/google-calendar.png?alt=media&token=5fe35ef3-4515-4152-b6d3-dbd20de1ce61', },
     { name: 'drive', image: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/google-drive.png?alt=media&token=278d55ef-6407-4f69-bd02-79750c515ff0', },
     { name: 'one', image: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/google-one.png?alt=media&token=2bcb69dd-ab4e-4048-9db5-f6367a786f6e', },
     { name: 'meet', image: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/google-meet.png?alt=media&token=4945f794-64ac-447b-9b60-cdb3ec04e1bb', },
-  ]
+  ];
+  
+  const [index, setIndex] = useState(0);
+  // ${imagesList[index]}
+
+  const imagesList = ['https://s3-alpha-sig.figma.com/img/4c8c/0a20/9ec03166753def42ba75a52439d352b7?Expires=1735516800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=YNC4BGiHGeCQ6kDYc0rIHEg8hr4RoyhvLMQLk~QxvA7ZeA0-1yvXV4A8kg-ErrlrJifUfX3u1TQEZQ0me4evml1hPl-G5BnHxPDCZARb0SKL6uzoknTxYYbJ~MzJwb45tJGnBow8hF5LLb0Qjq7Vk~Ppf~YGYRhj~MuBtjTNiXnqPlDDdewc5dEmx5VhhvJQhbwt9pHtl7wUt5t6zKESDILR8z-RP-tk~atlIHawpoUoNLFNMBy3cbzHq3JYte1g2a9YfDDWYJwOZi30S1WcINWwx3Tq6Jmgu6NGBgarWVGp2f0B1BvZwciG-pt841gEu4~pL8ctG2wrkKVDa6enkg__', 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/flower-image.png?alt=media&token=32a384bf-e79f-477f-9716-5110e40389d1'];
+  console.log(imagesList[index]);
   return (
     // <div className="w-full max-w-screen-2xl mx-auto h-[55.375rem] relative">
     //   <div className="flex w-full justify-between px-10 absolute z-10 items-center top-[22rem]">
@@ -112,7 +119,10 @@ const HeroSection = () => {
     //     </div>
     //   </div> */}
     // </div>
-    <div className={`bg-[url('https://s3-alpha-sig.figma.com/img/4c8c/0a20/9ec03166753def42ba75a52439d352b7?Expires=1735516800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=YNC4BGiHGeCQ6kDYc0rIHEg8hr4RoyhvLMQLk~QxvA7ZeA0-1yvXV4A8kg-ErrlrJifUfX3u1TQEZQ0me4evml1hPl-G5BnHxPDCZARb0SKL6uzoknTxYYbJ~MzJwb45tJGnBow8hF5LLb0Qjq7Vk~Ppf~YGYRhj~MuBtjTNiXnqPlDDdewc5dEmx5VhhvJQhbwt9pHtl7wUt5t6zKESDILR8z-RP-tk~atlIHawpoUoNLFNMBy3cbzHq3JYte1g2a9YfDDWYJwOZi30S1WcINWwx3Tq6Jmgu6NGBgarWVGp2f0B1BvZwciG-pt841gEu4~pL8ctG2wrkKVDa6enkg__')] bg-cover bg-center xl:h-[620px] lg:h-[690px] small-medium:h-[700px] md:h-[700px] min-[641px]:h-[730px] small:h-[1070px] h-[1180px] w-full py-1 flex flex-col relative`}>
+    <div
+      className={`xl:h-[620px] lg:h-[690px] small-medium:h-[700px] md:h-[700px] min-[641px]:h-[730px] small:h-[1070px] h-[1180px] w-full py-1 flex flex-col relative`}
+      style={{backgroundImage: `url('${imagesList[index]}')`, backgroundSize: 'cover', backgroundPosition: 'center'}}
+    >
       <div className="w-full overflow-hidden whitespace-nowrap bg-[#12A833] bg-opacity-50 shadow-sm">
         <div className="inline-block animate-scroll">
           <div className="flex items-center py-[2px] pb-1">
@@ -148,13 +158,14 @@ const HeroSection = () => {
             <button
               type="button"
               className="font-inter font-semibold text-base text-white my-8 px-3 py-[10px] rounded-[10px] bg-[#12A833]"
+              onClick={() => {navigate('/register')}}
             >Register now</button>
           </div>
         </div>
         <div className="col-span-1 sm:block hidden"></div>
       </div>
-      <BiChevronLeft className="absolute text-[#FEF4EF] w-20 h-20 top-1/2 left-0" />
-      <BiChevronRight className="absolute text-[#FEF4EF] w-20 h-20 top-1/2 right-0" />
+      <BiChevronLeft className="absolute text-[#FEF4EF] w-20 h-20 top-1/2 left-0" onClick={() => {index === 0 ? setIndex(1) : setIndex(0)}} />
+      <BiChevronRight className="absolute text-[#FEF4EF] w-20 h-20 top-1/2 right-0" onClick={() => {index === 0 ? setIndex(1) : setIndex(0)}} />
       <div className="absolute small-medium:top-1/2 small-medium:left-1/2 ml-1 bottom-4 grid grid-cols-2">
         <img
           src="https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/coupon-1.jpg?alt=media&token=069a7efa-12c6-4ca3-a156-c1113c7ed6e7"

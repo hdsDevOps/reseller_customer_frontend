@@ -15,7 +15,7 @@ const FrequentlyAskedQuestions = () => {
   );
   return (
     <section className="sm:px-16 px-4 w-full mt-10">
-      <div className="mb-8">
+      <div className="mb-2">
         <h2 className="text-greenbase font-semibold text-4xl">FAQ's</h2>
         {dottedline}
       </div>

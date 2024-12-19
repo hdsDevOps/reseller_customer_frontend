@@ -21,7 +21,7 @@ const PlanandPrice = () => {
           <button className="px-4 py-6 text-lg font-semibold text-white rounded-md bg-greenbase">Search Domain</button>
           </Link>
       </div>
-      {/* <PlanCard /> */}
+      <PlanCard />
       <div className="flex flex-col items-center justify-center mx-auto mt-10">
         <p className="mb-2 text-xl font-medium text-greenbase">Compare plans in details</p>
         <FaArrowDownLong fill="#12A833"/>

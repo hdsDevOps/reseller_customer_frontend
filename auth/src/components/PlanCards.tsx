@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { FaClover } from "react-icons/fa6";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const PlanCard: React.FC = () => {
+  const navigate = useNavigate();
   const [isYearly, setIsYearly] = useState(false);
 
   const toggleBilling = () => setIsYearly(!isYearly);
@@ -137,7 +138,7 @@ const PlanCard: React.FC = () => {
                         Gemini add-on available
                       </button>
                       <Link to="/subscribe">
-                      <button className="bg-black text-white py-2 px-3 w-full sm:py-2 sm:px-4 rounded-lg">
+                      <button type="button" onClick={() => {navigate('/subscribe')}} className="bg-black text-white py-2 px-3 w-full sm:py-2 sm:px-4 rounded-lg">
                         Start Trial
                       </button>
                       </Link>
@@ -216,7 +217,7 @@ const PlanCard: React.FC = () => {
                       Gemini add-on available
                     </button>
                     <Link to="/subscribe">
-                      <button className="bg-black text-white py-2 px-3 w-full sm:py-2 sm:px-4 rounded-lg">
+                      <button type="button" onClick={() => {navigate('/subscribe')}} className="bg-black text-white py-2 px-3 w-full sm:py-2 sm:px-4 rounded-lg">
                         Start Trial
                       </button>
                     </Link>

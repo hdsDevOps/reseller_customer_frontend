@@ -2,12 +2,13 @@ import React from "react";
 import { Base_URL } from "../../Constant";
 import { BsCheckLg } from "react-icons/bs";
 import { MdKeyboardArrowDown } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { SmallButton } from "../../utils/buttons/Button";
 import { RiCheckFill } from "react-icons/ri";
 
 
 const ProductivityAndCollaboration = () => {
+    const navigate = useNavigate();
     const list = [
         {name: '', label: '<p><b>Gmail</b> Business email', image: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/gmail.png?alt=media&token=ce4bf445-8280-4c97-9743-e79168a27f11',},
         {name: '', label: '<p>Custom email for your business</p>', image: '',},
@@ -37,14 +38,14 @@ const ProductivityAndCollaboration = () => {
                                     <div className="md:col-span-2 col-span-4 flex flex-col justify-center items-center border-l border-[#8C8C8C] pb-2" key={index}>
                                         <p className="font-inter font-normal md:text-xs text-[10px] text-[#12A833] bg-[#12A8331A] w-full text-center h-10 items-center pt-[13px]">MOST POPULAR</p>
                                         <p className="font-inter font-normal sm:text-lg text-xs text-black">{item.label}</p>
-                                        <button className="font-inter font-semibold sm:text-base text-xs text-[#F0F0F3] bg-[#12A833] sm:px-3 px-2 sm:py-2 py-[2px] sm:rounded-[10px] rounded-[4px] max-w-[126px] mt-1">Start a trial</button>
+                                        <button type="button" onClick={() => {navigate('/subscribe')}} className="font-inter font-semibold sm:text-base text-xs text-[#F0F0F3] bg-[#12A833] sm:px-3 px-2 sm:py-2 py-[2px] sm:rounded-[10px] rounded-[4px] max-w-[126px] mt-1">Start a trial</button>
                                     </div>
                                 )
                             } else {
                                 return (
                                     <div className="md:col-span-2 col-span-4 flex flex-col justify-center items-center border-l border-[#8C8C8C] last:border-r pt-10 pb-2" key={index}>
                                         <p className="font-inter font-normal sm:text-lg text-xs text-black">{item.label}</p>
-                                        <button className="font-inter font-semibold sm:text-base text-xs text-[#F0F0F3] bg-[#12A833] sm:px-3 px-2 sm:py-2 py-[2px] sm:rounded-[10px] rounded-[4px] max-w-[126px] mt-1">Start a trial</button>
+                                        <button type="button" onClick={() => {navigate('/subscribe')}} className="font-inter font-semibold sm:text-base text-xs text-[#F0F0F3] bg-[#12A833] sm:px-3 px-2 sm:py-2 py-[2px] sm:rounded-[10px] rounded-[4px] max-w-[126px] mt-1">Start a trial</button>
                                     </div>
                                 )
                             }

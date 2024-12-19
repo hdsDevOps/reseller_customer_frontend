@@ -6,7 +6,7 @@ import FrequentlyAskedQuestions from "./FrequentlyaskedQuestions";
 const AboutUs = () => {
   return (
     <section className="max-w-screen-2xl mx-auto">
-      <div className="w-full relative">
+      <div className="w-full relative my-2">
         <div className="bg-[#12A8334F] absolute inset-0 text-white flex flex-col gap-2 justify-center items-center">
           <h4 className="font-extrabold text-4xl">
             Everyting you need to know
@@ -22,7 +22,7 @@ const AboutUs = () => {
       <div className="w-full bg-cover bg-center"
       style={{ backgroundImage: `url(${Base_URL}/images/AboutUsSpiral.png)` }}>
         <div className="flex items-center flex-col lg:flex-row w-full">
-          <div className="pb-11 lg:w-1/2 w-full sm:pt-8">
+          <div className="pb-11 lg:w-1/2 w-full sm:pt-8 my-2 px-2 pl-5">
             <h2 className="font-semibold text-3xl text-greenbase">
               Make decisions faster, face to face.
             </h2>
@@ -43,13 +43,13 @@ const AboutUs = () => {
             className="lg:w-1/2 w-full object-cover"
           />
         </div>
-        <div className="flex flex-col-reverse items-center lg:flex-row w-full">
+        <div className="flex flex-col-reverse items-center lg:flex-row w-full my-2">
           <img
             src={Base_URL + "/images/dataanalysis.png"}
             alt="Aboutus"
             className="lg:w-1/2 w-full object-cover"
           />
-          <div className="pb-11 lg:w-1/2 w-full sm:pt-8">
+          <div className="pb-11 lg:w-1/2 w-full sm:pt-8 px-2 pl-5">
             <h2 className="font-semibold text-3xl text-greenbase">
               Secure your data and devices.
             </h2>

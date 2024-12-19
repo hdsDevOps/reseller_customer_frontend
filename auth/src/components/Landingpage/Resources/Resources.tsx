@@ -7,7 +7,7 @@ const Resources = () => {
       <h2 className="text-greenbase font-semibold text-4xl flex justify-center mt-[4rem]">
         Resources
       </h2>
-      <div className="grid grid-cols-2">
+      <div className="grid grid-cols-2 gap-4 mt-4">
         <Connect />
         <Access />
         <Create />

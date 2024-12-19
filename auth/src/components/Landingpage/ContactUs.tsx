@@ -14,38 +14,38 @@ const ContactUs = () => {
         </p>
       </div>
       <div className="flex gap-8 justify-center flex-col lg:flex-row">
-        <div className="grid grid-rows-6 grid-cols-2 gap-y-2 gap-x-6">
+        <form className="grid grid-rows-6 grid-cols-2 gap-y-2 gap-x-6">
           <div className="row-span-1 col-span-1">
             <p className="font-normal text-base">
               First Name<span className="text-[#ff0000]">*</span>
             </p>
-            <input type="text" className="w-full  p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" />
+            <input type="text" className="w-full  p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" required />
           </div>
           <div className="row-span-1 col-span-1">
             <p className="font-normal text-base">
               Last Name<span className="text-[#ff0000]">*</span>
             </p>
-            <input type="text" className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" />
+            <input type="text" className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" required />
           </div>
 
           <div className="row-span-1 col-span-2">
             <p className="font-normal text-base">
               Email Address<span className="text-[#ff0000]">*</span>
             </p>
-            <input type="text" className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" />
+            <input type="email" className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" required />
           </div>
 
           <div className="row-span-1 col-span-1">
             <p className="font-normal text-base">
               Phone Number<span className="text-[#ff0000]">*</span>
             </p>
-            <input type="text" className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" />
+            <input type="number" className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" required />
           </div>
           <div className="row-span-1 col-span-1">
             <p className="font-normal text-base">
               Subject<span className="text-[#ff0000]">*</span>
             </p>
-            <input type="text" className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" />
+            <input type="text" className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" required />
           </div>
 
           <div className="row-span-2 col-span-2">
@@ -53,12 +53,12 @@ const ContactUs = () => {
               Please tell us how we can help
               <span className="text-[#ff0000]">*</span>
             </p>
-            <textarea className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none h-[8.3rem]" />
+            <textarea className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none h-[8.3rem]" required />
           </div>
-          <div className="flex justify-center row-span-1 col-span-2 h-[3.375rem]">
+          <button type="submit" className="flex justify-center row-span-1 col-span-2 h-[3.375rem]">
             <SmallButton placeholder="Submit" className="w-[47.5rem] text-white" />
-          </div>
-        </div>
+          </button>
+        </form>
         <div className="flex flex-col gap-4 mt-8 items-center ">
           <div className="bg-white shadow-md flex items-center py-8 px-6 lg:px-12 gap-3  w-[300px] lg:w-full">
             <LuPhone size={28} />
