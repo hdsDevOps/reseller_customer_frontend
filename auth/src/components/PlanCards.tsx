@@ -74,24 +74,24 @@ const PlanCard: React.FC = () => {
       </div>
 
       {/* <div className="flex min-sm:flex-row  items-end justify-center gap-2 w-full max-sm:flex-col max-sm:items-center   mt-6"> */}
-      <div className="flex flex-col xl:flex-row  lg:flex-row md:items-center  items-end justify-center gap-2 w-full sm:flex-col max-sm:items-center   mt-6">
+      <div className="flex flex-col xl:flex-row  lg:flex-row  lg:items-stretch   justify-center gap-2 w-full sm:flex-col sm:items-center   mt-6">
       {/* <div className="grid   md:grid-cols-3  grid-cols-1 w-full    mt-6"> */}
       
         {plans.map((plan, index) => (
           <div
             key={index}
-             className="relative transition-transform transform lg:w-1/3  md:w-3/4 sm:w-full  "
+             className="relative transition-transform transform lg:w-1/3  md:w-3/4 sm:w-full mb-5"
             //className="col-span-1"
           >
             {/* Conditionally render the parent div for the second plan only */}
             {index === 1 && (
-              <div className=" p-0 rounded-lg relative flex   flex-col justify-center w-full   border-2 border-solid border-green-600 bg-green-600">
-                <div className="bg-green-600   text-white text-md text-left pl-4 rounded-lg ">
-                  <h1>Popular</h1>
+              <div className=" p-0 rounded-lg relative flex   flex-col justify-start w-full   border-2 border-solid border-green-600  h-full  ">
+                <div className="bg-green-600   text-white text-md text-left pl-4 rounded-t-lg relative -top-8 z-20 ">
+                  <h1 className="leading-9">Popular</h1>
                 </div>
-                <div className="bg-white border border-gray-200 rounded-lg rounded-l-none rounded-r-none  xsm-max:mb-1 relative z-10 h-[600px] lg:h-[620px] sm:h-auto h-auto">
+                <div className="bg-white   rounded-lg rounded-l-none rounded-r-none  xsm-max:mb-1 relative z-10 h-[600px] lg:h-[620px] sm:h-auto h-auto mt-[-39px]">
                   <div className="p-4 sm:p-6">
-                    <h1 className="flex items-center gap-2 text-xl sm:text-2xl font-medium text-gray-900 mb-2 uppercase">
+                    <h1 className="flex items-center gap-2 text-xl sm:text-2xl font-medium text-gray-900 mb-2 uppercase whitespace-nowrap">
                       <FaClover className={plan.iconClass} /> {plan.name}
                     </h1>
 
@@ -162,14 +162,15 @@ const PlanCard: React.FC = () => {
                       ))}
                     </div>
                   </div>
+                  <div className="pt-3"></div>
                 </div>
               </div>
             )}
             {/* Rendering the card without the background for other plans */}
             {index !== 1 && (
-              <div className="bg-white border border-gray-200 rounded-lg   mb-1 w-full   relative z-10  h-[600px] lg:h-[620px] sm:h-auto h-auto"> 
+              <div className="bg-white border border-gray-200 rounded-lg   mb-1 w-full   relative z-10 h-full    "> 
                 <div className="p-4 sm:p-6">
-                  <h1 className="flex items-center gap-2 text-xl sm:text-2xl font-medium text-gray-900 mb-2 uppercase">
+                  <h1 className="flex items-center gap-2 text-xl sm:text-2xl font-medium text-gray-900 mb-2 uppercase whitespace-nowrap">
                     <FaClover className={plan.iconClass} /> {plan.name}
                   </h1>
 
@@ -240,6 +241,7 @@ const PlanCard: React.FC = () => {
                     ))}
                   </div>
                 </div>
+                <div className="pt-3"></div>
               </div>
             )}
           </div>

@@ -7,12 +7,12 @@ const Resources = () => {
       <h2 className="text-greenbase font-semibold text-4xl flex justify-center mt-[4rem]">
         Resources
       </h2>
-      <div className="flex basis-1/2 py-12 justify-between items-center">
-        <div className="flex flex-col gap-[8.875rem]">
+      <div className="flex flex-col lg:flex-row  py-12 justify-between items-center gap-5">
+        <div className="flex flex-col gap-5 flex-none basis-1/2">
           <Connect />
           <Access />
         </div>
-        <div className="flex flex-col gap-[8.875rem]">
+        <div className="flex flex-col  gap-5 flex-none basis-1/2">
           <Create />
           <ConnectSecond />
         </div>

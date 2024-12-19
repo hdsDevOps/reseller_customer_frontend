@@ -13,39 +13,39 @@ const ContactUs = () => {
           Fill the form to contact us for more information
         </p>
       </div>
-      <div className="flex gap-8 justify-center">
+      <div className="flex gap-8 justify-center flex-col lg:flex-row">
         <div className="grid grid-rows-6 grid-cols-2 gap-y-2 gap-x-6">
           <div className="row-span-1 col-span-1">
             <p className="font-normal text-base">
               First Name<span className="text-[#ff0000]">*</span>
             </p>
-            <textarea className=" w-[27.063rem] p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" />
+            <input type="text" className="w-full  p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" />
           </div>
           <div className="row-span-1 col-span-1">
             <p className="font-normal text-base">
               Last Name<span className="text-[#ff0000]">*</span>
             </p>
-            <textarea className="w-[27.063rem] p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" />
+            <input type="text" className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" />
           </div>
 
           <div className="row-span-1 col-span-2">
             <p className="font-normal text-base">
               Email Address<span className="text-[#ff0000]">*</span>
             </p>
-            <textarea className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" />
+            <input type="text" className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" />
           </div>
 
           <div className="row-span-1 col-span-1">
             <p className="font-normal text-base">
               Phone Number<span className="text-[#ff0000]">*</span>
             </p>
-            <textarea className="w-[27.063rem] p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" />
+            <input type="text" className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" />
           </div>
           <div className="row-span-1 col-span-1">
             <p className="font-normal text-base">
               Subject<span className="text-[#ff0000]">*</span>
             </p>
-            <textarea className="w-[27.063rem] p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" />
+            <input type="text" className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" />
           </div>
 
           <div className="row-span-2 col-span-2">
@@ -59,8 +59,8 @@ const ContactUs = () => {
             <SmallButton placeholder="Submit" className="w-[47.5rem] text-white" />
           </div>
         </div>
-        <div className="flex flex-col gap-4 mt-8">
-          <div className="bg-white shadow-md flex items-center py-8 px-12 gap-3">
+        <div className="flex flex-col gap-4 mt-8 items-center ">
+          <div className="bg-white shadow-md flex items-center py-8 px-6 lg:px-12 gap-3  w-[300px] lg:w-full">
             <LuPhone size={28} />
             <div>
               <p className="text-greenbase font-bold text-base">CALL US</p>
@@ -68,7 +68,7 @@ const ContactUs = () => {
             </div>
           </div>
 
-          <div className="bg-white shadow-md flex items-center py-8 px-12 gap-3">
+          <div className="bg-white shadow-md flex items-center py-8 px-6 lg:px-12 gap-3   w-[300px] lg:w-full">
             <MdMailOutline size={28} />
             <div>
               <p className="text-greenbase font-bold text-base">EMAIL US</p>
@@ -78,7 +78,7 @@ const ContactUs = () => {
             </div>
           </div>
 
-          <div className="bg-white shadow-md flex items-center py-8 px-12 gap-3">
+          <div className="bg-white shadow-md flex items-center py-8 px-6 lg:px-12 gap-3  w-[300px] lg:w-full">
             <IoLocationOutline size={30} />
             <div>
               <p className="text-greenbase font-bold text-base">ADDRESS</p>

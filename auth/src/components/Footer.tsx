@@ -7,8 +7,8 @@ export default function Footer() {
   return (
     <footer className="bg-black !w-full">
       <div className=" flex flex-col gap-10 xl:justify-center xl:items-center py-20 px-[2rem] mx-auto sm:justify-start sm:flex-start">
-        <div className="flex gap-10 xl:flex-row sm:flex-col flex-col ">
-          <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-4 gap-10 items-centerw">
+          <div className="flex flex-col gap-2 col-span-4 sm:col-span-2 lg:col-span-1  ">
             <div className="flex flex-col gap-2">
               <p className="text-white font-semibold">MARKETING</p>
               <progress
@@ -44,7 +44,7 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 col-span-4 sm:col-span-2 lg:col-span-1  ">
             <div className="flex flex-col gap-2">
               <p className="text-white font-semibold">WEBSITES</p>
               <progress
@@ -80,7 +80,7 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 col-span-4 sm:col-span-2 lg:col-span-1  ">
             <div className="flex flex-col gap-2">
               <p className="text-white font-semibold">CONTACT US</p>
               <progress
@@ -130,7 +130,7 @@ export default function Footer() {
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 col-span-4 sm:col-span-2 lg:col-span-1  ">
             <div className="flex flex-col gap-2">
               <p className="text-white font-semibold">OUR NEWSLETTER</p>
               <progress
@@ -141,16 +141,16 @@ export default function Footer() {
             </div>
             <div className="flex flex-col gap-4">
               <p className="text-[#BDBDBD]">Search for: </p>
-              <div className="w-[21.25rem] border-yellow-300 h-14 rounded-full bg-[#BDBDBD] flex items-center px-1.5 py-2 relative">
+              <div className="w-full border-yellow-300 h-14 rounded-full bg-[#BDBDBD] flex items-center px-1.5 py-2 relative">
                 <input
-                  className="w-56 bg-[#F0F0F3] h-12 rounded-full p-2 text-md"
+                  className="w-full bg-[#F0F0F3] h-12 rounded-full p-2 text-md"
                   placeholder="Search"
                 ></input>
                 <button className="bg-[#12a833] px-3 rounded-full py-2.5 text-white font-semibold text-lg absolute right-1.5">
                   Search
                 </button>
               </div>
-              <p className="flex text-left w-[25.5rem] font-medium text-lg text-[#BDBDBD]">
+              <p className="flex text-left font-medium text-lg text-[#BDBDBD]">
                 From mobile apps, marketing & websites; to automation & extreme
                 software engineering. We tackle the difficult & not so easy
                 technical issues of today in the always on digital world of

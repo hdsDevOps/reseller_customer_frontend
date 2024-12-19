@@ -22,8 +22,8 @@ const AboutUs = () => {
       <div className="w-full bg-cover bg-center"
       style={{ backgroundImage: `url(${Base_URL}/images/AboutUsSpiral.png)` }}>
         <div>
-          <div className="flex">
-            <div className="px-[4.375rem] pt-[10.625rem] pb-11 w-[49.688rem]">
+          <div className="flex items-center flex-col lg:flex-row">
+            <div className="pb-11 lg:w-1/2 w-full sm:pt-8">
               <h2 className="font-semibold text-3xl text-greenbase">
                 Make decisions faster, face to face.
               </h2>
@@ -38,21 +38,19 @@ const AboutUs = () => {
                 eiusmod tempor incididunt ut labore et dolore magna aliqua.
               </p>
             </div>
-            <div>
-              <img
-                src={Base_URL + "/images/meetcall.png"}
-                alt="AboutusSpiral"
-                className="w-[45.688rem] h-[34.25rem] object-cover"
-              />
-            </div>
+            <img
+              src={Base_URL + "/images/meetcall.png"}
+              alt="AboutusSpiral"
+              className="lg:w-1/2 w-full object-cover"
+            />
           </div>
-          <div className="flex">
+          <div className="flex flex-col-reverse items-center lg:flex-row">
             <img
               src={Base_URL + "/images/dataanalysis.png"}
               alt="Aboutus"
-              className="w-[49.988rem] h-[34.25rem] object-cover"
+              className="lg:w-1/2 w-full object-cover"
             />
-            <div className="px-[4.375rem] pt-[10.625rem] pb-11 w-[45.688rem]">
+            <div className="pb-11 lg:w-1/2 w-full sm:pt-8">
               <h2 className="font-semibold text-3xl text-greenbase">
                 Secure your data and devices.
               </h2>
