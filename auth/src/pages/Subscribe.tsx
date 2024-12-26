@@ -1,37 +1,73 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { IoChevronBackSharp } from "react-icons/io5";
 import { TfiPlus, TfiMinus } from "react-icons/tfi";
 import "./cumtel.css"
-
-const countries = [
-  "United States",
-  "Canada",
-  "United Kingdom",
-  "Australia",
-  "Germany",
-  "France",
-  "India",
-  "China",
-  "Japan",
-  "South Korea",
-];
+import { useAppDispatch } from "store/hooks";
+import axios from "axios";
 
 const Subscribe: React.FC = () => {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    businessName: "",
-    country: "India",
-    firstName: "",
-    lastName: "",
+    business_name: "",
+    region: "",
+    first_name: "",
+    last_name: "",
     email: "",
-    phone: "",
+    phone_no: "",
   });
+  console.log("form data...", formData);
   const [count, setCount] = useState(1);
+  const [countryDropdownOpen, setCountryDropdownOpen] = useState<Boolean>(false);
+  const countryRef = useRef(null);
+  const [countryName, setCountryName] = useState("");
+  const [countries, setCountries] = useState([]);
+  const [country, setCountry] = useState({});
+  // console.log("countries...", countries);
+  console.log("country...", country);
+  
+  const handleClickOutsideCountry = (event: MouseEvent) => {
+    if(countryRef.current && !countryRef.current.contains(event.target as Node)) {
+      setCountryDropdownOpen(false);
+    }
+  };
 
-  const navigate = useNavigate();
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutsideCountry);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutsideCountry);
+    };
+  }, []);
+
+  useEffect(() => {
+    if(countries.length > 0 && countryName !== "") {
+      setCountryDropdownOpen(true);
+    }
+  }, [countries, countryName]);
+
+  useEffect(() => {
+    var config = {
+      method: 'get',
+      url: 'https://api.countrystatecity.in/v1/countries',
+      headers: {
+        'X-CSCAPI-KEY': 'Nk5BN011UlE5QXZ6eXc1c05Id3VsSmVwMlhIWWNwYm41S1NRTmJHMA=='
+      }
+    };
+    axios(config)
+      .then(res => {
+        setCountries(res.data);
+        // console.log(res.data);
+      })
+      .catch(err => {
+        setCountries([]);
+        console.log("error...", err);
+      })
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -44,11 +80,11 @@ const Subscribe: React.FC = () => {
     setFormData((prevData) => ({ ...prevData, phone: value }));
   };
 
-  const increment = () => setCount(count + 1);
+  const increment = () => setCount(count <10 ? count + 1 : count)
   const decrement = () => setCount(count > 1 ? count - 1 : 1); // Ensure count doesn't go below 1
 
   const handleNext = () => {
-    if (step === 1 && formData.businessName) {
+    if (step === 1 && formData.business_name) {
       setStep(2);
     } else if (step === 2) {
       navigate("/subscribeotp");
@@ -65,11 +101,11 @@ const Subscribe: React.FC = () => {
 
   const isNextDisabled =
     step === 1
-      ? !formData.businessName
-      : !formData.firstName ||
-        !formData.lastName ||
+      ? !formData.business_name
+      : !formData.first_name ||
+        !formData.last_name ||
         !formData.email ||
-        !formData.phone;
+        !formData.phone_no;
 
   return (
     <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative">
@@ -91,43 +127,69 @@ const Subscribe: React.FC = () => {
       {step === 1 && (
         <form action="" className="flex items-center justify-between flex-col w-full gap-20 xsm-max:flex xsm-max:flex-col xsm-max:gap-4">
           <div className="flex items-center gap-10 justify-center w-3/5 xsm-max:flex-col xsm-max:w-full">
-          <div className="relative w-full">
-            <input
-              id="businessName"
-              type="text"
-              placeholder=" "
-              value={formData.businessName}
-              onChange={handleChange}
-              className="peer border-2 border-gray-200 rounded-md p-[.63rem] bg-transparent w-full placeholder-transparent focus:border-blue-500 focus:outline-none"
-            />
-            <label
-              htmlFor="businessName"
-              className="absolute bg-white -top-3 left-3 text-gray-500 transition-all duration-300 ease-in-out origin-top-left peer-placeholder-shown:text-gray-400 peer-focus:text-blue-600 peer-focus:text-sm"
-            >
-              Business Name
-            </label>
-          </div>
+            <div className="w-full flex flex-col">
+              <label
+                htmlFor="business_name"
+                className="float-left text-sm font-normal text-custom-gray ml-[18px] bg-white w-fit px-2 z-10"
+              >
+                Business Name
+              </label>
+              <input
+                id="business_name"
+                type="text"
+                placeholder="Enter business name"
+                value={formData.business_name}
+                onChange={handleChange}
+                name="business_name"
+                className="border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 relative focus:outline-none w-full"
+              />
+            </div>
 
-          <div className="relative w-full">
-            <select
-              id="country"
-              value={formData.country}
-              onChange={handleChange}
-              className="peer border-2 border-gray-200 rounded-md p-[.8rem] bg-transparent w-full focus:border-blue-500 focus:outline-none uppercase"
-            >
-              {countries.map((country, index) => (
-                <option key={index} value={country}>
-                  {country.toUpperCase()}
-                </option>
-              ))}
-            </select>
-            <label
-              htmlFor="country"
-              className="absolute bg-white -top-3 left-3 text-gray-500 transition-all duration-300 ease-in-out origin-top-left peer-placeholder-shown:text-gray-400 peer-focus:text-blue-600 peer-focus:text-sm"
-            >
-              Country
-            </label>
-          </div>
+            <div className="w-full flex flex-col">
+              <label
+                className="float-left text-sm font-normal text-custom-gray ml-[18px] bg-white w-fit px-2 z-10"
+              >
+                Country
+              </label>
+              <input
+                type="text"
+                placeholder="Enter region name"
+                value={countryName || formData.region}
+                onChange={e => {
+                  setCountryName(e.target.value);
+                  setFormData({
+                    ...formData,
+                    region: ''
+                  });
+                }}
+                name="region"
+                className="border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-4 relative focus:outline-none w-full"
+                onFocus={() => {setCountryDropdownOpen(true)}}
+              />
+              {
+                countryDropdownOpen && (
+                  <div className="absolute mt-14 xl-custom:w-[28%] big:w-[27%] medium:w-[26%] md2:w-[26%] small-3:w-[94%] sm:w-[93%] small-2:w-[92%]  small-small:w-[90%] small:w-[88%] w-[85%] max-h-32 bg-[#E4E4E4] overflow-y-auto z-10 px-2 border border-[#8A8A8A1A] rounded-md">
+                    {
+                      countries?.filter(name => name?.name.toLowerCase().includes(countryName.toLowerCase())).map((country, index) => (
+                        <p
+                          key={index}
+                          className="py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer"
+                          onClick={() => {
+                            setFormData({
+                              ...formData,
+                              region: country?.name,
+                            });
+                            setCountryName("");
+                            setCountry(country);
+                            setCountryDropdownOpen(false);
+                          }}
+                        >{country?.name}</p>
+                      ))
+                    }
+                  </div>
+                )
+              }
+            </div>
           </div>
 
           <div className="flex items-center w-3/5 gap-20 xsm-max:flex-col xsm-max:gap-10 xsm-max:w-full">
@@ -197,7 +259,7 @@ const Subscribe: React.FC = () => {
               id="firstName"
               type="text"
               placeholder="Robert"
-              value={formData.firstName}
+              value={formData.first_name}
               onChange={handleChange}
               className="peer form-input"
             />
@@ -214,7 +276,7 @@ const Subscribe: React.FC = () => {
               id="lastName"
               type="text"
               placeholder="Clive"
-              value={formData.lastName}
+              value={formData.last_name}
               onChange={handleChange}
               className="peer form-input"
             />
@@ -246,8 +308,8 @@ const Subscribe: React.FC = () => {
           <div className="relative w-full mb-2">
             <div className="relatve"></div>
             <PhoneInput
-              country={"in"}
-              value={formData.phone}
+              country={country?.iso2.toLowerCase() || "us"}
+              value={formData.phone_no}
               onChange={handlePhoneChange}
               inputClass="react-tel-input outline-none"
               dropdownClass="peer"

@@ -1,15 +1,32 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { HiOutlineEye } from "react-icons/hi";
 import { RiEyeCloseLine } from "react-icons/ri";
+import { resetPasswordThunk } from 'store/user.thunk';
+import { useAppDispatch } from "store/hooks";
+import { toast } from "react-toastify";
 
 const ResetPassword: React.FC = () => {
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const location = useLocation();
+
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
+  const email = location.state?.email;
 
-  const navigate = useNavigate();
+  useEffect(() => {
+    if(location.state) {
+      if(location.state?.email) {
+        toast.success("Your OTP is verified. Please reset your password.")
+      }
+    } else {
+      navigate('/home')
+    }
+  }, []);
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
@@ -27,13 +44,22 @@ const ResetPassword: React.FC = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
     if (password === confirmPassword) {
-      console.log("Password reset successfully");
-      navigate("/successpassword"); // Navigate to the success page
+      try {
+        const result = await dispatch(resetPasswordThunk({
+          email: email,
+          password: password
+        })).unwrap();
+        navigate("/successpassword", {state: "Password reset successfull"});
+      } catch (error) {
+        toast.error("Error updating password.")
+      }
     } else {
-      console.log("Passwords do not match");
+      toast.warning("Password and Confirm Password do not match");
+      setLoading(false);
     }
   };
 
@@ -58,7 +84,7 @@ const ResetPassword: React.FC = () => {
                   onChange={handlePasswordChange}
                   className="custom-input"
                   minLength={8}
-                  placeholder=".........."
+                  placeholder="Enter your password"
                   required
                 />
                 <button
@@ -83,7 +109,7 @@ const ResetPassword: React.FC = () => {
                   value={confirmPassword}
                   onChange={handleConfirmPasswordChange}
                   className="custom-input"
-                  placeholder=".........."
+                  placeholder="Confirm your password"
                   minLength={8}
                   required
                 />
@@ -105,8 +131,11 @@ const ResetPassword: React.FC = () => {
               <button
                 type="submit"
                 className="btn-black"
+                disabled={loading}
               >
-                Confirm Password
+                {
+                  loading ? "Updating password..." : "Confirm Password"
+                }
               </button>
             </div>
           </form>

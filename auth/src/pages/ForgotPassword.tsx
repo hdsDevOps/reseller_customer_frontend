@@ -1,13 +1,27 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "store/hooks";
+import { forgetPasswordThunk } from "store/user.thunk";
+import { toast } from 'react-toastify';
 
 const ForgotPassword: React.FC = () => {
-  const [email, setEmail] = useState("");
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async(e: React.FormEvent) => {
     e.preventDefault();
-    navigate("/otp?mode=forgotpassword");
+    setLoading(true);
+    try {
+      const result = await dispatch(forgetPasswordThunk({email: email})).unwrap();
+      navigate("/otp?mode=forgotpassword", {state: {email}});
+    } catch (error) {
+      toast.error("Please enter a valid email");
+      setLoading(false);
+    }
+    // navigate
   };
   
 
@@ -48,7 +62,7 @@ const ForgotPassword: React.FC = () => {
                 autoComplete="email"
                 required
                 className="custom-input"
-                placeholder="Robertclive@gmail.com"
+                placeholder="Enter your email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 data-testid="email"
@@ -61,8 +75,11 @@ const ForgotPassword: React.FC = () => {
               type="submit"
               className="btn-black"
               data-testid="next"
+              disabled={loading}
             >
-              Next
+              {
+                loading ? "Loading..." : "Next"
+              }
             </button>
           </div>
         </form>

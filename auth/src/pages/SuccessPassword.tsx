@@ -1,8 +1,18 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const SuccessPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if(location.state) {
+      toast.success(location.state);
+    } else {
+      navigate('/home');
+    }
+  }, []);
 
   const handleBackToLogin = () => {
     navigate("/login");

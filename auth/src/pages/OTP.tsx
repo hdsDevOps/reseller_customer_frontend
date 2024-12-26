@@ -5,10 +5,11 @@ import React, {
   ChangeEvent,
   KeyboardEvent,
 } from "react";
+import { LuMoveLeft } from "react-icons/lu";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { verifyLoginOtpThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, } from 'store/user.thunk';
+import { verifyLoginOtpThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, resendLoginOtpThunk, verifyForgetPasswordOtpThunk, resendForgetPasswordOtpThunk, resendRegisterOtpThunk, verifyRegisterOtpThunk } from 'store/user.thunk';
 
 const OTP: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -16,7 +17,9 @@ const OTP: React.FC = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const customerId = location?.state?.customer_id;
+  const email = location.state?.email;
   const mode = queryParams.get("mode");
+  console.log(location.state)
 
   const otp1Ref = useRef<HTMLInputElement>(null);
   const otp2Ref = useRef<HTMLInputElement>(null);
@@ -31,8 +34,22 @@ const OTP: React.FC = () => {
   const [otp4, setOtp4] = useState<string>("");
   const [otp5, setOtp5] = useState<string>("");
   const [otp6, setOtp6] = useState<string>("");
-  const [timeLeft, setTimeLeft] = useState<number>(10);
+  const [timeLeft, setTimeLeft] = useState<number>(0);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if(location.state) {
+      if(location.state?.email) {
+        toast.success("OTP for resetting your password has been sent.");
+      } else if(location?.state?.customerId) {
+        toast.success("OTP for log in to your account has been sent.");
+      } else {
+        console.log("ok")
+      }
+    } else {
+      navigate('/home');
+    }
+  }, []);
 
 
   useEffect(() => {
@@ -178,18 +195,66 @@ const OTP: React.FC = () => {
           // Set loading state to false after request completes
           setLoading(false);
         }
+      } else if (mode === "forgotpassword") {
+        setLoading(true);
+        try {
+          const result = await dispatch(verifyForgetPasswordOtpThunk({
+            email: email,
+            otp: otp
+          })).unwrap();
+          console.log("result...", result);
+          navigate("/resetpassword", {state: {email: email}});
+        } catch (error) {
+          toast.error("Please enter a valid otp");
+        }
       } else if (mode === "signup") {
-        // TODO: Handle signup logic here
-        console.log("Handle signup process here.");
-      } else {
-        // If it's neither signin nor signup, navigate to reset password
-        navigate("/resetpassword");
+        setLoading(true);
+        try {
+          const result = await dispatch(verifyRegisterOtpThunk({
+            customer_id: customerId,
+            otp: otp
+          })).unwrap();
+          console.log("result...", result);
+          navigate("/login");
+        } catch (error) {
+          toast.error("Please enter a valid otp");
+        }
       }
     } else {
       // not entered 6 otps
       toast.warning("Please enter all 6 otps")
     }
   };
+
+  const handleResendOtp = async() => {
+    if(mode === "signin") {
+      try {
+        const result = await dispatch(resendLoginOtpThunk({customer_id: customerId})).unwrap();
+        console.log("result...", result);
+        setTimeLeft(120);
+      } catch (error) {
+        toast.error("Error resending otp");
+      }
+    } else if(mode === "forgotpassword") {
+      try {
+        const result = await dispatch(resendForgetPasswordOtpThunk({email: email})).unwrap();
+        console.log("result...", result);
+        setTimeLeft(120);
+      } catch (error) {
+        toast.error("Error resending otp");
+      }
+    } else if(mode === "signup") {
+      try {
+        const result = await dispatch(resendRegisterOtpThunk({customer_id: customerId})).unwrap();
+        console.log("result...", result);
+        setTimeLeft(120);
+      } catch (error) {
+        toast.error("Error resending otp");
+      }
+    } else {
+      toast.error("Error");
+    }
+  }
 
   const handleEditmail = () => {
     navigate(-1);
@@ -224,16 +289,16 @@ const OTP: React.FC = () => {
                 <>
                   <p>
                     We have sent an One Time Passcode to this
-                    Robertclive@gmail.com email address
+                    Robertclive@gmail.com email address:
+                    <button
+                      type="button"
+                      onClick={() => handleEditmail()}
+                      className="font-medium text-green-600 inline-block ml-[5px] hover:underline"
+                      data-testid="back-to-login"
+                    >
+                      Edit
+                    </button>
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => handleEditmail()}
-                    className="font-medium text-green-600 hover:text-gray-500"
-                    data-testid="back-to-login"
-                  >
-                    Edit
-                  </button>
                 </>
               )}
             </div>
@@ -307,7 +372,7 @@ const OTP: React.FC = () => {
               <button
                 type="submit"
                 //className={btnClass}
-                className="bg-green-500  text-white border-none px-4 py-2.5 rounded-lg font-semibold w-full"
+                className={`${mode === "forgotpassword" ? "bg-black" : "bg-green-500"} text-white border-none px-4 py-2.5 rounded-lg font-semibold w-full`}
                 data-testid="submit"
                 disabled={loading}
               >
@@ -320,18 +385,41 @@ const OTP: React.FC = () => {
                   : "Submit"}
               </button>
             </div>
-            <div className="text-center mt-4 xsm-max:text-sm">
+            <div className="text-center mt-4 xsm-max:text-sm flex justify-center gap-5">
               <p>
-                Didn't get an OTP?{" "}
-                <button
-                  disabled={timeLeft == 0 ? false : true}
-                  data-testid="resend-otp"
-                  className="text-red-600 underline ml-4 "
-                >
-                  Resend OTP
-                </button>{" "}
+                Didn't get an OTP?
               </p>
+              <button
+                type="button"
+                disabled={timeLeft == 0 ? false : true}
+                data-testid="resend-otp"
+                className={`${timeLeft === 0 ? "text-red-600 underline" : "text-[#858585]"}`}
+                onClick={() => {handleResendOtp()}}
+              >
+                Resend OTP
+              </button>
             </div>
+
+            {
+              mode === "singin" ? (
+                <div
+                  className="text-center flex flex-row justify-center mt-8 items-center"
+                >
+                  <button
+                    type="button"
+                    className="flex flex-row"
+                    onClick={() => {navigate('/login')}}
+                  >
+                    <LuMoveLeft
+                      className="w-2 pt-[2px] my-auto"
+                    />
+                    <p
+                      className="ml-2 font-inter font-semibold text-base"
+                    >Back to log in</p>
+                  </button>
+                </div>
+              ) : ""
+            }
           </form>
         </div>
       </div>

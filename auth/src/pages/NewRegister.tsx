@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import Input from "../utils/inputs/input";
 import { RiEyeCloseLine } from "react-icons/ri";
@@ -9,22 +9,21 @@ import TermsAndConditions from "./Terms";
 import CheckBox from "../utils/inputs/checkbox";
 import { Link } from "react-router-dom";
 import { useAppDispatch } from "store/hooks";
-import { makeUserRegisterThunk } from "store/user.thunk";
+import { resgiterCustomerThunk } from "store/user.thunk";
 import { HiOutlineEye } from "react-icons/hi";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const initialCustomer = {
+  email: "",
+  password: "",
+  business_phone_number: "",
   first_name: "",
   last_name: "",
   business_name: "",
-  street_address: "",
-  state: "",
   region: "",
-  city: "",
-  zip_code: "",
-  email: "",
-  business_phone_number: "",
-  password: "",
+  street_name: "",
+  zipcode: ""
 };
 
 const RegisterPage: React.FC = () => {
@@ -40,14 +39,51 @@ const RegisterPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [countryDropdownOpen, setCountryDropdownOpen] = useState<Boolean>(false);
+  const countryRef = useRef(null);
   const [countryName, setCountryName] = useState("");
-  const [stateName, setStateName] = useState("");
-  const [cityName, setCityName] = useState("");
   const [countries, setCountries] = useState([]);
-  console.log("countries...", countries);
+  const [country, setCountry] = useState({});
+  // console.log("countries...", countries);
+  // console.log("country...", country);
   
-  const [states, setStates] = useState([]);
-  const [cities, setCitites] = useState([]);
+  const handleClickOutsideCountry = (event: MouseEvent) => {
+    if(countryRef.current && !countryRef.current.contains(event.target as Node)) {
+      setCountryDropdownOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutsideCountry);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutsideCountry);
+    };
+  }, []);
+
+  useEffect(() => {
+    if(countries.length > 0 && countryName !== "") {
+      setCountryDropdownOpen(true);
+    }
+  }, [countries, countryName]);
+
+  useEffect(() => {
+    var config = {
+      method: 'get',
+      url: 'https://api.countrystatecity.in/v1/countries',
+      headers: {
+        'X-CSCAPI-KEY': 'Nk5BN011UlE5QXZ6eXc1c05Id3VsSmVwMlhIWWNwYm41S1NRTmJHMA=='
+      }
+    };
+    axios(config)
+      .then(res => {
+        setCountries(res.data);
+        // console.log(res.data);
+      })
+      .catch(err => {
+        setCountries([]);
+        console.log("error...", err);
+      })
+  }, []);
 
   const [loading, setLoading] = useState(false);
 
@@ -55,13 +91,11 @@ const RegisterPage: React.FC = () => {
     {name: 'first_name', label: "First name", type: "text", required: false, placeholder: "Enter First name", },
     {name: 'last_name', label: "Last name", type: "text", required: false, placeholder: "Enter Last name", },
     {name: 'business_name', label: "Business Name", type: "text", required: false, placeholder: "Enter Business Name", },
-    {name: 'street_address', label: "Street address", type: "text", required: false, placeholder: "Select Street address", },
-    {name: 'state', label: "State", type: "dropdown", required: false, placeholder: "Enter your State", },
+    {name: 'street_name', label: "Street address", type: "text", required: false, placeholder: "Select Street address", },
     {name: 'region', label: "Region/Country", type: "dropdown", required: false, placeholder: "Enter your Region", },
-    {name: 'city', label: "City", type: "dropdown", required: false, placeholder: "Enter your City", },
-    {name: 'zip_code', label: "Zip code", type: "number", required: false, placeholder: "Enter Zip code", },
+    {name: 'zipcode', label: "Zip code", type: "number", required: false, placeholder: "Enter Zip code", },
     {name: 'email', label: "Email address", type: "email", required: false, placeholder: "Enter Email address", },
-    {name: 'Business_phone_number', label: "Business phone number", type: "text", required: false, placeholder: "Enter Business phone number", },
+    {name: 'business_phone_number', label: "Business phone number", type: "text", required: false, placeholder: "Enter Business phone number", },
     {name: 'password', label: "Password", type: "password", required: false, placeholder: "Enter Password", },
     {name: 'c_password', label: "Confirm Password", type: "password", required: false, placeholder: "Enter Confirm Password", },
   ];
@@ -73,83 +107,53 @@ const RegisterPage: React.FC = () => {
     });
   };
 
-  useEffect(() => {
-    axios
-      .get("https://www.universal-tutorial.com/api/getaccesstoken", {headers: {
-        "Accept": "application/json",
-        "api-token": "AtAMX2sSL0P0xiNSJ5gEmgL9uNc9MH31bPRqvD4dlqQvl9KEfHiAjzJUYjrbDLdAS6Q",
-        "user-email": "hesham.reza@schemaphic.com"
-      }})
-      .then(res => {
-        axios
-          .get("https://www.universal-tutorial.com/api/countries/", { headers: {
-            "Authorization": `Bearer ${res.data.auth_token}`,
-            "Accept": "application/json"
-          }})
-          .then(response => {
-            setCountries(response.data);
-          })
-          .catch(error => {
-            setCountries([]);
-            console.log("error...", error);
-          })
-      })
-      .catch(err => {
-        console.log("err...", err);
-      })
-  }, []);
-  
-  useEffect(() => {
-    axios
-      .get("https://www.universal-tutorial.com/api/getaccesstoken", {headers: {
-        "Accept": "application/json",
-        "api-token": "AtAMX2sSL0P0xiNSJ5gEmgL9uNc9MH31bPRqvD4dlqQvl9KEfHiAjzJUYjrbDLdAS6Q",
-        "user-email": "hesham.reza@schemaphic.com"
-      }})
-      .then(res => {
-        if(customer?.region !== ""){
-          axios
-          .get(`https://www.universal-tutorial.com/api/states/${customer?.country}`, { headers: {
-            "Authorization": `Bearer ${res.data.auth_token}`,
-            "Accept": "application/json"
-          }})
-          .then(response => {
-            setStates(response.data);
-          })
-          .catch(error => {
-            setStates([]);
-            console.log("error...", error);
-          })
-        } else {
-          setStates([]);
-        }
-      })
-      .catch(err => {
-        console.log("err...", err);
-      })
-  }, [customer]);
+  const validateForm = () => {
+    for (const key in customer) {
+      if (customer[key].trim() === '') {
+        return false;
+      }
+    }
+    return true;
+  }
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    navigate("/otp?mode=signup");
+    // navigate("/otp?mode=signup");
     // return;
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    if (!termsAccepted) {
-      setError("You must accept the terms and conditions");
-      return;
-    }
     setLoading(true);
-    try {
-      
-      navigate("/otp?mode=signin");
-    } catch (error) {
-      console.error("Login error:", error);
+    if (customer.password !== confirmPassword) {
+      toast.warning("Passwords do not match");
       setLoading(false);
+    } else if (!termsAccepted) {
+      toast.warning("You must accept the terms and conditions");
+      setLoading(false);
+    } else {
+      if(validateForm()) {
+        try {
+          const result = await dispatch(resgiterCustomerThunk({
+            email: customer?.email,
+            password: customer?.password,
+            business_phone_number: customer?.business_phone_number,
+            first_name: customer?.first_name,
+            last_name: customer?.last_name,
+            business_name: customer?.business_name,
+            region: customer?.region,
+            street_name: customer?.street_name,
+            state: "",
+            city: "",
+            zipcode: customer?.zipcode
+          })).unwrap();
+          console.log("result...", result);
+          navigate("/otp?mode=signup", { state: {customerId: result?.customer_id} })
+        } catch (error) {
+          toast.error("Error registering customer");
+        }
+      } else {
+        toast.warning("Please fill out all the fields");
+        setLoading(false);
+      }
     }
+    
   };
 
   return (
@@ -270,6 +274,7 @@ const RegisterPage: React.FC = () => {
                       <div
                         key={index}
                         className='flex flex-col px-2 mb-2  sm:col-span-1 col-span-2 relative'
+                        ref={countryRef}
                       >
                         <label
                           className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
@@ -282,37 +287,32 @@ const RegisterPage: React.FC = () => {
                           onChange={e => {
                             setCustomer({
                               ...customer,
-                              region: e.target.value,
-                              state: "",
-                              street_address: "",
-                              city: "",
-                              zip_code: ""
+                              region: ''
                             });
                             setCountryName(e.target.value);
-                            setStateName("");
-                            setCityName("");
                           }}
                           placeholder={head?.placeholder}
-                          value={customer[head.name]}
+                          value={countryName || customer[head.name]}
+                          onFocus={() => {setCountryDropdownOpen(true)}}
                         />
                         {
-                          countryName.length > 2 && (
-                            <div className="w-[95.5%] max-h-32 absolute mt-14 bg-white overflow-y-auto z-[100] px-2 border border-[#C9C9C9]">
+                          countryDropdownOpen && (
+                            <div className="w-[95.5%] max-h-32 absolute mt-14 bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#C9C9C9]">
                               {
-                                countries?.filter(name => name?.country_name?.toLowerCase().includes(countryName.toLowerCase())).map((country, idx) => (
+                                countries?.filter(name => name?.name?.toLowerCase().includes(countryName.toLowerCase())).map((country, idx) => (
                                   <p
                                     key={idx}
                                     className="py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer"
                                     onClick={() => {
                                       setCustomer({
                                         ...customer,
-                                        region: country?.country_name,
+                                        region: country?.name,
                                       });
                                       setCountryName("");
-                                      setStateName("");
-                                      setCityName("");
+                                      setCountryDropdownOpen(false);
+                                      setCountry(country)
                                     }}
-                                  >{country?.country_name}</p>
+                                  >{country?.name}</p>
                                 ))
                               }
                             </div>

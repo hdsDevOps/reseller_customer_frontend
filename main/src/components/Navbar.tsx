@@ -18,6 +18,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { CiCreditCard1 } from "react-icons/ci";
 import { useAppDispatch } from "store/hooks";
 import { setTokenDetails } from "store/authSlice";
+import { removeUserAuthTokenFromLSThunk, removeUserIdFromLSThunk } from 'store/user.thunk';
 
 const links = [
   {
@@ -79,7 +80,8 @@ const Sidebar = () => {
   const [email] = useState("roberclive@domain.co.in"); // Replace with actual email
 
   const handleLogout = async () => {
-    dispatch(setTokenDetails(""));
+    await dispatch(removeUserAuthTokenFromLSThunk());
+    await dispatch(removeUserIdFromLSThunk());
     navigate("/login");
     localStorage.clear();
   };
