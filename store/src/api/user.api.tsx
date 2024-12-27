@@ -129,6 +129,76 @@ async function verifyRegisterOtpApi(
   }
 };
 
+async function getDomainsListApi(
+  customer_id: string
+): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.getDomainsList, { customer_id });
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+async function addNewDomainApi(
+  customer_id: string,
+  domain_name: string,
+  domain_type: string,
+  subscription_id: string,
+  business_name: string,
+  business_email: string,
+  license_usage: string,
+  plan: string,
+  payment_method: string,
+  domain_status: Boolean,
+  billing_period: string,
+  renew_status: Boolean,
+  subscription_status: Boolean,
+): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.addNewDomain, { customer_id, domain_name, domain_type, subscription_id, business_name, business_email, license_usage, plan, payment_method, domain_status, billing_period, renew_status, subscription_status });
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+async function addEmailsApi(
+  user_id: string,
+  domain_id: string,
+  emails: []
+): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.addEmails, { user_id, domain_id, emails });
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+async function getCartApi(
+  user_id: string
+): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.getCart, { user_id });
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+async function addToCartApi(
+  user_id: string,
+  products: []
+): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.addToCart, { user_id, products });
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 async function getStaffListApi(
   user_type_id: string,
   user_id: string,
@@ -156,6 +226,14 @@ export const userApis = {
   resgiterCustomerApi,
   resendRegisterOtpApi,
   verifyRegisterOtpApi,
+
+  getDomainsListApi,
+  addNewDomainApi,
+
+  addEmailsApi,
+
+  getCartApi,
+  addToCartApi,
 
   getStaffListApi,
 };

@@ -1,8 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import BusinessEmail from "../components/BusinessEmail";
 import SubscriptionModal from "../components/SubscriptionModal";
+import { useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Dashboard: React.FC = () => {
+  const location = useLocation();
+  useEffect(() => {
+    if(location.state) {
+      console.log(location.state);
+      if(location.state?.from === "otp") {
+        toast.success("Successfully logged in");
+      } else if(location.state?.from === "registration") {
+        toast.success("Successfully registered");
+      }
+    }
+  }, []);
   const [isSubscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
 
   return (

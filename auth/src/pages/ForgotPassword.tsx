@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "store/hooks";
 import { forgetPasswordThunk } from "store/user.thunk";
 import { toast } from 'react-toastify';
@@ -7,8 +7,9 @@ import { toast } from 'react-toastify';
 const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const location = useLocation();
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(location?.state?.email || "");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async(e: React.FormEvent) => {

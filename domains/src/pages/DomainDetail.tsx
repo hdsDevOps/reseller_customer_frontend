@@ -1,10 +1,92 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa6";
 import { AiOutlineCheck } from "react-icons/ai";
 import { MdOutlineAddShoppingCart } from "react-icons/md";
+import { removeUserAuthTokenFromLSThunk, getCartThunk, addToCartThunk } from "store/user.thunk";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
-const SelectedDomain: React.FC = () => {
+const initialDomain = {
+  domain: '',
+  domain_extension: '.com',
+}
+
+const SelectedDomain: React.FC = () => { 
+  const location = useLocation();
+  // console.log(location.state);
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  const { customerId } = useAppSelector(state => state.auth);
+
+  useEffect(() => {
+    if(!location.state) {
+      navigate('/login')
+    }
+  }, []);
+
+  const [domain, setDomain] = useState(initialDomain);
+  // console.log("domain...", domain);
+
+  const [cart, setCart] = useState([]);
+  console.log("cart...", cart);
+
+  const getCart = async() => {
+    try {
+      const result = await dispatch(getCartThunk({ user_id: customerId })).unwrap();
+      setCart(result?.cart);
+    } catch (error) {
+      setCart([]);
+      if(error?.message == "Authentication token is required") {
+        try {
+          await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    }
+  }
+
+  useEffect(() => {
+    getCart();
+  }, []);
+
+  useEffect(() => {
+    setDomain(location.state.domain);
+  }, [location.state]);
+
+  const addToCart = async(e) => {
+    e.preventDefault();
+    try {
+      const newCart = cart;
+      const addCart = {
+        domain: `${domain?.domain}${domain?.domain_extension}`,
+        product_type: "Domain",
+        price: "$99.99",
+        payment_cycle: "yearly",
+        total_year: "1"
+      }
+      newCart.push(addCart)
+      const result = await dispatch(addToCartThunk({
+        user_id: customerId,
+        products: newCart
+      })).unwrap();
+      console.log("result...", result);
+    } catch (error) {
+      if(error?.message == "Authentication token is required") {
+        try {
+          await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    } finally {
+      getCart();
+      navigate('/add-cart');
+    }
+  }
   return (
     <div>
       <main>
@@ -18,29 +100,29 @@ const SelectedDomain: React.FC = () => {
           <div className="w-full max-w-3xl flex flex-col items-center justify-center gap-1 p-0 md:px-7">
             <div className="bg-white w-full border border-black rounded-sm py-4 p-3 flex justify-between items-center text-sm md:text-lg">
               <div className="text-xs sm:text-lg font-semibold">
-                domain.co.in
+                {domain?.domain}{domain?.domain_extension}
               </div>
               <div className="text-xs sm:text-lg flex items-center gap-2 font-semibold">
                 <small className="text-green-500 font-normal">Available</small>
-                <p>₹684.00/year</p>
+                <p>$99.99/year</p>
               </div>
             </div>
 
             <div className="mt-6 space-y-4">
               <div className="flex items-start gap-2 text-sm md:text-lg">
-                <AiOutlineCheck className="text-green-500" />
+                <AiOutlineCheck className="text-green-500 !w-4 !h-4" />
                 <p className="text-gray-600">
                   You'll use this domain to set up Google Workspace, create
                   professional email addresses like{" "}
-                  <strong>sales@dboss.live</strong>, and sign in to Gmail, Docs,
+                  <strong>sales@{domain?.domain}{domain?.domain_extension}</strong>, and sign in to Gmail, Docs,
                   Drive, Calendar, and more.
                 </p>
               </div>
 
               <div className="flex items-start gap-2 text-sm md:text-lg">
-                <AiOutlineCheck className="text-green-500" />
+                <AiOutlineCheck className="text-green-500 !w-4 !h-4" />
                 <p className="text-gray-600">
-                  You'll be able to purchase <strong>domain.co.in</strong> after
+                  You'll be able to purchase <strong>{domain?.domain}{domain?.domain_extension}</strong> after
                   creating your Google Workspace account.
                 </p>
               </div>
@@ -77,11 +159,14 @@ const SelectedDomain: React.FC = () => {
               </p>
             </div>
 
-            <button className="self-start flex items-center gap-1 text-green-500 border-2 border-green-500 hover:bg-green-500 hover:text-white transition duration-200 ease-in-out py-2 px-4 rounded-lg mt-4 text-xs sm:text-sm md:text-lg">
+            <button
+              className="self-start flex items-center gap-1 text-green-500 border-2 border-green-500 hover:bg-green-500 hover:text-white transition duration-200 ease-in-out py-2 px-4 rounded-lg mt-4 text-xs sm:text-sm md:text-lg"
+              onClick={(e) => addToCart(e)}
+            >
               Add to Cart <MdOutlineAddShoppingCart />
             </button>
 
-            <p className="text-xs sm:text-sm md:text-lg text-green-500 font-medium self-start mt-2">
+            <p className="text-xs sm:text-sm md:text-lg text-green-500 font-medium self-start mt-2 cursor-pointer" onClick={() => {navigate('/buy-domain')}}>
               Want to use a new domain?
             </p>
           </div>

@@ -113,6 +113,41 @@ export const verifyRegisterOtpThunk = createAsyncThunk(
   }
 );
 
+export const getDomainsListThunk = createAsyncThunk(
+  "users/getDomainsList",
+  async ({ customer_id }: any) => {
+    return await userApis.getDomainsListApi( customer_id  );
+  }
+);
+
+export const addNewDomainThunk = createAsyncThunk(
+  "users/addNewDomain",
+  async ({ customer_id, domain_name, domain_type, subscription_id, business_name, business_email, license_usage, plan, payment_method, domain_status, billing_period, renew_status, subscription_status }: any) => {
+    return await userApis.addNewDomainApi( customer_id, domain_name, domain_type, subscription_id, business_name, business_email, license_usage, plan, payment_method, domain_status, billing_period, renew_status, subscription_status  );
+  }
+);
+
+export const addEmailsThunk = createAsyncThunk(
+  "users/addEmails",
+  async ({ user_id, domain_id, emails }: any) => {
+    return await userApis.addEmailsApi( user_id, domain_id, emails  );
+  }
+);
+
+export const getCartThunk = createAsyncThunk(
+  "users/getCart",
+  async ({ user_id }: any) => {
+    return await userApis.getCartApi( user_id );
+  }
+);
+
+export const addToCartThunk = createAsyncThunk(
+  "users/addToCart",
+  async ({ user_id, products }: any) => {
+    return await userApis.addToCartApi( user_id, products );
+  }
+);
+
 export const getStaffListThunk = createAsyncThunk(
   "users/verifyLoginOtp",
   async ({ user_type_id, user_id, search_text }: any) => {

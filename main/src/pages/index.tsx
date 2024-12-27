@@ -10,6 +10,8 @@ import SettingsApp from "settings/SettingsApp";
 import HdsProfile from "../components/HdsProfile";
 import EmailApp from "email/EmailApp";        
 import PlanCard from "./PlanCards";
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from "react-toastify";
 
 const Dashboard = React.lazy(() => import("./Dashboard"));
 const routes = [
@@ -19,9 +21,10 @@ const routes = [
 ];
 
 const MainApp: React.FC = () => {
-  const [showProfile,setShowProfile] = useState<boolean>(false)
+  const [showProfile,setShowProfile] = useState<boolean>(false);
   return (
   <div className="main-wrapper">
+    <ToastContainer />
     <Header onSetShowProfile={setShowProfile} />
     <div className="content-body relative min-h-screen pl-[5.2rem] lg:pl-[17rem] pt-[6rem] pr-[0.8rem] pb-4">
     {

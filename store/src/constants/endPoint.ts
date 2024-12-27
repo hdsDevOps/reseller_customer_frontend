@@ -1,8 +1,8 @@
 export const endPoints = {
     //login
     login: 'customerservices/customer/api/v1/login',
-    verifyLoginOtp: 'customerservices/customer/api/v1/otpverify',
     resendLoginOtp: 'customerservices/customer/api/v1/resed_otp_login',
+    verifyLoginOtp: 'customerservices/customer/api/v1/otpverify',
 
     //forget password
     forgetPassword: 'customerservices/customer/api/v1/forgetpassword',
@@ -14,6 +14,17 @@ export const endPoints = {
     resgiterCustomer: 'customerservices/customer/api/v1/registration',
     resendRegisterOtp: 'customerservices/customer/api/v1/resend_otp',
     verifyRegisterOtp: 'customerservices/customer/api/v1/otpverify',
+
+    // domains
+    getDomainsList: 'customerservices/domain/api/v1/domain-list',
+    addNewDomain: 'customerservices/domain/api/v1/adddomain',
+
+    // emails
+    addEmails: 'userservices/user/api/v1/addemail',
+
+    //cart
+    getCart: 'userservices/user/api/v1/cartlist',
+    addToCart: 'userservices/user/api/v1/addtocart',
 
 
     // staff

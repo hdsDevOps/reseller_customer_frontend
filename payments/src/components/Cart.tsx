@@ -8,6 +8,7 @@ import { BiSolidCheckShield } from "react-icons/bi";
 import { MdClose, MdOutlineAddShoppingCart } from "react-icons/md";
 import { cartItems, recommendations } from "../utils/Utils";
 import "./Cart.css";
+import { addNewDomainThunk } from 'store/user.thunk';
 
 // Sample vouchers
 const vouchers = [
@@ -362,7 +363,11 @@ const Cart = () => {
                       <h2>₹936.28</h2>
                     </div>
                   </div>
-                  <button className="bg-green-600 rounded-lg text-white font-semibold py-3 hover:bg-opacity-90 flex items-center justify-center gap-3">
+                  <button
+                    className="bg-green-600 rounded-lg text-white font-semibold py-3 hover:bg-opacity-90 flex items-center justify-center gap-3"
+                    type="button"
+                    // onClick={() => {navigate('/Review')}}
+                  >
                     <FaLock /> Submit Purchase
                   </button>
 

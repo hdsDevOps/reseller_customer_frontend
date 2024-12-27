@@ -11,7 +11,7 @@ interface IFormInput {
   password: string;
 };
 
-const initialUserDetails = {
+const initialUserDetails:IFormInput = {
   email: "",
   password: "",
 };
@@ -154,9 +154,7 @@ const Login: React.FC = () => {
                   </p>
                 )}
               </div>
-              <div style={{ color: "red" }}>
-                <Link to="/forgotpassword">Forgot Password</Link>
-              </div>
+              <button className="text-red-600 hover:text-[#12A833] hover:underline" onClick={() => {navigate('/forgotpassword')}}>Forgot Password?</button>
               <div className="mt-4">
                 <button
                   type="submit"

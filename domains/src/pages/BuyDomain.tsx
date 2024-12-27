@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { checkDomainThunk } from 'store/reseller.thunk';
+import { removeUserAuthTokenFromLSThunk } from "store/user.thunk";
 
 const initialDomain = {
   domain: "",
@@ -14,6 +15,7 @@ const BuyDomain: React.FC = () => {
   const navigate = useNavigate();
   const { userAuthStatus = "" } = useAppSelector((state: any) => state.auth);
   const [domain, setDomain] = useState(initialDomain);
+  // console.log("domain...", domain);
 
   const handleChangeDomain = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setDomain({
@@ -27,7 +29,7 @@ const BuyDomain: React.FC = () => {
     // console.log(domain);
     try {
       const result = await dispatch(checkDomainThunk(domain.domain+domain.domain_extension)).unwrap();
-      console.log(result);
+      console.log("check domain result...", result);
       if(result?.message === "Customer domain is Already Registered with a Google Workspace") {
         navigate('/choose-domain', {state: {result, domain}});
       } else if(result?.message === "Domain is Still Available for Purchase , doesn't belong to anyone yet") {
@@ -36,6 +38,14 @@ const BuyDomain: React.FC = () => {
       // navigate('/choose-domain', {state: {result, domain}});
     } catch (error) {
       console.log(error);
+      if(error?.message == "Authentication token is required") {
+        try {
+          await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
     }
   }
 

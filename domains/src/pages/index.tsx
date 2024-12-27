@@ -6,10 +6,13 @@ const DomainList = React.lazy(() => import("./DomainList"));
 const DomainDetail = React.lazy(() => import("./DomainDetail"));
 const BuyDomain = React.lazy(() => import("./BuyDomain"));
 const ChooseDomain = React.lazy(() => import("./ChooseDomain"));
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from "react-toastify";
 
 const DomainApp: React.FC = () => {
   return (
     <div>
+      <ToastContainer />
       <Routes>
         <Route path="/domain" element={<DomainList />} />
         <Route path="/add-domain" element={<AddDomain />} />

@@ -13,6 +13,9 @@ import { resgiterCustomerThunk } from "store/user.thunk";
 import { HiOutlineEye } from "react-icons/hi";
 import axios from "axios";
 import { toast } from "react-toastify";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import "./cumtel.css"
 
 const initialCustomer = {
   email: "",
@@ -107,6 +110,10 @@ const RegisterPage: React.FC = () => {
     });
   };
 
+  const handlePhoneChange = (value: string) => {
+    setCustomer((prevData) => ({ ...prevData, business_phone_number: value }));
+  };
+
   const validateForm = () => {
     for (const key in customer) {
       if (customer[key].trim() === '') {
@@ -144,7 +151,7 @@ const RegisterPage: React.FC = () => {
             zipcode: customer?.zipcode
           })).unwrap();
           console.log("result...", result);
-          navigate("/otp?mode=signup", { state: {customerId: result?.customer_id} })
+          navigate("/otp?mode=signup", { state: {customer_id: result?.customer_id} })
         } catch (error) {
           toast.error("Error registering customer");
         }
@@ -192,7 +199,7 @@ const RegisterPage: React.FC = () => {
                         type={showPassword ? "text" : "password"}
                         name={head.name}
                         required={head.required}
-                        className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                        className='border border-[#E4E4E4] rounded-[10px] h-[54px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
                         onChange={updateCustomer}
                         placeholder={head.placeholder}
                         value={customer[head.name]}
@@ -223,7 +230,7 @@ const RegisterPage: React.FC = () => {
                         type={showCPassword ? "text" : "password"}
                         name={head.name}
                         required={head.required}
-                        className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                        className='border border-[#E4E4E4] rounded-[10px] h-[54px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
                         onChange={e => {setConfirmPassword(e.target.value)}}
                         placeholder={head?.placeholder}
                         value={confirmPassword}
@@ -233,7 +240,7 @@ const RegisterPage: React.FC = () => {
                         onClick={() => {setShowCPassword(!showCPassword)}}
                         className="relative float-right mt-[-35px] mr-[15px] ml-auto"
                       >
-                        {showPassword ? (
+                        {showCPassword ? (
                           <HiOutlineEye className="h-[25px] w-[25px]" aria-hidden="true" />
                         ) : (
                           <RiEyeCloseLine className="h-[25px] w-[25px]" aria-hidden="true" />
@@ -254,14 +261,14 @@ const RegisterPage: React.FC = () => {
                         type="text"
                         name={head.name}
                         required
-                        className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                        className='border border-[#E4E4E4] rounded-[10px] h-[54px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
                         // onChange={updateCustomer}
                         placeholder={head?.placeholder}
                       /> */}
                       <select
                         name={head.name}
                         required={head.required}
-                        className="border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2"
+                        className="border border-[#E4E4E4] rounded-[10px] h-[54px] mt-[-9px] pl-2"
                       >
                         <option selected disabled>{head.placeholder}</option>
                         <option>United States</option>
@@ -283,7 +290,7 @@ const RegisterPage: React.FC = () => {
                           type="text"
                           name="region"
                           required
-                          className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                          className='border border-[#E4E4E4] rounded-[10px] h-[54px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
                           onChange={e => {
                             setCustomer({
                               ...customer,
@@ -321,6 +328,23 @@ const RegisterPage: React.FC = () => {
                       </div>
                     )
                   }
+                } else if(head.name === "business_phone_number") {
+                  return (
+                    <div className="relative !w-full mb-2 pl-[6px] pr-2 !pb-[2px] !pt-[6px] sm:col-span-1 col-span-2 mt-2">
+                      <PhoneInput
+                        country={country?.iso2?.toLowerCase() || "us"}
+                        value={customer?.business_phone_number}
+                        onChange={handlePhoneChange}
+                        inputClass="!w-full !outline-none !border-0"
+                        dropdownClass="peer"
+                        containerClass="relative !outline-none !w-full !border !border-[#E4E4E4] !rounded-[10px]"
+                      />
+                      <label
+                        htmlFor="business_phone_number"
+                        className="absolute bg-white -top-3 left-3 text-gray-500 transition-all duration-300 ease-in-out origin-top-left peer-placeholder-shown:text-gray-400 peer-focus:text-blue-600 peer-focus:text-sm"
+                      >{head?.label}</label>
+                    </div>
+                  )
                 } else {
                   return (
                     <div
@@ -334,7 +358,7 @@ const RegisterPage: React.FC = () => {
                         type={head.type}
                         name={head.name}
                         required={head.required}
-                        className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                        className='border border-[#E4E4E4] rounded-[10px] h-[54px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
                         onChange={updateCustomer}
                         placeholder={head?.placeholder}
                         value={customer[head.name]}
@@ -374,7 +398,7 @@ const RegisterPage: React.FC = () => {
               className="group relative w-full md:max-w-40 flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:!bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer"
               data-testid="log-in"
               disabled={
-                !termsAccepted || customer.password !== confirmPassword || loading
+                customer.password !== confirmPassword || loading
               }
             >
               {loading ? "Loading..." : "Submit"}

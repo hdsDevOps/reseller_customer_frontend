@@ -19,7 +19,6 @@ const OTP: React.FC = () => {
   const customerId = location?.state?.customer_id;
   const email = location.state?.email;
   const mode = queryParams.get("mode");
-  console.log(location.state)
 
   const otp1Ref = useRef<HTMLInputElement>(null);
   const otp2Ref = useRef<HTMLInputElement>(null);
@@ -180,11 +179,18 @@ const OTP: React.FC = () => {
           if(result?.status === 200) {
             try {
               await dispatch(setUserAuthTokenToLSThunk({token: result?.token})).unwrap();
-              const setCustomerId = await dispatch(setUserIdToLSThunk(customerId)).unwrap();
-              console.log("customer id...", setCustomerId);
+              await dispatch(setUserIdToLSThunk(customerId)).unwrap();
               navigate('/dashboard', {state: {from: 'otp'}});
             } catch (error) {
               console.log("Error on token");
+            } finally {
+              try {
+                await dispatch(getUserAuthTokenFromLSThunk()).unwrap();
+                await dispatch(getUserIdFromLSThunk()).unwrap();
+                navigate('/dashboard', {state: {from: 'otp'}})
+              } catch (error) {
+                console.log("Error on token")
+              }
             }
           }
         } catch (error) {
@@ -215,7 +221,23 @@ const OTP: React.FC = () => {
             otp: otp
           })).unwrap();
           console.log("result...", result);
-          navigate("/login");
+          if(result?.status === 200) {
+            try {
+              await dispatch(setUserAuthTokenToLSThunk({token: result?.token})).unwrap();
+              await dispatch(setUserIdToLSThunk(customerId)).unwrap();
+              navigate('/dashboard', {state: {from: 'registration'}});
+            } catch (error) {
+              console.log("Error on token");
+            } finally {
+              try {
+                await dispatch(getUserAuthTokenFromLSThunk()).unwrap();
+                await dispatch(getUserIdFromLSThunk()).unwrap();
+                navigate('/dashboard', {state: {from: 'registration'}})
+              } catch (error) {
+                console.log("Error on token")
+              }
+            }
+          }
         } catch (error) {
           toast.error("Please enter a valid otp");
         }
@@ -231,14 +253,17 @@ const OTP: React.FC = () => {
       try {
         const result = await dispatch(resendLoginOtpThunk({customer_id: customerId})).unwrap();
         console.log("result...", result);
+        toast.success("Please check your email for OTP.");
         setTimeLeft(120);
       } catch (error) {
+        console.log(error)
         toast.error("Error resending otp");
       }
     } else if(mode === "forgotpassword") {
       try {
         const result = await dispatch(resendForgetPasswordOtpThunk({email: email})).unwrap();
         console.log("result...", result);
+        toast.success("Please check your email for OTP.");
         setTimeLeft(120);
       } catch (error) {
         toast.error("Error resending otp");
@@ -247,6 +272,7 @@ const OTP: React.FC = () => {
       try {
         const result = await dispatch(resendRegisterOtpThunk({customer_id: customerId})).unwrap();
         console.log("result...", result);
+        toast.success("Please check your email for OTP.");
         setTimeLeft(120);
       } catch (error) {
         toast.error("Error resending otp");
@@ -257,7 +283,7 @@ const OTP: React.FC = () => {
   }
 
   const handleEditmail = () => {
-    navigate(-1);
+    navigate('/forgotpassword', { state: {email: email}});
   };
 
   return (
@@ -288,8 +314,7 @@ const OTP: React.FC = () => {
               {mode === "forgotpassword" && (
                 <>
                   <p>
-                    We have sent an One Time Passcode to this
-                    Robertclive@gmail.com email address:
+                    We have sent an One Time Passcode to this <span className="font-bold">{email}</span> email address:
                     <button
                       type="button"
                       onClick={() => handleEditmail()}

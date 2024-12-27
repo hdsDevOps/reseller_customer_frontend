@@ -40,3 +40,11 @@ declare module 'store/authSlice' {
 
   export default authSlice.reducer;
 }
+
+
+
+declare module 'store/user.thunk' {
+  export const getDomainsListThunk;
+  export const removeUserAuthTokenFromLSThunk;
+  // Add more thunk declarations as needed
+}

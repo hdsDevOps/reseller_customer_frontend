@@ -1,10 +1,55 @@
 import { ArrowLeft, ChevronRight } from "lucide-react";
-import React from "react";
-import { Link } from "react-router-dom";
-import { useAppSelector } from "store/hooks";
+import React, { ReactEventHandler, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import { checkDomainThunk } from "store/reseller.thunk";
+import { removeUserAuthTokenFromLSThunk } from "store/user.thunk";
+
+const initialDomain = {
+  domain: '',
+  domain_extension: '.com',
+}
 
 const AddDomain: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { userAuthStatus = "" } = useAppSelector((state: any) => state.auth);
+
+  const [domain, setDomain] = useState(initialDomain);
+  console.log("domain...", domain);
+
+  const handleChangeDomain = (e) => {
+    setDomain({
+      ...domain,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+    try {
+      const result = await dispatch(checkDomainThunk(domain.domain+domain.domain_extension)).unwrap();
+      console.log("check domain result...", result);
+      if(result?.message === "Customer domain is Already Registered with a Google Workspace") {
+        navigate('/domain-details', {state: {result, domain}});
+      } else if(result?.message === "Domain is Still Available for Purchase , doesn't belong to anyone yet") {
+        // navigate('/domain-details', {state: {result, domain}});
+        toast.warning("This domain is still available for purchase");
+      }
+      // navigate('/choose-domain', {state: {result, domain}});
+    } catch (error) {
+      console.log(error);
+      if(error?.message == "Authentication token is required") {
+        try {
+          await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    }
+  }
 
   return (
     <div>
@@ -40,26 +85,49 @@ const AddDomain: React.FC = () => {
                 Use a Domain You Own
               </h2>
             </div>
-            <form className="p-3 mt-8 flex flex-col gap-4 bg-white flex-1">
-              <input
-                type="text"
-                placeholder="domain.co.in"
-                className="border-2 border-gray-200 bg-transparent rounded-lg p-[.65rem] focus:border-green-500 focus:outline-none"
-              />
-              <p className="text-gray-400 text-sm">
-                Enter your existing domain name.
-              </p>
+            <form
+              className="p-3 mt-8 flex flex-col gap-4 bg-white flex-1"
+              onSubmit={handleSubmit}
+            >
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Enter your domain"
+                  className={`flex-1 border-2 bg-transparent rounded-lg p-[.65rem] focus:border-green-500 focus:outline-none px-2`}
+                  style={{height: '50px'}}
+                  value={domain.domain}
+                  name="domain"
+                  onChange={handleChangeDomain}
+                  required
+                />
+                <div className="flex gap-4">
+                  <label htmlFor="domain-select" className="sr-only">
+                    Choose a domain extension
+                  </label>
+                  <select
+                    id="domain-select"
+                    className="border-2 border-gray-200 bg-transparent rounded-lg p-[.65rem] focus:border-green-500 focus:outline-none"
+                    aria-label="Choose a domain extension"
+                    name="domain_extension"
+                    onChange={handleChangeDomain}
+                  >
+                    <option value=".com">.com</option>
+                    <option value=".cc">.cc</option>
+                    <option value=".org">.org</option>
+                  </select>
+                </div>
+              </div>
+              <p className="text-gray-400 text-sm">Search available domains</p>
+            
+              <div className="flex flex-start pb-2">
+                <button
+                  type="submit"
+                  className="py-2 px-4 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 ease-in-out"
+                >
+                  Next
+                </button>
+              </div>
             </form>
-            <div className="p-4 flex flex-start">
-              <Link to="/domain-details">
-              <button
-                type="button"
-                className="py-2 px-4 bg-green-600 text-white rounded-md hover:bg-green-700 transition duration-200 ease-in-out"
-              >
-                Next
-              </button>
-              </Link>
-            </div>
           </div>
         </div>
       </main>

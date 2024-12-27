@@ -1,28 +1,84 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FilterX } from "lucide-react";
 import EmailModal from "../components/EmailModal";
 import ActionModal from "../components/ActionModal";
 import AddLicense from "../components/AddLicense";
+import { getDomainsListThunk, removeUserAuthTokenFromLSThunk } from 'store/user.thunk'
 
 import "../index.css";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 const EmailList: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const location = useLocation();
+  const searchRef = useRef();
+
+  const { customerId } = useAppSelector(state => state.auth);
+  // console.log("userId...", customerId);
+  
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState<boolean>(false);
   const [isLicenseModalOpen, setIsLicenseModalOpen] = useState<boolean>(false);
   const [selectedUserRole, setSelectedUserRole] = useState<string | undefined>();
   const [actionModalStyle, setActionModalStyle] = useState<React.CSSProperties>({});
   const [searchTerm, setSearchTerm] = useState("");
-
-  const location = useLocation();
+  const [searchDropdown, setSearchDropdown] = useState(false);
   const params = new URLSearchParams(location.search);
   const domainName = params.get("domain") || "schemaphic.com";
-
+  const [domains, setDomains] = useState([]);
+  // console.log("domains...", domains);
+  const [selectedDomain, setSelectedDomain] = useState({});
   const [emailData, setEmailData] = useState([
     { name: "Robert Clive > Admin", email: "robertclive@", status: true, role: ".Admin" },
     { name: "Michel Henry", email: "michelhenry@", status: false, role: "" },
   ]);
+
+  useEffect(() => {
+    const getDomainsList = async() => {
+      try {
+        const result = await dispatch(getDomainsListThunk({customer_id: customerId})).unwrap();
+        setDomains(result?.data);
+      } catch (error) {
+        setDomains([]);
+        if(error?.message == "Authentication token is required") {
+          try {
+            const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+            navigate('/login');
+          } catch (error) {
+            //
+          }
+        }
+      }
+    }
+    getDomainsList();
+  }, []);
+
+  useEffect(() => {
+    if(domains.length > 0) {
+      const result = domains.find(item => item?.domain_type === "primary");
+      ////////////////////////////////
+    }
+  }, []);
+  
+  const handleClickOutside = (event: MouseEvent) => {
+    if(searchRef.current && !searchRef.current.contains(event.target as Node)) {
+      setSearchDropdown(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    if(searchTerm !== "" && domains.length > 0) {
+      setSearchDropdown(true);
+    }
+  }, [searchTerm, domains]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -62,15 +118,28 @@ const EmailList: React.FC = () => {
             </div>
           </div>
 
-          <div className="self-start sm:self-end">
-            <div className="flex items-center space-x-1">
+          <div className="flex sm:justify-end justify-center">
+            <div className="flex items-center space-x-1 relative" ref={searchRef}>
               <input
                 type="text"
                 placeholder="Search domain..."
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="bg-transparent border rounded px-2 py-1"
+                className="bg-transparent border rounded px-2 py-1 relative"
+                onFocus={() => {setSearchDropdown(true)}}
               />
+              {
+                searchDropdown && domains?.filter(item => item?.domain_name?.toLowerCase().includes(searchTerm?.toLowerCase())).length > 0 && (
+                  <div className="absolute top-0 max-h-32 flex flex-col mt-8 bg-slate-200 py-1 w-[184px] overflow-y-auto">
+                    {
+                   // countries?.filter(name => name?.name?.toLowerCase().includes(countryName.toLowerCase()))
+                      domains?.filter(item => item?.domain_name?.toLowerCase().includes(searchTerm?.toLowerCase())).map((item2, index) => (
+                        <p key={index} className="px-2 first:border-0 border-t border-white">{item2?.domain_name}</p>
+                      ))
+                    }
+                  </div>
+                )
+              }
               <FilterX className="text-green-500" size={24} />
             </div>
           </div>
