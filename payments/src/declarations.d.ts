@@ -74,5 +74,6 @@ declare module 'store/authSlice' {
 declare module 'store/user.thunk' {
   export const addNewDomainThunk;
   export const removeUserAuthTokenFromLSThunk;
+  export const getCartThunk;
   // Add more thunk declarations as needed
 }

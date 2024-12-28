@@ -5,6 +5,10 @@ export default{
   ],
   theme: {
     extend: {
+      fontFamily: {
+        inter: ["Inter", "sans-serif"],
+        roboto: ["Roboto", "sans-serif"],
+      },
       screens: {
         // "sm-max": { "min": "320px" , "max": "767px" },
       },

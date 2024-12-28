@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { ChevronRight, CirclePlus, Trash2 } from "lucide-react";
+import React, { useEffect, useRef, useState } from 'react';
+import { ChevronRight, CircleEllipsis, CirclePlus, Trash2, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import EmailModal from './EmailModal';
 import ActionModal from '../components/ActionModal';
@@ -26,14 +26,24 @@ const DomainList: React.FC = () => {
   const { customerId } = useAppSelector(state => state.auth);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState<boolean>(false);
+  const [actionModalType, setActionModalType] = useState<string>("Cancel");
   const [actionModalStyle, setActionModalStyle] = useState<React.CSSProperties | null>(null);
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [domainsList, setDomainsList] = useState([]);
-  // console.log("domainsList...", domainsList);
+  console.log("domainsList...", domainsList);
   const [emailsList, setEmailsList] = useState([intialEmail]);
   console.log("emailList...", emailsList);
   const [licenseUsage, setLicenseUsage] = useState(0);
   const [domainId, setDomainId] = useState("");
+  const [showList, setShowList] = useState("");
+  const listRef = useRef(null);
+  const modalRef = useRef(null);
+
+  const showListTable = [
+    { label: "Update payment method", },
+    { label: "Cancel Domain", },
+    { label: "Transfer Domain", },
+  ];
 
   const headers: string[] = ["Domain", "Domain Types", "Business Email", "User Licenses", " "];
   const singleDomainTable = ["domain_name", "domain_type", "business_email", "license_usage", "button"]
@@ -56,6 +66,18 @@ const DomainList: React.FC = () => {
     ]
   };
 
+  const onClickTableList = (e, label:string) => {
+    if(label === "Update payment method") {
+      navigate('/payment-method');
+    } else if(label === "Cancel Domain") {
+      setIsActionModalOpen(true);
+      setActionModalType("Cancel");
+    } else if(label === "Transfer Domain") {
+      setIsActionModalOpen(true);
+      setActionModalType("Transfer");
+    }
+  }
+
   useEffect(() => {
     const getDomainsList = async() => {
       try {
@@ -63,7 +85,7 @@ const DomainList: React.FC = () => {
         setDomainsList(result?.data);
       } catch (error) {
         setDomainsList([]);
-        if(error?.message == "Authentication token is required") {
+        if(error?.message == "Invalid token") {
           try {
             const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
             navigate('/login');
@@ -74,6 +96,35 @@ const DomainList: React.FC = () => {
       }
     }
     getDomainsList();
+  }, []);
+
+  const toggleList = (domainId:string) => {
+    setShowList((prev) => (prev === domainId ? "" : domainId));
+  };
+  const handleClickOutsideOfList = e => {
+    if(listRef.current && !listRef.current.contains(e.target)) {
+      setShowList("");
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutsideOfList);
+    return() => {
+      document.removeEventListener('mousedown', handleClickOutsideOfList);
+    };
+  }, []);
+
+  const handleClickOutsideOfModal = e => {
+    if(modalRef.current && !modalRef.current.contains(e.target)) {
+      setShowList("");
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutsideOfModal);
+    return() => {
+      document.removeEventListener('mousedown', handleClickOutsideOfModal);
+    };
   }, []);
 
   const handleOpenActionModal = (event: React.MouseEvent, domain: string) => {
@@ -128,7 +179,7 @@ const DomainList: React.FC = () => {
         }
       }
     }
-  }
+  };
 
   return (
     <div>
@@ -156,8 +207,8 @@ const DomainList: React.FC = () => {
             domainsList.length > 0 ? (
               domainsList?.map((domain, index) => (
                 <div key={index} className="flex flex-col bg-gray-100 rounded-sm w-full p-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-gray-600 font-semibold text-xl md:text-lg sm-max:text-xs">{domain?.domain_name}</h3>
+                  <div className="flex min-[500px]:flex-row flex-col items-center justify-between mb-4">
+                    <h3 className="text-gray-600 font-semibold text-xl md:text-lg sm-max:text-xs self-start">{domain?.domain_name}</h3>
                     <button
                       className="px-4 py-2 md:px-3 sm-max:px-2 sm-max:text-xs bg-green-600 text-white font-medium rounded-md hover:bg-opacity-90"
                       onClick={() => {
@@ -172,7 +223,7 @@ const DomainList: React.FC = () => {
                   </div>
     
                   <div className="w-full overflow-x-auto">
-                    <table className="w-full border-collapse">
+                    <table className="w-full min-w-[700px] border-collapse">
                       <thead className="border border-gray-300 mb-4">
                         <tr>
                           {headers.map((header, index) => (
@@ -189,21 +240,47 @@ const DomainList: React.FC = () => {
                             singleDomainTable.map((row, index) => {
                               if(row === "license_usage") {
                                 return (
-                                  <td className="p-2 text-gray-800 sm-max:text-xs" key={index}>{domain?.emails?.length}/{domain[row]}</td>
+                                  <td className="p-2 text-gray-800 sm-max:text-xs w-[22%]" key={index}>{domain?.emails ? domain?.emails?.length : 0}/{domain[row]}</td>
                                 )
                               } else if (row === "button") {
                                 return (
-                                  <td className="p-2 text-center" key={index}>
-                                    <button className="relative w-6 h-6 rounded-full border-2 border-green-500 flex justify-center items-center">
-                                      <p className="mb-2"
-                                        // onClick={(e) => handleOpenActionModal(e, domain)}
-                                      >...</p>
+                                  <td className="p-2 text-center w-[8%] relative" key={index}>
+                                    <button
+                                      type='button'
+                                      className="w-6 h-6"
+                                      onClick={() => {toggleList(domain?.id)}}
+                                    >
+                                      <CircleEllipsis className='w-6 h-6 text-[#12A833]' />
                                     </button>
+                                    {
+                                      showList === domain?.id && (
+                                        <div
+                                          className='absolute right-0 rounded-3xl bg-white border-2 w-[214px]'
+                                          ref={listRef}
+                                        >
+                                          <ul className='text-left w-full h-fit p-2 pl-6'>
+                                            {
+                                              showListTable.map((list, idx) => (
+                                                <li
+                                                  className='font-roboto font-medium text-[14px] text-[#222222] p-1 cursor-pointer'
+                                                  key={idx}
+                                                  onClick={(e) => {onClickTableList(e, list.label)}}
+                                                >{list.label}</li>
+                                              ))
+                                            }
+                                          </ul>
+                                        </div>
+                                      )
+                                    }
                                   </td>
                                 )
-                              } else {
+                              } else if(row === "business_email") {
                                 return (
-                                  <td className="p-2 text-gray-800 sm-max:text-xs" key={index}>{domain[row]}</td>
+                                  <td className="p-2 text-gray-800 sm-max:text-xs w-[26%]" key={index}>{domain?.business_email}</td>
+                                )
+                              }  else {
+                                return (
+                                  <td className="p-2 text-gray-800 sm-max:text-xs w-[22%]" key={index}>{domain[row]}</td>
                                 )
                               }
                             })
@@ -377,15 +454,30 @@ const DomainList: React.FC = () => {
           </div>
         )
       }
-      {isActionModalOpen && actionModalStyle && (
-        <ActionModal
-          isOpen={isActionModalOpen}
-          onClose={() => {
-            setIsActionModalOpen(false);
-            setActionModalStyle(null);
-          }}
-          style={actionModalStyle}
-        />
+      {isActionModalOpen && (
+        <div className='fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50'>
+          <div className='bg-white rounded-3xl shadow-lg max-w-[538px] p-5' ref={modalRef}>
+            <div className='flex justify-between items-center w-full px-2'>
+              <h3 className='font-inter font-medium text-[28px] text-[#0D121F]'>{actionModalType} Your Domain</h3>
+              <X className='w-7 h-7 text-[#0D121F]' onClick={() => {setIsActionModalOpen(false)}} />
+            </div>
+
+            <h4 className='font-inter font-medium text-2xl text-[#222222] mt-10'>Are you sure want to {actionModalType} your domain?</h4>
+
+            <div className='flex justify-center gap-10 mt-10'>
+              <button 
+                className='font-inter font-semibold text-base text-[#F0F0F3] items-center text-center w-[80px] h-10 rounded-[10px] bg-[#12A833]'
+                type='button'
+                onClick={() => {setIsActionModalOpen(false)}}
+              >Yes</button>
+              <button
+                className='font-inter font-semibold text-base text-[#F0F0F3] items-center text-center w-[80px] h-10 rounded-[10px] bg-[#EE1010]'
+                type='button'
+                onClick={() => {setIsActionModalOpen(false)}}
+              >Cancel</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

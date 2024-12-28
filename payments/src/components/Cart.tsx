@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GoChevronLeft } from "react-icons/go";
 import { useNavigate } from "react-router-dom";
 import { LuPencilLine } from "react-icons/lu";
@@ -8,7 +8,8 @@ import { BiSolidCheckShield } from "react-icons/bi";
 import { MdClose, MdOutlineAddShoppingCart } from "react-icons/md";
 import { cartItems, recommendations } from "../utils/Utils";
 import "./Cart.css";
-import { addNewDomainThunk } from 'store/user.thunk';
+import { addNewDomainThunk, getCartThunk, removeUserAuthTokenFromLSThunk } from 'store/user.thunk';
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 // Sample vouchers
 const vouchers = [
@@ -25,12 +26,42 @@ interface Voucher {
 
 const Cart = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { customerId } = useAppSelector(state => state.auth);
   const [showVoucherInput, setShowVoucherInput] = useState(false);
   const [showAvailableVouchers, setShowAvailableVouchers] = useState(false);
   const [voucherCode, setVoucherCode] = useState("");
   const [appliedVoucher, setAppliedVoucher] = useState<Voucher | null>(null);
   const [selectedVoucher] = useState<Voucher | null>(null);
   const [isVoucherApplied, setIsVoucherApplied] = useState(false);
+  const [cart, setCart] = useState([]);
+  console.log("cart...", cart);
+
+  const getCartDetails = async() => {
+    try {
+      const result = await dispatch(getCartThunk({ user_id: customerId })).unwrap();
+      setCart(result?.cart);
+    } catch (error) {
+      setCart([]);
+      if(error?.error == "Invalid token") {
+        try {
+          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    getCartDetails();
+  }, []);
+
+  const handleDeleteItemFromCart = (index) => {
+    const newCart = cart.filter((_, i) => i !== index);
+    setCart(newCart);
+  }
 
   const handleVoucherToggle = () => {
     setShowVoucherInput((prev) => !prev);
@@ -121,48 +152,74 @@ const Cart = () => {
               repudiandae natus, perspiciatis tenetur maxime!.
             </small>
           </div>
-          {cartItems.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white shadow-md rounded-lg py-4 px-8 flex gap-6 items-start justify-between border border-transparent w-full"
-            >
-              <div className="flex gap-10 w-full">
-                <div className="flex items-center justify-center bg-gray-200 shadow-md rounded-md w-24 h-20">
-                  <img
-                    src={item.imageUrl}
-                    alt={item.title}
-                    className="size-[97%] object-cover"
-                  />
+          {
+            cart.length > 0 ? cart?.map((item, index) => (
+              <div
+                key={index}
+                className="bg-white shadow-md rounded-lg py-4 px-8 flex gap-6 items-start justify-between border border-transparent w-full"
+              >
+                <div className="flex gap-10 w-full">
+                  <div className="flex items-center justify-center bg-gray-200 shadow-md rounded-md w-24 h-20">
+                    <img
+                      src={item?.product_type === "Domain" ? "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/globe.svg?alt=media&token=426e0f86-ea50-4d0d-b902-e64d52024975" : "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/google.webp?alt=media&token=76556bcb-a71c-4ea7-a8a6-04735644213d"}
+                      alt={item?.product_type}
+                      className="size-[97%] object-cover"
+                    />
+                  </div>
+                  <div className="flex items-start gap-10">
+                    <div className="flex-grow flex flex-col justify-center">
+                      <h3 className="text-xl font-semibold">{item?.product_name}</h3>
+                      <small className="text-sm my-1">({item?.product_type})</small>
+                      <small className="text-[10px] text-gray-400">
+                        Upgrade user license
+                      </small>
+                      {
+                        item?.product_type === "Domain" ? (
+                          <select
+                            title="Qty"
+                            className="mt-1 bg-transparent border border-black rounded-md p-1 text-sm max-w-20 w-full"
+                          >
+                            <option value="1">1 year</option>
+                            <option value="2">2 year</option>
+                            <option value="3">3 year</option>
+                          </select>
+                        ) : (
+                          <select
+                            title="Qty"
+                            className="mt-1 bg-transparent border border-black rounded-md p-1 text-sm max-w-20 w-full"
+                          >
+                            <option value="1">Qty: 1</option>
+                            <option value="2">Qty: 2</option>
+                            <option value="3">Qty: 3</option>
+                          </select>
+                        )
+                      }
+                    </div>
+                    <div className="flex flex-col justify-center">
+                      <span className="text-xl font-bold">{item?.price}</span>
+                      <small className="text-[10px] text-gray-400 self-end">
+                        <span className="uppercase">{item?.payment_cycle}</span> cycle
+                      </small>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-start gap-10">
-                  <div className="flex-grow flex flex-col justify-center">
-                    <h3 className="text-xl font-semibold">{item.title}</h3>
-                    <small className="text-sm my-1">{item.subtitle}</small>
-                    <small className="text-[10px] text-gray-400">
-                      Upgrade user license
-                    </small>
-                    <select
-                      title="Qty"
-                      className="mt-1 bg-transparent border border-black rounded-md p-1 text-sm max-w-20 w-full"
-                    >
-                      {item.qtyOptions.map((option, index) => (
-                        <option key={index}>{option}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="flex flex-col justify-center">
-                    <span className="text-xl font-bold">{item.price}</span>
-                    <small className="text-[10px] text-gray-400 self-end">
-                      Yearly cycle
-                    </small>
-                  </div>
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleDeleteItemFromCart(index)
+                    }}
+                  >
+                    <RiDeleteBin6Line className="text-red-500 text-2xl cursor-pointer w-full" />
+                  </button>
                 </div>
               </div>
-              <div>
-                <RiDeleteBin6Line className="text-red-500 text-2xl cursor-pointer w-full" />
-              </div>
-            </div>
-          ))}
+            )) : (
+              <div
+                className="bg-white shadow-md rounded-lg py-4 px-8 flex gap-6 items-start justify-between border border-transparent w-full"
+              >Cart is empty</div>
+            )
+          }
 
           <div className="my-4">
             <h1 className="text-3xl font-semibold mb-4">Recommended for you</h1>
