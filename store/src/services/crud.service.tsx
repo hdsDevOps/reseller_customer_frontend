@@ -142,3 +142,46 @@ export async function deleteApiCall(
     throw new CustomError(apiError.API_CALL_FAILED, error?.message);
   }
 }
+
+
+
+
+
+export async function uploadImageApiCall(
+  endPoint: string,
+  imageFile: any,
+  user_id: string
+): Promise<any | CustomError> {
+  try {
+    const formData = new FormData();
+    formData.append("image", imageFile);
+    formData.append("user_id", user_id);
+    const fetchedData = await axiosInstance.post(endPoint, formData, {
+      headers:{
+        "Content-Type": "multipart/form-data",
+      }
+    });
+    if (fetchedData?.status === 200 || fetchedData?.status === 201) {
+      return fetchedData?.data;
+    } else if (
+      fetchedData?.status === 401 ||
+      fetchedData?.status === 400 ||
+      fetchedData?.status === 410
+    ) {
+      throw new CustomError(
+        apiError.TOKEN_EXPIRED,
+        fetchedData.data?.message || fetchedData.data?.msg
+      );
+    } else {
+      throw new CustomError(
+        apiError.DATA_NOT_FOUND,
+        fetchedData.data?.message || fetchedData.data?.msg
+      );
+    }
+  } catch (error) {
+    if (error instanceof CustomError) {
+      throw error;
+    }
+    throw new CustomError(apiError.API_CALL_FAILED, error?.message);
+  }
+}

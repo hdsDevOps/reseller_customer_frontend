@@ -61,9 +61,9 @@ const SelectedDomain: React.FC = () => {
     try {
       const newCart = cart;
       const addCart = {
-        domain: `${domain?.domain}${domain?.domain_extension}`,
+        product_name: `${domain?.domain}${domain?.domain_extension}`,
         product_type: "Domain",
-        price: "$99.99",
+        price: "99.99",
         payment_cycle: "yearly",
         total_year: "1"
       }

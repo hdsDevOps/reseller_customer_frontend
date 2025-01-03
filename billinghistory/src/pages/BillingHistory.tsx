@@ -1,67 +1,264 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { FaDownload } from "react-icons/fa6";
 import { TiExportOutline } from "react-icons/ti";
 // import PaymentModal from "../components/PaymentModal";
 import DateSearch from "../components/DateSearch";
+// import html2canvas from "html2canvas";
+import html2canvas from 'html2canvas-pro';
+import jsPDF from "jspdf";
+import { useReactToPrint } from 'react-to-print';
+import html2pdf from 'html2pdf.js'
+import BillingInvoice from "../components/BillingInvoice";
+import './invoice.css';
+import { getBillingHistoryThunk, getDomainsListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import { useNavigate } from "react-router-dom";
+import { addDays, addMonths, endOfMonth, endOfWeek, format, startOfMonth, startOfWeek, subDays } from "date-fns";
+import { DateRangePicker } from "rsuite";
+import "rsuite/dist/rsuite.min.css";
 
-interface BillingDetail {
-  TransactID: string;
-  date_invoice: string;
-  description: string;
-  domain: string;
-  productType: string;
-  amount: string;
-  status: string;
-  invoice: JSX.Element;
-  paymentMethod: string | null;
+interface RangeType<T> {
+  label: string;
+  value: [T, T] | ((value: T[]) => [T, T]);
+  placement?: string;
+  closeOverlay?: boolean;
+  appearance?: string;
 }
 
+const predefinedRanges: RangeType<Date>[] = [
+  { label: "Today", value: [new Date(), new Date()], placement: "left" },
+  {
+    label: "Yesterday",
+    value: [addDays(new Date(), -1), addDays(new Date(), -1)],
+    placement: "left",
+  },
+  {
+    label: "This week",
+    value: [startOfWeek(new Date()), endOfWeek(new Date())],
+    placement: "left",
+  },
+  {
+    label: "Last week",
+    value: [subDays(new Date(), 6), new Date()],
+    placement: "left",
+  },
+  {
+    label: "This month",
+    value: [startOfMonth(new Date()), new Date()],
+    placement: "left",
+  },
+  {
+    label: "Last month",
+    value: [
+      startOfMonth(addMonths(new Date(), -1)),
+      endOfMonth(addMonths(new Date(), -1)),
+    ],
+    placement: "left",
+  },
+  {
+    label: "This year",
+    value: [new Date(new Date().getFullYear(), 0, 1), new Date()],
+    placement: "left",
+  },
+  {
+    label: "Last year",
+    value: [
+      new Date(new Date().getFullYear() - 1, 0, 1),
+      new Date(new Date().getFullYear(), 0, 0),
+    ],
+    placement: "left",
+  },
+  {
+    label: "All time",
+    value: [new Date(new Date().getFullYear() - 1, 0, 1), new Date()],
+    placement: "left",
+  },
+];
+
 const BillingHistory: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { customerId } = useAppSelector(state => state.auth);
+  const domainRef = useRef();
   const [isOpen, setIsOpen] = useState(false);
+  const pdfRef = useRef<HTMLDivElement>(null);
+  const invoiceRef = useRef<HTMLDivElement>(null);
+  const [pdfDownload, setPdfDownload] = useState('hidden');
+  const [domains, setDomains] = useState([]);
+  console.log(domains)
+  const [selectedDomain, setSelectedDomain] = useState("");
+  const [search, setSearch] = useState("");
+  const [domainDropdownOpen, setDomainDropdownOpen] = useState(false);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
+  
+  const getDomainsList = async() => {
+    try {
+      const result = await dispatch(getDomainsListThunk({customer_id: customerId})).unwrap();
+      setDomains(result?.data);
+    } catch (error) {
+      setDomains([]);
+      if(error?.message == "Authentication token is required") {
+        try {
+          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    }
+  };
 
-  const BillingDetails: BillingDetail[] = [
-    {
-      TransactID: "6611**1b36",
-      date_invoice: "Jan 30 2024",
-      description: "Google Workspace starter",
-      domain: "examplepetstore.com",
-      productType: "Google workspace",
-      amount: "₹3.00",
-      status: "Paid",
-      invoice: <FaDownload />,
-      paymentMethod: "...2354",
-    },
-    {
-      TransactID: "3611**1b39",
-      date_invoice: "Jan 30 2024",
-      description: "Purchase Google Domain",
-      domain: "example-pet-store.com",
-      productType: "Google domain",
-      amount: "₹648.00",
-      status: "Paid",
-      invoice: <FaDownload />,
-      paymentMethod: "...2354",
-    },
-    {
-      TransactID: "7611**1b86",
-      date_invoice: "Jan 30 2024",
-      description: "Purchase Google <br /> Workspace standard plan & 2 domains",
-      domain: "myownpersonaldomain.com, schemaphic.com",
-      productType: "Google workspace + domain",
-      amount: "₹648.00",
-      status: "Paid",
-      invoice: <FaDownload />,
-      paymentMethod: "...2354",
-    },
-  ];
+  useEffect(() => {
+    getDomainsList();
+  }, []);
 
+  
+  const handleClickOutside = (event: MouseEvent) => {
+    if(domainRef.current && !domainRef.current.contains(event.target as Node)) {
+      setDomainDropdownOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    if(domains.length > 0 && search !== "") {
+      setDomainDropdownOpen(true);
+    }
+  }, [domains, search]);
+
+  const [range, setRange] = useState<[Date | null, Date | null]>([null, null]);
+  // console.log("range...", range);
+  
+  const handleChange = (value: [Date | null, Date | null]) => {
+    setRange(value);
+  };
+
+  const renderValue = (date: [Date, Date]) => {
+    if (!date[0] || !date[1]) return "Select Date Range";
+    return `${format(date[0], 'MMM d')} - ${format(date[1], 'MMM d, yyyy')}`;
+  };
+
+  const formatDate2 = (datee) => {
+
+    const date = new Date(datee);
+    // const date = new Date();
+
+    const formattedDate = format(date, "yyyy-MM-dd");
+    return formattedDate;
+  };
+
+  const [BillingDetails, setBillingDetails] = useState([]);
+  // console.log("billing details...", BillingDetails);
+
+  const getBillingHistoryData = async() => {
+    try {
+      const result = await dispatch(getBillingHistoryThunk({
+        user_id: customerId,
+        start_date: range[0] === null ? "" : formatDate2(range[0]),
+        end_date: range[1] === null ? "" : formatDate2(range[1]),
+        domain: selectedDomain
+      })).unwrap();
+      setBillingDetails(result?.data);
+    } catch (error) {
+      setBillingDetails([]);
+      if(error?.message == "Authentication token is required") {
+        try {
+          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    getBillingHistoryData();
+  }, [range, selectedDomain]);
+
+  const formatDate = (seconds, nanoseconds) => {
+    const miliseconds = parseInt(seconds) * 1000 + parseInt(nanoseconds) / 1e6;
+
+    const date = new Date(miliseconds);
+    // const date = new Date();
+
+    const formattedDate = format(date, "MMM dd, yyyy, h:mm:ss a");
+    return formattedDate;
+  };
+
+  const exportPdf = async() => {
+    const element = await pdfRef.current;
+    console.log("element...", element);
+
+    if(element) {
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true
+      });
+      console.log(canvas);
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+
+      const imgWidth = canvas.width / 2;
+      const imgHeight = canvas.height / 2;
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const finalWidth = imgWidth * ratio;
+      const finalHeight = imgHeight * ratio;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, finalWidth, finalHeight);
+
+      pdf.save('revenue.pdf');
+    } else {
+      console.log("No element found.");
+    }
+  };
+
+  const downloadInvoice = async() => {
+    await setPdfDownload("hidden-for-pdf");
+    const element = invoiceRef.current;
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,  // Allow CORS requests for images
+      allowTaint: true, 
+    });
+    const imgData = canvas.toDataURL('image/png');
+
+    if (imgData.startsWith('data:image/png;base64,')) {
+      const pdf = new jsPDF('p', 'mm', 'a4');
+
+      const fixedPdfWidth = 80;
+      const imgWidth = canvas.width / 2;
+      const imgHeight = canvas.height / 2;
+
+      const aspectRatio = imgHeight / imgWidth;
+      const adjustedHeight = fixedPdfWidth * aspectRatio;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, fixedPdfWidth, adjustedHeight);
+
+      pdf.save('invoice.pdf');
+    } else {
+      console.error("Image data is invalid or empty", imgData);
+    }
+
+    setPdfDownload('hidden');
+  };
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 bg-white z-1">
       <div className="flex flex-col gap-1 mb-6">
         <h1 className="text-green-500 text-3xl font-medium">Billing History</h1>
         <p className="text-gray-900 text-sm">
@@ -71,38 +268,67 @@ const BillingHistory: React.FC = () => {
       </div>
       <div className="flex flex-col sm:flex-col md:flex-row  gap-4  justify-between p-4 bg-gray-100">
         <div className="flex flex-col sm:flex-col md:flex-row   gap-4">
-          <DateSearch />
-          <div className="relative align-self-start">
-            <select
-              className="border border-transparent bg-transparent text-gray-700 p-2 pr-8 appearance-none focus:outline-none focus:ring-1 focus:ring-green-500 w-80"
-              onClick={toggleDropdown}
-            >
-              <option value="" disabled selected hidden>
-                Auto search domain list
-              </option>
-              <option value="option1" className="text-gray-300">
-                Robertclive@schemaphic.com
-              </option>
-              <option value="option2" className="text-gray-300">
-                Robertclive@domain.co.in
-              </option>
-              <option value="option3" className="text-gray-300">
-                Robertclive@hordanso.com
-              </option>
-            </select>
+          <DateRangePicker
+            ranges={predefinedRanges}
+            placeholder="Select Date Range"
+            style={{ width: 200 }}
+            onChange={handleChange}
+            value={range}
+            showHeader={false}
+            renderValue={renderValue} // Custom render for the selected value
+          />
+          <div className="relative align-self-start" ref={domainRef}>
+            <input
+              type='text'
+              className='border border-transparent bg-transparent text-gray-700 p-2 pr-8 appearance-none focus:outline-none focus:ring-1 focus:ring-green-500 w-80'
+              placeholder="Auto search domain list"
+              name='serach'
+              onChange={e => {
+                setSelectedDomain("");
+                setSearch(e.target.value);
+              }}
+              value={selectedDomain || search}
+              onFocus={() => {setDomainDropdownOpen(true)}}
+              cypress-name="city_input"
+            />
             <IoIosArrowDown
               className={`absolute right-3 top-1/2 transform -translate-y-1/2 transition-transform ${
-                isOpen ? "rotate-180" : ""
+                domainDropdownOpen ? "rotate-180" : ""
               }`}
               onClick={toggleDropdown}
             />
+            {
+              domainDropdownOpen && (
+                <div className='w-full absolute mt-1 bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+                  {
+                    domains?.filter(name => name?.domain_name.toLowerCase().includes(search.toLowerCase())).map((domain, idx) => (
+                      <p
+                        key={idx}
+                        className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                        onClick={() => {
+                          setSelectedDomain(domain?.domain_name);
+                          setSearch("");
+                          setDomainDropdownOpen(false);
+                        }}
+                        dropdown-name="city-dropdown"
+                      >{domain?.domain_name}</p>
+                    ))
+                  }
+                </div>
+              )
+            }
           </div>
         </div>
         <div className="flex items-center gap-0">
           
-          <button className="text-green-500 border-2 border-green-500 rounded-md p-2 hover:bg-green-200 transition flex items-center gap-2" style={{
-            backgroundColor:"#A7F3D0",
-          }}>
+          <button
+            className="text-green-500 border-2 border-green-500 rounded-md p-2 hover:bg-green-200 transition flex items-center gap-2"
+            style={{
+              backgroundColor:"#A7F3D0",
+            }}
+            type="button"
+            onClick={() => {exportPdf()}}
+          >
             <TiExportOutline className="text-green-500 text-xl rotate-180" />
             Export
           </button>
@@ -110,7 +336,7 @@ const BillingHistory: React.FC = () => {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full">
+        <table className="min-w-[1360px] w-full" ref={pdfRef}>
           <thead>
             <tr className="bg-gray-100">
               {[
@@ -134,60 +360,71 @@ const BillingHistory: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {BillingDetails.map((detail, index) => (
-              <React.Fragment key={index}>
-                <tr className="text-xs text-gray-400">
-                  <td className="px-2 pb-10 pt-3 text-center text-green-500">
-                    {detail.TransactID}
-                  </td>
-                  <td className="px-2 pb-10 pt-3 text-center flex items-center flex-col">
-                    {detail.date_invoice}
-                    <small className="text-green-500 text-xs">12309864</small>
-                  </td>
-                  <td className="px-2 pb-10 pt-3 text-center">
-                    {detail.productType}
-                  </td>
-                  <td className="px-2 pb-10 pt-3 text-center">
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: detail.description.replace(
-                          /<br\s*\/?>/gi,
-                          "<br />"
-                        ),
-                      }}
-                    />
-                  </td>
-
-                  <td className="px-2 pb-10 pt-3 text-center">
-                    {detail.domain}
-                  </td>
-
-                  <td className="px-2 pb-10 pt-3 text-center">
-                    <span className="flex items-center justify-center">
-                      <img
-                        src="/images/visa.png"
-                        alt="Visa"
-                        className="h-4 mr-1"
-                      />
-                      <span className="text-[0.75rem] text-gray-600 font-semibold">
-                        {detail.paymentMethod}
-                      </span>
-                    </span>
-                  </td>
-                  <td className="px-2 pb-10 pt-3 text-center">
-                    <button className="bg-green-500 text-white hover:bg-opacity-95 w-[80px] h-[30px] rounded">
-                      {detail.status}
-                    </button>
-                  </td>
-                  <td className="px-2 pb-10 pt-3 text-center text-green-500">
-                    {detail.amount}
-                  </td>
-                  <td className="px-2 pb-10 pt-3 cursor-pointer flex items-center justify-center text-green-500 text-xl">
-                    {detail.invoice}
-                  </td>
+            {
+              BillingDetails?.length > 0 ? (BillingDetails?.map((detail, index) => (
+                <React.Fragment key={index}>
+                  <tr className="text-xs text-gray-400">
+                    <td className="px-2 pb-10 pt-3 text-center text-green-500">
+                      {detail?.transaction_id}
+                    </td>
+                    <td className="px-2 pb-10 pt-3 text-center flex items-center flex-col" style={{width: '180px'}}>
+                      {formatDate(detail?.created_at?._seconds, detail?.created_at?._nanoseconds)}
+                      <small className="text-green-500 text-xs">{detail?.inovoice}</small>
+                    </td>
+                    <td className="px-2 pb-10 pt-3 text-center" style={{width: '180px'}}>
+                      {detail?.production_type}
+                    </td>
+                    <td className="px-2 pb-10 pt-3 text-center">
+                      {detail?.description}
+                    </td>
+  
+                    <td className="px-2 pb-10 pt-3 text-center">
+                      {detail?.domain}
+                    </td>
+  
+                    <td className="px-2 pb-10 pt-3 text-center">
+                      {/* <span className="flex items-center justify-center">
+                        <img
+                          src="/images/visa.png"
+                          alt="Visa"
+                          className="h-4 mr-1"
+                        />
+                        <span className="text-[0.75rem] text-gray-600 font-semibold">
+                          {detail.paymentMethod}
+                        </span>
+                      </span> */}
+                      {detail?.payment_method}
+                    </td>
+                    <td className="px-2 pb-10 pt-3 text-center">
+                      <button className="bg-green-500 text-white hover:bg-opacity-95 w-[80px] h-[30px] rounded">
+                        {detail?.payment_status}
+                      </button>
+                    </td>
+                    <td className="px-2 pb-10 pt-3 text-center text-green-500">
+                      {detail?.amount}
+                    </td>
+                    <td className="px-2 cursor-pointer flex items-center justify-center align-middle py-auto text-green-500 text-xl">
+                      <button
+                        type="button"
+                        className="mt-auto text-lg text-custom-green  flex items-center justify-center align-middle "
+                        onClick={() => {downloadInvoice()}}
+                        // disabled={!rolePermissionsSlice?.billing_history?.download ? true : false}
+                        cypress-name="invoice_download"
+                      >
+                        <FaDownload />
+                      </button>
+                      <div className={pdfDownload}>
+                        <BillingInvoice pdfRef={invoiceRef} data={detail} />
+                      </div>
+                    </td>
+                  </tr>
+                </React.Fragment>
+              ))) : (
+                <tr>
+                  <td colSpan={10}>No Data Available</td>
                 </tr>
-              </React.Fragment>
-            ))}
+              )
+            }
           </tbody>
         </table>
       </div>

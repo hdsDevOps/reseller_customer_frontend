@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from "react";
 import BusinessEmail from "../components/BusinessEmail";
 import SubscriptionModal from "../components/SubscriptionModal";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import { getDomainsListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
+import { Plus } from "lucide-react";
 
 const Dashboard: React.FC = () => {
   const location = useLocation();
+  const dispatch = useAppDispatch();
+  const { customerId, userDetails } = useAppSelector(state => state.auth);
+  const navigate = useNavigate();
   useEffect(() => {
     if(location.state) {
       console.log(location.state);
@@ -17,6 +23,53 @@ const Dashboard: React.FC = () => {
     }
   }, []);
   const [isSubscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
+
+  const [selectedDomain, setSelectedDomain] = useState({});
+  // console.log("selectedDomain...", selectedDomain);
+  console.log("userDetails...", userDetails);
+  const [activeStatus, setActiveStatus] = useState<Boolean>(false);
+
+  useEffect(() => {
+    const checkDate = () => {
+      if(userDetails?.workspace) {
+        const miliseconds = parseInt(userDetails?.workspace?.next_payment?._seconds) * 1000 + parseInt(userDetails?.workspace?.next_payment?._nanoseconds) / 1e6;
+        const date = new Date(miliseconds);
+        const today = new Date();
+        if(today < date) {
+          setActiveStatus(true);
+        } else {
+          setActiveStatus(false);
+        }
+      } else {
+        setActiveStatus(false);
+      }
+    };
+
+    checkDate();
+  }, [userDetails]);
+
+  const getDomainsList = async() => {
+    try {
+      const result = await dispatch(getDomainsListThunk({customer_id: customerId})).unwrap();
+      if(result?.data) {
+        result?.data?.find((item) => item?.domain_type === "primary" ? setSelectedDomain(item) : null);
+      }
+    } catch (error) {
+      setSelectedDomain({});
+      if(error?.message == "Authentication token is required") {
+        try {
+          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    }
+  }
+
+  useEffect(() => {
+    getDomainsList();
+  }, []);
 
   return (
     <div>
@@ -96,10 +149,29 @@ const Dashboard: React.FC = () => {
             </tbody>
           </table>
         </div>
-        <div className="">
-          <BusinessEmail />
-        </div>
-        <SubscriptionModal isOpen={isSubscriptionModalOpen} onClose={() => setSubscriptionModalOpen(false)} />
+        {
+          activeStatus ? (
+            <React.Fragment>
+              <div className="">
+                <BusinessEmail data={selectedDomain} getDomainsList={getDomainsList} />
+              </div>
+              <SubscriptionModal isOpen={isSubscriptionModalOpen} onClose={() => setSubscriptionModalOpen(false)} />
+            </React.Fragment>
+          ) : (
+            <div className="my-[10px] w-full bg-[#F8F7F7] rounded-[10px] drop-shadow-custom py-2 pb-4 px-4 flex flex-col">
+              <h3 className="font-inter font-medium small:text-[28px] text-xl text-black text-nowrap">Add Subscription</h3>
+              <p className="font-inter font-normal small:text-base text-sm text-black w-full pt-1 pb-3 border-b-2 border-black drop-shadow-custom">It seems you don’t have subscriptions</p>
+              <button
+                type="button"
+                className="max-w-[220px] bg-[#12A833] rounded-[10px] font-plus-jakarta-sans font-bold small:text-base text-sm text-white gap-1 items-center flex justify-center small:px-4 px-1 py-2 mt-3 mb-2"
+                onClick={() => {navigate('/upgrade-plan')}}
+              >
+                <Plus />
+                <span>Add Subscription</span>
+              </button>
+            </div>
+          )
+        }
       </main>
     </div>
   );

@@ -111,7 +111,7 @@ const Sidebar = () => {
     <aside
       className={`fixed h-full sm:max-h-screen top-0 left-0 transition-all duration-300 ease-in-out bg-[#F0F0F0] text-black shadow-md flex flex-col ${
         isOpen ? "max-w-64 sm-max:max-w-64" : "max-w-20"
-      } lg:max-w-64 w-full z-40`}
+      } lg:max-w-64 w-full z-20`}
     >
       <div className="flex items-center relative p-4">
         <button

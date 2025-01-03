@@ -46,5 +46,11 @@ declare module 'store/authSlice' {
 declare module 'store/user.thunk' {
   export const getDomainsListThunk;
   export const removeUserAuthTokenFromLSThunk;
+  export const changeEmailStatusThunk;
+  export const deleteEmailThunk;
+  export const makeEmailAdminThunk;
+  export const updateEmailUserDataThunk;
+  export const resetEmailPasswordThunk;
+  export const updateLicenseUsageThunk;
   // Add more thunk declarations as needed
 }

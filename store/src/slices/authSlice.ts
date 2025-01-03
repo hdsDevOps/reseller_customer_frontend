@@ -15,6 +15,8 @@ export interface UserDetailsState {
   token: string | null;
   customerId: string | null;
   resellerToken: string | null;
+  cartState: [];
+  domainsState: [];
 }
 
 const initialState: UserDetailsState = {
@@ -24,6 +26,8 @@ const initialState: UserDetailsState = {
   token: '',
   customerId:'',
   resellerToken: '',
+  cartState: [],
+  domainsState: [],
 };
 
 const authSlice = createSlice({
@@ -38,6 +42,12 @@ const authSlice = createSlice({
     },
     setCustomerId: (state, action: PayloadAction<any>) => {
       state.customerId = action.payload;
+    },
+    setCart: (state, action: PayloadAction<any>) => {
+      state.cartState = action.payload;
+    },
+    setDomains: (state, action: PayloadAction<any>) => {
+      state.domainsState = action.payload;
     },
     setUserAuthStatus: (state, action: PayloadAction<'AUTHORIZED' | 'UN_AUTHORIZED' | 'PENDING' | 'UPGRADE'>) => {
       state.userAuthStatus = action.payload;
@@ -101,6 +111,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setTokenDetails, setUserDetails, setUserAuthStatus,  setResellerToken, resetUserSlice } = authSlice.actions;
+export const { setTokenDetails, setUserDetails, setUserAuthStatus,  setResellerToken, resetUserSlice, setCart,setDomains } = authSlice.actions;
 
 export default authSlice.reducer;

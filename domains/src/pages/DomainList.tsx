@@ -5,18 +5,24 @@ import EmailModal from './EmailModal';
 import ActionModal from '../components/ActionModal';
 import "../domain.css";
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { getDomainsListThunk, removeUserAuthTokenFromLSThunk } from 'store/user.thunk';
+import { getDomainsListThunk, removeUserAuthTokenFromLSThunk, addEmailsThunk, cancelDomainThunk } from 'store/user.thunk';
 import { initialState } from 'store/authSlice';
 import { toast } from 'react-toastify';
-import { addEmailsThunk } from 'store/reseller.thunk';
+import { HiOutlineEye } from 'react-icons/hi';
+import { RiEyeCloseLine } from 'react-icons/ri';
 
 const intialEmail = {
-    user_id:"",
-    domain_id:"",
-    first_name:"",
-    last_name:"",
-    email:"",
-    password:""
+  first_name:"",
+  last_name:"",
+  email:"",
+  phone_no: "",
+  address: "",
+  country: "",
+  state: "",
+  city: "",
+  password:"",
+  status: true,
+  role: "User"
 }
 
 const DomainList: React.FC = () => {
@@ -30,14 +36,24 @@ const DomainList: React.FC = () => {
   const [actionModalStyle, setActionModalStyle] = useState<React.CSSProperties | null>(null);
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [domainsList, setDomainsList] = useState([]);
-  console.log("domainsList...", domainsList);
+  // console.log("domainsList...", domainsList);
   const [emailsList, setEmailsList] = useState([intialEmail]);
-  console.log("emailList...", emailsList);
+  // console.log("emailList...", emailsList);
   const [licenseUsage, setLicenseUsage] = useState(0);
   const [domainId, setDomainId] = useState("");
   const [showList, setShowList] = useState("");
   const listRef = useRef(null);
   const modalRef = useRef(null);
+  const [newEmails, setNewEmails] = useState([]);
+  // console.log("newEmails...", newEmails);
+  const [newEmailsCount, setNewEmailsCount] = useState(0);
+  // console.log(newEmailsCount);
+  const [passwordVisible, setPasswordVisible ] = useState([]);
+  const togglePasswordVisibilty = (index) => {
+    setPasswordVisible((prevState) =>
+      prevState.map((visibility, i) => (i === index ? !visibility : visibility))
+    );
+  }
 
   const showListTable = [
     { label: "Update payment method", },
@@ -66,35 +82,38 @@ const DomainList: React.FC = () => {
     ]
   };
 
-  const onClickTableList = (e, label:string) => {
+  const onClickTableList = (e, label:string, id: string) => {
     if(label === "Update payment method") {
       navigate('/payment-method');
     } else if(label === "Cancel Domain") {
       setIsActionModalOpen(true);
       setActionModalType("Cancel");
+      setDomainId(id);
     } else if(label === "Transfer Domain") {
       setIsActionModalOpen(true);
       setActionModalType("Transfer");
+      setDomainId(id);
+    }
+  };
+
+  const getDomainsList = async() => {
+    try {
+      const result = await dispatch(getDomainsListThunk({customer_id: customerId})).unwrap();
+      setDomainsList(result?.data);
+    } catch (error) {
+      setDomainsList([]);
+      if(error?.message == "Invalid token") {
+        try {
+          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
     }
   }
 
   useEffect(() => {
-    const getDomainsList = async() => {
-      try {
-        const result = await dispatch(getDomainsListThunk({customer_id: customerId})).unwrap();
-        setDomainsList(result?.data);
-      } catch (error) {
-        setDomainsList([]);
-        if(error?.message == "Invalid token") {
-          try {
-            const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
-            navigate('/login');
-          } catch (error) {
-            //
-          }
-        }
-      }
-    }
     getDomainsList();
   }, []);
 
@@ -116,7 +135,8 @@ const DomainList: React.FC = () => {
 
   const handleClickOutsideOfModal = e => {
     if(modalRef.current && !modalRef.current.contains(e.target)) {
-      setShowList("");
+      setIsModalOpen(false);
+      setDomainId("");
     }
   };
 
@@ -141,7 +161,7 @@ const DomainList: React.FC = () => {
   };
 
   const handleEmailDataChange = (index, field, value) => {
-    setEmailsList((prev) => {
+    setNewEmails((prev) => {
       const array = [...prev];
       array[index] = {
         ...array[index],
@@ -152,24 +172,31 @@ const DomainList: React.FC = () => {
   };
 
   const handleDeleteEmail = (index) => {
-    if(emailsList.length === 1) {
-      setEmailsList([intialEmail]);
+    if(newEmails.length === 1) {
+      setNewEmails([]);
+      setPasswordVisible([]);
     } else {
-      setEmailsList(prev => prev.filter((_, i) => i !== index));
+      setNewEmails(prev => prev.filter((_, i) => i !== index));
+      setPasswordVisible(prev => prev.filter((_, i) => i !== index));
     }
   };
 
   const handleEmailSubmit = async(e) => {
     // e.preventDeault();
+    console.log({
+      user_id: customerId,
+      domain_id: domainId,
+      emails: newEmails
+    })
     try {
       const result = await dispatch(addEmailsThunk({
         user_id: customerId,
         domain_id: domainId,
-        emails: emailsList
+        emails: newEmails
       })).unwrap();
-      console.log("result...", result);
+      toast.success(result?.message);
     } catch (error) {
-      toast.error("Error updating emails");
+      toast.error("Error adding email");
       if(error?.message == "Authentication token is required") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -178,13 +205,51 @@ const DomainList: React.FC = () => {
           //
         }
       }
+    } finally {
+      getDomainsList();
+      setIsModalOpen(false);
+      setDomainId("");
+      setNewEmails([]);
+      setNewEmailsCount(0);
+      setLicenseUsage(0);
+      setPasswordVisible([]);
     }
   };
+
+  const handleModalSubmit = async(e) => {
+    e.preventDefault();
+    try {
+      if(actionModalType === "Cancel") {
+        const result = await dispatch(cancelDomainThunk({domain_id: domainId})).unwrap();
+        console.log("result...", result);
+        setIsActionModalOpen(false);
+      } else if(actionModalType === "Transfer") {
+        //
+        setIsActionModalOpen(false);
+      } else {
+        toast.error("Error");
+      }
+    } catch (error) {
+      toast.error(actionModalType === "Cancel" ? "Error cancelling domain" : actionModalType === "Transfer" ? "Error transfering domain" : "");
+      if(error?.message == "Authentication token is required") {
+        try {
+          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+      setIsActionModalOpen(false);
+    } finally {
+      setDomainId("");
+      getDomainsList();
+    }
+  }
 
   return (
     <div>
       <main>
-        <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-start sm:justify-between w-full">
+        <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between w-full">
           <div className="text-sm text-green-500 sm:text-lg md:text-2xl">Domain</div>
           <div className="flex gap-2 md:gap-8">
             <Link
@@ -206,16 +271,19 @@ const DomainList: React.FC = () => {
           {
             domainsList.length > 0 ? (
               domainsList?.map((domain, index) => (
-                <div key={index} className="flex flex-col bg-gray-100 rounded-sm w-full p-4">
+                <div key={index} className="flex flex-col bg-gray-100 rounded-sm w-full p-4 relative">
                   <div className="flex min-[500px]:flex-row flex-col items-center justify-between mb-4">
-                    <h3 className="text-gray-600 font-semibold text-xl md:text-lg sm-max:text-xs self-start">{domain?.domain_name}</h3>
+                    <h3 className="text-gray-600 font-semibold text-xl md:text-lg sm-max:text-xs self-start" style={{wordBreak: 'break-word', wordWrap: 'break-word', overflowWrap: 'break-word'}}>{domain?.domain_name}</h3>
                     <button
                       className="px-4 py-2 md:px-3 sm-max:px-2 sm-max:text-xs bg-green-600 text-white font-medium rounded-md hover:bg-opacity-90"
                       onClick={() => {
                         setIsModalOpen(true);
-                        setEmailsList(domain?.emails?.length > 0 ? domain?.emails : [intialEmail]);
+                        setNewEmailsCount(
+                          domain?.emails?.length > 0 ? parseInt(domain?.license_usage) - domain?.emails?.length : parseInt(domain?.license_usage)
+                        );
                         setLicenseUsage(domain?.license_usage);
-                        setDomainId(domain?.id)
+                        setDomainId(domain?.id);
+                        setEmailsList(domain?.emails ? domain?.emails : []);
                       }}
                     >
                       Add Emails
@@ -244,7 +312,7 @@ const DomainList: React.FC = () => {
                                 )
                               } else if (row === "button") {
                                 return (
-                                  <td className="p-2 text-center w-[8%] relative" key={index}>
+                                  <td className="p-2 text-center w-[8%]" key={index}>
                                     <button
                                       type='button'
                                       className="w-6 h-6"
@@ -264,7 +332,7 @@ const DomainList: React.FC = () => {
                                                 <li
                                                   className='font-roboto font-medium text-[14px] text-[#222222] p-1 cursor-pointer'
                                                   key={idx}
-                                                  onClick={(e) => {onClickTableList(e, list.label)}}
+                                                  onClick={(e) => {onClickTableList(e, list.label, domain?.id)}}
                                                 >{list.label}</li>
                                               ))
                                             }
@@ -308,18 +376,19 @@ const DomainList: React.FC = () => {
       {
         isModalOpen && (
           <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50 z-50">
-            <div className="bg-gray-100 rounded-xl shadow-md p-6 w-11/12 max-w-3xl relative">
+            <div className="bg-gray-100 rounded-xl shadow-md p-6 w-11/12 max-w-3xl relative" ref={modalRef}>
               <div className="flex items-center justify-between mb-4">
                 <h1 className="text-2xl font-bold">Add Email</h1>
                 <div className="flex items-center">
-                  <p className="text-sm text-green-500 mr-1">Add {emailsList?.length}/{licenseUsage}</p>
+                  <p className="text-sm text-green-500 mr-1">Add {(emailsList?.length + newEmails.length)}/{licenseUsage}</p>
                   <button
                     aria-label="Add Email"
                     className="text-green-500"
                     type='button'
                     onClick={() => {
-                      if(emailsList?.length < licenseUsage) {
-                        setEmailsList([...emailsList, intialEmail])
+                      if((emailsList?.length + newEmails.length) < licenseUsage) {
+                        setNewEmails([...newEmails, intialEmail])
+                        setPasswordVisible([...passwordVisible, false]);
                       } else {
                         toast.warning("You have reached your maximum license usage.")
                       }
@@ -331,7 +400,7 @@ const DomainList: React.FC = () => {
               </div>
               <div className='w-full max-h-[500px] overflow-y-auto flex flex-col gap-5'>
                 {
-                  emailsList?.map((email, index) => (
+                  newEmails?.map((email, index) => (
                     <div className="flex" key={index}>
                       <div className="bg-white p-4 rounded-xl shadow-inner flex-grow max-w-2xl border">
                         <div className="grid grid-cols-2 gap-4">
@@ -386,9 +455,11 @@ const DomainList: React.FC = () => {
                           <div className="relative col-span-2">
                             <input
                               id="password"
-                              // type={passwordVisible ? "text" : "password"}
+                              type={passwordVisible[index] ? "text" : "password"}
                               placeholder="Enter password"
                               className="peer border-2 border-gray-200 rounded-xl p-[.63rem] bg-transparent w-full placeholder-transparent focus:border-blue-500 focus:outline-none"
+                              value={email?.password}
+                              onChange={(e) => {handleEmailDataChange(index, "password", e.target.value)} }
                             />
                             <label
                               htmlFor="password"
@@ -398,17 +469,17 @@ const DomainList: React.FC = () => {
                             </label>
                             <button
                               type="button"
-                              // onClick={() => setPasswordVisible(!passwordVisible)}
-                              // aria-label={
-                              //   passwordVisible ? "Hide Password" : "Show Password"
-                              // }
+                              onClick={() => togglePasswordVisibilty(index)}
+                              aria-label={
+                                passwordVisible[index] ? "Hide Password" : "Show Password"
+                              }
                               className="absolute right-2 top-1/2 transform -translate-y-1/2"
                             >
-                              {/* {passwordVisible ? (
+                              {passwordVisible[index] ? (
                                 <HiOutlineEye size={20} />
                               ) : (
                                 <RiEyeCloseLine size={20} />
-                              )} */}
+                              )}
                             </button>
                           </div>
                         </div>
@@ -443,7 +514,9 @@ const DomainList: React.FC = () => {
                   onClick={() => {
                     setIsModalOpen(false);
                     setDomainId("");
-                    setEmailsList([intialEmail]);
+                    setNewEmails([]);
+                    setPasswordVisible([]);
+                    setNewEmailsCount(0);
                     setLicenseUsage(0);
                   }}
                 >
@@ -468,12 +541,15 @@ const DomainList: React.FC = () => {
               <button 
                 className='font-inter font-semibold text-base text-[#F0F0F3] items-center text-center w-[80px] h-10 rounded-[10px] bg-[#12A833]'
                 type='button'
-                onClick={() => {setIsActionModalOpen(false)}}
+                onClick={(e) => {handleModalSubmit(e)}}
               >Yes</button>
               <button
                 className='font-inter font-semibold text-base text-[#F0F0F3] items-center text-center w-[80px] h-10 rounded-[10px] bg-[#EE1010]'
                 type='button'
-                onClick={() => {setIsActionModalOpen(false)}}
+                onClick={() => {
+                  setIsActionModalOpen(false);
+                  setDomainId("");
+                }}
               >Cancel</button>
             </div>
           </div>

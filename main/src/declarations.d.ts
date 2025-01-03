@@ -62,6 +62,25 @@ declare module 'store/user.thunk' {
   export const getUserAuthTokenFromLSThunk: AsyncThunkAction<UserAuthToken, void, {}>;
   export const checkUserTokenThunk: AsyncThunkAction<CheckUserTokenResult, void, {}>;
   // Add more thunk declarations as needed
+  export const removeUserAuthTokenFromLSThunk;
+  export const getDomainsListThunk;
+  export const addEmailsThunk;
+  
+  export const changeEmailStatusThunk;
+  export const deleteEmailThunk;
+  export const makeEmailAdminThunk;
+  export const updateEmailUserDataThunk;
+  export const resetEmailPasswordThunk;
+  export const updateLicenseUsageThunk;
+  export const plansAndPricesListThunk;
+  export const getProfileDataThunk;
+  export const udpateProfileDataThunk;
+  export const uploadProfilePhotoThunk;
+  export const getCartThunk;
+  export const addToCartThunk;
+  export const getNotificationsListThunk;
+  export const readNotificationThunk;
+  export const toggleNotificationStatusThunk;
 }
 
 declare module 'store/authSlice' {
@@ -69,7 +88,8 @@ declare module 'store/authSlice' {
   import { UserDetailsState } from 'store/authSlice';
 
   export const setTokenDetails: (payload: string) => PayloadAction<string>;
+  export const setUserDetails: (payload: string) => PayloadAction<string>;
   // Other exports
-}
-
+  export const setCart: (payload: string) => PayloadAction<string>;
+  export const setDomains: (payload: string) => PayloadAction<string>;
 }

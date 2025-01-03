@@ -1,25 +1,44 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaTriangleExclamation } from "react-icons/fa6";
 import { FaRegCopy } from "react-icons/fa";
 import { GoChevronDown } from "react-icons/go";
 import VoucherModal from './VoucherModal';
 import "./Voucher.css";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import { useNavigate } from "react-router-dom";
+import { getVouchersListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
 // import '../styles/CustomStyle.css';
 
 const VoucherCard: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { customerId } = useAppSelector(state => state.auth);
   const [isModalOpen, setModalOpen] = useState(false);
-  const voucherList = [
-    {name: "coupon 1", image: "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/coupon-1.jpg?alt=media&token=069a7efa-12c6-4ca3-a156-c1113c7ed6e7"},
-    {name: "coupon 2", image: "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/coupon-2.jpg?alt=media&token=1345dc5f-928e-4987-a7af-5075f9d38f7f"},
-    {name: "coupon 1", image: "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/coupon-1.jpg?alt=media&token=069a7efa-12c6-4ca3-a156-c1113c7ed6e7"},
-    {name: "coupon 2", image: "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/coupon-2.jpg?alt=media&token=1345dc5f-928e-4987-a7af-5075f9d38f7f"},
-    {name: "coupon 1", image: "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/coupon-1.jpg?alt=media&token=069a7efa-12c6-4ca3-a156-c1113c7ed6e7"},
-    {name: "coupon 2", image: "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/coupon-2.jpg?alt=media&token=1345dc5f-928e-4987-a7af-5075f9d38f7f"},
-    {name: "coupon 1", image: "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/coupon-1.jpg?alt=media&token=069a7efa-12c6-4ca3-a156-c1113c7ed6e7"},
-    {name: "coupon 2", image: "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/coupon-2.jpg?alt=media&token=1345dc5f-928e-4987-a7af-5075f9d38f7f"},
-    {name: "coupon 1", image: "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/coupon-1.jpg?alt=media&token=069a7efa-12c6-4ca3-a156-c1113c7ed6e7"},
-    {name: "coupon 2", image: "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/coupon-2.jpg?alt=media&token=1345dc5f-928e-4987-a7af-5075f9d38f7f"},
-  ]
+  const [voucherList, setVouhcerList] = useState([]);
+  console.log("voucher list...", voucherList);
+
+  const getVouchersList = async() => {
+    try {
+      const result = await dispatch(getVouchersListThunk({
+        customer_id: customerId
+      })).unwrap();
+      setVouhcerList(result?.joinedData);
+    } catch (error) {
+      setVouhcerList([]);
+      if(error?.message == "Authentication token is required") {
+        try {
+          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    getVouchersList();
+  }, []);
   const handleOpenModal = () => {
     console.log("Opening modal");
     setModalOpen(true);
@@ -40,17 +59,23 @@ const VoucherCard: React.FC = () => {
           Use your vouchers to build your brand and drive visitors to your site
         </p>
       </div>
-      <div className="flex items-center gap-5 flex-wrap">
+      <div className="flex justify-center items-center gap-5 flex-wrap">
         {
-          voucherList.map((coupon, index) => (
-            <div className="" key={index}>
-              <img
-                src={coupon.image}
-                alt={coupon.name}
-                className="max-w-[300px]"
-              />
-            </div>
-          ))
+          voucherList?.length > 0 && voucherList?.map((coupon, index) => {
+            if(coupon?.status === "active") {
+              return (
+                <div className="max-w-[400px] max-h-[200px] relative w-full items-center" key={index}>
+                  <div className="w-full" dangerouslySetInnerHTML={{__html: coupon?.voucher?.template_details}} />
+                </div>
+              )
+            } else if(coupon?.status === "expired") {
+              return (
+                <div className="max-w-[400px] max-h-[200px] relative w-full items-center" key={index}>
+                  <div className="w-full" dangerouslySetInnerHTML={{__html: coupon?.voucher?.template_details}} />
+                </div>
+              )
+            }
+          })
         }
       </div>
       <VoucherModal isModalOpen={isModalOpen} closeModal={handleCloseModal} />

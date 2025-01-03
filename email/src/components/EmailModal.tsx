@@ -71,9 +71,6 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
                   placeholder=" "
                   className="peer border-2 border-gray-200 rounded-xl p-[.63rem] bg-transparent w-full placeholder-transparent focus:border-blue-500 focus:outline-none"
                 />
-                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">
-                  @domain.co.in
-                </span>
                 <label
                   htmlFor="username"
                   className="absolute bg-white -top-3 left-3 text-gray-500 transition-all duration-300 ease-in-out origin-top-left peer-placeholder-shown:text-gray-400 peer-focus:text-blue-600 peer-focus:text-sm"

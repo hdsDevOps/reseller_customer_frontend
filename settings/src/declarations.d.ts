@@ -1,28 +1,3 @@
-declare module '*.png';
-declare module '*.jpg';
-declare module '*.jpeg';
-declare module '*.gif';
-declare module '*.svg';
-declare module '*.webp';
-
-
-declare module 'react-date-range' {
-  import { ComponentType } from 'react';
-
-  export const DateRangePicker: ComponentType<any>;
-  export const Calendar: ComponentType<any>;
-}
-
-declare module 'rsuite/lib/DateRangePicker' {
-  import { DateRangePickerProps } from 'rsuite';
-  export const DateRangePicker: React.FC<DateRangePickerProps>;
-}
-
-declare module 'rsuite' {
-  import { DateRangePickerProps } from 'rsuite';
-  export const DateRangePicker: React.FC<DateRangePickerProps>;
-}
-
 declare module "store/ReduxProvider" {
   import { ComponentType, PropsWithChildren } from "react";
   const ReduxProvider: ComponentType<PropsWithChildren<{}>>;
@@ -35,11 +10,6 @@ declare module 'store/hooks' {
   
   export const useAppDispatch: () => AppDispatch;
   export const useAppSelector: TypedUseSelectorHook<RootState>;
-}
-
-declare module "store/reseller.thunk" {
-  import { createAsyncThunk } from '@reduxjs/toolkit';
-  export const checkDomainThunk;
 }
 
 declare module 'store/authSlice' {
@@ -67,22 +37,21 @@ declare module 'store/authSlice' {
     setUserAuthStatus: (payload: 'AUTHORIZED' | 'UN_AUTHORIZED' | 'PENDING' | 'UPGRADE') => PayloadAction<'AUTHORIZED' | 'UN_AUTHORIZED' | 'PENDING' | 'UPGRADE'>;
     resetUserSlice: () => PayloadAction<void>;
   }
-  export const setDomains: (payload: string) => PayloadAction<string>;
-  export const setCart: (payload: string) => PayloadAction<string>;
 
   export default authSlice.reducer;
 }
 
+
+
 declare module 'store/user.thunk' {
-  export const addNewDomainThunk;
   export const removeUserAuthTokenFromLSThunk;
-  export const getCartThunk;
-  export const addToCartThunk;
-  export const getPaymentMethodsThunk;
-  export const makeDefaultPaymentMethodThunk;
-  export const getPaymentSubscriptionsListThunk;
-  export const addSubscriptionThunk;
-  export const getDomainsListThunk;
-  export const getVouchersListThunk;
+  export const getStaffListThunk;
+  export const addStaffThunk;
+  export const editStaffThunk;
+  export const deleteStaffThunk;
+  export const getSettingsListThunk;
+  export const addSettingThunk;
+  export const editSettingThunk;
+  export const deleteSettingThunk;
   // Add more thunk declarations as needed
 }

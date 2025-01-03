@@ -65,7 +65,9 @@ module.exports = (_, argv) => ({
     new ModuleFederationPlugin({
       name: "billinghistory",
       filename: "remoteEntry.js",
-      remotes: {},
+      remotes: {
+				store: `store@${process.env.STORE_BASE_URL || 'http://localhost:3030'}/remoteEntry.js`,
+			},
       exposes: {
         "./HistoryApp": "./src/pages/index.tsx",
       },

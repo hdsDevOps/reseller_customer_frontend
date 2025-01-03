@@ -52,5 +52,6 @@ declare module 'store/user.thunk' {
   export const addEmailsThunk;
   export const getCartThunk;
   export const addToCartThunk;
+  export const cancelDomainThunk;
   // Add more thunk declarations as needed
 }

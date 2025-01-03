@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
@@ -12,24 +12,23 @@ import EmailApp from "email/EmailApp";
 import PlanCard from "./PlanCards";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from "react-toastify";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import { getProfileDataThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
 
 const Dashboard = React.lazy(() => import("./Dashboard"));
 const routes = [
   { path: "/", element: <Dashboard /> },
   { path: "/dashboard", element: <Dashboard /> },
   { path: "/upgrade-plan/*", element: <PlanCard /> },
+  { path: "/profile", element: <HdsProfile /> },
 ];
 
 const MainApp: React.FC = () => {
-  const [showProfile,setShowProfile] = useState<boolean>(false);
   return (
   <div className="main-wrapper">
     <ToastContainer />
-    <Header onSetShowProfile={setShowProfile} />
+    <Header />
     <div className="content-body relative min-h-screen pl-[5.2rem] lg:pl-[17rem] pt-[6rem] pr-[0.8rem] pb-4">
-    {
-        showProfile && <HdsProfile setShowProfile={setShowProfile}/>
-      }
       <Routes>
         {routes.map((route, index) => (
           <Route key={index} path={route.path} element={route.element} />

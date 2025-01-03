@@ -32,7 +32,7 @@ const BuyDomain: React.FC = () => {
       console.log("check domain result...", result);
       if(result?.message === "Customer domain is Already Registered with a Google Workspace") {
         navigate('/choose-domain', {state: {result, domain}});
-      } else if(result?.message === "Domain is Still Available for Purchase , doesn't belong to anyone yet") {
+      } else if(result?.message === "Domain is Still Available for Purchase , doesn't belong to anyone yet" || result?.message === "Customer domain is Available to be used with a google workspace") {
         navigate('/domain-details', {state: {result, domain}});
       }
       // navigate('/choose-domain', {state: {result, domain}});

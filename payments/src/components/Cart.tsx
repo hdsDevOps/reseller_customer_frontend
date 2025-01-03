@@ -8,16 +8,10 @@ import { BiSolidCheckShield } from "react-icons/bi";
 import { MdClose, MdOutlineAddShoppingCart } from "react-icons/md";
 import { cartItems, recommendations } from "../utils/Utils";
 import "./Cart.css";
-import { addNewDomainThunk, getCartThunk, removeUserAuthTokenFromLSThunk } from 'store/user.thunk';
+import { addNewDomainThunk, addToCartThunk, getCartThunk, getVouchersListThunk, removeUserAuthTokenFromLSThunk } from 'store/user.thunk';
 import { useAppDispatch, useAppSelector } from "store/hooks";
-
-// Sample vouchers
-const vouchers = [
-  { code: "HORD6290", discount: 8.6 },
-  { code: "HORD6190", discount: 4.6 },
-  { code: "HORD6390", discount: 5.6 },
-  { code: "HORD6490", discount: 9.6 },
-];
+import { toast } from "react-toastify";
+import { setCart } from "store/authSlice";
 
 interface Voucher {
   code: string;
@@ -32,17 +26,45 @@ const Cart = () => {
   const [showAvailableVouchers, setShowAvailableVouchers] = useState(false);
   const [voucherCode, setVoucherCode] = useState("");
   const [appliedVoucher, setAppliedVoucher] = useState<Voucher | null>(null);
+  console.log("applied voucher...", appliedVoucher);
   const [selectedVoucher] = useState<Voucher | null>(null);
   const [isVoucherApplied, setIsVoucherApplied] = useState(false);
-  const [cart, setCart] = useState([]);
-  console.log("cart...", cart);
+  const [cart, setCartItems] = useState([]);
+  // console.log("cart...", cart);
+  const [vouchers, setVouchers] = useState([]);
+  // console.log("vouchers..", vouchers);
+  const [totalPrice, setTotalPrice] = useState(0);
+  // console.log("total price...", totalPrice);
+  const [finalTotalPrice, setFinalTotalPrice] = useState(0.00);
+  const [taxAmount, setTaxAmount] = useState(8.25);
+  const [taxedPrice, setTaxedPrice] = useState(0.00);
+  const [discountedPrice, setDiscountedPrice] = useState(0.00);
+
+  useEffect(() => {
+    if(cart?.length > 0) {
+      const total = cart?.reduce((sum, product) => {
+        return parseFloat((sum + parseFloat(product?.price) * parseInt(product?.total_year)).toFixed(2));
+      }, 0);
+      setTotalPrice(parseFloat(total.toFixed(2)));
+      setTaxedPrice(parseFloat(((total * taxAmount) / 100).toFixed(2)));
+      const discountedPercent = isVoucherApplied ? appliedVoucher === null ? 0.00 : parseFloat(parseFloat(appliedVoucher?.voucher?.discount_rate).toFixed(2)) : 0.00;
+      const totalOutPrice = parseFloat((total + ((total * taxAmount) / 100)).toFixed(2));
+      const discountedAMount = parseFloat(((totalOutPrice * discountedPercent) / 100).toFixed(2));
+      setDiscountedPrice(discountedAMount);
+      const finalDiscountedPrice = parseFloat((totalOutPrice - discountedAMount).toFixed(2));
+      setFinalTotalPrice(finalDiscountedPrice);
+    } else {
+      setTotalPrice(0);
+    }
+  }, [cart, isVoucherApplied, appliedVoucher]);
 
   const getCartDetails = async() => {
     try {
       const result = await dispatch(getCartThunk({ user_id: customerId })).unwrap();
-      setCart(result?.cart);
+      setCartItems(result?.cart);
+      await dispatch(setCart(result?.cart));
     } catch (error) {
-      setCart([]);
+      setCartItems([]);
       if(error?.error == "Invalid token") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -58,10 +80,103 @@ const Cart = () => {
     getCartDetails();
   }, []);
 
-  const handleDeleteItemFromCart = (index) => {
+  const addToCart = async(e, product_name, product_type, price, payment_cycle, total_year) => {
+    e.preventDefault();
+    try {
+      const newCart = cart;
+      const addCart = {
+        product_name: product_name,
+        product_type: product_type,
+        price: price,
+        payment_cycle: payment_cycle,
+        total_year: total_year
+      }
+      newCart.push(addCart);
+      const result = await dispatch(addToCartThunk({
+        user_id: customerId,
+        products: newCart
+      })).unwrap();
+      console.log("result...", result);
+    } catch (error) {
+      if(error?.message == "Authentication token is required") {
+        try {
+          await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    } finally {
+      getCartDetails();
+    }
+  };
+
+  const addToCart2 = async(e, cartValue) => {
+    e.preventDefault();
+    try {
+      const result = await dispatch(addToCartThunk({
+        user_id: customerId,
+        products: cartValue
+      })).unwrap();
+      console.log("result...", result);
+      await dispatch(setCartItems(cartValue));
+    } catch (error) {
+      if(error?.message == "Authentication token is required") {
+        try {
+          await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    } finally {
+      getCartDetails();
+    }
+  };
+
+  const getVouchersList = async() => {
+    try {
+      const result = await dispatch(getVouchersListThunk({customer_id: customerId})).unwrap();
+      setVouchers(result?.joinedData);
+    } catch (error) {
+      setVouchers([]);
+      if(error?.message == "Authentication token is required") {
+        try {
+          await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    getVouchersList();
+  }, [customerId]);
+
+  const handleDeleteItemFromCart = async(index) => {
     const newCart = cart.filter((_, i) => i !== index);
-    setCart(newCart);
-  }
+    try {
+      const result = await dispatch(addToCartThunk({
+        user_id: customerId,
+        products: newCart
+      })).unwrap();
+      toast.success("Your cart item has been deleted.");
+    } catch (error) {
+      toast.error("Error on deleting cart item.");
+      if(error?.error == "Invalid token") {
+        try {
+          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    } finally {
+      getCartDetails();
+    }
+  };
 
   const handleVoucherToggle = () => {
     setShowVoucherInput((prev) => !prev);
@@ -78,7 +193,7 @@ const Cart = () => {
   };
 
   const handleVoucherCheck = () => {
-    const selectedVoucher = vouchers.find((v) => v.code === voucherCode);
+    const selectedVoucher = vouchers.find((v) => v?.voucher?.voucher_code === voucherCode);
     if (selectedVoucher) {
       setAppliedVoucher(selectedVoucher);
       setShowAvailableVouchers(false);
@@ -106,6 +221,15 @@ const Cart = () => {
   const handleApplyClick = () => {
     setIsVoucherApplied(true);
   };
+
+  const handleChangeCartValue = (e, index, value) => {
+    const newCart = cart[index];
+    newCart.total_year = value;
+    const newCartValue = cart.filter((prev, i) => 
+      i === index ? newCart : prev
+    );
+    addToCart2(e, newCartValue)
+  }
 
   return (
     <div className="flex flex-col gap-6 px-2">
@@ -171,13 +295,21 @@ const Cart = () => {
                       <h3 className="text-xl font-semibold">{item?.product_name}</h3>
                       <small className="text-sm my-1">({item?.product_type})</small>
                       <small className="text-[10px] text-gray-400">
-                        Upgrade user license
+                        {
+                          item?.product_type === "google workspace" ?
+                          "Upgrade user license" :
+                          "Upgrade total period"
+                        }
                       </small>
                       {
                         item?.product_type === "Domain" ? (
                           <select
                             title="Qty"
                             className="mt-1 bg-transparent border border-black rounded-md p-1 text-sm max-w-20 w-full"
+                            onChange={e => {
+                              handleChangeCartValue(e, index, e.target.value);
+                            }}
+                            value={item?.total_year}
                           >
                             <option value="1">1 year</option>
                             <option value="2">2 year</option>
@@ -187,6 +319,10 @@ const Cart = () => {
                           <select
                             title="Qty"
                             className="mt-1 bg-transparent border border-black rounded-md p-1 text-sm max-w-20 w-full"
+                            onChange={e => {
+                              handleChangeCartValue(e, index, e.target.value);
+                            }}
+                            value={item?.total_year}
                           >
                             <option value="1">Qty: 1</option>
                             <option value="2">Qty: 2</option>
@@ -195,23 +331,24 @@ const Cart = () => {
                         )
                       }
                     </div>
-                    <div className="flex flex-col justify-center">
-                      <span className="text-xl font-bold">{item?.price}</span>
-                      <small className="text-[10px] text-gray-400 self-end">
-                        <span className="uppercase">{item?.payment_cycle}</span> cycle
-                      </small>
+                    <div className="flex flex-col justify-between">
+                      <div className="flex flex-col justify-center">
+                        <span className="text-xl font-bold">₹{item?.price}</span>
+                        <small className="text-[10px] text-gray-400 self-end">
+                          <span className="uppercase">{item?.payment_cycle}</span> cycle
+                        </small>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleDeleteItemFromCart(index)
+                        }}
+                        className="mt-10"
+                      >
+                        <RiDeleteBin6Line className="text-red-500 text-2xl cursor-pointer w-full" />
+                      </button>
                     </div>
                   </div>
-                </div>
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      handleDeleteItemFromCart(index)
-                    }}
-                  >
-                    <RiDeleteBin6Line className="text-red-500 text-2xl cursor-pointer w-full" />
-                  </button>
                 </div>
               </div>
             )) : (
@@ -229,17 +366,17 @@ const Cart = () => {
                   <div className="flex items-start gap-6">
                     <div className="flex items-center justify-center size-10">
                       <img
-                        src={item.imageUrl}
+                        src={item?.imageUrl}
                         alt=""
-                        className="h-full w-full object-cover"
+                        className="w-full object-cover mt-12"
                       />
                     </div>
                     <div className="flex items-start gap-10">
                       <div className="flex-grow flex flex-col justify-center">
-                        <h3 className="text-md font-semibold">{item.title}</h3>
+                        <h3 className="text-md font-semibold">{item?.title}</h3>
                         <small
                           className="text-xs my-1 text-gray-400"
-                          dangerouslySetInnerHTML={{ __html: item.description }}
+                          dangerouslySetInnerHTML={{ __html: item?.description }}
                         />
                       </div>
                       <div className="flex flex-col justify-center">
@@ -253,7 +390,10 @@ const Cart = () => {
                     </div>
                   </div>
                   <div>
-                    <small className="text-green-500 text-xs flex items-center self-end cursor-pointer">
+                    <small
+                      className="text-green-500 text-xs flex items-center self-end cursor-pointer"
+                      onClick={(e) => {addToCart(e, item?.title, item?.type, item?.price, item?.cycle, 1)}}
+                    >
                       Add <MdOutlineAddShoppingCart />
                     </small>
                   </div>
@@ -276,38 +416,30 @@ const Cart = () => {
                 <div className="flex flex-col gap-2  mt-6">
                   <div className="flex flex-col gap-2">
                     <h1 className="text-2xl lg:text-4xl font-bold">Summary</h1>
-                    <div className="flex items-start justify-between">
-                      <div className="flex flex-col">
-                        <h1 className="text-xl font-semibold flex item ">
-                          Business Standard{" "}
-                          <span className="text-gray-700 text-md font-normal">
-                            (Google Workspace)
-                          </span>
-                        </h1>
-                        <small className="text-xs text-gray-400">
-                          3 users, Yearly commitment
-                        </small>
-                      </div>
-                      <div className="text-xl font-normal text-black">
-                        <h2>3 X ₹72.00</h2>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-start justify-between">
-                    <div className="flex flex-col">
-                      <h1 className="text-xl font-semibold flex item ">
-                        Domain.co.in{" "}
-                        <span className="text-gray-700 text-md font-normal">
-                          (Domain)
-                        </span>
-                      </h1>
-                      <small className="text-xs text-gray-400">
-                        1 Year commitment
-                      </small>
-                    </div>
-                    <div className="text-xl font-normal text-black">
-                      <h2>₹648.00</h2>
-                    </div>
+                    {
+                      cart?.map((item, index) => (
+                        <div className="flex items-start justify-between" key={index}>
+                          <div className="flex flex-col">
+                            <h1 className="text-xl font-semibold flex item ">
+                              {item?.product_name}
+                              <span className="text-gray-700 text-md font-normal">
+                                ({item?.product_type})
+                              </span>
+                            </h1>
+                            <small className="text-xs text-gray-400">
+                              {
+                                item?.product_type === "Google workspace" ? 
+                                `${item?.total_year} users` :
+                                `${item?.total_year} years`
+                              }, {item?.payment_cycle} commitment
+                            </small>
+                          </div>
+                          <div className="text-xl font-normal text-black">
+                            <h2>{item?.total_year} X ₹{item?.price}</h2>
+                          </div>
+                        </div>
+                      ))
+                    }
                   </div>
                   <div className="flex items-start justify-between">
                     <p
@@ -371,10 +503,10 @@ const Cart = () => {
                           paddingBottom: "0.65rem",
                         }}
                       >
-                        {appliedVoucher.code}
+                        {appliedVoucher?.voucher?.voucher_code}
                       </div>
                       <p className="text-green-500">
-                        Saved ₹{appliedVoucher.discount}!
+                        {isVoucherApplied ? "Saved" : "You will save"} ₹{discountedPrice}!
                       </p>
                     </div>
                     <p
@@ -400,15 +532,15 @@ const Cart = () => {
                       </h1>
                     </div>
                     <div className="text-md font-bold text-black">
-                      <h2>₹648.00</h2>
+                      <h2>₹{totalPrice.toFixed(2)}</h2>
                     </div>
                   </div>
                   <div className="flex items-start justify-between">
                     <div className="flex flex-col">
-                      <h1 className="text-sm font-normal">Tax (8.25%)</h1>
+                      <h1 className="text-sm font-normal">Tax ({taxAmount.toFixed(2)}%)</h1>
                     </div>
                     <div className="text-sm font-normal text-black">
-                      <h2>₹72.00</h2>
+                      <h2>₹{taxedPrice.toFixed(2)}</h2>
                     </div>
                   </div>
                   <div className="border border-black"></div>
@@ -417,13 +549,14 @@ const Cart = () => {
                       <h1 className="text-xl font-bold flex item ">Total</h1>
                     </div>
                     <div className="text-xl font-bold text-black">
-                      <h2>₹936.28</h2>
+                      <h2>₹{finalTotalPrice.toFixed(2)}</h2>
                     </div>
                   </div>
                   <button
                     className="bg-green-600 rounded-lg text-white font-semibold py-3 hover:bg-opacity-90 flex items-center justify-center gap-3"
                     type="button"
-                    // onClick={() => {navigate('/Review')}}
+                    disabled={cart.length > 0 ? false : true}
+                    onClick={() => {navigate('/review-and-check-out', { state: { cart, price: {totalPrice, finalTotalPrice, taxAmount, discountedPrice} } })}}
                   >
                     <FaLock /> Submit Purchase
                   </button>
@@ -444,7 +577,7 @@ const Cart = () => {
                       You also agree to Auto renewal of your yearly subscription
                       for ₹467.64, which can be disabled at any time through
                       your account. Your card details will be saved for future
-                      purchases and subscription renewals.
+                      purchases and subscription renewals.
                     </p>
                   </div>
                 </div>
@@ -487,43 +620,48 @@ const Cart = () => {
                   </div>
                 </div>
                 <div className="flex flex-col">
-                  {vouchers.map((voucher: Voucher) => (
-                    <div key={voucher.code} className="flex flex-col mb-4">
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-6">
-                          <div
-                            className="px-6 rounded-sm text-xs"
-                            style={{
-                              border: "2px dashed gray",
-                              backgroundColor: "#12A83333",
-                              paddingTop: "0.65rem",
-                              paddingBottom: "0.65rem",
-                            }}
-                          >
-                            {voucher.code}
+                  {vouchers?.map((voucher: Voucher) => {
+                    if(voucher?.status === "active" && voucher?.used_date === null) {
+                      return (
+                        <div key={voucher.code} className="flex flex-col mb-4">
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-6">
+                              <div
+                                className="px-6 rounded-sm text-xs"
+                                style={{
+                                  border: "2px dashed gray",
+                                  backgroundColor: "#12A83333",
+                                  paddingTop: "0.65rem",
+                                  paddingBottom: "0.65rem",
+                                }}
+                              >
+                                {voucher?.voucher?.voucher_code}
+                              </div>
+                              <p className="text-black font-semibold">
+                                {selectedVoucher?.code === voucher?.voucher?.voucher_code ? "Save" : "Saved"} {voucher?.voucher?.discount_rate}%
+                              </p>
+                            </div>
+    
+                            {selectedVoucher?.code === voucher?.voucher?.voucher_code ? (
+                              <p className="font-bold text-2xl">Available</p>
+                            ) : (
+                              <button
+                                className={`font-bold ${appliedVoucher?.voucher?.voucher_code === voucher?.voucher?.voucher_code ? "text-gray-400" : "text-green-500"} cursor-pointer`}
+                                onClick={() => handleSelectVoucher(voucher)}
+                                disabled={appliedVoucher?.voucher?.voucher_code === voucher?.voucher?.voucher_code}
+                              >
+                                {appliedVoucher?.voucher?.voucher_code === voucher?.voucher?.voucher_code ? "Applied" : "Apply"}
+                              </button>
+                            )}
                           </div>
-                          <p className="text-black font-semibold">
-                            Saved ₹{voucher.discount}
+                          <p className="text-[10px] text-gray-400 mt-2">
+                            Lorem ipsum dolor sit, amet consectetur adipisicing
+                            elit. Reprehenderit <br /> non libero consequuntur?
                           </p>
                         </div>
-
-                        {selectedVoucher?.code === voucher.code ? (
-                          <p className="font-bold text-2xl">Available</p>
-                        ) : (
-                          <button
-                            className="font-bold text-green-500 cursor-pointer"
-                            onClick={() => handleSelectVoucher(voucher)}
-                          >
-                            Apply
-                          </button>
-                        )}
-                      </div>
-                      <p className="text-[10px] text-gray-400 mt-2">
-                        Lorem ipsum dolor sit, amet consectetur adipisicing
-                        elit. Reprehenderit <br /> non libero consequuntur?
-                      </p>
-                    </div>
-                  ))}
+                      )
+                    }
+                  })}
                 </div>
               </div>
             )}
