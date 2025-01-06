@@ -19,7 +19,7 @@ const PaymentMethod = () => {
       const result = await dispatch(getPaymentMethodsThunk({user_id: customerId})).unwrap();
       setPaymentMethods(result?.paymentMethods);
     } catch (error) {
-      if(error?.message == "Invalid token") {
+      if(error?.message == "Request failed with status code 401") {
         setPaymentMethods([]);
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -45,7 +45,7 @@ const PaymentMethod = () => {
         toast.success(result?.message);
       }, 1000);
     } catch (error) {
-      if(error?.message == "Invalid token") {
+      if(error?.message == "Request failed with status code 401") {
         toast.error("Error making default payment method");
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();

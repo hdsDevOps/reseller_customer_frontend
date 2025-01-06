@@ -17,6 +17,8 @@ export interface UserDetailsState {
   resellerToken: string | null;
   cartState: [];
   domainsState: [];
+  saveCardsState: [];
+  paymentMethodsState: [];
 }
 
 const initialState: UserDetailsState = {
@@ -28,6 +30,8 @@ const initialState: UserDetailsState = {
   resellerToken: '',
   cartState: [],
   domainsState: [],
+  saveCardsState: [],
+  paymentMethodsState: [],
 };
 
 const authSlice = createSlice({
@@ -48,6 +52,12 @@ const authSlice = createSlice({
     },
     setDomains: (state, action: PayloadAction<any>) => {
       state.domainsState = action.payload;
+    },
+    setSaveCards: (state, action: PayloadAction<any>) => {
+      state.saveCardsState = action.payload;
+    },
+    setPaymentMethodsState: (state, action: PayloadAction<any>) => {
+      state.paymentMethodsState = action.payload;
     },
     setUserAuthStatus: (state, action: PayloadAction<'AUTHORIZED' | 'UN_AUTHORIZED' | 'PENDING' | 'UPGRADE'>) => {
       state.userAuthStatus = action.payload;
@@ -111,6 +121,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setTokenDetails, setUserDetails, setUserAuthStatus,  setResellerToken, resetUserSlice, setCart,setDomains } = authSlice.actions;
+export const { setTokenDetails, setUserDetails, setUserAuthStatus,  setResellerToken, resetUserSlice, setCart, setDomains, setSaveCards, setPaymentMethodsState } = authSlice.actions;
 
 export default authSlice.reducer;

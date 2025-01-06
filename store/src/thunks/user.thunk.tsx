@@ -136,8 +136,8 @@ export const cancelDomainThunk = createAsyncThunk(
 
 export const updateLicenseUsageThunk = createAsyncThunk(
   "users/updateLicenseUsage",
-  async ({ domain_id, license_usage }: any) => {
-    return await userApis.updateLicenseUsageApi( domain_id, license_usage );
+  async ({ user_id, license_usage }: any) => {
+    return await userApis.updateLicenseUsageApi( user_id, license_usage );
   }
 );
 
@@ -267,6 +267,13 @@ export const getBillingHistoryThunk = createAsyncThunk(
   }
 );
 
+export const addBillingHistoryThunk = createAsyncThunk(
+  "users/addBillingHistory",
+  async ({ transaction_id, date, invoice_no, product_type, description, domain, payment_method, payment_status, amount }: any) => {
+    return await userApis.addBillingHistoryApi( transaction_id, date, invoice_no, product_type, description, domain, payment_method, payment_status, amount );
+  }
+);
+
 export const plansAndPricesListThunk = createAsyncThunk(
   "users/plansAndPricesList",
   async ({ subscription_id }: any) => {
@@ -290,8 +297,8 @@ export const udpateProfileDataThunk = createAsyncThunk(
 
 export const uploadProfilePhotoThunk = createAsyncThunk(
   "users/uploadProfilePhoto",
-  async ({ user_id, image }: any) => {
-    return await userApis.uploadProfilePhotoApi( user_id, image );
+  async ({ image, user_id }: any) => {
+    return await userApis.uploadProfilePhotoApi( image, user_id );
   }
 );
 
@@ -318,8 +325,22 @@ export const getPaymentSubscriptionsListThunk = createAsyncThunk(
 
 export const addSubscriptionThunk = createAsyncThunk(
   "users/addSubscription",
-  async ({ product_type, payment_cycle, customer_id, description, domain, last_payment, next_payment, payment_method, subscription_status, plan_name_id, payment_details, plan_name, workspace_status, is_trial }: any) => {
-    return await userApis.addSubscriptionApi( product_type, payment_cycle, customer_id, description, domain, last_payment, next_payment, payment_method, subscription_status, plan_name_id, payment_details, plan_name, workspace_status, is_trial );
+  async ({ product_type, payment_cycle, customer_id, description, domain, last_payment, next_payment, payment_method, subscription_status, plan_name_id, payment_details, plan_name, workspace_status, is_trial, license_usage }: any) => {
+    return await userApis.addSubscriptionApi( product_type, payment_cycle, customer_id, description, domain, last_payment, next_payment, payment_method, subscription_status, plan_name_id, payment_details, plan_name, workspace_status, is_trial, license_usage );
+  }
+);
+
+export const cancelSubscriptionThunk = createAsyncThunk(
+  "users/cancelSubscription",
+  async ({ product_type, subscription_id, customer_id, reason, subscription_status }: any) => {
+    return await userApis.cancelSubscriptionApi( product_type, subscription_id, customer_id, reason, subscription_status );
+  }
+);
+
+export const changeAutoRenewThunk = createAsyncThunk(
+  "users/changeAutoRenew",
+  async ({ subscription_id, status, product_type }: any) => {
+    return await userApis.changeAutoRenewApi( subscription_id, status, product_type );
   }
 );
 
@@ -341,5 +362,19 @@ export const toggleNotificationStatusThunk = createAsyncThunk(
   "users/toggleNotificationStatus",
   async ({ user_id, status }: any) => {
     return await userApis.toggleNotificationStatusApi( user_id, status );
+  }
+);
+
+export const savedCardsListThunk = createAsyncThunk(
+  "users/savedCardsList",
+  async ({ user_id }: any) => {
+    return await userApis.savedCardsListApi( user_id );
+  }
+);
+
+export const saveCardsThunk = createAsyncThunk(
+  "users/saveCards",
+  async ({ user_id, card }: any) => {
+    return await userApis.saveCardsApi( user_id, card );
   }
 );

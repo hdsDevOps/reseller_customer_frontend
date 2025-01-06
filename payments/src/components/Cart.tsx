@@ -26,7 +26,7 @@ const Cart = () => {
   const [showAvailableVouchers, setShowAvailableVouchers] = useState(false);
   const [voucherCode, setVoucherCode] = useState("");
   const [appliedVoucher, setAppliedVoucher] = useState<Voucher | null>(null);
-  console.log("applied voucher...", appliedVoucher);
+  // console.log("applied voucher...", appliedVoucher);
   const [selectedVoucher] = useState<Voucher | null>(null);
   const [isVoucherApplied, setIsVoucherApplied] = useState(false);
   const [cart, setCartItems] = useState([]);
@@ -65,7 +65,7 @@ const Cart = () => {
       await dispatch(setCart(result?.cart));
     } catch (error) {
       setCartItems([]);
-      if(error?.error == "Invalid token") {
+      if(error?.error == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');
@@ -83,7 +83,6 @@ const Cart = () => {
   const addToCart = async(e, product_name, product_type, price, payment_cycle, total_year) => {
     e.preventDefault();
     try {
-      const newCart = cart;
       const addCart = {
         product_name: product_name,
         product_type: product_type,
@@ -91,13 +90,14 @@ const Cart = () => {
         payment_cycle: payment_cycle,
         total_year: total_year
       }
-      newCart.push(addCart);
+      const newCart = [...cart, addCart];
       const result = await dispatch(addToCartThunk({
         user_id: customerId,
         products: newCart
       })).unwrap();
       console.log("result...", result);
     } catch (error) {
+      console.log("error")
       if(error?.message == "Authentication token is required") {
         try {
           await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -165,7 +165,7 @@ const Cart = () => {
       toast.success("Your cart item has been deleted.");
     } catch (error) {
       toast.error("Error on deleting cart item.");
-      if(error?.error == "Invalid token") {
+      if(error?.error == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');
@@ -223,12 +223,13 @@ const Cart = () => {
   };
 
   const handleChangeCartValue = (e, index, value) => {
-    const newCart = cart[index];
-    newCart.total_year = value;
-    const newCartValue = cart.filter((prev, i) => 
+    const newCart = { ...cart[index] };
+    newCart.total_year = parseInt(value);
+    const newCartValue = cart?.map((prev, i) => 
       i === index ? newCart : prev
     );
-    addToCart2(e, newCartValue)
+    // console.log(newCartValue);
+    addToCart2(e, newCartValue);
   }
 
   return (

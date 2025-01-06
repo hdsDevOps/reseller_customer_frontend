@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "store/hooks";
 import { HiOutlineEye } from "react-icons/hi";
 import { RiEyeCloseLine } from "react-icons/ri";
 import { makeUserLoginThunk } from "store/user.thunk";
 import { useForm, SubmitHandler } from "react-hook-form";
+import axios from "axios";
 
 interface IFormInput {
   email: string;
@@ -62,6 +63,21 @@ const Login: React.FC = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  // useEffect(() => {
+  //   axios
+  //     .post('https://api.customer.gworkspace.withhordanso.com/settingservices/setting/api/v1/staff_list', {
+  //       user_type_id: "",
+  //       user_id: "",
+  //       search_text: ""
+  //     }, {
+  //       headers: {
+  //         'Authorization': 'Bearer casc'
+  //       }
+  //     })
+  //     .then(res => console.log(res.data))
+  //     .catch(error => console.log(error));
+  // }, []);
 
   return (
     <div className="w-full flex flex-col justify-center items-center h-screen xsm-max:px-1">

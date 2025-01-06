@@ -16,6 +16,7 @@ import { HiOutlineEye } from "react-icons/hi";
 import { RiDeleteBin6Line, RiEyeCloseLine } from "react-icons/ri";
 import AddPayment from "../components/AddPaymentMethods";
 import { MdOutlineMail } from "react-icons/md";
+import { setUserDetails } from "store/authSlice";
 
 const intialEmail = {
   first_name:"",
@@ -29,8 +30,11 @@ const EmailList: React.FC = () => {
   const location = useLocation();
   const searchRef = useRef();
 
-  const { customerId } = useAppSelector(state => state.auth);
+  const { customerId, userDetails, saveCardsState, paymentMethodsState } = useAppSelector(state => state.auth);
   // console.log("userId...", customerId);
+  console.log("user details...", userDetails);
+  console.log("save Cards State...", saveCardsState);
+  console.log("paymentMethodsState...", paymentMethodsState);
   
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState<boolean>(false);
@@ -75,6 +79,24 @@ const EmailList: React.FC = () => {
   const [activeMethod, setActiveMethod] = useState("saved");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>("stripe");
 
+  const getProfileData = async() => {
+    if(token) {
+      try {
+        const result = await dispatch(getProfileDataThunk({user_id: customerId})).unwrap();
+        await dispatch(setUserDetails(result?.customerData));
+      } catch (error) {
+        if(error?.message == "Request failed with status code 401") {
+          try {
+            const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+            navigate('/login');
+          } catch (error) {
+            //
+          }
+        }
+      }
+    }
+  };
+
   const handlePaymentMethodChange = (method: string) => {
     setSelectedPaymentMethod(method);
   };
@@ -90,7 +112,7 @@ const EmailList: React.FC = () => {
       ? selectedDomain?.id !== ""
         ? selectedDomain?.id : ""
       : "";
-    // console.log("domain id...", domainId);
+    console.log("domain id...", domainId);
     try {
       const result = await dispatch(getDomainsListThunk({customer_id: customerId})).unwrap();
       setDomains(result?.data);
@@ -99,8 +121,8 @@ const EmailList: React.FC = () => {
         setSelectedDomain(data);
         // console.log(data);
       } else {
-        const data = domains.find(item => item?.domain_type === "primary");
-        setSelectedDomain(data || result?.data[0]);
+        const data = result?.data?.find(item => item?.domain_type === "primary");
+        setSelectedDomain(data);
       }
     } catch (error) {
       setDomains([]);
@@ -117,7 +139,7 @@ const EmailList: React.FC = () => {
 
   useEffect(() => {
     getDomainsList();
-  }, []);
+  }, [customerId]);
   
   const handleClickOutside = (event: MouseEvent) => {
     if(searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -450,10 +472,10 @@ const EmailList: React.FC = () => {
     e.preventDefault();
     try {
       if(numUsers > 0) {
-        const originalLicense = parseInt(selectedDomain?.license_usage);
+        const originalLicense = parseInt(userDetails?.license_usage);
         const updatedLicense = originalLicense + numUsers;
         const result = await dispatch(updateLicenseUsageThunk({
-          domain_id: selectedDomain?.id,
+          user_id: customerId,
           license_usage: updatedLicense
         })).unwrap();
         // console.log("result...", result);
@@ -477,6 +499,12 @@ const EmailList: React.FC = () => {
       getDomainsList();
     }
   };
+
+  function hideCardNumber(cardNumber) {
+    const cardStr = String(cardNumber);
+    const hiddenCard = cardStr.replace(/^(\d{8})/, "**** **** ");
+    return hiddenCard;
+  }
 
   return (
     <div>
@@ -536,188 +564,202 @@ const EmailList: React.FC = () => {
               </div>
               <div className="flex flex-col gap-2">
                 <p className="text-sm md:text-md lg:text-lg font-semibold text-gray-600">{selectedDomain?.domain_name}</p>
-                <p className="text-sm md:text-md lg:text-lg font-semibold text-gray-600">
-                  {selectedDomain?.emails ? selectedDomain?.emails.length : 0}@{selectedDomain?.domain_name}.{" "}
-                  <span className="text-xs sm:text-sm text-green-500 ml-3 cursor-pointer" onClick={() => setIsLicenseModalOpen(true)}>
-                    Add user license
-                  </span>
-                </p>
-                <p className="text-sm md:text-md text-gray-600">
-                  Google Workspace Starter.{" "}
-                  <span className="text-xs sm:text-sm text-green-500 ml-3 cursor-pointer" onClick={() => navigate('/upgrade-plan')}>
-                    Upgrade plan
-                  </span>
-                </p>
+                {
+                  selectedDomain?.domain_type === "primary" && (
+                    <React.Fragment>
+                      <p className="text-sm md:text-md lg:text-lg font-semibold text-gray-600">
+                        {selectedDomain?.emails ? selectedDomain?.emails.length : 0}@{selectedDomain?.domain_name}.{" "}
+                        <span className="text-xs sm:text-sm text-green-500 ml-3 cursor-pointer" onClick={() => setIsLicenseModalOpen(true)}>
+                          Add user license
+                        </span>
+                      </p>
+                      <p className="text-sm md:text-md text-gray-600">
+                        Google Workspace Starter.{" "}
+                        <span className="text-xs sm:text-sm text-green-500 ml-3 cursor-pointer" onClick={() => navigate('/upgrade-plan')}>
+                          Upgrade plan
+                        </span>
+                      </p>
+                    </React.Fragment>
+                  )
+                }
               </div>
             </div>
 
-            <div className="flex flex-col gap-4 md:ml-4">
-              <button
-                className="border-2 border-green-500 text-green-500 bg-white px-4 py-2 rounded-md mb-2 transition-transform duration-300 ease-in-out transform hover:scale-105"
-                onClick={() => setIsModalOpen(true)}
-              >
-                Add Email
-              </button>
-              <p className="text-sm md:text-md">User Licenses: {selectedDomain?.emails ? selectedDomain?.emails.length : 0}/{selectedDomain?.license_usage}</p>
-            </div>
+            {
+              selectedDomain?.domain_type === "primary" && (
+                <div className="flex flex-col gap-4 md:ml-4">
+                  <button
+                    className="border-2 border-green-500 text-green-500 bg-white px-4 py-2 rounded-md mb-2 transition-transform duration-300 ease-in-out transform hover:scale-105"
+                    onClick={() => setIsModalOpen(true)}
+                  >
+                    Add Email
+                  </button>
+                  <p className="text-sm md:text-md">User Licenses: {selectedDomain?.emails ? selectedDomain?.emails.length : 0}/{userDetails?.license_usage}</p>
+                </div>
+              )
+            }
           </div>
 
-          <div className="mt-2">
-            <div className="w-full overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead className="bg-[#F7FAFF] mb-4">
-                  <tr>
-                    <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-medium">
-                      Name
-                    </th>
-                    <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-medium">
-                      Email
-                    </th>
-                    <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-medium">
-                      Status
-                    </th>
-                    <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-medium">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {selectedDomain?.emails?.map((row, index) => (
-                    <tr key={index} className="relative ">
-                      <td className="p-2 text-gray-600 font-semibold text-xs sm:text-sm md:text-md flex items-center">
-                        <span>{row?.first_name}&nbsp;{row?.last_name}</span>
-                        {row?. is_admin ? (
-                          <span className="p-2 text-gray-600 font-semibold text-xs sm:text-sm md:text-md flex items-center">
-                            <ChevronRight />
-                            <span className="text-gray-600 font-semibold text-xs sm:text-sm md:text-md">Admin</span>
-                          </span>
-                        ) : ""}
-                      </td>
-                      <td className="p-2 text-gray-500 text-xs sm:text-sm md:text-md">
-                        {row?.email}
-                      </td>
-                      <td className="p-2 text-gray-800 text-xs sm:text-sm md:text-md">
-                        <button
-                          className={`relative w-24 h-10 rounded-md border-2 flex justify-center items-center ${
-                            row?.status
-                              ? "border-green-500 bg-green-500"
-                              : "border-red-500 bg-red-500"
-                          }`}
-                          onClick={() => toggleStatus(selectedDomain?.id, row?.email, row?.status)}
-                        >
-                          <span className="text-white text-xs">
-                            {row.status ? "Active" : "Inactive"}
-                          </span>
-                        </button>
-                      </td>
-                      <td className="p-2 text-center relative">
-                        <button className="w-6 h-6 rounded-full border-2 border-green-500 flex justify-center items-center">
-                          <p
-                            className="mb-2"
-                            onClick={(e) => toggleList(row?.uuid)}
-                          >
-                            ...
-                          </p>
-                        </button>
-                        {
-                          showList === row?.uuid && (
-                            <div
-                              className="p-2 w-80 max-w-[12rem] absolute right-0 top-0 mt-9 z-10"
-                              style={actionModalStyle}
-                              onClick={(e) => {e.stopPropagation()}}
-                              ref={listRef}
+          {
+            selectedDomain?.domain_type === "primary" && (
+              <div className="mt-2">
+                <div className="w-full overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead className="bg-[#F7FAFF] mb-4">
+                      <tr>
+                        <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-medium">
+                          Name
+                        </th>
+                        <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-medium">
+                          Email
+                        </th>
+                        <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-medium">
+                          Status
+                        </th>
+                        <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-medium">
+                          Action
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedDomain?.emails?.map((row, index) => (
+                        <tr key={index} className="relative ">
+                          <td className="p-2 text-gray-600 font-semibold text-xs sm:text-sm md:text-md flex items-center">
+                            <span>{row?.first_name}&nbsp;{row?.last_name}</span>
+                            {row?. is_admin ? (
+                              <span className="p-2 text-gray-600 font-semibold text-xs sm:text-sm md:text-md flex items-center">
+                                <ChevronRight />
+                                <span className="text-gray-600 font-semibold text-xs sm:text-sm md:text-md">Admin</span>
+                              </span>
+                            ) : ""}
+                          </td>
+                          <td className="p-2 text-gray-500 text-xs sm:text-sm md:text-md">
+                            {row?.email}
+                          </td>
+                          <td className="p-2 text-gray-800 text-xs sm:text-sm md:text-md">
+                            <button
+                              className={`relative w-24 h-10 rounded-md border-2 flex justify-center items-center ${
+                                row?.status
+                                  ? "border-green-500 bg-green-500"
+                                  : "border-red-500 bg-red-500"
+                              }`}
+                              onClick={() => toggleStatus(selectedDomain?.id, row?.email, row?.status)}
                             >
-                              <ul className="bg-gray-100 rounded-xl shadow-md space-y-2 flex-grow flex-col items-start justify-center">
-                                {row?.is_admin ? (
-                                  <>
-                                    <li>
-                                      <button
-                                        type="button"
-                                        className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
-                                        onClick={() => {
-                                          setIsResetUserPasswordModalOpen(true);
-                                          setSelectedEmail(row);
-                                        }}
-                                      >
-                                        Reset user password
-                                      </button>
-                                    </li>
-                                    <li>
-                                      <button
-                                        type="button"
-                                        className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
-                                        onClick={() => {
-                                          setIsRenameUserAccountModalOpen(true);
-                                          setSelectedEmail(row);
-                                        }}
-                                      >
-                                        Rename user account
-                                      </button>
-                                    </li>
-                                  </>
-                                ) : (
-                                  <>
-                                    <li>
-                                      <button
-                                        type="button"
-                                        className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
-                                        onClick={() => {
-                                          setIsRemoveUserModalOpen(true);
-                                          setSelectedEmail(row);
-                                        }}
-                                      >
-                                        Remove user account
-                                      </button>
-                                    </li>
-                                    <li>
-                                      <button
-                                        type="button"
-                                        className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
-                                        onClick={() => {
-                                          setIsMakeAdminModalOpen(true);
-                                          setSelectedEmail(row);
-                                        }}
-                                      >
-                                        Make admin
-                                      </button>
-                                    </li>
-                                    <li>
-                                      <button
-                                        type="button"
-                                        className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
-                                        onClick={() => {
-                                          setIsResetUserPasswordModalOpen(true);
-                                          setSelectedEmail(row);
-                                        }}
-                                      >
-                                        Reset user password
-                                      </button>
-                                    </li>
-                                    <li>
-                                      <button
-                                        type="button"
-                                        className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
-                                        onClick={() => {
-                                          setIsRenameUserAccountModalOpen(true);
-                                          setSelectedEmail(row);
-                                        }}
-                                      >
-                                        Rename user account
-                                      </button>
-                                    </li>
-                                  </>
-                                )}
-                              </ul>
-                            </div>
-                          )
-                        }
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                              <span className="text-white text-xs">
+                                {row.status ? "Active" : "Inactive"}
+                              </span>
+                            </button>
+                          </td>
+                          <td className="p-2 text-center relative">
+                            <button className="w-6 h-6 rounded-full border-2 border-green-500 flex justify-center items-center">
+                              <p
+                                className="mb-2"
+                                onClick={(e) => toggleList(row?.uuid)}
+                              >
+                                ...
+                              </p>
+                            </button>
+                            {
+                              showList === row?.uuid && (
+                                <div
+                                  className="p-2 w-80 max-w-[12rem] absolute right-0 top-0 mt-9 z-10"
+                                  style={actionModalStyle}
+                                  onClick={(e) => {e.stopPropagation()}}
+                                  ref={listRef}
+                                >
+                                  <ul className="bg-gray-100 rounded-xl shadow-md space-y-2 flex-grow flex-col items-start justify-center">
+                                    {row?.is_admin ? (
+                                      <>
+                                        <li>
+                                          <button
+                                            type="button"
+                                            className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
+                                            onClick={() => {
+                                              setIsResetUserPasswordModalOpen(true);
+                                              setSelectedEmail(row);
+                                            }}
+                                          >
+                                            Reset user password
+                                          </button>
+                                        </li>
+                                        <li>
+                                          <button
+                                            type="button"
+                                            className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
+                                            onClick={() => {
+                                              setIsRenameUserAccountModalOpen(true);
+                                              setSelectedEmail(row);
+                                            }}
+                                          >
+                                            Rename user account
+                                          </button>
+                                        </li>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <li>
+                                          <button
+                                            type="button"
+                                            className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
+                                            onClick={() => {
+                                              setIsRemoveUserModalOpen(true);
+                                              setSelectedEmail(row);
+                                            }}
+                                          >
+                                            Remove user account
+                                          </button>
+                                        </li>
+                                        <li>
+                                          <button
+                                            type="button"
+                                            className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
+                                            onClick={() => {
+                                              setIsMakeAdminModalOpen(true);
+                                              setSelectedEmail(row);
+                                            }}
+                                          >
+                                            Make admin
+                                          </button>
+                                        </li>
+                                        <li>
+                                          <button
+                                            type="button"
+                                            className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
+                                            onClick={() => {
+                                              setIsResetUserPasswordModalOpen(true);
+                                              setSelectedEmail(row);
+                                            }}
+                                          >
+                                            Reset user password
+                                          </button>
+                                        </li>
+                                        <li>
+                                          <button
+                                            type="button"
+                                            className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
+                                            onClick={() => {
+                                              setIsRenameUserAccountModalOpen(true);
+                                              setSelectedEmail(row);
+                                            }}
+                                          >
+                                            Rename user account
+                                          </button>
+                                        </li>
+                                      </>
+                                    )}
+                                  </ul>
+                                </div>
+                              )
+                            }
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )
+          }
         </div>
         {
           isModalOpen && (
@@ -903,7 +945,7 @@ const EmailList: React.FC = () => {
                       <div className="flex justify-between items-center mt-2">
                         <div className="flex items-center gap-1">
                           <p>
-                            {numUsers} users, Year subscription (price adjusted to current cycle)
+                            {numUsers + parseInt(userDetails?.license_usage)} users, Year subscription (price adjusted to current cycle)
                           </p>
                           <span className="border-2 border-green-500 rounded-full h-5 w-5 flex items-center justify-center text-green-500 font-bold mr-1">
                             i
@@ -975,72 +1017,85 @@ const EmailList: React.FC = () => {
                 <div className="rounded-b-lg rounded-tr-lg border p-3">
                   {activeMethod === "saved" && (
                     <div className="border-2 border-green-500 p-4 rounded-lg my-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <div className="flex items-center">
-                          <input
-                            type="radio"
-                            id="saved-method"
-                            checked={selectedPaymentMethod === "saved"}
-                            onChange={() => handlePaymentMethodChange("saved")}
-                            className="mr-2 radio radio-xs radio-success"
-                            aria-labelledby="saved-method-label"
-                            defaultChecked
-                          />
-                          <label id="saved-method-label" className="flex items-center">
-                            <img
-                              src="/images/stripe.webp"
-                              alt="Stripe"
-                              className="w-14 h-8 mr-6"
-                            />
-                            <div className="flex flex-col">
-                              <small className="text-xs font-bold text-gray-700">**** **** **** 4002</small>
-                              <small className="text-[10px] text-gray-300">Expiry: 20/2024</small>
-                              <small className="text-[10px] flex items-center gap-1 text-gray-300">
-                                <MdOutlineMail /> billing@acme.corp
-                              </small>
+                      {
+                        saveCardsState?.length > 0 ? saveCardsState?.map((card, index) => (
+                          <div className="flex justify-between items-center mb-2" key={index}>
+                            <div className="flex items-center">
+                              <input
+                                type="radio"
+                                id="saved-method"
+                                checked={activeMethod === "saved" && selectedPaymentMethod === card?.card_id || card?.is_default}
+                                onChange={() => handlePaymentMethodChange(card?.card_id)}
+                                className="mr-2 radio radio-xs radio-success"
+                                aria-labelledby="saved-method-label"
+                                defaultChecked
+                              />
+                              <label id="saved-method-label" className="flex items-center">
+                                <img
+                                  src="/images/stripe.webp"
+                                  alt="Stripe"
+                                  className="w-14 h-8 mr-6"
+                                />
+                                <div className="flex flex-col">
+                                  <small className="text-xs font-bold text-gray-700">{hideCardNumber(card?.card_id)}</small>
+                                  <small className="text-[10px] text-gray-300">Expiry: {card?.expiry_month}/{card?.expiry_year}</small>
+                                  <small className="text-[10px] flex items-center gap-1 text-gray-300">
+                                    {/* <MdOutlineMail /> billing@acme.corp */}
+                                    {card?.name}
+                                  </small>
+                                </div>
+                              </label>
                             </div>
-                          </label>
-                        </div>
-                        <button className="bg-green-500 text-white text-xs rounded-3xl px-4 py-1 mx-auto block">
-                          Default
-                        </button>
-                        <RiDeleteBin6Line className="text-red-500 text-lg cursor-pointer" />
-                      </div>
+                            {
+                              card?.is_default && (
+                                <button className="bg-green-500 text-white text-xs rounded-3xl px-4 py-1 mx-auto block">
+                                  Default
+                                </button>
+                              )
+                            }
+                            <RiDeleteBin6Line className="text-red-500 text-lg cursor-pointer" />
+                          </div>
+                        )) : (
+                          <p className="text-center">No saved cards</p>
+                        )
+                      }
                     </div>
                   )}
           
                   {activeMethod === "other" && (
                     <div>
-                      {Object.keys(paymentImages).map((method) => (
-                        <div className="flex items-center justify-between mb-2" key={method}>
-                          <div className="flex items-center">
-                            <input
-                              type="radio"
-                              id={method}
-                              name="payment-method"
-                              checked={selectedPaymentMethod === method || (method === "stripe" && selectedPaymentMethod === null)} // Check if method is 'stripe'
-                              onChange={() => handlePaymentMethodChange(method)}
-                              className="mr-2 radio radio-xs radio-success"
-                              title={method.charAt(0).toUpperCase() + method.slice(1)}
-                            />
-                            <label htmlFor={method} className="mr-2">
-                              {method.charAt(0).toUpperCase() + method.slice(1)}
-                            </label>
+                      {
+                        paymentMethodsState?.length > 0 && paymentMethodsState?.map((method, index) => (
+                          <div className="flex items-center justify-between mb-2" key={index}>
+                            <div className="flex items-center">
+                              <input
+                                type="radio"
+                                id={method?.id}
+                                name="payment-method"
+                                checked={selectedPaymentMethod === method?.id || method?.default} // Check if method is 'stripe'
+                                onChange={() => handlePaymentMethodChange(method?.id)}
+                                className="mr-2 radio radio-xs radio-success"
+                                title={method?.method_name}
+                              />
+                              <label htmlFor={method?.id} className="mr-2 capitalize">
+                                {method?.method_name}
+                              </label>
+                            </div>
+                            <div>
+                              <img
+                                src={method?.method_image}
+                                alt={method?.method_name}
+                                className="w-14 h-8 border-2 border-gray-200 shadow-sm p-1 rounded-md"
+                              />
+                            </div>
                           </div>
-                          <div>
-                            <img
-                              src={paymentImages[method]}
-                              alt={method.charAt(0).toUpperCase() + method.slice(1)}
-                              className="w-14 h-8 border-2 border-gray-200 shadow-sm p-1 rounded-md"
-                            />
-                          </div>
-                        </div>
-                      ))}
+                        ))
+                      }
                     </div>
                   )}
           
                   {activeMethod === "saved" && (
-                    <p className="text-green-500 text-sm text-left mt-4 cursor-pointer">
+                    <p className="text-green-500 text-sm text-left mt-4 cursor-pointer" onClick={() => {setActiveMethod("other")}}>
                       Use another payment method
                     </p>
                   )}

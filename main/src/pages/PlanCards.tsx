@@ -121,7 +121,7 @@ const PlanCard: React.FC = () => {
       navigate('/add-cart');
     } catch (error) {
       console.log(error);
-      if(error?.error == "Invalid token") {
+      if(error?.error == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');
@@ -214,7 +214,7 @@ const PlanCard: React.FC = () => {
                       <label
                         htmlFor={`monthly-billing-${index}`}
                         className="text-gray-700"
-                      >Or ${currencyLogo}${getAmount(plan?.amount_details, "Monthly")?.price || 0} per user / month when billed monthly (without yearly commitment)</label>
+                      >Or {currencyLogo}{getAmount(plan?.amount_details, "Monthly")?.price || 0} per user / month when billed monthly (without yearly commitment)</label>
                     </div>
                   )
                 }

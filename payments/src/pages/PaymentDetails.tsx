@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import PaymentModal from "../components/PaymentModal";
 import DateSearch from "../components/DateSearch";
-import { getDomainsListThunk, getPaymentMethodsThunk, getPaymentSubscriptionsListThunk, makeDefaultPaymentMethodThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
+import { cancelSubscriptionThunk, changeAutoRenewThunk, getDomainsListThunk, getPaymentMethodsThunk, getPaymentSubscriptionsListThunk, makeDefaultPaymentMethodThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { DateRangePicker } from "rsuite";
@@ -73,7 +73,8 @@ const predefinedRanges: RangeType<Date>[] = [
 ];
 
 const inititalCancel = {
-  number: 0, reason: "",
+  number: 0,
+  reason: ""
 };
 
 // const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899";
@@ -122,6 +123,7 @@ const PaymentDetails: React.FC = () => {
   const pdfRef = useRef(null);
   const [paymentMethods, setPaymentMethods] = useState([]);
   // console.log("paymentMethods...", paymentMethods);
+  const [subscriptionId, setSubscriptionId] = useState("");
 
   const showListTable = [
     { label: "Upgarde Plan", type: "link", link: "/upgrade-plan", },
@@ -209,7 +211,7 @@ const PaymentDetails: React.FC = () => {
       setPaymentDetails(result?.subscriptions || []);
       console.log("result...", result?.subscriptions);
     } catch (error) {
-      if(error?.message == "Invalid Token") {
+      if(error?.message == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');
@@ -291,7 +293,7 @@ const PaymentDetails: React.FC = () => {
       const result = await dispatch(getPaymentMethodsThunk({user_id: customerId})).unwrap();
       setPaymentMethods(result?.paymentMethods);
     } catch (error) {
-      if(error?.message == "Invalid token") {
+      if(error?.message == "Request failed with status code 401") {
         setPaymentMethods([]);
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -317,7 +319,7 @@ const PaymentDetails: React.FC = () => {
         toast.success(result?.message);
       }, 1000);
     } catch (error) {
-      if(error?.message == "Invalid token") {
+      if(error?.message == "Request failed with status code 401") {
         toast.error("Error making default payment method");
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -328,6 +330,61 @@ const PaymentDetails: React.FC = () => {
       }
     } finally {
       getPaymentMethods();
+    }
+  };
+
+  const cancelSubscription = async(e) => {
+    e.preventDefault();
+    try {
+      const result = await dispatch(cancelSubscriptionThunk({
+        product_type: "google workspace",
+        subscription_id: subscriptionId,
+        customer_id: customerId,
+        reason: cancelReason?.reason,
+        subscription_status: "Cancel Requested"
+      })).unwrap();
+      console.log("result...", result);
+    } catch (error) {
+      if(error?.message == "Request failed with status code 401") {
+        toast.error("Error making default payment method");
+        try {
+          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    } finally {
+      getPaymentSubscriptionsList();
+      setIsModalOpen(false);
+      setModalType("");
+      setCancelReason(inititalCancel);
+      setSubscriptionId("");
+    }
+  };
+
+  const changeAutoRenewStatus = async(e) => {
+    e.preventDefault();
+    try {
+      const result = await dispatch(changeAutoRenewThunk({subscription_id: subscriptionId, status: "Manual", product_type: "google workspace"})).unwrap();
+      console.log("result....", result);
+      toast.success("Auto Renew Status updated");
+    } catch (error) {
+      if(error?.message == "Request failed with status code 401") {
+      toast.error("Auto Renew Status updation failed");
+      toast.error("Error making default payment method");
+        try {
+          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    } finally {
+      getPaymentSubscriptionsList();
+      setIsModalOpen(false);
+      setModalType("");
+      setSubscriptionId("");
     }
   }
 
@@ -457,6 +514,8 @@ const PaymentDetails: React.FC = () => {
                             ? "text-red-700 border-2 border-red-500 hover:bg-red-500"
                             : detail?.subscription_status === "Expired"
                             ? "bg-gray-300 text-gray-700 border-2 border-gray-500 hover:bg-gray-700"
+                            : detail?.subscription_status === "Cancel Requested"
+                            ? "text-yellow-600 border-2 border-yellow-600 hover:bg-gray-300"
                             : "text-green-500 border-2 border-green-500 hover:bg-green-500"
                         }`}
                       >
@@ -524,6 +583,7 @@ const PaymentDetails: React.FC = () => {
                                         onClick={() => {
                                           setIsModalOpen(true);
                                           setModalType(list?.label);
+                                          setSubscriptionId(detail?.id);
                                           if(list?.label === "View Invoice") {
                                             updateInvoiceData(detail?.payment_details);
                                           } else {
@@ -541,6 +601,7 @@ const PaymentDetails: React.FC = () => {
                                       onClick={() => {
                                         setIsModalOpen(true);
                                         setModalType(list?.label);
+                                        setSubscriptionId(detail?.id);
                                         if(list?.label === "View Invoice") {
                                           updateInvoiceData(detail?.payment_details);
                                         } else {
@@ -843,6 +904,7 @@ const PaymentDetails: React.FC = () => {
               setIsModalOpen(false);
               setModalType("");
               setCancelReason(inititalCancel);
+              setSubscriptionId("");
             }}
           >
             <div className="fixed inset-0 bg-black bg-opacity-50 z-40 w-screen overflow-y-auto mt-16">
@@ -863,6 +925,7 @@ const PaymentDetails: React.FC = () => {
                         setIsModalOpen(false);
                         setModalType("");
                         setCancelReason(inititalCancel);
+                        setSubscriptionId("");
                       }}
                     ><X /></button>
                   </div>
@@ -910,8 +973,8 @@ const PaymentDetails: React.FC = () => {
                     <button
                       className="font-inter font-semibold min-[440px]:text-base max-[440px]:text-sm text-[#F0F0F3] text-center items-center py-[10px] bg-[#12A833] w-[79px] rounded-[10px]"
                       type="button"
-                      // onClick={(e) => {deleteRole(e)}}
-                      disabled
+                      onClick={(e) => {cancelSubscription(e)}}
+                      disabled={cancelReason?.reason === "" ? true : false}
                     >Yes</button>
                     <button
                       className="font-inter font-semibold min-[440px]:text-base max-[440px]:text-sm text-[#F0F0F3] text-center items-center py-[10px] bg-[#EE1010] w-[79px] ml-[60px] rounded-[10px]"
@@ -920,6 +983,7 @@ const PaymentDetails: React.FC = () => {
                         setIsModalOpen(false);
                         setModalType("");
                         setCancelReason(inititalCancel);
+                        setSubscriptionId("");
                       }}
                     >Cancel</button>
                   </div>
@@ -1003,6 +1067,7 @@ const PaymentDetails: React.FC = () => {
             onClose={() => {
               setIsModalOpen(false);
               setModalType("");
+              setSubscriptionId("");
             }}
           >
             <div className="fixed inset-0 bg-black bg-opacity-50 z-40 w-screen overflow-y-auto mt-16">
@@ -1022,6 +1087,7 @@ const PaymentDetails: React.FC = () => {
                       onClick={() => {
                         setIsModalOpen(false);
                         setModalType("");
+                        setSubscriptionId("");
                       }}
                     ><X /></button>
                   </div>
@@ -1040,7 +1106,7 @@ const PaymentDetails: React.FC = () => {
                     <button
                       className="font-inter font-semibold min-[440px]:text-base max-[440px]:text-sm text-[#F0F0F3] text-center items-center py-[10px] bg-[#12A833] w-[79px] rounded-[10px]"
                       type="button"
-                      // onClick={(e) => {deleteRole(e)}}
+                      onClick={(e) => {changeAutoRenewStatus(e)}}
                     >Yes</button>
                     <button
                       className="font-inter font-semibold min-[440px]:text-base max-[440px]:text-sm text-[#F0F0F3] text-center items-center py-[10px] bg-[#EE1010] w-[79px] ml-[60px] rounded-[10px]"
@@ -1048,6 +1114,7 @@ const PaymentDetails: React.FC = () => {
                       onClick={() => {
                         setIsModalOpen(false);
                         setModalType("");
+                        setSubscriptionId("");
                       }}
                     >Cancel</button>
                   </div>

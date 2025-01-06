@@ -36,7 +36,7 @@ const DomainList: React.FC = () => {
   const [actionModalStyle, setActionModalStyle] = useState<React.CSSProperties | null>(null);
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [domainsList, setDomainsList] = useState([]);
-  // console.log("domainsList...", domainsList);
+  console.log("domainsList...", domainsList);
   const [emailsList, setEmailsList] = useState([intialEmail]);
   // console.log("emailList...", emailsList);
   const [licenseUsage, setLicenseUsage] = useState(0);
@@ -102,7 +102,7 @@ const DomainList: React.FC = () => {
       setDomainsList(result?.data);
     } catch (error) {
       setDomainsList([]);
-      if(error?.message == "Invalid token") {
+      if(error?.message == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');
@@ -274,20 +274,24 @@ const DomainList: React.FC = () => {
                 <div key={index} className="flex flex-col bg-gray-100 rounded-sm w-full p-4 relative">
                   <div className="flex min-[500px]:flex-row flex-col items-center justify-between mb-4">
                     <h3 className="text-gray-600 font-semibold text-xl md:text-lg sm-max:text-xs self-start" style={{wordBreak: 'break-word', wordWrap: 'break-word', overflowWrap: 'break-word'}}>{domain?.domain_name}</h3>
-                    <button
-                      className="px-4 py-2 md:px-3 sm-max:px-2 sm-max:text-xs bg-green-600 text-white font-medium rounded-md hover:bg-opacity-90"
-                      onClick={() => {
-                        setIsModalOpen(true);
-                        setNewEmailsCount(
-                          domain?.emails?.length > 0 ? parseInt(domain?.license_usage) - domain?.emails?.length : parseInt(domain?.license_usage)
-                        );
-                        setLicenseUsage(domain?.license_usage);
-                        setDomainId(domain?.id);
-                        setEmailsList(domain?.emails ? domain?.emails : []);
-                      }}
-                    >
-                      Add Emails
-                    </button>
+                    {
+                      domain?.domain_type === "primary" && (
+                        <button
+                          className="px-4 py-2 md:px-3 sm-max:px-2 sm-max:text-xs bg-green-600 text-white font-medium rounded-md hover:bg-opacity-90"
+                          onClick={() => {
+                            setIsModalOpen(true);
+                            setNewEmailsCount(
+                              domain?.emails?.length > 0 ? parseInt(domain?.license_usage) - domain?.emails?.length : parseInt(domain?.license_usage)
+                            );
+                            setLicenseUsage(domain?.license_usage);
+                            setDomainId(domain?.id);
+                            setEmailsList(domain?.emails ? domain?.emails : []);
+                          }}
+                        >
+                          Add Emails
+                        </button>
+                      )
+                    }
                   </div>
     
                   <div className="w-full overflow-x-auto">

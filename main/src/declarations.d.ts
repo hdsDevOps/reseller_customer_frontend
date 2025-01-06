@@ -81,6 +81,16 @@ declare module 'store/user.thunk' {
   export const getNotificationsListThunk;
   export const readNotificationThunk;
   export const toggleNotificationStatusThunk;
+  export const getPaymentSubscriptionsListThunk;
+  export const savedCardsListThunk;
+  export const saveCardsThunk;
+  export const getPaymentMethodsThunk;
+  export const addBillingHistoryThunk;
+  export const getProfileDataThunk;
+  export const getPaymentMethodsThunk;
+  export const makeDefaultPaymentMethodThunk;
+  export const cancelSubscriptionThunk;
+  export const changeAutoRenewThunk;
 }
 
 declare module 'store/authSlice' {
@@ -88,8 +98,10 @@ declare module 'store/authSlice' {
   import { UserDetailsState } from 'store/authSlice';
 
   export const setTokenDetails: (payload: string) => PayloadAction<string>;
-  export const setUserDetails: (payload: string) => PayloadAction<string>;
   // Other exports
   export const setCart: (payload: string) => PayloadAction<string>;
   export const setDomains: (payload: string) => PayloadAction<string>;
+  export const setSaveCards: (payload: string) => PayloadAction<string>;
+  export const setPaymentMethodsState: (payload: string) => PayloadAction<string>;
+  export const setUserDetails: (payload: string) => PayloadAction<string>;
 }

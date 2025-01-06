@@ -149,12 +149,12 @@ export async function deleteApiCall(
 
 export async function uploadImageApiCall(
   endPoint: string,
-  imageFile: any,
+  image: any,
   user_id: string
 ): Promise<any | CustomError> {
   try {
     const formData = new FormData();
-    formData.append("image", imageFile);
+    formData.append("image", image);
     formData.append("user_id", user_id);
     const fetchedData = await axiosInstance.post(endPoint, formData, {
       headers:{

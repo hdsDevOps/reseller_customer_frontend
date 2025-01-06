@@ -43,6 +43,8 @@
     "@types/react-redux": "^7.1.33",
     "axios": "^1.7.2",
     "date-fns": "^4.1.0",
+    "html2canvas-pro": "^1.5.8",
+    "jspdf": "^2.5.2",
     "lucide-react": "^0.439.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

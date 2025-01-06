@@ -175,11 +175,11 @@ async function cancelDomainApi(
 };
 
 async function updateLicenseUsageApi(
-  domain_id: string,
-  license_usage: string,
+  user_id: string,
+  license_usage: string|number,
 ): Promise<any> {
   try {
-    const result = await postApiCall(endPoints.updateLicenseUsage, { domain_id, license_usage });
+    const result = await postApiCall(endPoints.updateLicenseUsage, { user_id, license_usage });
     return result;
   } catch (error: any) {
     throw error;
@@ -417,6 +417,25 @@ async function getBillingHistoryApi(
   }
 };
 
+async function addBillingHistoryApi(
+  transaction_id: string,
+  date: string,
+  invoice_no: string,
+  product_type: string,
+  description: string,
+  domain: string,
+  payment_method: string,
+  payment_status: string,
+  amount: string
+): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.addBillingHistory, {  transaction_id, date, invoice_no, product_type, description, domain, payment_method, payment_status, amount });
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 async function plansAndPricesListApi(
   subscription_id:string
 ): Promise<any> {
@@ -464,11 +483,11 @@ async function udpateProfileDataApi(
 };
 
 async function uploadProfilePhotoApi(
-  user_id:string,
-  image:any
+  image:any,
+  user_id:string
 ): Promise<any> {
   try {
-    const result = await uploadImageApiCall(endPoints.uploadProfilePhoto, user_id, image);
+    const result = await uploadImageApiCall(endPoints.uploadProfilePhoto, image, user_id);
     return result;
   } catch (error: any) {
     throw error;
@@ -526,10 +545,39 @@ async function addSubscriptionApi(
   payment_details:[],
   plan_name:string,
   workspace_status:string | Boolean,
-  is_trial:Boolean
+  is_trial:Boolean,
+  license_usage: string
 ): Promise<any> {
   try {
-    const result = await postApiCall(endPoints.addSubscription, { product_type, payment_cycle, customer_id, description, domain, last_payment, next_payment, payment_method, subscription_status, plan_name_id, payment_details, plan_name, workspace_status, is_trial });
+    const result = await postApiCall(endPoints.addSubscription, { product_type, payment_cycle, customer_id, description, domain, last_payment, next_payment, payment_method, subscription_status, plan_name_id, payment_details, plan_name, workspace_status, is_trial, license_usage });
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+async function cancelSubscriptionApi(
+  product_type:string,
+  subscription_id:string,
+  customer_id:string,
+  reason:string,
+  subscription_status:string,
+): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.cancelSubscription, { product_type, subscription_id, customer_id, reason, subscription_status });
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+async function changeAutoRenewApi(
+  subscription_id:string,
+  status:string,
+  product_type:string
+): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.changeAutoRenew, { subscription_id, status, product_type });
     return result;
   } catch (error: any) {
     throw error;
@@ -567,6 +615,29 @@ async function toggleNotificationStatusApi(
 ): Promise<any> {
   try {
     const result = await postApiCall(endPoints.toggleNotificationStatus, { user_id, status });
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+async function savedCardsListApi(
+  user_id: string
+): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.savedCardsList, { user_id });
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+async function saveCardsApi(
+  user_id: string,
+  card: []
+): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.saveCards, { user_id, card });
     return result;
   } catch (error: any) {
     throw error;
@@ -615,6 +686,7 @@ export const userApis = {
   getVouchersListApi,
 
   getBillingHistoryApi,
+  addBillingHistoryApi,
 
   plansAndPricesListApi,
 
@@ -627,8 +699,13 @@ export const userApis = {
 
   getPaymentSubscriptionsListApi,
   addSubscriptionApi,
+  cancelSubscriptionApi,
+  changeAutoRenewApi,
 
   getNotificationsListApi,
   readNotificationApi,
   toggleNotificationStatusApi,
+
+  savedCardsListApi,
+  saveCardsApi,
 };

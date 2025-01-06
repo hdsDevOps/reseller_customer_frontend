@@ -97,7 +97,7 @@ const MyStaff = () => {
       setUserTypes(result?.settings);
     } catch (error) {
       setUserTypes([]);
-      if(error?.message == "Invalid Token") {
+      if(error?.message == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');
@@ -126,7 +126,7 @@ const MyStaff = () => {
       setStaffs(result?.data);
     } catch (error) {
       setStaffs([]);
-      if(error?.message == "Authentication token is required") {
+      if(error?.message == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');
@@ -357,7 +357,7 @@ const MyStaff = () => {
               className='max-w-[315px] bg-white py-2 pl-3 w-full border text-sm text-[#7E7E7E] font-inter font-light border-[#E4E4E4]'
               value={filter?.search_text || type2}
               onChange={(e) => {
-                setType2(e.target.value)
+                setType2(e.target.value);
               }}
             />
             <button
@@ -366,7 +366,7 @@ const MyStaff = () => {
               onClick={() => {
                 setFilter({
                   ...filter,
-                  search_text: type2
+                  search_text: type2.replace('+', '')
                 });
                 setType("");
               }}

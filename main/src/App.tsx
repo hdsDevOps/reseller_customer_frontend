@@ -7,8 +7,8 @@ import UserAuth from "./hoc/UserAuth.hoc";
 import MainApp from "./pages";
 import AuthApp from "auth/AuthApp";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { getCartThunk, getDomainsListThunk, getProfileDataThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, removeUserAuthTokenFromLSThunk } from 'store/user.thunk';
-import { setCart, setDomains, setResellerToken, setUserDetails } from 'store/authSlice';
+import { getCartThunk, getDomainsListThunk, getPaymentMethodsThunk, getProfileDataThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, removeUserAuthTokenFromLSThunk, savedCardsListThunk } from 'store/user.thunk';
+import { setCart, setDomains, setPaymentMethodsState, setResellerToken, setSaveCards, setUserDetails } from 'store/authSlice';
 import "auth/AuthCss";
 import "./index.css";
 
@@ -37,16 +37,18 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const getProfileData = async() => {
-      try {
-        const result = await dispatch(getProfileDataThunk({user_id: customerId})).unwrap();
-        await dispatch(setUserDetails(result?.customerData));
-      } catch (error) {
-        if(error?.message == "Invalid token") {
-          try {
-            const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
-            navigate('/login');
-          } catch (error) {
-            //
+      if(token) {
+        try {
+          const result = await dispatch(getProfileDataThunk({user_id: customerId})).unwrap();
+          await dispatch(setUserDetails(result?.customerData));
+        } catch (error) {
+          if(error?.message == "Request failed with status code 401") {
+            try {
+              const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+              navigate('/login');
+            } catch (error) {
+              //
+            }
           }
         }
       }
@@ -68,16 +70,18 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const getCartItems = async() => {
-      try {
-        const result = await dispatch(getCartThunk({user_id: customerId})).unwrap();
-        await dispatch(setCart(result?.cart));
-      } catch (error) {
-        if(error?.message == "Invalid token") {
-          try {
-            const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
-            navigate('/login');
-          } catch (error) {
-            //
+      if(token) {
+        try {
+          const result = await dispatch(getCartThunk({user_id: customerId})).unwrap();
+          await dispatch(setCart(result?.cart));
+        } catch (error) {
+          if(error?.message == "Request failed with status code 401") {
+            try {
+              const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+              navigate('/login');
+            } catch (error) {
+              //
+            }
           }
         }
       }
@@ -87,21 +91,67 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const getDomains = async() => {
-      try {
-        const result = await dispatch(getDomainsListThunk({customer_id: customerId})).unwrap();
-        await dispatch(setDomains(result?.data));
-      } catch (error) {
-        if(error?.message == "Invalid token") {
-          try {
-            const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
-            navigate('/login');
-          } catch (error) {
-            //
+      if(token) {
+        try {
+          const result = await dispatch(getDomainsListThunk({customer_id: customerId})).unwrap();
+          await dispatch(setDomains(result?.data));
+        } catch (error) {
+          if(error?.message == "Request failed with status code 401") {
+            try {
+              const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+              navigate('/login');
+            } catch (error) {
+              //
+            }
           }
         }
       }
     };
     getDomains();
+  }, [customerId]);
+
+  useEffect(() => {
+    const getsavedCards = async() => {
+      if(token) {
+        try {
+          const result = await dispatch(savedCardsListThunk({user_id: customerId})).unwrap();
+          await dispatch(setSaveCards(result?.cards));
+          // console.log("result///", result)
+        } catch (error) {
+          if(error?.message == "Request failed with status code 401") {
+            try {
+              const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+              navigate('/login');
+            } catch (error) {
+              //
+            }
+          }
+        }
+      }
+    };
+    getsavedCards();
+  }, [customerId]);
+
+  useEffect(() => {
+    const getPaymentMethodsState = async() => {
+      if(token) {
+        try {
+          const result = await dispatch(getPaymentMethodsThunk({user_id: customerId})).unwrap();
+          await dispatch(setPaymentMethodsState(result?.paymentMethods));
+          // console.log("result///", result)
+        } catch (error) {
+          if(error?.message == "Request failed with status code 401") {
+            try {
+              const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+              navigate('/login');
+            } catch (error) {
+              //
+            }
+          }
+        }
+      }
+    };
+    getPaymentMethodsState();
   }, [customerId]);
 
   return (

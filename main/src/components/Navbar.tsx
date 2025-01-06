@@ -16,7 +16,7 @@ import {
 
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { CiCreditCard1 } from "react-icons/ci";
-import { useAppDispatch } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 import { setTokenDetails } from "store/authSlice";
 import { removeUserAuthTokenFromLSThunk, removeUserIdFromLSThunk } from 'store/user.thunk';
 
@@ -72,10 +72,8 @@ const Sidebar = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const { userDetails } = useAppSelector(state => state.auth);
   const [isOpen, setIsOpen] = useState(false);
-  const [image, setImage] = useState<string | ArrayBuffer | null>(
-    localStorage.getItem("profileImage") || null
-  );
   const [username] = useState("Robert Clive"); // Replace with actual username
   const [email] = useState("roberclive@domain.co.in"); // Replace with actual email
 
@@ -84,21 +82,6 @@ const Sidebar = () => {
     await dispatch(removeUserIdFromLSThunk());
     navigate("/login");
     localStorage.clear();
-  };
-
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setImage(base64String);
-        localStorage.setItem("profileImage", base64String);
-      };
-
-      reader.readAsDataURL(file);
-    }
   };
 
   const getLinkClass = (path: string) => {
@@ -127,26 +110,15 @@ const Sidebar = () => {
       </div>
       <div className="p-[14px] flex-1 mt-2">
         <div className="bg-[#DAE8FF] shadow-sm p-[6px] rounded-md flex items-center gap-2 my-[10px]">
-          <div className="relative">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-              id="profileImageUpload"
-            />
-            <label htmlFor="profileImageUpload">
-              <img
-                src={image ? (image as string) : "/default-profile.png"}
-                alt="Profile"
-                className="w-10 h-10 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full border-2 border-gray-300 object-cover cursor-pointer"
-              />
-            </label>
-          </div>
+          <img
+            src={userDetails?.profile_image || 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/profile-image.png?alt=media&token=faf9b1b9-7e08-496a-a6c1-355911d7b384'}
+            alt="Profile"
+            className="w-10 h-10 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full border-2 border-gray-300 object-cover cursor-pointer"
+          />
           <div className={`flex items-center gap-2 overflow-hidden ${isOpen ? "flex" : "hidden  sm:flex"}`}>
             <div className="flex flex-col text-xs ml-2">
-              <span className="font-medium text-gray-600">{username}</span>
-              <span className="text-gray-400">{email}</span>
+              <span className="font-medium text-gray-600">{userDetails?.first_name}&nbsp;{userDetails?.last_name}</span>
+              <span className="text-gray-400">{userDetails?.email}</span>
             </div>
             <div className="text-gray-400 text-sm">
               <PanelLeftClose className="w-4 h-4" />

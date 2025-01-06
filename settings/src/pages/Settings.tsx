@@ -62,7 +62,7 @@ const Settings = () => {
       setUserTypes(result?.settings);
     } catch (error) {
       setUserTypes([]);
-      if(error?.message == "Invalid Token") {
+      if(error?.message == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');
@@ -211,7 +211,7 @@ const Settings = () => {
       }, 1000);
     } catch (error) {
       toast.error("Error deleting user type");
-      if(error?.message == "Invalid Token") {
+      if(error?.message == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');

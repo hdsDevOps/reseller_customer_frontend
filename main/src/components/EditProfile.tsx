@@ -339,7 +339,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
             handleCloseShowModal();
             toast.error("Error updating profile");
             console.log(error)
-            if(error?.message == "Invalid token") {
+            if(error?.message == "Request failed with status code 401") {
                 try {
                     const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
                     navigate('/login');

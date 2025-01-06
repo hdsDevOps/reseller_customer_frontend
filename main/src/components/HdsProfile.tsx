@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { IoArrowBackSharp } from "react-icons/io5";
 import { FaCamera } from "react-icons/fa";
 import { PiEyeClosedBold } from "react-icons/pi";
@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { toast } from 'react-toastify';
-import { removeUserAuthTokenFromLSThunk, uploadProfilePhotoThunk } from 'store/user.thunk';
+import { getProfileDataThunk, removeUserAuthTokenFromLSThunk, udpateProfileDataThunk, uploadProfilePhotoThunk } from 'store/user.thunk';
 import { setUserDetails } from 'store/authSlice';
 import ReactCrop, { centerCrop, Crop, makeAspectCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
@@ -35,7 +35,8 @@ const HdsProfile = () => {
     };
     const [imageModal, setImageModal] = useState(false);
     const [image, setImage] = useState(null);
-    console.log("image...", image);
+    // console.log("image...", image);
+    console.log("user details...", userDetails);
   
     const [crop, setCrop] = useState<Crop>({
       x: 0,
@@ -46,15 +47,40 @@ const HdsProfile = () => {
     });
     const [zoom, setZoom] = useState(1);
     const imgRef = useRef(null);
+    console.log("image ref...", imgRef);
 
     const handleZoomChange = (e) => {
       setZoom(Number(e.target.value)); // Update zoom state
     };
 
+    const showImage = () => {
+      const file = image;
+      if(file){
+            if(file instanceof File){
+                const reader = new FileReader();
+                reader.onload = () => {
+                    if (imgRef.current) {
+                    imgRef.current.src = reader.result;
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+            else if(typeof file === 'string'){
+                if (imgRef.current) {
+                    imgRef.current.src = file;
+                }
+            }
+        }
+    };
+
+    useEffect(() => {
+        showImage();
+    }, [image]);
+
     const imageUpload = async(e) => {
         e.preventDefault();
         if(image === null) {
-          const defaultImageURL = userDetails?.profile_pic;
+          const defaultImageURL = userDetails?.profile_image;
           // const defaultImageURL = 'http://localhost:3000/images/logo.jpeg'
     
           const response = await fetch(defaultImageURL);
@@ -95,7 +121,7 @@ const HdsProfile = () => {
             })
           } catch (error) {
             toast.error("Error uploading profile image");
-            if(error?.message == "Invalid Token") {
+            if(error?.message == "Request failed with status code 401") {
               try {
                 const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
                 navigate('/login');
@@ -138,12 +164,12 @@ const HdsProfile = () => {
               } else {
                 const file = new File([blob], "resized-image.png", {type: 'image/png'});
                 const result = await dispatch(uploadProfilePhotoThunk({image: file, user_id: customerId})).unwrap();
-                console.log("result ...", result);
+                console.log("result2...", result);
                 toast.success("Profile image updated successfully");
-                // const updateProfile = await dispatch(updateAdminDetailsThunk({
-                //   userid: userId,
-                //   profile_pic: result?.url
-                // })).unwrap();
+                const getProfile = await dispatch(getProfileDataThunk({
+                  user_id: customerId
+                })).unwrap();
+                await dispatch(setUserDetails(getProfile?.customerData));
               }
             })
           } catch (error) {
@@ -158,10 +184,9 @@ const HdsProfile = () => {
             }
             console.log("error...", error);
           } finally {
-            // dispatch(setUserDetails(profile));
-            // setImageModal(false);
-            // setImage(null);
-            // setZoom(1);
+            setImageModal(false);
+            setImage(null);
+            setZoom(1);
           }
         }
     };
@@ -173,8 +198,12 @@ const HdsProfile = () => {
         </h2>
         <div className='flex justify-between items-center pt-4'>
             <div className='relative'>
-                <img src='.\images\profile-image.png' className='' alt='profile_image'/>
-                <div onClick={() => {setImageModal(true)}} className='border border-[#5A5A5A] rounded-full p-1 cursor-pointer absolute top-[5rem] left-[4rem]'>
+                <img
+                    src={userDetails?.profile_image || 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/profile-image.png?alt=media&token=faf9b1b9-7e08-496a-a6c1-355911d7b384'}
+                    className={`w-full h-full max-h-[93px] min-h-[93px] rounded-full object-contain border border-black`}
+                    alt='profile_image'
+                />
+                <div onClick={() => {setImageModal(true)}} className='border border-[#5A5A5A] bg-white rounded-full p-1 cursor-pointer absolute top-[4rem] left-[4rem]'>
                     <FaCamera size={16} color='#12A833'/>
                 </div>
             </div>
@@ -378,24 +407,28 @@ const HdsProfile = () => {
                     onSubmit={imageUpload}
                 >
                     <div className="flex flex-col justify-center items-center">
-                    <div className="relative items-center w-[300px] [300px] border">
-                        <ReactCrop
-                        // crop={crop}
-                        onChange={(newCrop) => { setCrop(newCrop) }}
-                        className='w-[300px] h-[300px] relative overflow-hidden'
-                        >
-                        <img
-                            ref={imgRef}
-                            src={image === null ? userDetails?.profile_pic : image}
-                            alt='profile picture'
-                            className={`absolute top-0 left-0 transform scale-[${zoom}] duration-200 ease-in-out w-full h-full`}
-                        />
-                        <div className='absolute inset-0 flex items-center justify-center'>
-                            <div className='w-full h-full rounded-full bg-transparent z-10' style={{boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.6)'}}></div>
-                            {/* <div className='absolute inset-0 bg-black opacity-50 mix-blend-darken pointer-events-none'></div> */}
+                        <div className="relative items-center w-[300px] [300px] border">
+                            <ReactCrop
+                                // crop={crop}
+                                onChange={(newCrop) => { setCrop(newCrop) }}
+                                className='w-[300px] h-[300px] relative overflow-hidden'
+                            >
+                                <img
+                                    ref={imgRef}
+                                    src={
+                                        image === null ?
+                                        userDetails?.profile_image ? userDetails?.profile_image :
+                                        'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/profile-image.png?alt=media&token=faf9b1b9-7e08-496a-a6c1-355911d7b384' : image
+                                    }
+                                    alt='profile picture'
+                                    className={`absolute top-0 left-0 transform scale-[${zoom}] duration-200 ease-in-out w-full h-full`}
+                                />
+                                <div className='absolute inset-0 flex items-center justify-center'>
+                                    <div className='w-full h-full rounded-full bg-transparent z-10' style={{boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.6)'}}></div>
+                                    {/* <div className='absolute inset-0 bg-black opacity-50 mix-blend-darken pointer-events-none'></div> */}
+                                </div>
+                            </ReactCrop>
                         </div>
-                        </ReactCrop>
-                    </div>
                     </div>
                     <div>
                     <label

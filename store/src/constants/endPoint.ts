@@ -19,7 +19,7 @@ export const endPoints = {
     getDomainsList: 'customerservices/domain/api/v1/domain-list',
     addNewDomain: 'customerservices/domain/api/v1/adddomain',
     cancelDomain: 'customerservices/domain/api/v1/delete-domain',
-    updateLicenseUsage: 'customerservices/domain/api/v1/update_license_usage',
+    updateLicenseUsage: 'subscriptionservices/subscription/api/v1/update_license_usage',
 
     // emails
     addEmails: 'userservices/user/api/v1/addemail',
@@ -51,6 +51,7 @@ export const endPoints = {
 
     // billing history
     getBillingHistory: 'customerservices/home/api/v1/getbillinghistory',
+    addBillingHistory: 'customerservices/home/api/v1/add_billing_data',
 
     // landing page
     plansAndPricesList: 'customerservices/home/api/v1/getsubscriptiondata',
@@ -67,11 +68,19 @@ export const endPoints = {
     // payment subscription
     getPaymentSubscriptionsList: 'subscriptionservices/subscription/api/v1/get_customer_subscription',
     addSubscription: 'subscriptionservices/subscription/api/v1/add_customer_subscription',
+    cancelSubscription: 'subscriptionservices/subscription/api/v1/update_customer_subscription',
+    changeAutoRenew: 'subscriptionservices/subscription/api/v1/change_auto_renewal_status',
 
     // notifications
     getNotificationsList: 'userservices/user/api/v1/get_notifications',
     readNotification: 'userservices/user/api/v1/get_notifications',
     toggleNotificationStatus: 'userservices/user/api/v1/update_notification_status_on_off',
+
+    // saved cards
+    savedCardsList: 'customerservices/user/api/v1/card_list',
+    saveCards: 'customerservices/user/api/v1/update_card',
+
+
 };
 
 export const resellerEndPoints = {

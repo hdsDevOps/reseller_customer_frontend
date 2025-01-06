@@ -6,8 +6,9 @@ import { TbInfoTriangleFilled } from "react-icons/tb";
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { format } from "date-fns";
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { addNewDomainThunk, addSubscriptionThunk, addToCartThunk, getDomainsListThunk, removeUserAuthTokenFromLSThunk } from 'store/user.thunk';
-import { setCart, setDomains } from 'store/authSlice';
+import { addNewDomainThunk, addSubscriptionThunk, addToCartThunk, getDomainsListThunk, getProfileDataThunk, removeUserAuthTokenFromLSThunk } from 'store/user.thunk';
+import { setCart, setDomains, setUserDetails } from 'store/authSlice';
+import { toast } from 'react-toastify';
 
 function Review() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ function Review() {
   const [isChecked, setIsChecked] = useState(false);
 
   const cart = location.state?.cart;
-  // console.log("cart...", cart);
+  console.log("cart...", cart);
 
   const initialData = {
     customer_id: "",
@@ -37,7 +38,7 @@ function Review() {
   };
 
   const [data, setData] = useState(initialData);
-  // console.log("data...", data);
+  console.log("data...", data);
 
   useEffect(() =>{
     setData({
@@ -79,6 +80,22 @@ function Review() {
     setIsChecked(!isChecked);
   };
 
+  const getUserDetails = async() => {
+    try {
+      const result = await dispatch(getProfileDataThunk({user_id: customerId})).unwrap();
+      await dispatch(setUserDetails(result?.customerData));
+    } catch (error) {
+      if(error?.error == "Request failed with status code 401") {
+        try {
+          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    }
+  }
+
   const topForm = [
     { label: 'Tax status', name: 'tax_status', placeholder: 'Select your text status', type: 'select', },
     { label: 'PAN (optional)', name: 'pan_number', placeholder: 'Enter your PAN number', type: 'text', },
@@ -98,7 +115,7 @@ function Review() {
       const result = await dispatch(getDomainsListThunk({customer_id: customerId})).unwrap();
       await dispatch(setDomains(result?.data));
     } catch (error) {
-      if(error?.message == "Invalid token") {
+      if(error?.message == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');
@@ -125,12 +142,13 @@ function Review() {
         payment_details: [{name: "asa", amount: location?.state?.price?.finalTotalPrice}],
         plan_name: item?.product_name,
         workspace_status: "active",
-        is_trial: true
+        is_trial: true,
+        license_usage: item?.total_year
       })).unwrap();
       console.log("result1...", result);
     } catch (error) {
       console.log(error);
-      if(error?.error == "Invalid token") {
+      if(error?.error == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');
@@ -164,7 +182,7 @@ function Review() {
       console.log("result2...", result);
     } catch (error) {
       console.log(error);
-      if(error?.error == "Invalid token") {
+      if(error?.error == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');
@@ -196,7 +214,7 @@ function Review() {
       console.log("result3...", result);
     } catch (error) {
       console.log(error);
-      if(error?.error == "Invalid token") {
+      if(error?.error == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');
@@ -226,7 +244,7 @@ function Review() {
       })).unwrap();
       console.log("result...", result);
     } catch (error) {
-      if(error?.error == "Invalid token") {
+      if(error?.error == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');
@@ -249,7 +267,7 @@ function Review() {
       navigate('/add-cart');
     } catch (error) {
       console.log(error);
-      if(error?.error == "Invalid token") {
+      if(error?.error == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');
@@ -263,17 +281,22 @@ function Review() {
   const handleSubmit = async(e) => {
     e.preventDefault();
     if(cart.length > 0) {
-      await cart?.map((item) => {
-        if(item?.product_type === "google workspace") {
-          addSubscriptionForWorkspace(item);
-        } else if(item?.product_type.toLowerCase() === "domain") {
-          addDomain(item);
-          addSubscriptionForDomain(item);
-        } else {
-          addSubscription(item);
-        }
-      });
-      updateCart();
+      if(data?.payment_method !== "") {
+        await cart?.map((item) => {
+          if(item?.product_type === "google workspace") {
+            addSubscriptionForWorkspace(item);
+          } else if(item?.product_type.toLowerCase() === "domain") {
+            addDomain(item);
+            addSubscriptionForDomain(item);
+          } else {
+            addSubscription(item);
+          }
+        });
+        await updateCart();
+        getUserDetails();
+      } else {
+        toast.warning("Please select a payment method");
+      }
     }
     else {
       navigate('/');

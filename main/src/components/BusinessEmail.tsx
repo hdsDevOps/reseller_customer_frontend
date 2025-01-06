@@ -19,7 +19,7 @@ const intialEmail = {
 }
 
 const EmailList: React.FC = ({data, getDomainsList}) => {
-  console.log(data);
+  // console.log(data);
   const { customerId } = useAppSelector(state => state.auth);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLicenseModalOpen, setisLicenseModalOpen] = useState<boolean>(false);
@@ -102,7 +102,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
   const toggleStatus = async( domainId:string, email:string, status:Boolean ) => {
     try {
       const result = await dispatch(changeEmailStatusThunk({ domain_id: domainId, email: email, status: !status })).unwrap();
-      console.log("result...", result);
+      // console.log("result...", result);
     } catch (error) {
       toast.error("Error updating email status");
       if(error?.message == "Authentication token is required") {
