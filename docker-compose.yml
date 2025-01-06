@@ -63,14 +63,6 @@ services:
       - 3010:3010
     networks:
       - dev_network
-  
-  api:
-    build: ./api
-    container_name: microfrontend_customer_api
-    ports:
-      - 3011:3011
-    networks:
-      - dev_network
  
 networks:
   dev_network:

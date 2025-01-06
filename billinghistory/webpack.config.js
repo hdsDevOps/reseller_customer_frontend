@@ -6,16 +6,16 @@ const Dotenv = require('dotenv-webpack');
 const deps = require("./package.json").dependencies;
 
 const printCompilationMessage = require('./compilation.config.js');
-
+   
 module.exports = (_, argv) => ({
   output: {
-    publicPath: "http://localhost:3010/",
+    publicPath: "auto",
   },
-
+             
   resolve: {
     extensions: [".tsx", ".ts", ".jsx", ".js", ".json"],
   },
-
+   
   devServer: {
     port: 3010,
     allowedHosts: ["all"],
@@ -60,7 +60,7 @@ module.exports = (_, argv) => ({
       },
     ],
   },
-
+    
   plugins: [
     new ModuleFederationPlugin({
       name: "billinghistory",
@@ -89,3 +89,4 @@ module.exports = (_, argv) => ({
     new Dotenv()
   ],
 });
+   

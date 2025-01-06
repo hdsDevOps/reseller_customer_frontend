@@ -11,6 +11,9 @@ RUN mkdir -p /billinghistory
 # Set /app as the working directory
 WORKDIR /billinghistory
 
+# Install git and other required tools
+RUN apk add --no-cache git python3 make g++
+
 # Copy package.json and package-lock.json
 # to the /app working directory
 COPY package*.json /billinghistory
@@ -21,7 +24,7 @@ RUN npm install
 # Copy the rest of our Next.js folder into /app
 COPY . /billinghistory
 
-# Ensure port 3002 is accessible to our system
+# Ensure port 3000 is accessible to our system
 EXPOSE 3010
 
 # Run yarn dev, as we would via the command line 
