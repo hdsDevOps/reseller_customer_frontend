@@ -1,17 +1,19 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { IoChevronBackSharp } from "react-icons/io5";
 import SummaryDomainDetails from "../components/Summary/SummaryDomainDetails"
 import DomainSummary from "../components/Summary/DomainSummary"
 
 const Summary: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  // console.log("location state...", location.state);
   return (
     <div className="relative flex flex-col items-center justify-center w-full h-full gap-6 p-4">
       {" "}
       <p
         className="absolute flex items-center gap-1 text-green-600 cursor-pointer left-4 top-2"
-        onClick={() => navigate(-1)}
+        onClick={() => {navigate(-1), {state: location.state}}}
       >
         {" "}
         <IoChevronBackSharp /> Back to previous page{" "}
@@ -20,7 +22,7 @@ const Summary: React.FC = () => {
         {" "}
         <div className="w-[45%]">
           {" "}
-          < SummaryDomainDetails/>{" "}
+          < SummaryDomainDetails state={location.state}/>{" "}
         </div>{" "}
         <div className="w-[45%]">
           {" "}

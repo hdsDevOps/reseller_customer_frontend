@@ -6,8 +6,8 @@ import { AiOutlineCheck } from "react-icons/ai";
 const SelectedDomain: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { state } = location;
-  const domain = state?.selectedDomain;
+  const domain = location.state.selectedDomain;
+  console.log(location.state)
 
 
   if (!domain) {
@@ -27,9 +27,9 @@ const SelectedDomain: React.FC = () => {
         <h1 className="mt-1 mb-4 text-3xl font-bold">The domain you want is available!</h1>
 
         <div className="flex items-center justify-between w-full p-4 bg-white border border-black rounded-sm">
-          <div className="text-lg font-semibold">{domain.name}</div>
+          <div className="text-lg font-semibold">{domain}</div>
           <div className="text-lg font-semibold">
-            <span className="font-normal text-green-500">Available</span> {domain.price}
+            <span className="font-normal text-green-500">Available</span> $99.99/year
           </div>
         </div>
 
@@ -54,11 +54,19 @@ const SelectedDomain: React.FC = () => {
         <button
           className="self-start px-4 py-2 mt-4 text-white bg-green-600 rounded-lg"
           // onClick={() => navigate('/signin-domain', { state: { selectedDomain: domain } })}
-          onClick={()=> navigate("/summary")}
+          onClick={()=> { 
+            navigate("/signin-domain", {state: location.state})
+          }}
         >
           Next
         </button>
-        <p className="self-start mt-1 text-xl font-bold text-green-600"><a href="/DomainDetails">Want to use a domain i already own</a></p>
+        <p className="self-start mt-1 text-xl font-bold text-green-600"><a
+          onClick={()=> {
+            location.state.from === "business_info" ?
+            navigate('/adddomain', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from}}) : 
+            navigate("/adddomain")
+          }}
+        >Want to use a domain i already own</a></p>
       </div>
     </div>
   );

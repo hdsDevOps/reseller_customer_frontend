@@ -49,7 +49,7 @@ declare module "store/user.thunk" {
   export const resgiterCustomerThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
   export const resendRegisterOtpThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
   export const verifyRegisterOtpThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
-  export const udpateProfileDataThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
+  export const udpateBusinessDataThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
 }
 
 

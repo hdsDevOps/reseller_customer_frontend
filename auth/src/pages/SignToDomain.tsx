@@ -11,15 +11,17 @@ const RECAPTCHA_SITE_KEY = "YOUR_RECAPTCHA_SITE_KEY";
 const SignInForm: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  console.log("location state...", location.state);
   
   // Retrieve the domain from the location state
-  const domain = location.state?.selectedDomain;
+  const domain = location.state.selectedDomain;
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
+  console.log("from data...", formData);
   // const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [charCount, setCharCount] = useState({
     username: 0,
@@ -53,6 +55,7 @@ const SignInForm: React.FC = () => {
     // } else {
     //   console.log("Please complete the reCAPTCHA.");
     // }
+    navigate('/free-trial', { state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, selectedDomain: location.state.selectedDomain, token: location.state.token, emailData: formData, from: location.state.from} });
   };
 
   return (
@@ -95,7 +98,7 @@ const SignInForm: React.FC = () => {
             {charCount.username}/64
           </span>
           <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">
-            {domain ? `@${domain.name}` : "@domain.co.in"}
+            @{domain}
           </span>
         </div>
 
@@ -104,7 +107,7 @@ const SignInForm: React.FC = () => {
           <input
             id="password"
             type={showPassword ? "text" : "password"}
-            placeholder="********"
+            placeholder="Enter your password"
             value={formData.password}
             onChange={handleChange}
             required
@@ -178,7 +181,7 @@ const SignInForm: React.FC = () => {
 
         <button
           type="submit"
-          className="bg-green-600 text-sm text-white p-[10px] px-4 rounded-lg mt-4" onClick={()=>navigate('/free-trial')}
+          className="bg-green-600 text-sm text-white p-[10px] px-4 rounded-lg mt-4"
         >
           Agree and Continue
         </button>

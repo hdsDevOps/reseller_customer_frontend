@@ -1,5 +1,6 @@
 import { apiError } from "../constants/apiError.const";
 import axiosInstance from "../services/api.service";
+import axiosInstance2 from '../services/api.service2';
 import CustomError from "../customClass/CustomError.class";
 
 /**
@@ -42,6 +43,39 @@ export async function postApiCall<T>(
 ): Promise<any | CustomError> {
   try {
     const fetchedData = await axiosInstance.post(endPoint, body);
+    // console.log("data...", fetchedData);
+    if (fetchedData.data?.status === 200 || fetchedData.data?.status === 201) {
+      return fetchedData?.data;
+    } else if (
+      fetchedData.data?.status === 401 ||
+      fetchedData.data?.status === 400 ||
+      fetchedData.data?.status === 410
+    ) {
+      throw new CustomError(
+        apiError.TOKEN_EXPIRED,
+        fetchedData.data?.message || fetchedData.data?.msg
+      );
+    } else {
+      throw new CustomError(
+        apiError.DATA_NOT_FOUND,
+        fetchedData.data?.message || fetchedData.data?.msg
+      );
+    }
+  } catch (error: any) {
+    if (error instanceof CustomError) {
+      throw error;
+    }
+    throw new CustomError(apiError.API_CALL_FAILED, error?.message);
+  }
+}
+
+export async function postApiCall2<T>(
+  endPoint: string,
+  body: T | any,
+  token: string
+): Promise<any | CustomError> {
+  try {
+    const fetchedData = await axiosInstance2.post(endPoint, body, {headers: {'Authorization': `Bearer ${token}`}});
     // console.log("data...", fetchedData);
     if (fetchedData.data?.status === 200 || fetchedData.data?.status === 201) {
       return fetchedData?.data;

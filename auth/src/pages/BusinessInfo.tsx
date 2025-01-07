@@ -6,6 +6,8 @@ import { IoChevronBackSharp } from "react-icons/io5";
 import "./cumtel.css";
 import { useAppDispatch } from "store/hooks";
 import axios from "axios";
+import { udpateBusinessDataThunk } from "store/user.thunk";
+import { toast } from "react-toastify";
 
 //user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, business_zip_code
 
@@ -16,7 +18,7 @@ const BusinessInfo: React.FC = () => {
   const stateRef = useRef(null);
   const cityRef = useRef(null);
 
-  // console.log("state....", location.state);
+  console.log("state....", location.state);
 
   useEffect(() => {
     if(!location.state) {
@@ -37,7 +39,7 @@ const BusinessInfo: React.FC = () => {
   const [state, setState] = useState({});
   const [city, setCity] = useState({});
   // console.log({countries, states, cities});
-  console.log({country, state, city});
+  // console.log({country, state, city});
 
   useEffect(() => {
     const countryFind = countries?.find(item => item?.name === region);
@@ -157,6 +159,30 @@ const BusinessInfo: React.FC = () => {
     // Handle form submission or navigate to another route
     // navigate("/adddomain");
     e.preventDefault();
+    try {
+      const result = await dispatch(udpateBusinessDataThunk({
+        user_id: location.state.customer_id,
+        first_name: location.state.formData.first_name,
+        last_name: location.state.formData.last_name,
+        email: location.state.formData.email,
+        phone_no: formData?.phone_no,
+        address: formData?.address,
+        state: '',
+        city: '',
+        country: region,
+        password: '',
+        business_name: formData?.business_name,
+        business_state: formData?.business_state,
+        business_city: formData?.business_city,
+        business_zip_code: formData?.business_zip_code,
+        token: location.state.token
+      })).unwrap();
+      // console.log("result...", result);
+      toast.success("Business Information updated successfully");
+      navigate("/adddomain", {state: {customer_id: location.state.customer_id, formData: formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: 'business_info'}});
+    } catch (error) {
+      toast.error("Error updating Business Information");
+    }
   };
 
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);

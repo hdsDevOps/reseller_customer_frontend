@@ -154,7 +154,7 @@ const Subscribe: React.FC = () => {
         zipcode: ''
       })).unwrap();
       console.log("result...", result);
-      navigate('/subscribeotp', { state: { plan: location.state, formData: formData, customer_id: result?.customer_id, license_usage: count }});
+      navigate('/subscribeotp', { state: { plan: location.state.plan, period: location.state.period, formData: formData, customer_id: result?.customer_id, license_usage: count }});
     } catch (error) {
       toast.error("Error registering");
     }

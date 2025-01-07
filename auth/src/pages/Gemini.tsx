@@ -1,10 +1,13 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import { FaClover } from "react-icons/fa6";
 import { IoChevronBackSharp } from "react-icons/io5";
 
 const PlanCard: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const geminiPlan = {
     name: "Gemini Standard",
     iconClass: "text-green-600",
@@ -20,7 +23,6 @@ const PlanCard: React.FC = () => {
     alternativePrice: "₹1.824",
   };
 
-  const navigate = useNavigate();
 
   return (
     <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative">
@@ -100,7 +102,7 @@ const PlanCard: React.FC = () => {
       </div>
       <button
         className="self-end bg-[#12a83c9d] uppercase text-black py-2 px-8 rounded-lg font-semibold"
-        onClick={() => navigate('/summary')} 
+        onClick={() => navigate('/summary', {state: location.state})} 
       >
         Skip
       </button>

@@ -185,7 +185,7 @@ const OTP: React.FC = () => {
 
     const handleCloseModal = () => {
         setShowModal(false);
-        navigate("/businessinfo", {state: {customer_id: customerId, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, token: token}});
+        navigate("/businessinfo", {state: {customer_id: customerId, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: token}});
     };
 
     return (

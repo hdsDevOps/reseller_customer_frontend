@@ -295,6 +295,13 @@ export const udpateProfileDataThunk = createAsyncThunk(
   }
 );
 
+export const udpateBusinessDataThunk = createAsyncThunk(
+  "users/udpateBusinessData",
+  async ({ user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, business_zip_code, token }: any) => {
+    return await userApis.udpateBusinessDataApi( user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, business_zip_code, token );
+  }
+);
+
 export const uploadProfilePhotoThunk = createAsyncThunk(
   "users/uploadProfilePhoto",
   async ({ image, user_id }: any) => {

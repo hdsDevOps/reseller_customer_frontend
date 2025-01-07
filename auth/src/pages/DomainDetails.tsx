@@ -1,16 +1,28 @@
 import React, { useState } from "react";
 import { FaTriangleExclamation } from "react-icons/fa6";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { IoChevronBackSharp } from "react-icons/io5";
 import "./cumtel.css";
+import { useAppDispatch } from "store/hooks";
+import { toast } from "react-toastify";
+import { checkDomainThunk } from "store/reseller.thunk";
 
 const DomainDetails: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useAppDispatch();
+  console.log("location state....", location.state);
+
+  const navigatedFrom = location.state.from;
+  // console.log("navigated from...", navigatedFrom);
   const [domainName, setDomainName] = useState("");
+  const [domainExtension, setDomainExtension] = useState(".com");
   const [domainError, setDomainError] = useState(false);
+  console.log({domainName, domainExtension});
 
   // State for "Use a Domain You Own" form
   const [existingDomainName, setExistingDomainName] = useState("");
+  // console.log("existing...", existingDomainName);
   const [existingDomainError, setExistingDomainError] = useState(false);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,22 +33,52 @@ const DomainDetails: React.FC = () => {
     setExistingDomainName(event.target.value);
   };
 
-  const handleToDomain = () => {
+  const handleToDomain = async(e) => {
+    e.preventDefault()
     if (domainName.trim() === "") {
       setDomainError(true);
       return;
+    } else {
+      setDomainError(false);
+      try {
+        const result = await dispatch(checkDomainThunk( `${domainName}${domainExtension}`)).unwrap();
+        console.log("result...", result);
+        if(result?.message === "Domain is Still Available for Purchase , doesn't belong to anyone yet" || result?.message === "Customer domain is Available to be used with a google workspace") {
+          if(location.state.from === "business_info") {
+            navigate('/selected-domain', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, selectedDomain: `${domainName}${domainExtension}`, type: 'new'}});
+          }
+        } else if(result?.message === "Customer domain is Already Registered with a Google Workspace") {
+          navigate('/domainlist', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, domain: {domainName, domainExtension}, type: 'new_error'}});
+        }
+      } catch (error) {
+        toast.error("Error searching for the domain");
+      }
     }
-    setDomainError(false);
-    navigate('/domainlist');
   };
 
-  const handleExistingDomainSubmit = () => {
+  const handleExistingDomainSubmit = async(e) => {
+    e.preventDefault();
     if (existingDomainName.trim() === "") {
       setExistingDomainError(true);
       return;
     }
-    setExistingDomainError(false);
-    navigate('/signin-domain');
+    else {
+      setExistingDomainError(false);
+      // navigate('/signin-domain');
+      try {
+        const result = await dispatch(checkDomainThunk( existingDomainName)).unwrap();
+        console.log("result...", result);
+        if(result?.message === "Domain is Still Available for Purchase , doesn't belong to anyone yet" || result?.message === "Customer domain is Available to be used with a google workspace") {
+          toast.warning("Domain is Still Available for Purchase , doesn't belong to anyone yet");
+        } else if(result?.message === "Customer domain is Already Registered with a Google Workspace") {
+          if(location.state.from === "business_info") {
+            navigate('/signin-domain', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, domain_name: existingDomainName, type: 'existing'}});
+          }
+        }
+      } catch (error) {
+        toast.error("Error searching domain");
+      }
+    }
   };
 
   return (
@@ -78,6 +120,8 @@ const DomainDetails: React.FC = () => {
                 />
                 <select
                   className="p-3 bg-transparent border-2 border-gray-200 rounded-md focus:border-blue-500 focus:outline-none"
+                  onChange={(e) => {setDomainExtension(e.target.value)}}
+                  value={domainExtension}
                 >
                   <option>.com</option>
                   <option>.cc</option>

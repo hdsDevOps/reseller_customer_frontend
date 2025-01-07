@@ -1,6 +1,8 @@
 import axios from "axios";
 import { endPoints } from "../constants/endPoint";
-import { getApiCall, postApiCall, uploadImageApiCall } from "../services/crud.service";
+import { getApiCall, postApiCall, postApiCall2, uploadImageApiCall } from "../services/crud.service";
+import CustomError from "../customClass/CustomError.class";
+import { apiError } from "../constants/apiError.const";
 
 async function userLoginApi(
   email: string,
@@ -500,20 +502,12 @@ async function udpateBusinessDataApi(
   business_zip_code:string,
   token:string
 ): Promise<any> {
-  // try {
-  //   const result = await postApiCall(endPoints.udpateProfileData, { user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, business_zip_code });
-  //   return result;
-  // } catch (error: any) {
-  //   throw error;
-  // }
-  axios
-    .post(`${process.env.BASE_URL}/${endPoints.updateEmailUserData}`, {user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, business_zip_code}, {headers: {
-      'Authorization': `Bearer ${token}`
-    }})
-    .then((res) => {
-      return res?.data;
-    })
-    .catch()
+  try {
+    const result = await postApiCall2(endPoints.udpateProfileData, { user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, business_zip_code }, token);
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
 };
 
 async function uploadProfilePhotoApi(
@@ -769,6 +763,7 @@ export const userApis = {
 
   getProfileDataApi,
   udpateProfileDataApi,
+  udpateBusinessDataApi,
   uploadProfilePhotoApi,
 
   getPaymentMethodsApi,

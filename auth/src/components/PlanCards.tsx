@@ -146,7 +146,11 @@ const PlanCard: React.FC = ({plans}:any) => {
                             >
                               Gemini add-on available
                             </button>
-                            <button type="button" onClick={() => {navigate('/subscribe', { state: plan })}} className="bg-black text-white py-2 px-3 w-full sm:py-2 sm:px-4 rounded-lg">
+                            <button type="button" onClick={() => {navigate('/subscribe', { state: {plan: plan, period: `${
+                              isYearly ? 'Yearly' : 
+                              checkbox ? 'Monthly' :
+                              'Yearly Subscription with monthly billing'
+                            }`} })}} className="bg-black text-white py-2 px-3 w-full sm:py-2 sm:px-4 rounded-lg">
                               Start Trial
                             </button>
                             {
@@ -243,7 +247,12 @@ const PlanCard: React.FC = ({plans}:any) => {
                           <button className="bg-green-100 text-black py-1 px-2 sm:py-1 sm:px-4 rounded-lg mb-2 sm:mb-0 font-semibold text-[10px] sm:text-[12px]">
                             Gemini add-on available
                           </button>
-                          <button type="button" onClick={() => {navigate('/subscribe', { state: plan })}} className="bg-black text-white py-2 px-3 w-full sm:py-2 sm:px-4 rounded-lg">
+                          <button type="button" onClick={() => {navigate('/subscribe', { state: {plan: plan, period: `${
+                              isYearly ? 'Yearly' : 
+                              checkbox ? 'Monthly' :
+                              'Yearly Subscription with monthly billing'
+                            }`} })}} 
+                            className="bg-black text-white py-2 px-3 w-full sm:py-2 sm:px-4 rounded-lg">
                             Start Trial
                           </button>
                         </div>
