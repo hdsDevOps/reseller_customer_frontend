@@ -94,7 +94,7 @@ export const resetPasswordThunk = createAsyncThunk(
 
 export const resgiterCustomerThunk = createAsyncThunk(
   "users/resgiterCustomer",
-  async ({ email, password, business_phone_number, first_name, last_name, business_name, region, street_name, state, city, zipcode  }: any) => {
+  async ({ email, password, business_phone_number, first_name, last_name, business_name, region, street_name, state, city, zipcode }: any) => {
     return await userApis.resgiterCustomerApi( email, password, business_phone_number, first_name, last_name, business_name, region, street_name, state, city, zipcode  );
   }
 );
@@ -376,5 +376,33 @@ export const saveCardsThunk = createAsyncThunk(
   "users/saveCards",
   async ({ user_id, card }: any) => {
     return await userApis.saveCardsApi( user_id, card );
+  }
+);
+
+export const getLandingPageThunk = createAsyncThunk(
+  "users/getLandingPage",
+  async () => {
+    return await userApis.getLandingPageApi();
+  }
+);
+
+export const getFaqsThunk = createAsyncThunk(
+  "users/getFaqs",
+  async () => {
+    return await userApis.getFaqsApi();
+  }
+);
+
+export const getBannerThunk = createAsyncThunk(
+  "users/getBanner",
+  async () => {
+    return await userApis.getBannerApi();
+  }
+);
+
+export const contactFormThunk = createAsyncThunk(
+  "users/contactForm",
+  async ({ first_name, last_name, email, phone_no, subject, message }:any) => {
+    return await userApis.contactFormApi( first_name, last_name, email, phone_no, subject, message );
   }
 );

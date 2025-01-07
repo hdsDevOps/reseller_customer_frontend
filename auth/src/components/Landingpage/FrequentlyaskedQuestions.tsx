@@ -1,8 +1,23 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Accordion from "./Resources/Accordion";
+import { useAppDispatch } from "store/hooks";
+import { getFaqsThunk } from "store/user.thunk";
 
 const FrequentlyAskedQuestions = () => {
-   const dottedline = (
+  const dispatch = useAppDispatch();
+  const [faqs, setFaqs] = useState([]);
+  const getFaqsList = async() => {
+    try {
+      const result = await dispatch(getFaqsThunk()).unwrap();
+      setFaqs(result?.data);
+    } catch (error) {
+      setFaqs([]);
+    }
+  };
+  useEffect(() => {
+    getFaqsList();
+  }, []);
+  const dottedline = (
     <svg height="4" width="100%" className="mt-4">
       <line
         x1="0"
@@ -19,7 +34,7 @@ const FrequentlyAskedQuestions = () => {
         <h2 className="text-greenbase font-semibold text-4xl">FAQ's</h2>
         {dottedline}
       </div>
-      <Accordion/>
+      <Accordion faqList={faqs} />
     </section>
   );
 };

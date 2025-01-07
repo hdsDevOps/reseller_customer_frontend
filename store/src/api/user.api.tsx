@@ -1,3 +1,4 @@
+import axios from "axios";
 import { endPoints } from "../constants/endPoint";
 import { getApiCall, postApiCall, uploadImageApiCall } from "../services/crud.service";
 
@@ -482,6 +483,39 @@ async function udpateProfileDataApi(
   }
 };
 
+async function udpateBusinessDataApi(
+  user_id:string,
+  first_name:string,
+  last_name:string,
+  email:string,
+  phone_no:string,
+  address:string,
+  state:string,
+  city:string,
+  country:string,
+  password:string,
+  business_name:string,
+  business_state:string,
+  business_city:string,
+  business_zip_code:string,
+  token:string
+): Promise<any> {
+  // try {
+  //   const result = await postApiCall(endPoints.udpateProfileData, { user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, business_zip_code });
+  //   return result;
+  // } catch (error: any) {
+  //   throw error;
+  // }
+  axios
+    .post(`${process.env.BASE_URL}/${endPoints.updateEmailUserData}`, {user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, business_zip_code}, {headers: {
+      'Authorization': `Bearer ${token}`
+    }})
+    .then((res) => {
+      return res?.data;
+    })
+    .catch()
+};
+
 async function uploadProfilePhotoApi(
   image:any,
   user_id:string
@@ -644,6 +678,49 @@ async function saveCardsApi(
   }
 };
 
+async function getLandingPageApi(): Promise<any> {
+  try {
+    const result = await getApiCall(endPoints.getLandingPage);
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+async function getFaqsApi(): Promise<any> {
+  try {
+    const result = await getApiCall(endPoints.getFaqs);
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+async function getBannerApi(): Promise<any> {
+  try {
+    const result = await getApiCall(endPoints.getBanner);
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+async function contactFormApi(
+  first_name:string,
+  last_name:string,
+  email:string,
+  phone_no:string,
+  subject:string,
+  message:string
+): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.contactForm, { first_name, last_name, email, phone_no, subject, message });
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 export const userApis = {
   userLoginApi,
   resendLoginOtpApi,
@@ -708,4 +785,9 @@ export const userApis = {
 
   savedCardsListApi,
   saveCardsApi,
+
+  getLandingPageApi,
+  getFaqsApi,
+  getBannerApi,
+  contactFormApi,
 };

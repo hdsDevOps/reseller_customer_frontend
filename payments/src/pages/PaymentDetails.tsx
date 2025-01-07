@@ -370,9 +370,9 @@ const PaymentDetails: React.FC = () => {
       console.log("result....", result);
       toast.success("Auto Renew Status updated");
     } catch (error) {
-      if(error?.message == "Request failed with status code 401") {
       toast.error("Auto Renew Status updation failed");
       toast.error("Error making default payment method");
+      if(error?.message == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');

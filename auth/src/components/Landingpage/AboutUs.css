@@ -1,0 +1,11 @@
+.grid-custom{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1024px) {
+  .grid-custom{
+    grid-template-columns: repeat(1, 1fr);
+  }
+}

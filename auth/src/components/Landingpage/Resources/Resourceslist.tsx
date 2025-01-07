@@ -28,15 +28,13 @@ const connectImages2 = [
   { name: 'poly', image: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/google-poly.png?alt=media&token=5c898009-fb99-4f1e-b163-7a7003901af8', },
 ];
 
-export const Connect = () => {
+export const Connect = ({connect}:any) => {
   return (
     <div
       className="lg:col-span-1 col-span-2 flex flex-col w-full resource-align"
     >
-      <h1 className="font-medium text-3xl">Connect</h1>
-      <p className="text-[#868686] font-normal text-xl mt-3 mb-6">
-        Lorem ipsum dolor sit amet consectetur.{" "}
-      </p>
+      <h1 className="font-medium text-3xl">{connect?.content_title}</h1>
+      <p className="text-[#868686] font-normal text-xl mt-3 mb-6" dangerouslySetInnerHTML={{__html: connect?.description}}></p>
       <div className="flex gap-4">
         {
           connectImages1.map((item, index) => (
@@ -53,13 +51,11 @@ export const Connect = () => {
   );
 };
 
-export const Create = () => {
+export const Create = ({create}:any) => {
   return (
     <div className="lg:col-span-1 col-span-2 flex flex-col resource-align">
-      <h1 className="font-medium text-3xl">Create</h1>
-      <p className="text-[#868686] font-normal text-xl mt-3 mb-6">
-        Lorem ipsum dolor sit amet consectetur Lacus sollicitudin.{" "}
-      </p>
+      <h1 className="font-medium text-3xl">{create?.content_title}</h1>
+      <p className="text-[#868686] font-normal text-xl mt-3 mb-6" dangerouslySetInnerHTML={{__html: create?.description}}></p>
       <div className="flex gap-4">
         {
           createImages.map((item, index) => (
@@ -76,13 +72,11 @@ export const Create = () => {
   );
 };
 
-export const Access = () => {
+export const Access = ({access}:any) => {
   return (
     <div className="lg:col-span-1 col-span-2 flex flex-col resource-align">
-      <h1 className="font-medium text-3xl">Access</h1>
-      <p className="text-[#868686] font-normal text-xl mt-3 mb-6">
-        Lorem ipsum dolor sit amet.{" "}
-      </p>
+      <h1 className="font-medium text-3xl">{access?.content_title}</h1>
+      <p className="text-[#868686] font-normal text-xl mt-3 mb-6" dangerouslySetInnerHTML={{__html: access?.description}}></p>
       <div className="flex gap-4">
         {
           accessImages.map((item, index) => (
@@ -99,13 +93,11 @@ export const Access = () => {
   );
 };
 
-export const ConnectSecond = () => {
+export const Contact = ({contact}:any) => {
   return (
     <div className="lg:col-span-1 col-span-2 flex flex-col resource-align">
-      <h1 className="font-medium text-3xl">Connect</h1>
-      <p className="text-[#868686] font-normal text-xl mt-3 mb-6">
-        Lorem ipsum dolor sit amet consectetur.{" "}
-      </p>
+      <h1 className="font-medium text-3xl">{contact?.content_title}</h1>
+      <p className="text-[#868686] font-normal text-xl mt-3 mb-6" dangerouslySetInnerHTML={{__html: contact?.description}}></p>
       <div className="flex gap-4">
         {
           connectImages2.map((item, index) => (

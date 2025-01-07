@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { IoChevronBackSharp } from "react-icons/io5";
@@ -7,10 +7,21 @@ import { TfiPlus, TfiMinus } from "react-icons/tfi";
 import "./cumtel.css"
 import { useAppDispatch } from "store/hooks";
 import axios from "axios";
+import { toast } from "react-toastify";
+import { resgiterCustomerThunk } from "store/user.thunk";
 
 const Subscribe: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useAppDispatch();
+
+  console.log("state...", location.state);
+
+  useEffect(() => {
+    if(!location.state) {
+      navigate('/');
+    };
+  }, [location.state]);
 
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -69,15 +80,15 @@ const Subscribe: React.FC = () => {
       })
   }, []);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { id, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [id]: value }));
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
   };
 
   const handlePhoneChange = (value: string) => {
-    setFormData((prevData) => ({ ...prevData, phone: value }));
+    setFormData((prevData) => ({ ...prevData, phone_no: value }));
   };
 
   const increment = () => setCount(count <10 ? count + 1 : count)
@@ -96,21 +107,61 @@ const Subscribe: React.FC = () => {
   const handleBack = () => {
     if (step === 2) {
       setStep(1);
+    } else {
+      navigate(-1);
     }
   };
 
-  const isNextDisabled =
-    step === 1
-      ? !formData.business_name
-      : !formData.first_name ||
-        !formData.last_name ||
-        !formData.email ||
-        !formData.phone_no;
+  const [isNextDisabled, setIsNextDisabled] = useState(false);
+  useEffect(() => {
+    if(step === 1) {
+      if(
+        formData?.business_name === "" || formData?.business_name?.trim() === "" ||
+        formData?.region === "" || formData?.region?.trim() === ""
+      ){
+        setIsNextDisabled(true);
+      } else {
+        setIsNextDisabled(false);
+      }
+    } else {
+      if(
+        formData?.first_name === "" || formData?.first_name?.trim() === "" ||
+        formData?.last_name === "" || formData?.last_name?.trim() === "" ||
+        formData?.email === "" || formData?.email?.trim() === "" ||
+        formData?.phone_no === "" || formData?.phone_no?.trim() === ""
+      ){
+        setIsNextDisabled(true);
+      } else {
+        setIsNextDisabled(false);
+      }
+    }
+  }, [step, formData])
+
+  const handleSubscribeSubmit = async(e) => {
+    e.preventDefault();
+    try {
+      const result = await dispatch(resgiterCustomerThunk({
+        email: formData?.email,
+        password: '',
+        business_phone_number: '',
+        first_name: formData?.first_name,
+        last_name: formData?.last_name,
+        business_name: formData?.business_name,
+        region: formData?.region,
+        street_name: '',
+        state: '',
+        city: '',
+        zipcode: ''
+      })).unwrap();
+      console.log("result...", result);
+      navigate('/subscribeotp', { state: { plan: location.state, formData: formData, customer_id: result?.customer_id, license_usage: count }});
+    } catch (error) {
+      toast.error("Error registering");
+    }
+  }
 
   return (
     <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative">
-  
-  
         <p className="flex items-center gap-1 text-green-600 cursor-pointer absolute left-4 top-2" onClick={handleBack}>
           <IoChevronBackSharp /> Back to previous page
         </p>
@@ -242,7 +293,7 @@ const Subscribe: React.FC = () => {
 
       {step === 2 && (
         <form
-          action=""
+          onSubmit={handleSubscribeSubmit}
           className="mt-4 flex flex-col items-center justify-center gap-4 bg-white border-gray-200 rounded-lg border-2 p-7"
         >
           <div className="pb-4">
@@ -256,7 +307,7 @@ const Subscribe: React.FC = () => {
           </div>
           <div className="relative w-full mb-2">
             <input
-              id="firstName"
+              name="first_name"
               type="text"
               placeholder="Robert"
               value={formData.first_name}
@@ -264,7 +315,7 @@ const Subscribe: React.FC = () => {
               className="peer form-input"
             />
             <label
-              htmlFor="firstName"
+              htmlFor="first_name"
               className="absolute bg-white -top-3 left-3 text-gray-500 transition-all duration-300 ease-in-out origin-top-left peer-placeholder-shown:text-gray-400 peer-focus:text-blue-600 peer-focus:text-sm"
             >
               First Name
@@ -273,7 +324,7 @@ const Subscribe: React.FC = () => {
 
           <div className="relative w-full mb-2">
             <input
-              id="lastName"
+              name="last_name"
               type="text"
               placeholder="Clive"
               value={formData.last_name}
@@ -281,7 +332,7 @@ const Subscribe: React.FC = () => {
               className="peer form-input"
             />
             <label
-              htmlFor="lastName"
+              htmlFor="last_name"
               className="absolute bg-white -top-3 left-3 text-gray-500 transition-all duration-300 ease-in-out origin-top-left peer-placeholder-shown:text-gray-400 peer-focus:text-blue-600 peer-focus:text-sm"
             >
               Last Name
@@ -290,7 +341,7 @@ const Subscribe: React.FC = () => {
 
           <div className="relative w-full mb-2">
             <input
-              id="email"
+              name="email"
               type="email"
               placeholder="robertclive@gmail.com"
               value={formData.email}
@@ -326,8 +377,7 @@ const Subscribe: React.FC = () => {
           <div className="col-span-2 flex justify-between mt-6">
             
             <button
-              type="button"
-              onClick={handleNext}
+              type="submit"
               disabled={isNextDisabled}
               className={`py-2 px-4 rounded-md text-white transition duration-200 ease-in-out ${
                 isNextDisabled

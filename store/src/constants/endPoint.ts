@@ -53,9 +53,6 @@ export const endPoints = {
     getBillingHistory: 'customerservices/home/api/v1/getbillinghistory',
     addBillingHistory: 'customerservices/home/api/v1/add_billing_data',
 
-    // landing page
-    plansAndPricesList: 'customerservices/home/api/v1/getsubscriptiondata',
-
     // profile
     getProfileData: 'userservices/user/api/v1/get_customer_profile_data',
     udpateProfileData: 'userservices/user/api/v1/updateprofile',
@@ -80,7 +77,12 @@ export const endPoints = {
     savedCardsList: 'customerservices/user/api/v1/card_list',
     saveCards: 'customerservices/user/api/v1/update_card',
 
-
+    // landing page
+    getLandingPage: 'customerservices/home/api/v1/gethomedata',
+    getFaqs: 'customerservices/home/api/v1/getfaqs',
+    getBanner: 'customerservices/home/api/v1/get_banners',
+    contactForm: 'customerservices/home/api/v1/contactform',
+    plansAndPricesList: 'customerservices/home/api/v1/getsubscriptiondata',
 };
 
 export const resellerEndPoints = {

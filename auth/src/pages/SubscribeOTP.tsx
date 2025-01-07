@@ -1,9 +1,27 @@
 import React, { useEffect, useState, useRef, ChangeEvent, KeyboardEvent } from "react";
 import { IoChevronBackSharp } from "react-icons/io5";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useAppDispatch } from "store/hooks";
+import { resendRegisterOtpThunk, verifyRegisterOtpThunk } from "store/user.thunk";
 
 const OTP: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    // console.log("state....", location.state);
+    const dispatch = useAppDispatch();
+
+    const customerId = location.state.customer_id;
+    // console.log("customerId...", customerId);
+    //931183
+
+    useEffect(() => {
+        if(!location.state) {
+            navigate('/');
+        } else {
+            toast.success("Customer registered successfully. Please check your email for OTP.");
+        }
+    }, [location.state]);
 
     const otp1Ref = useRef<HTMLInputElement>(null);
     const otp2Ref = useRef<HTMLInputElement>(null);
@@ -19,6 +37,23 @@ const OTP: React.FC = () => {
     const [otp5, setOtp5] = useState<string>("");
     const [otp6, setOtp6] = useState<string>("");
     const [showModal, setShowModal] = useState<boolean>(false);
+    const [timeLeft, setTimeLeft] = useState<number>(120);
+    const [loading, setLoading] = useState(false);
+    const [token, setToken] = useState("");
+    
+    useEffect(() => {
+        if (timeLeft === 0) return;
+        const timer = setInterval(() => {
+            setTimeLeft((prev) => prev - 1);
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [timeLeft]);
+
+    const formatTime = (time: number) => {
+        const minutes = Math.floor(time / 60);
+        const seconds = time % 60;
+        return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2,"0")}`;
+    };
 
     useEffect(() => {
         otp1Ref.current?.focus();
@@ -108,20 +143,35 @@ const OTP: React.FC = () => {
         }
     };
 
-    const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleResendOtp = async(e) => {
         e.preventDefault();
-        const otp = `${otp1}${otp2}${otp3}${otp4}${otp5}`;
+        try {
+            const result = await dispatch(resendRegisterOtpThunk({customer_id: customerId})).unwrap();
+            console.log("result...", result);
+            toast.success(result?.message);
+        } catch (error) {
+            toast.error("Error resending otp");
+        }
+    };
+
+    const handleLogin = async(e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const otp = `${otp1}${otp2}${otp3}${otp4}${otp5}${otp6}`;
         
-        if (otp.length === 5) {
-            const isValidOtp = true; // Replace this with actual OTP validation logic
-            
-            if (isValidOtp) {
+        if (otp.length === 6) {
+            try {
+                const result = await dispatch(verifyRegisterOtpThunk({
+                    customer_id: customerId,
+                    otp: otp
+                })).unwrap();
+                console.log("result...", result);
+                setToken(result?.token);
                 setShowModal(true);
-            } else {
-                alert("Invalid OTP. Please try again.");
+            } catch (error) {
+                toast.error("Error verifying OTP");
             }
         } else {
-            alert("Please enter all 5 digits.");
+            alert("Please enter all 6 digits.");
         }
     };
 
@@ -135,7 +185,7 @@ const OTP: React.FC = () => {
 
     const handleCloseModal = () => {
         setShowModal(false);
-        navigate("/businessinfo");
+        navigate("/businessinfo", {state: {customer_id: customerId, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, token: token}});
     };
 
     return (
@@ -169,7 +219,7 @@ const OTP: React.FC = () => {
                         </div>
                         <div className="flex justify-between mt-12">
                             <p className="text-md font-bold">OTP verification</p>
-                            <span className="text-red-600">01:19</span>
+                            <span className="text-red-600">{formatTime(timeLeft)}</span>
                         </div>
                         <div className="grid grid-cols-6 gap-2 mt-4">
                             <input
@@ -241,13 +291,14 @@ const OTP: React.FC = () => {
                         <div className="text-center mt-4 xsm-max:text-sm">
                             <p>
                                 Didn't get an OTP?{" "}
-                                <Link
+                                <button
                                     data-testid="resend-otp"
-                                    to="#"
+                                    type="button"
+                                    onClick={(e) => {handleResendOtp(e)}}
                                     className="text-red-600 underline ml-4"
                                 >
                                     Resend OTP
-                                </Link>{" "}
+                                </button>{" "}
                             </p>
                         </div>
                     </form>
@@ -255,15 +306,15 @@ const OTP: React.FC = () => {
             </div>
 
             {showModal && (
-                <div className="fixed inset-0 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-[32rem]">
-                        <h3 className="text-lg font-semibold mb-4">Verified!</h3>
-                        <p className="text-sm">Your email is verified successfully!</p>
-                        <p className="text-sm">We have sent the auto-generated password to your email address robertclive@gmail to logon to the Hordanso portal.</p>
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-10">
+                    <div className="bg-white px-4 py-6 rounded-lg shadow-lg w-full max-w-[582px] border-[0.5px] border-black drop-shadow-lg">
+                        <h3 className="font-inter font-bold text-[20px] text-black mb-4">Verified!</h3>
+                        <p className="font-inter font-normal text-sm text-black">Your email is verified successfully!</p>
+                        <p className="font-inter font-normal text-sm text-black">We have sent the auto-generated password to your email address {location.state.formData.email} to login to the Hordanso portal.</p>
                         <div className="mt-4 text-center">
                             <button
                                 onClick={handleCloseModal}
-                                className="bg-green-600 text-white px-4 py-2 rounded"
+                                className="bg-green-600 text-white px-4 py-2 rounded-[10px]"
                             >
                                 Continue
                             </button>

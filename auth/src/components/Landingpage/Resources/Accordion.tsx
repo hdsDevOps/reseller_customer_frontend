@@ -70,12 +70,14 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
   );
 };
 
-const Accordion: React.FC = () => {
+const Accordion: React.FC = ({faqList}:any) => {
   const [openId, setOpenId] = useState<string | null>(null);
 
   const toggleAccordion = (id: string) => {
     setOpenId(openId === id ? null : id);
   };
+
+  // console.log("faqlist...", faqList);
 
   return (
     <div
@@ -84,7 +86,22 @@ const Accordion: React.FC = () => {
       data-active-classes="bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
       data-inactive-classes="text-gray-500 dark:text-gray-400"
     >
-      <AccordionItem
+      {
+        faqList?.map((faq, index) => (
+          <AccordionItem
+            title={faq?.question}
+            id={index}
+            isOpen={openId === index}
+            onToggle={toggleAccordion}
+            key={index}
+          >
+            <p className="mb-2 text-gray-500 dark:text-gray-400">
+              {faq?.answer}
+            </p>
+          </AccordionItem>
+        ))
+      }
+      {/* <AccordionItem
         title="What is Google Workspace?"
         id="1"
         isOpen={openId === "1"}
@@ -97,7 +114,7 @@ const Accordion: React.FC = () => {
           makes collaboration easy and efficient, and it's trusted by millions
           of businesses around the world. At Bluehost, we offer Google Workspace
           as a way to help our customers streamline their workflow and focus on
-          what they do best. For a more in-depth look, read our introduction to
+          what they do best. For a more in-depth look, read our introduction to
           Google Workspace.
         </p>
       </AccordionItem>
@@ -139,7 +156,7 @@ const Accordion: React.FC = () => {
           dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
           incididunt ut labore et dolore magna aliqua.
         </p>
-      </AccordionItem>
+      </AccordionItem> */}
     </div>
   );
 };

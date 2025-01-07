@@ -33,7 +33,7 @@ const OTP: React.FC = () => {
   const [otp4, setOtp4] = useState<string>("");
   const [otp5, setOtp5] = useState<string>("");
   const [otp6, setOtp6] = useState<string>("");
-  const [timeLeft, setTimeLeft] = useState<number>(0);
+  const [timeLeft, setTimeLeft] = useState<number>(120);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -66,10 +66,7 @@ const OTP: React.FC = () => {
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
-    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
-      2,
-      "0"
-    )}`;
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2,"0")}`;
   };
 
   const handleInputChange = (

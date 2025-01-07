@@ -16,6 +16,7 @@ module.exports = {
         small: '367px',
         'small-small': '410px',
         'small-2': '500px',
+        'small-2-1': '640px',
         'small-3': '700px',
         'md2': '767px',
         'small-medium': '790px',
