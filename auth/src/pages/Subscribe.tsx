@@ -249,7 +249,7 @@ const Subscribe: React.FC = () => {
               Number of employees, including you
             </h1>
             <p className="text-sm">
-              Your first 30 days are at no charge (limited to 10 users)
+              Your first {location.state.plan.trial_period} days are at no charge (limited to 10 users)
             </p>
           </div>
 

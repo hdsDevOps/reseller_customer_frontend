@@ -166,6 +166,30 @@ async function addNewDomainApi(
   }
 };
 
+async function addNewDomainWithoutLoginApi(
+  customer_id: string,
+  domain_name: string,
+  domain_type: string,
+  subscription_id: string,
+  business_name: string,
+  business_email: string,
+  license_usage: string,
+  plan: string,
+  payment_method: string,
+  domain_status: Boolean,
+  billing_period: string,
+  renew_status: Boolean|string,
+  subscription_status: Boolean|string,
+  token: string
+): Promise<any> {
+  try {
+    const result = await postApiCall2(endPoints.addNewDomain, { customer_id, domain_name, domain_type, subscription_id, business_name, business_email, license_usage, plan, payment_method, domain_status, billing_period, renew_status, subscription_status }, token);
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 async function cancelDomainApi(
   domain_id: string
 ): Promise<any> {
@@ -196,6 +220,20 @@ async function addEmailsApi(
 ): Promise<any> {
   try {
     const result = await postApiCall(endPoints.addEmails, { user_id, domain_id, emails });
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+async function addEmailsWithoutLoginApi(
+  user_id: string,
+  domain_id: string,
+  emails: [],
+  token: string
+): Promise<any> {
+  try {
+    const result = await postApiCall2(endPoints.addEmails, { user_id, domain_id, emails }, token);
     return result;
   } catch (error: any) {
     throw error;
@@ -584,6 +622,32 @@ async function addSubscriptionApi(
   }
 };
 
+async function addSubscriptionWithoutLoginApi(
+  product_type:string,
+  payment_cycle:string,
+  customer_id:string,
+  description:string,
+  domain:[],
+  last_payment:string,
+  next_payment:string,
+  payment_method:string,
+  subscription_status:string,
+  plan_name_id:string,
+  payment_details:[],
+  plan_name:string,
+  workspace_status:string | Boolean,
+  is_trial:Boolean,
+  license_usage: string,
+  token: string
+): Promise<any> {
+  try {
+    const result = await postApiCall2(endPoints.addSubscription, { product_type, payment_cycle, customer_id, description, domain, last_payment, next_payment, payment_method, subscription_status, plan_name_id, payment_details, plan_name, workspace_status, is_trial, license_usage }, token);
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 async function cancelSubscriptionApi(
   product_type:string,
   subscription_id:string,
@@ -731,10 +795,12 @@ export const userApis = {
 
   getDomainsListApi,
   addNewDomainApi,
+  addNewDomainWithoutLoginApi,
   cancelDomainApi,
   updateLicenseUsageApi,
 
   addEmailsApi,
+  addEmailsWithoutLoginApi,
   changeEmailStatusApi,
   deleteEmailApi,
   makeEmailAdminApi,
@@ -771,6 +837,7 @@ export const userApis = {
 
   getPaymentSubscriptionsListApi,
   addSubscriptionApi,
+  addSubscriptionWithoutLoginApi,
   cancelSubscriptionApi,
   changeAutoRenewApi,
 

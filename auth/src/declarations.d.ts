@@ -39,6 +39,10 @@ declare module "store/user.thunk" {
   }
 
   export const makeUserLoginThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserLoginPayload, {}>;
+  export const setUserAuthTokenToLSThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserLoginPayload, {}>;
+  export const setUserIdToLSThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserLoginPayload, {}>;
+  export const getUserAuthTokenFromLSThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserLoginPayload, {}>;
+  export const getUserIdFromLSThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserLoginPayload, {}>;
 
   export const makeUserRegisterThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
   export const getLandingPageThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
@@ -50,6 +54,10 @@ declare module "store/user.thunk" {
   export const resendRegisterOtpThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
   export const verifyRegisterOtpThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
   export const udpateBusinessDataThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
+  export const addSubscriptionWithoutLoginThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
+  export const addNewDomainWithoutLoginThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
+  export const addEmailsWithoutLoginThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
+  export const plansAndPricesListThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
 }
 
 
@@ -58,6 +66,7 @@ declare module 'store/authSlice' {
   import { UserDetailsState } from 'store/authSlice';
 
   export const setTokenDetails: (payload: string) => PayloadAction<string>;
+  export const setDefaultCurrencySlice: (payload: string) => PayloadAction<string>;
   // Other exports
 }
 

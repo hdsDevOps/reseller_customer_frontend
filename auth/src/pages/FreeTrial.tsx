@@ -3,16 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { IoChevronBackSharp } from "react-icons/io5";
 import { FaCrown } from "react-icons/fa";
 import { format } from "date-fns";
-
-const currencyList = [
-  { name: 'EUR', logo: '€',},
-  { name: 'AUD', logo: 'A$',},
-  { name: 'USD', logo: '$',},
-  { name: 'NGN', logo: 'N₦',},
-  { name: 'GBP', logo: '£',},
-  { name: 'CAD', logo: 'C$',},
-  { name: 'INR', logo: '₹',},
-];
+import { currencyList } from "../components/CurrencyList";
+import { useAppSelector } from "store/hooks";
 
 const FreeTrial: React.FC = () => {
   const navigate = useNavigate();
@@ -20,7 +12,7 @@ const FreeTrial: React.FC = () => {
 
   console.log("location state...", location.state);
   const plan = location.state.plan;
-  const defaulCurrency = "USD"
+  const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
   const [today, setToday] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
@@ -38,7 +30,7 @@ const FreeTrial: React.FC = () => {
   }, []);
 
   const findAmount = async(array) => {
-    const data = await array.find(item => item.currency_code === defaulCurrency).price;
+    const data = await array.find(item => item.currency_code === defaultCurrencySlice).price;
     console.log(data)
     const amount = await data.find(item => item.type === location.state.period)?.discount_price;
     console.log(amount);
@@ -93,7 +85,7 @@ const FreeTrial: React.FC = () => {
               <div className="w-full flex items-center justify-between">
               <p className="text-xl xsm-max:text-sm">Starting {expiryDate}</p>
               <p className="text-xl xsm-max:text-sm">
-                {currencyList.find(item => item.name === defaulCurrency)?.logo}
+                {currencyList.find(item => item.name === defaultCurrencySlice)?.logo}
                 {amount}
                   {
                     location.state.period === "Yearly" ? "/year" : "/month"
@@ -104,10 +96,10 @@ const FreeTrial: React.FC = () => {
         </div>
 
         <ul className="text-xs text-gray-500 list-disc pl-5 mb-4">
-          <li className="mb-6">To verify your payment method, you will be charged 2 {defaulCurrency}, which will be refunded in 10 days.</li>
+          <li className="mb-6">To verify your payment method, you will be charged 2 {defaultCurrencySlice}, which will be refunded in 10 days.</li>
           <li className="mb-6">Cancel anytime in Subscription on Hordanso.</li>
           <li className="mb-6">You won't be charged if you cancel before your free trial ends, and we'll remind you 2 days before.</li>
-          <li className="mb-6">We'll charge {amount} {defaulCurrency} every { location.state.period === "Yearly" ? "/year" : "/month" } until you cancel. You can cancel renewal anytime before expire.</li>
+          <li className="mb-6">We'll charge {amount} {defaultCurrencySlice} every { location.state.period === "Yearly" ? "/year" : "/month" } until you cancel. You can cancel renewal anytime before expire.</li>
         </ul>
 
         <p className="text-xs text-gray-500 mb-4">

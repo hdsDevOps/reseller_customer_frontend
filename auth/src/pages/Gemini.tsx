@@ -3,10 +3,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import { FaClover } from "react-icons/fa6";
 import { IoChevronBackSharp } from "react-icons/io5";
+import { useAppSelector } from "store/hooks";
+import { currencyList } from "../components/CurrencyList";
 
 const PlanCard: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
   const geminiPlan = {
     name: "Gemini Standard",
@@ -17,10 +21,10 @@ const PlanCard: React.FC = () => {
       "Enterprise-grade security and privacy",
       "Meets the needs of typical business users",
     ],
-    price: "₹1,520",
-    startingAt: "₹2100",
+    price: `${currencyList.find(item => item.name === defaultCurrencySlice)?.logo}1,520`,
+    startingAt: `${currencyList.find(item => item.name === defaultCurrencySlice)?.logo}2100`,
     nextRenewalDate: "12-07-2024",
-    alternativePrice: "₹1.824",
+    alternativePrice: `${currencyList.find(item => item.name === defaultCurrencySlice)?.logo}1.824`,
   };
 
 

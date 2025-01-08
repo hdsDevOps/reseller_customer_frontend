@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { TiArrowSortedDown } from "react-icons/ti";
+import { currencyList } from '../CurrencyList';
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import { toast } from "react-toastify";
+import { setDefaultCurrencySlice } from "store/authSlice";
 
-export default function CustomerNavbar({width, closeNav, navOpen}: { width: number, closeNav: () => void, navOpen: boolean }) {
+export default function CustomerNavbar({width, closeNav, navOpen, header}: { width: number, closeNav: () => void, navOpen: boolean, header:object }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useAppDispatch();
+
+  const { defaultCurrencySlice } = useAppSelector(state => state.auth);
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
@@ -15,28 +24,54 @@ export default function CustomerNavbar({width, closeNav, navOpen}: { width: numb
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
+
+  const handleScroll = (sectionId:string) => {
+    const section = document.getElementById(sectionId);
+    if(section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+  
+  const findDefaultFlag = () => {
+    const data = currencyList.find(item => item.name === defaultCurrencySlice);
+    if(data) {
+      return data;
+    } else {
+      return currencyList.find(item => item.name === "USD");
+    }
+  };
+
+  const setDefaultCurrencyNameOnSlice = async(name:string) => {
+    try {
+      const result = await dispatch(setDefaultCurrencySlice(name)).unwrap();
+      console.log("result...", result);
+    } catch (error) {
+      // toast.error("Error setting default currency");
+    }
+  }
+
   return (
     <div className={`flex lg:flex-row flex-col justify-between lg:gap-0 gap-2 w-full bg-white lg:bg-transparent ${width<1024 ? "z-[1000] absolute" : ""}`}>
         <ul className="lg:flex lg:gap-4 lg:pl-0 pl-3 items-center justify-between">
           <li className="py-1 lg:py-0">
-            <Link to="/plans">Plan & Price</Link>
+            <button onClick={() => {handleScroll('plan_and_price')}}>{header?.menu1}</button>
           </li>
           <li className="py-1 lg:py-0">
-            <Link to="/about-us">About Us</Link>
+            <button onClick={() => {handleScroll('about_us')}}>{header?.menu2}</button>
           </li>
           <li className="py-1 lg:py-0">
-            <Link to="/faqs">FAQ's</Link>
+            <button onClick={() => {handleScroll('faqs')}}>{header?.menu3}</button>
           </li>
           <li className="py-1 lg:py-0">
-            <Link to="/resources">Resources</Link>
+            <button onClick={() => {handleScroll('resources')}}>{header?.menu4}</button>
           </li>
           <li className="py-1 lg:py-0">
-            <Link to="#">AI</Link>
+            <button onClick={() => {navigate('/')}}>{header?.menu5}</button>
           </li>
         </ul>
         <div className="lg:flex lg:gap-10 items-center lg:pl-0 pl-3">
           <p className="my-2 lg:my-0">
-            <Link to="#">Contact Us</Link>
+            <button onClick={() => {handleScroll('contact_us')}}>{header?.menu6}</button>
           </p>
           <button
             className="bg-gray-100 text-green-500 hover:bg-green-500 hover:text-white border-none px-4 py-2.5 rounded-lg font-semibold text-base my-2 lg:my-0"
@@ -50,56 +85,39 @@ export default function CustomerNavbar({width, closeNav, navOpen}: { width: numb
           <div className="relative flex flex-col my-2 lg:my-0">
             <div className="flex items-center gap-1.5 cursor-pointer" onClick={toggleDropdown}>
               <img
-                src={process.env.BASE_URL + "/images/usflag.png"}
-                alt="logo"
+                src={findDefaultFlag()?.flag}
+                alt={findDefaultFlag()?.name}
                 className="w-8 h-8"
               />
-              <p className="font-normal text-base">USD</p>
+              <p className="font-normal text-base">{findDefaultFlag()?.name}</p>
               <TiArrowSortedDown size={20} />
             </div>
 
             {isDropdownOpen && (
               <ul className="absolute top-full mt-2 bg-white shadow-lg rounded-lg p-2 w-32 z-10">
-                <li className="flex gap-1 items-center hover:bg-gray-100 p-2">
-                  <img
-                    src={process.env.BASE_URL + "/images/flag.png"}
-                    alt="logo"
-                    className="w-8 h-8"
-                  />
-                  <p className="font-normal text-base">INR</p>
-                </li>
-                <li className="flex gap-1 items-center hover:bg-gray-100 p-2">
-                  <img
-                    src={process.env.BASE_URL + "/images/ukflag.png"}
-                    alt="logo"
-                    className="w-8 h-8"
-                  />
-                  <p className="font-normal text-base">GBP</p>
-                </li>
-                <li className="flex gap-1 items-center hover:bg-gray-100 p-2">
-                  <img
-                    src={process.env.BASE_URL + "/images/euroflag.png"}
-                    alt="logo"
-                    className="w-8 h-8"
-                  />
-                  <p className="font-normal text-base">EUR</p>
-                </li>
-                <li className="flex gap-1 items-center hover:bg-gray-100 p-2">
-                  <img
-                    src={process.env.BASE_URL + "/images/canadaflag.png"}
-                    alt="logo"
-                    className="w-8 h-8 !bg-white"
-                  />
-                  <p className="font-normal text-base">CAD</p>
-                </li>
-                <li className="flex gap-1 items-center hover:bg-gray-100 p-2">
-                  <img
-                    src={process.env.BASE_URL + "/images/australianflag.jpg"}
-                    alt="logo"
-                    className="w-8 h-8"
-                  />
-                  <p className="font-normal text-base">AUD</p>
-                </li>
+                {
+                  currencyList.map((currency, index) => {
+                    if(currency.name !== defaultCurrencySlice) {
+                      return (
+                        <li
+                          className="flex gap-1 items-center hover:bg-gray-100 p-2"
+                          key={index}
+                          onClick={() => {
+                            setDefaultCurrencyNameOnSlice(currency.name);
+                            setIsDropdownOpen(false);
+                          }}
+                        >
+                          <img
+                            src={currency.flag}
+                            alt={currency.name}
+                            className="w-8 h-8"
+                          />
+                          <p className="font-normal text-base">{currency.name}</p>
+                        </li>
+                      )
+                    }
+                  })
+                }
               </ul>
             )}
           </div>

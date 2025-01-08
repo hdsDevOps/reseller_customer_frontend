@@ -19,6 +19,7 @@ export interface UserDetailsState {
   domainsState: [];
   saveCardsState: [];
   paymentMethodsState: [];
+  defaultCurrencySlice: string;
 }
 
 const initialState: UserDetailsState = {
@@ -32,6 +33,7 @@ const initialState: UserDetailsState = {
   domainsState: [],
   saveCardsState: [],
   paymentMethodsState: [],
+  defaultCurrencySlice: 'USD',
 };
 
 const authSlice = createSlice({
@@ -64,6 +66,9 @@ const authSlice = createSlice({
     },
     setResellerToken: (state, action: PayloadAction<any>) => {
       state.resellerToken = action.payload;
+    },
+    setDefaultCurrencySlice: (state, action: PayloadAction<any>) => {
+      state.defaultCurrencySlice = action.payload;
     },
     resetUserSlice: (state) => {
       state.userAuthStatus = 'PENDING';
@@ -121,6 +126,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setTokenDetails, setUserDetails, setUserAuthStatus,  setResellerToken, resetUserSlice, setCart, setDomains, setSaveCards, setPaymentMethodsState } = authSlice.actions;
+export const { setTokenDetails, setUserDetails, setUserAuthStatus,  setResellerToken, resetUserSlice, setCart, setDomains, setSaveCards, setPaymentMethodsState, setDefaultCurrencySlice } = authSlice.actions;
 
 export default authSlice.reducer;

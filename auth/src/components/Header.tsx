@@ -1,14 +1,45 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { TiArrowSortedDown } from "react-icons/ti";
 import CustomerNavbar from "./Landingpage/CustomerNavbar";
 import { IoMdClose } from "react-icons/io";
+import { useAppDispatch } from "store/hooks";
+import { getLandingPageThunk } from "store/user.thunk";
+
+const initialHeader = {
+  menu1: 'Plan & Price',
+  menu2: 'About Us',
+  menu3: 'FAQ’s',
+  menu4: 'Resources',
+  menu5: 'AI',
+  menu6: 'Contact Us',
+};
 
 export default function Header() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useAppDispatch();
+  // console.log("location...", location);
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [width, setWidth] = useState(window.innerWidth);
+  const [header, setHeader] = useState(initialHeader);
+  // console.log("header...", header);
+
+  const getLandingPageData = async() => {
+    try {
+      const result = await dispatch(getLandingPageThunk()).unwrap();
+      setHeader(result?.data?.header);
+    } catch (error) {
+      setHeader(initialHeader);
+    }
+  }
+  
+  useEffect(() => {
+    getLandingPageData();
+  }, []);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -32,18 +63,34 @@ export default function Header() {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
+
+  const handleScroll = (sectionId:string) => {
+    const section = document.getElementById(sectionId);
+    if(section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+
   return (
-    <nav className="w-full flex items-center py-2 px-10 relative">
-      <Link to="/home">
+    <nav className="w-full flex items-center py-2 px-10 relative" id="home">
+      <button
+        type="button"
+        onClick={() => {
+          location.pathname.toLowerCase().includes('/home')
+          ? handleScroll('home')
+          : navigate('/home');
+        }}
+      >
         <img
           src={process.env.BASE_URL + "/images/logo.jpeg"}
           alt="logo"
           className="w-16 h-16"
         />
-      </Link>
+      </button>
 
       <div className="lg:block hidden w-full">
-        <CustomerNavbar width={width} closeNav={toggleNavOpen} navOpen={isNavOpen} />
+        <CustomerNavbar header={header} width={width} closeNav={toggleNavOpen} navOpen={isNavOpen} />
       </div>
       <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden ml-auto" onClick={() => { setIsNavOpen(!isNavOpen) }}>
         {
@@ -55,7 +102,7 @@ export default function Header() {
       {
         width < 1024 ?
         <div className={isNavOpen ? 'block absolute left-0 right-0 top-[80px]' : 'hidden'}>
-          <CustomerNavbar width={width} closeNav={toggleNavOpen} navOpen={isNavOpen} />
+          <CustomerNavbar header={header} width={width} closeNav={toggleNavOpen} navOpen={isNavOpen} />
         </div>
         : null
       }

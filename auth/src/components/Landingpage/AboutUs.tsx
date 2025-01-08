@@ -6,11 +6,11 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "store/hooks";
 import './AboutUs.css';
 
-const AboutUs = ({aboutUs}:any) => {
+const AboutUs = ({aboutUs, id}:any) => {
   const navigate = useNavigate();
   // console.log("aboutUs...", aboutUs);
   return (
-    <section className="max-w-screen-2xl mx-auto">
+    <section className="max-w-screen-2xl mx-auto" id={id}>
       <div className="w-full relative my-2">
         <div className="bg-[#12A8334F] absolute inset-0 text-white flex flex-col gap-2 justify-center items-center">
           <h4 className="font-extrabold text-4xl">

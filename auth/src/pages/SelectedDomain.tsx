@@ -2,13 +2,17 @@ import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { IoChevronBackSharp } from "react-icons/io5";
 import { AiOutlineCheck } from "react-icons/ai";
+import { currencyList } from "../components/CurrencyList";
+import { useAppSelector } from "store/hooks";
 
 const SelectedDomain: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const domain = location.state.selectedDomain;
-  console.log(location.state)
 
+  const { defaultCurrencySlice } = useAppSelector(state => state.auth);
+
+  const domain = location.state.selectedDomain;
+  // console.log(location.state)
 
   if (!domain) {
     return <div>No domain selected.</div>;
@@ -29,7 +33,7 @@ const SelectedDomain: React.FC = () => {
         <div className="flex items-center justify-between w-full p-4 bg-white border border-black rounded-sm">
           <div className="text-lg font-semibold">{domain}</div>
           <div className="text-lg font-semibold">
-            <span className="font-normal text-green-500">Available</span> $99.99/year
+            <span className="font-normal text-green-500">Available</span> {currencyList.find(item => item.name === defaultCurrencySlice)?.logo}99.99/year
           </div>
         </div>
 

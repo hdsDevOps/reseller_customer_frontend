@@ -14,6 +14,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { getProfileDataThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
+import Footer from "../components/Footer";
 
 const Dashboard = React.lazy(() => import("./Dashboard"));
 const routes = [
@@ -39,6 +40,9 @@ const MainApp: React.FC = () => {
       <PaymentApp />
       <HistoryApp />
       <EmailApp />
+      <div className="absolute bottom-0 left-0 right-0 w-full">
+        <Footer />
+      </div>
     </div>
     <Navbar />
   

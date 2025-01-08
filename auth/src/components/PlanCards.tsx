@@ -3,24 +3,20 @@ import React, { useEffect, useState } from "react";
 import { FaClover } from "react-icons/fa6";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
-
-const currencyList = [
-  { name: 'EUR', logo: '€',},
-  { name: 'AUD', logo: 'A$',},
-  { name: 'USD', logo: '$',},
-  { name: 'NGN', logo: 'N₦',},
-  { name: 'GBP', logo: '£',},
-  { name: 'CAD', logo: 'C$',},
-  { name: 'INR', logo: '₹',},
-];
+import { currencyList } from "./CurrencyList";
+import { useAppSelector } from "store/hooks";
 
 const PlanCard: React.FC = ({plans}:any) => {
   const navigate = useNavigate();
+  
+  const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
-  const defaultCurrency = "USD";
   const [isYearly, setIsYearly] = useState(false);
   const [checkbox, setCheckbox] = useState(false);
-  const toggleBilling = () => setIsYearly(!isYearly);
+  const toggleBilling = () => {
+    setIsYearly(!isYearly);
+    setCheckbox(false);
+  };
   const [isHovering, setIsHovering] = useState<Number|null>(null);
 
   // console.log("plans...", plans);
@@ -33,16 +29,15 @@ const PlanCard: React.FC = ({plans}:any) => {
   };
   
   const getParticularAmount = (array, period) => {
-    const amountArray = array?.find(item => item?.currency_code === defaultCurrency);
+    const amountArray = array?.find(item => item?.currency_code === defaultCurrencySlice);
     const amount = amountArray?.price?.find(item => item?.type === period);
-    console.log("amount...",amount);
     return amount;
   };
 
   const discountPercentage = (array, period) => {
-    const amountArray = array?.find(item => item?.currency_code === defaultCurrency);
+    const amountArray = array?.find(item => item?.currency_code === defaultCurrencySlice);
     const amount = amountArray?.price?.find(item => item?.type === period);
-    const discount = ((parseFloat(amount?.price) - parseFloat(amount?.discount_price)) / parseFloat(amount?.price)) * 100;
+    const discount = parseFloat((((parseFloat(amount?.price) - parseFloat(amount?.discount_price)) / parseFloat(amount?.price)) * 100).toFixed(2));
     return discount;
   };
 
@@ -103,12 +98,12 @@ const PlanCard: React.FC = ({plans}:any) => {
                           <p className="text-xs sm:text-sm text-gray-600 mb-1">
                             Starting at{" "}
                             <span className="text-red-500 line-through">
-                              {currencyList.find(item => item.name === defaultCurrency)?.logo}{isYearly ? getParticularAmount(plan?.amount_details, "Yearly")?.price : getParticularAmount(plan?.amount_details, "Yearly Subscription with monthly billing")?.price}
+                              {currencyList.find(item => item.name === defaultCurrencySlice)?.logo}{isYearly ? getParticularAmount(plan?.amount_details, "Yearly")?.price : getParticularAmount(plan?.amount_details, "Yearly Subscription with monthly billing")?.price}
                             </span>
                           </p>
                           <div className="flex items-center gap-2 sm:gap-3 mb-2">
                             <p className="text-3xl sm:text-5xl font-medium text-black">
-                              {currencyList.find(item => item.name === defaultCurrency)?.logo}{isYearly ? getParticularAmount(plan?.amount_details, "Yearly")?.discount_price : getParticularAmount(plan?.amount_details, "Yearly Subscription with monthly billing")?.discount_price}
+                              {currencyList.find(item => item.name === defaultCurrencySlice)?.logo}{isYearly ? getParticularAmount(plan?.amount_details, "Yearly")?.discount_price : getParticularAmount(plan?.amount_details, "Yearly Subscription with monthly billing")?.discount_price}
                             </p>
                             <span className="text-[10px] sm:text-[12px] rounded-sm bg-green-700 text-black py-[2px] px-2 mt-2">
                               Save {isYearly ? discountPercentage(plan?.amount_details, "Yearly") : discountPercentage(plan?.amount_details, "Yearly Subscription with monthly billing")}%
@@ -208,12 +203,12 @@ const PlanCard: React.FC = ({plans}:any) => {
                         <p className="text-xs sm:text-sm text-gray-600 mb-1">
                           Starting at{" "}
                           <span className="text-red-500 line-through">
-                            {currencyList.find(item => item.name === defaultCurrency)?.logo}{isYearly ? getParticularAmount(plan?.amount_details, "Yearly")?.price : getParticularAmount(plan?.amount_details, "Yearly Subscription with monthly billing")?.price}
+                            {currencyList.find(item => item.name === defaultCurrencySlice)?.logo}{isYearly ? getParticularAmount(plan?.amount_details, "Yearly")?.price : getParticularAmount(plan?.amount_details, "Yearly Subscription with monthly billing")?.price}
                           </span>
                         </p>
                         <div className="flex items-center gap-2 sm:gap-3 mb-2">
                           <p className="text-3xl sm:text-5xl font-medium text-black">
-                            {currencyList.find(item => item.name === defaultCurrency)?.logo}{isYearly ? getParticularAmount(plan?.amount_details, "Yearly")?.discount_price : getParticularAmount(plan?.amount_details, "Yearly Subscription with monthly billing")?.discount_price}
+                            {currencyList.find(item => item.name === defaultCurrencySlice)?.logo}{isYearly ? getParticularAmount(plan?.amount_details, "Yearly")?.discount_price : getParticularAmount(plan?.amount_details, "Yearly Subscription with monthly billing")?.discount_price}
                           </p>
                           <span className="text-[10px] sm:text-[12px] rounded-sm bg-green-700 text-black py-[2px] px-2 mt-2">
                             Save {isYearly ? discountPercentage(plan?.amount_details, "Yearly") : discountPercentage(plan?.amount_details, "Yearly Subscription with monthly billing")}%

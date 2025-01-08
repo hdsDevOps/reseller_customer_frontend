@@ -127,6 +127,13 @@ export const addNewDomainThunk = createAsyncThunk(
   }
 );
 
+export const addNewDomainWithoutLoginThunk = createAsyncThunk(
+  "users/addNewDomainWithoutLogin",
+  async ({ customer_id, domain_name, domain_type, subscription_id, business_name, business_email, license_usage, plan, payment_method, domain_status, billing_period, renew_status, subscription_status, token }: any) => {
+    return await userApis.addNewDomainWithoutLoginApi( customer_id, domain_name, domain_type, subscription_id, business_name, business_email, license_usage, plan, payment_method, domain_status, billing_period, renew_status, subscription_status, token );
+  }
+);
+
 export const cancelDomainThunk = createAsyncThunk(
   "users/cancelDomain",
   async ({ domain_id }: any) => {
@@ -145,6 +152,13 @@ export const addEmailsThunk = createAsyncThunk(
   "users/addEmails",
   async ({ user_id, domain_id, emails }: any) => {
     return await userApis.addEmailsApi( user_id, domain_id, emails  );
+  }
+);
+
+export const addEmailsWithoutLoginThunk = createAsyncThunk(
+  "users/addEmailsWithoutLogin",
+  async ({ user_id, domain_id, emails, token }: any) => {
+    return await userApis.addEmailsWithoutLoginApi( user_id, domain_id, emails, token );
   }
 );
 
@@ -334,6 +348,13 @@ export const addSubscriptionThunk = createAsyncThunk(
   "users/addSubscription",
   async ({ product_type, payment_cycle, customer_id, description, domain, last_payment, next_payment, payment_method, subscription_status, plan_name_id, payment_details, plan_name, workspace_status, is_trial, license_usage }: any) => {
     return await userApis.addSubscriptionApi( product_type, payment_cycle, customer_id, description, domain, last_payment, next_payment, payment_method, subscription_status, plan_name_id, payment_details, plan_name, workspace_status, is_trial, license_usage );
+  }
+);
+
+export const addSubscriptionWithoutLoginThunk = createAsyncThunk(
+  "users/addSubscriptionWithoutLogin",
+  async ({ product_type, payment_cycle, customer_id, description, domain, last_payment, next_payment, payment_method, subscription_status, plan_name_id, payment_details, plan_name, workspace_status, is_trial, license_usage, token }: any) => {
+    return await userApis.addSubscriptionWithoutLoginApi( product_type, payment_cycle, customer_id, description, domain, last_payment, next_payment, payment_method, subscription_status, plan_name_id, payment_details, plan_name, workspace_status, is_trial, license_usage, token );
   }
 );
 

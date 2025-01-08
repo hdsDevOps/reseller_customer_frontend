@@ -8,11 +8,12 @@ import '../../styles/styles.css';
 import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
-import { useAppDispatch } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 import { getBannerThunk } from "store/user.thunk";
+import { currencyList } from "../CurrencyList";
 
 
-const HeroSection = () => {
+const HeroSection = ({id}:any) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const googleImages = [
@@ -22,7 +23,8 @@ const HeroSection = () => {
     { name: 'one', image: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/google-one.png?alt=media&token=2bcb69dd-ab4e-4048-9db5-f6367a786f6e', },
     { name: 'meet', image: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/google-meet.png?alt=media&token=4945f794-64ac-447b-9b60-cdb3ec04e1bb', },
   ];
-  const defaultCurrency = "USD";
+  const { defaultCurrencySlice } = useAppSelector(state => state.auth);
+  // console.log("defaultCurrencySlice...", defaultCurrencySlice);
   const [banner, setBanner] = useState([]);
   // console.log("banner...", banner);
 
@@ -40,12 +42,12 @@ const HeroSection = () => {
   }, []);
 
   const getAmountByCurrency = (array) => {
-    const amount = array?.find((item) => item?.currency_code === defaultCurrency);
+    const amount = array?.find((item) => item?.currency_code === defaultCurrencySlice);
     return amount;
   }
 
   return (
-    <div>
+    <div id={id}>
       <div className="w-full overflow-hidden whitespace-nowrap bg-[#12A833] bg-opacity-50 shadow-sm">
         <div className="inline-block animate-scroll">
           <div className="flex items-center py-[2px] pb-1">
@@ -58,11 +60,11 @@ const HeroSection = () => {
       </div>
       {
         banner?.length > 0 && (
-          <Carousel>
+          <Carousel showThumbs={false}>
             {
               banner?.map((item, index) => (
                 <div
-                  className={`xl:h-[620px] big:h-[690px] small-medium:h-[800px] small-2-1:h-[800px] small:h-[1070px] h-[1180px] w-full py-1 grid grid-cols-5 relative`}
+                  className={`xl:h-[620px] big:h-[690px] small-medium:h-[800px] small-2-1:h-[800px] small:h-[1070px] h-[1180px] w-full grid grid-cols-5 relative`}
                   style={{backgroundImage: `url('${item?.background_image}')`, backgroundSize: 'cover', backgroundPosition: 'center'}}
                   key={index}
                 >
@@ -72,7 +74,8 @@ const HeroSection = () => {
                         <div className="backdrop-blur-sm h-full"></div>
                         <div className="absolute top-0 md:py-[40px] py-3 md:px-[70px] px-3">
                           <h3 className="font-inter font-extrabold text-[40px] text-white">{item?.title}</h3>
-                          <p className="font-inter font-normal text-lg text-white py-2" dangerouslySetInnerHTML={{__html: item?.description}}></p>
+                          {/* <p className="!font-inter !font-normal !text-lg !text-white py-2" dangerouslySetInnerHTML={{__html: item?.description}}></p> */}
+                          <p className="!font-inter !font-normal !text-lg !text-white py-2">{item?.description}</p>
 
                           <div className="mt-[80px] flex gap-[10px] sm:h-[50px] h-[30px]">
                             {
@@ -87,7 +90,7 @@ const HeroSection = () => {
                             }
                           </div>
 
-                          <h4 className="font-inter font-extrabold text-2xl text-white mt-14">Starting at {getAmountByCurrency(item?.currency_details)?.value}{getAmountByCurrency(item?.currency_details)?.amount}/mth</h4>
+                          <h4 className="font-inter font-extrabold text-2xl text-white mt-14">Starting at {currencyList.find(item => item.name === defaultCurrencySlice)?.logo}{getAmountByCurrency(item?.currency_details)?.amount}/mth</h4>
 
                           <button
                             type="button"

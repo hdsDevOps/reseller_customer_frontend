@@ -11,7 +11,7 @@ const ProductivityAndCollaboration = ({plans}:any) => {
     const navigate = useNavigate();
 
     const [seeMore, setSeeMore] = useState(false);
-    console.log("plans...", plans);
+    // console.log("plans...", plans);
     const list = [
         {name: 'gmail_business_email', label: '<p><b>Gmail</b> Business email', image: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/gmail.png?alt=media&token=ce4bf445-8280-4c97-9743-e79168a27f11',},
         {name: 'custom_email_for_business', label: '<p>Custom email for your business</p>', image: '',},

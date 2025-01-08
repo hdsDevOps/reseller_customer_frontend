@@ -1,56 +1,52 @@
 import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
 import { BiSolidEditAlt } from "react-icons/bi";
+import { currencyList } from "../CurrencyList";
+import { useAppSelector } from "store/hooks";
 
-const currencyList = [
-  { name: 'EUR', logo: '€',},
-  { name: 'AUD', logo: 'A$',},
-  { name: 'USD', logo: '$',},
-  { name: 'NGN', logo: 'N₦',},
-  { name: 'GBP', logo: '£',},
-  { name: 'CAD', logo: 'C$',},
-  { name: 'INR', logo: '₹',},
-];
-const SummaryDomainDetails = ({state}:any) => {
-  console.log("state....", state);
-  const defaulCurrency = "USD";
+const SummaryDomainDetails = ({state, handleContactModalOpen, handleBusinessModalOpen, plan}:any) => {
+  // console.log("state....", state);
+  console.log("plan...", plan);
+  const { defaultCurrencySlice } = useAppSelector(state => state.auth);
   
   const [today, setToday] = useState("");
+  const [todayMinusYear, setTodayMinusYear] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [amount, setAmount] = useState(0);
   
   useEffect(() => {
     const dayToday = new Date();
     setToday(format(dayToday, "MMMM dd, yyyy"));
-    const trial = parseInt(state.plan.trial_period);
+    setTodayMinusYear(format(dayToday, "MMMM dd"));
+    const trial = parseInt(state.plan.trial_period || 0);
     
     const expiryDateValue = new Date();
     expiryDateValue.setDate(dayToday.getDate() + trial);
 
     setExpiryDate(format(expiryDateValue, "MMMM dd, yyyy"))
-  }, []);
+  }, [plan]);
   
   const findAmount = async(array) => {
-    const data = await array.find(item => item.currency_code === defaulCurrency).price;
+    const data = await array.find(item => item.currency_code === defaultCurrencySlice).price;
     const amount = await data.find(item => item.type === state.period)?.discount_price;
     setAmount(amount);
   };
   
   useEffect(() => {
-    findAmount(state.plan.amount_details);
-  }, [state]);
+    findAmount(plan?.amount_details);
+  }, [plan]);
   return (
-    <div className="">
+    <div className="w-full grid grid-cols-1">
       {/* Plan Details */}
-      <div>
+      <div className="w-full">
         <h2 className="pb-2 mb-3 text-[20px] font-extrabold border-b-2 border-black inline-block relative">
           Plan details
         </h2>
-        <div className="mb-3 w-[220px]">
+        <div className="mb-3 w-full max-w-[600px]">
           <p className="text-gray-500">{state.plan.plan_name}</p>
           <p className="text-gray-500">
-            {currencyList.find(item => item.name === defaulCurrency)?.logo}
-            {amount}
+            {currencyList.find(item => item.name === defaultCurrencySlice)?.logo}
+            {amount}{" "}
             {
               state.period === "Yearly" ? "user/year" : "user/month"
             }
@@ -67,59 +63,67 @@ const SummaryDomainDetails = ({state}:any) => {
         </div>
       </div>
       {/* Domain Details */}
-      <div>
+      <div className="w-full">
         <h2 className="pb-2 mb-3 text-[20px] font-extrabold border-b-2 border-black inline-block relative">
           Domain details
         </h2>
-        <div className="mb-3 w-[220px]">
-          <p className="text-gray-500">domain.co.in</p>
-          <p className="text-gray-500">₹ 648.00 per year</p>
+        <div className="mb-3 w-full max-w-[600px]">
+          <p className="text-gray-500">{state.selectedDomain}</p>
+          <p className="text-gray-500">$ 648.00 per year</p>
           <p className="text-gray-500">
-            Your annual plan will begin <strong>June 25, 2024</strong>. You can{" "}
+            Your annual plan will begin <strong>{today}</strong>. You can{" "}
             <span className="text-blue-500 underline">cancel at any time</span>.
           </p>
           <p className="text-gray-500">
-            Charges today and recurs yearly on June 25.
+            Charges today and recurs yearly on {todayMinusYear}.
           </p>
         </div>
       </div>
 
       {/* Contact Information */}
-      <div>
+      <div className="w-full">
         <div className="flex flex-row items-center justify-between w-full">
           <h2 className="pb-2 mb-3 text-[20px] font-extrabold border-b-2 border-black inline-block relative">
             Contact Information
           </h2>
-          <button className="text-green-600 underline hover:text-green-800">
+          <button
+            type="button"
+            className="text-green-600 underline hover:text-green-800"
+            onClick={handleContactModalOpen}
+          >
             <BiSolidEditAlt className="text-[30px] font-extrabold" />
           </button>
         </div>
         <div className="mb-3 w-[220px]">
-          <p className="text-gray-500">Robert Clive</p>
-          <p className="text-gray-500">robertclive@gmail.com</p>
-          <p className="text-gray-500">9874761230</p>
+          <p className="text-gray-500">{state.formData.first_name} {state.formData.last_name}</p>
+          <p className="text-gray-500">{state.formData.email}</p>
+          <p className="text-gray-500">+{state.formData.phone_no}</p>
         </div>
       </div>
 
       {/* Business Information */}
-      <div>
+      <div className="w-full">
         <div className="flex flex-row items-center justify-between w-full">
           <h2 className="pb-2 mb-3 text-[20px] font-extrabold border-b-2 border-black inline-block relative">
             Business information
           </h2>
-          <button className="text-green-600 underline hover:text-green-800">
+          <button
+            type="button"
+            className="text-green-600 underline hover:text-green-800"
+            onClick={handleBusinessModalOpen}
+          >
             <BiSolidEditAlt className="text-[30px] font-extrabold" />
           </button>
         </div>
         <div className="w-[220px]">
-          <p className="text-gray-500">ABC Business</p>
+          <p className="text-gray-500">{state.formData.business_name}</p>
           <p className="text-gray-500">
-            Amherst St, College Row, College Street
+            {/* {state.formData.address} */}
           </p>
-          <p className="text-gray-500">Kolkata 700009</p>
-          <p className="text-gray-500">West Bengal</p>
-          <p className="text-gray-500">India</p>
-          <p className="text-gray-500">8777593945</p>
+          <p className="text-gray-500">{state.formData.business_city} {state.formData.business_zip_code}</p>
+          <p className="text-gray-500">{state.formData.business_state}</p>
+          <p className="text-gray-500">{state.formData.region}</p>
+          {/* <p className="text-gray-500">8777593945</p> */}
         </div>
       </div>
     </div>

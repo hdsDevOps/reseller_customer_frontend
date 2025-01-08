@@ -15,7 +15,7 @@ const initialDomain = {
   extention: '.com'
 };
 
-const PlanandPrice = () => {
+const PlanandPrice = ({id}:any) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -49,27 +49,32 @@ const PlanandPrice = () => {
     try {
       const result = await dispatch(checkDomainThunk({domain: `${domain?.domain}${domain?.extention}`})).unwrap();
       console.log("result...", result);
+      if(result?.message === "Domain is Still Available for Purchase , doesn't belong to anyone yet" || result?.message === "Customer domain is Available to be used with a google workspace") {
+        navigate('/selected-domain', {state: {selectedDomain: `${domain.domain}${domain.extention}`, from: 'home', type: 'new'}});
+      } else if(result?.message === "Customer domain is Already Registered with a Google Workspace") {
+        navigate('/domainlist', {state: {domain: {domainName: domain.domain, domainExtension: domain.extention}, from: 'home', type: 'new_error'}});
+      }
     } catch (error) {
       toast.error("Error finding domain");
     }
   }
   return (
-    <section className="w-full ms:px-16 px-4 max-w-screen-2xl mx-auto">
+    <section className="w-full ms:px-16 px-4 max-w-screen-2xl mx-auto" id={id}>
       <form onSubmit={handleDomainSearch} className="py-[4.175rem] flex flex-col md:flex-row justify-center gap-4 items-center mx-auto">
-          <div className="relative flex justify-center flex-1 w-full">
-            <input className="bg-transparent border py-6 px-10  w-full rounded-md shadow-md font-normal text-2x" placeholder="Type your desired domain here." onChange={handleDomainChange} name="domain" value={domain?.domain} />
-            <div className="flex justify-center items-center absolute top-5 right-[2rem]">
-              <select onChange={handleDomainChange} name="extention" value={domain?.extention}>
-                <option value=".com">.com</option>
-                <option value=".co.in">.co.in</option>
-                <option value=".website">.website</option>
-                <option value=".net">.net</option>
-                <option value=".in">.in</option>
-                <option value=".co.uk">.co.uk</option>
-              </select>
-            </div>
+        <div className="relative flex justify-center flex-1 w-full">
+          <input className="bg-transparent border py-6 px-10  w-full rounded-md shadow-md font-normal text-2x" placeholder="Type your desired domain here." onChange={handleDomainChange} name="domain" value={domain?.domain} />
+          <div className="flex justify-center items-center absolute top-5 right-[2rem]">
+            <select onChange={handleDomainChange} name="extention" value={domain?.extention}>
+              <option value=".com">.com</option>
+              <option value=".co.in">.co.in</option>
+              <option value=".website">.website</option>
+              <option value=".net">.net</option>
+              <option value=".in">.in</option>
+              <option value=".co.uk">.co.uk</option>
+            </select>
           </div>
-          <button className="px-4 py-6 text-lg font-semibold text-white rounded-md bg-greenbase" type="submit">Search Domain</button>
+        </div>
+        <button className="px-4 py-6 text-lg font-semibold text-white rounded-md bg-greenbase" type="submit">Search Domain</button>
       </form>
       <PlanCard plans={plans} />
       <div className="flex flex-col items-center justify-center mx-auto mt-10">

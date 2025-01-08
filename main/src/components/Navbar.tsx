@@ -80,7 +80,7 @@ const Sidebar = () => {
   const handleLogout = async () => {
     await dispatch(removeUserAuthTokenFromLSThunk());
     await dispatch(removeUserIdFromLSThunk());
-    navigate("/login");
+    navigate("/");
     localStorage.clear();
   };
 
