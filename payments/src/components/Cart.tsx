@@ -291,8 +291,8 @@ const Cart = () => {
                       className="size-[97%] object-cover"
                     />
                   </div>
-                  <div className="flex items-start gap-10">
-                    <div className="flex-grow flex flex-col justify-center">
+                  <div className="flex flex-row justify-between w-full">
+                    <div className="flex flex-col justify-center">
                       <h3 className="text-xl font-semibold">{item?.product_name}</h3>
                       <small className="text-sm my-1">({item?.product_type})</small>
                       <small className="text-[10px] text-gray-400">
@@ -332,11 +332,11 @@ const Cart = () => {
                         )
                       }
                     </div>
-                    <div className="flex flex-col justify-between">
+                    <div className="cart-delete-flex">
                       <div className="flex flex-col justify-center">
-                        <span className="text-xl font-bold">₹{item?.price}</span>
-                        <small className="text-[10px] text-gray-400 self-end">
-                          <span className="uppercase">{item?.payment_cycle}</span> cycle
+                        <span className="text-xl font-inter font-bold text-black text-end">₹{item?.price}</span>
+                        <small className="font-inter font-medium text-[8px] text-gray-400 self-end">
+                          <span className="capitalize">{item?.payment_cycle}</span> cycle
                         </small>
                       </div>
                       <button
@@ -344,7 +344,7 @@ const Cart = () => {
                         onClick={() => {
                           handleDeleteItemFromCart(index)
                         }}
-                        className="mt-10"
+                        className="ml-auto max-[640px]:mt-10 pt-1"
                       >
                         <RiDeleteBin6Line className="text-red-500 text-2xl cursor-pointer w-full" />
                       </button>
@@ -360,7 +360,7 @@ const Cart = () => {
           }
 
           <div className="my-4">
-            <h1 className="text-3xl font-semibold mb-4">Recommended for you</h1>
+            {/* <h1 className="text-3xl font-semibold mb-4">Recommended for you</h1>
             {recommendations.map((item, index) => (
               <div key={index}>
                 <div className="flex items-start justify-between my-8">
@@ -403,7 +403,7 @@ const Cart = () => {
                   <div style={{ borderBottom: "2px dashed gray" }}></div>
                 )}
               </div>
-            ))}
+            ))} */}
           </div>
         </div>
 
@@ -576,7 +576,7 @@ const Cart = () => {
                       and acknowledge reading the{" "}
                       <span className="text-green-500">Privacy Policy.</span>{" "}
                       You also agree to Auto renewal of your yearly subscription
-                      for ₹467.64, which can be disabled at any time through
+                      for, which can be disabled at any time through
                       your account. Your card details will be saved for future
                       purchases and subscription renewals.
                     </p>

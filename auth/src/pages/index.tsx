@@ -32,6 +32,7 @@ const PaymentGateway = React.lazy(() => import("./PaymentGateway"));
 const Receipt = React.lazy(() => import("./Receipt"));
 const RegisterText = React.lazy(() => import("./RegisterText"));
 const NewRegister = React.lazy(() => import("./NewRegister"));
+const DownloadInvoice = React.lazy(() => import("./DownloadInvoice"));
 const AuthApp: React.FC = () => {
   return (
     <div className="w-full min-h-screen bg-white relative">
@@ -70,6 +71,7 @@ const AuthApp: React.FC = () => {
             <Route path="/Receipt" element={<Receipt />} />
             <Route path="/RegisterText" element={<RegisterText />} />
             <Route path="/register" element={<NewRegister />} />
+            <Route path="/download-invoice" element={<DownloadInvoice />} />
           </Routes>
         </main>
         <div className="absolute top-100">

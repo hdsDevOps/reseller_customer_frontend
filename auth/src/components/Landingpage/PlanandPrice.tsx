@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { useAppDispatch } from "store/hooks";
 import { checkDomainThunk } from "store/reseller.thunk";
 import { plansAndPricesListThunk } from "store/user.thunk";
+import { Base_URL } from "../../Constant";
 
 const initialDomain = {
   domain: '',
@@ -61,7 +62,7 @@ const PlanandPrice = ({id}:any) => {
   return (
     <section className="w-full ms:px-16 px-4 max-w-screen-2xl mx-auto" id={id}>
       <form onSubmit={handleDomainSearch} className="py-[4.175rem] flex flex-col md:flex-row justify-center gap-4 items-center mx-auto">
-        <div className="relative flex justify-center flex-1 w-full">
+        <div className="relative flex justify-center flex-1 w-full bg-white">
           <input className="bg-transparent border py-6 px-10  w-full rounded-md shadow-md font-normal text-2x" placeholder="Type your desired domain here." onChange={handleDomainChange} name="domain" value={domain?.domain} />
           <div className="flex justify-center items-center absolute top-5 right-[2rem]">
             <select onChange={handleDomainChange} name="extention" value={domain?.extention}>

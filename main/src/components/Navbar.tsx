@@ -92,12 +92,12 @@ const Sidebar = () => {
 
   return (
     <aside
-      className={`fixed h-full sm:max-h-screen top-0 left-0 transition-all duration-300 ease-in-out bg-[#F0F0F0] text-black shadow-md flex flex-col ${
+      className={`fixed h-full sm:max-h-screen top-3 left-0 transition-all duration-300 ease-in-out bg-[#F0F0F0] text-black shadow-md flex flex-col ${
         isOpen ? "max-w-64 sm-max:max-w-64" : "max-w-20"
       } lg:max-w-64 w-full z-20`}
     >
       <div className="flex items-center relative p-4">
-        <button
+        {/* <button
           onClick={() => setIsOpen(!isOpen)}
           className="lg:hidden text-black absolute top-24 -right-1"
         >
@@ -106,7 +106,17 @@ const Sidebar = () => {
           ) : (
             <CircleChevronRight className="size-3" />
           )}
-        </button>
+        </button> */}
+        <a
+          className="lg:hidden text-[#12A833] absolute top-24 -right-[10px] cursor-pointer"
+          onClick={() => {
+            setIsOpen(!isOpen);
+          }}
+        >
+          <i className={`bi ${
+            isOpen ? `bi-text-indent-right` : 'bi-text-indent-left'
+          } text-white bg-[#12A833] border-[2px] border-[#12A833] rounded-full w-[21px] h-[21px] px-[2px]`}></i>
+        </a>
       </div>
       <div className="p-[14px] flex-1 mt-2">
         <div className="bg-[#DAE8FF] shadow-sm p-[6px] rounded-md flex items-center gap-2 my-[10px]">
@@ -119,9 +129,6 @@ const Sidebar = () => {
             <div className="flex flex-col text-xs ml-2">
               <span className="font-medium text-gray-600">{userDetails?.first_name}&nbsp;{userDetails?.last_name}</span>
               <span className="text-gray-400">{userDetails?.email}</span>
-            </div>
-            <div className="text-gray-400 text-sm">
-              <PanelLeftClose className="w-4 h-4" />
             </div>
           </div>
         </div>

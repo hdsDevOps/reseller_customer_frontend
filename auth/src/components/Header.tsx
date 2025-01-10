@@ -16,6 +16,9 @@ const initialHeader = {
   menu6: 'Contact Us',
 };
 
+const logoImage = 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo-2.png?alt=media&token=9315e750-1f5d-4032-ba46-1aeafa340a75';
+const logoImageSmall = 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899';
+
 export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -83,13 +86,13 @@ export default function Header() {
         }}
       >
         <img
-          src={process.env.BASE_URL + "/images/logo.jpeg"}
+          src={logoImage}
           alt="logo"
-          className="w-16 h-16"
+          className="h-10 object-contain"
         />
       </button>
 
-      <div className="lg:block hidden w-full">
+      <div className="lg:block hidden w-full ml-6">
         <CustomerNavbar header={header} width={width} closeNav={toggleNavOpen} navOpen={isNavOpen} />
       </div>
       <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden ml-auto" onClick={() => { setIsNavOpen(!isNavOpen) }}>

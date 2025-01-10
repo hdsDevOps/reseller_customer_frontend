@@ -64,7 +64,7 @@ const SelectedDomain: React.FC = () => {
         >
           Next
         </button>
-        <p className="self-start mt-1 text-xl font-bold text-green-600"><a
+        <p className="self-start mt-1 text-xl font-bold text-green-600 cursor-pointer hover:underline"><a
           onClick={()=> {
             location.state.from === "business_info" ?
             navigate('/adddomain', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from}}) : 

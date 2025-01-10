@@ -4,7 +4,13 @@
   grid-gap: 10px;
 }
 
-
+.cart-delete-flex {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 30%;
+  align-items: start;
+}
 
 @media (min-width: 1281px) {
   .grid-container {
@@ -16,5 +22,13 @@
   .grid-container {
     grid-template-columns: 1fr;
     grid-gap: 50px;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  .cart-delete-flex {
+    flex-direction: column;
+    justify-content: end;
+    align-items: end;
   }
 }

@@ -133,17 +133,17 @@ const PlanCard: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center justify-center mb-5">
       <div className="self-start">
-        <Link to="/payment-subscription">
+        <button type="button" onClick={() => {navigate(-1)}}>
           <h2 className="text-green-500 font-medium text-sm sm:text-md lg:text-2xl flex items-center mb-3">
-            <ArrowLeft className="text-sm sm:text-md lg:text-2xl" /> Upgrade Plan
+            <ArrowLeft className="text-sm sm:text-md lg:text-2xl" /> Update Plan
           </h2>
-        </Link>
+        </button>
         <div className="flex items-center gap-1 text-sm sm:text-md md:text-lg">
           <Link to="/domain">Payment subscription</Link>
           <ChevronRight />
-          <p className="text-green-500">Upgrade Plan</p>
+          <p className="text-green-500">Update Plan</p>
         </div>
       </div>
       <div className="flex flex-col items-center justify-center mb-1 text-center">

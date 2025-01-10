@@ -31,7 +31,7 @@ const ProductivityAndCollaboration = ({plans}:any) => {
         {name: 'group_base_policy_control', label: '<p>Group base policy control</p>', image: '',},
     ];
     return (
-        <section className="min-w-full my-5">
+        <section className="min-w-full my-5 bg-white">
             <div className="w-full relative">
                 <div className="w-full grid grid-cols-12 sticky top-0 bg-white z-10">
                     <div className="md:col-span-6 col-span-12"></div>

@@ -83,8 +83,11 @@ export const endPoints = {
     getBanner: 'customerservices/home/api/v1/get_banners',
     contactForm: 'customerservices/home/api/v1/contactform',
     plansAndPricesList: 'customerservices/home/api/v1/getsubscriptiondata',
+
+    // get payment methods
+    getPaymetnMethods: 'paymentservices/payment/api/v1/getpaymentmethod',
 };
 
 export const resellerEndPoints = {
-    checkDomain: 'api/v1/reseller/check-domain?customer_domain=',
+    checkDomain: 'api/v1/domain/check-availability/?domain_name=',
 };

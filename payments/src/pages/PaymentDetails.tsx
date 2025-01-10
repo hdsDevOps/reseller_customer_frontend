@@ -126,7 +126,7 @@ const PaymentDetails: React.FC = () => {
   const [subscriptionId, setSubscriptionId] = useState("");
 
   const showListTable = [
-    { label: "Upgarde Plan", type: "link", link: "/upgrade-plan", },
+    { label: "Update Plan", type: "link", link: "/upgrade-plan", },
     { label: "Update payment method", type: "modal", link: "", },
     { label: "Renew Plan", type: "link", link: "/upgrade-plan", },
     { label: "Turn off auto-renew", type: "modal", link: "", },
@@ -448,7 +448,7 @@ const PaymentDetails: React.FC = () => {
             }
           </div>
         </div>
-        <div className="flex min-[375px]:flex-row max-[375px]:flex-col items-center gap-0 ">
+        {/* <div className="flex min-[375px]:flex-row max-[375px]:flex-col items-center gap-0 ">
           <input
             type="text"
             className="border border-gray-300 rounded-l-sm bg-transparent text-gray-700 p-2 focus:outline-none focus:ring-1 focus:ring-green-500"
@@ -457,13 +457,13 @@ const PaymentDetails: React.FC = () => {
           <button className="bg-green-500 text-white rounded-r-sm p-2 hover:bg-green-600 transition max-[375px]:w-full">
             Search
           </button>
-        </div>
+        </div> */}
       </div>
 
       <div className="overflow-x-auto">
         <table className="min-w-full">
           <thead>
-            <tr className="bg-gray-100">
+            <tr className="bg-[#F7FAFF]">
               {[
                 "Product Type",
                 "Payment Cycle",

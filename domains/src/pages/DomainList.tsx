@@ -364,9 +364,13 @@ const DomainList: React.FC = () => {
     
                   <div className="my-4 border-t border-black"></div>
                   <div className="flex self-end text-xs sm:text-sm">
-                    {/* <Link to={`/email?domain=${encodeURIComponent(data[0].domain)}`} className="text-green-600 font-medium hover:text-opacity-90 flex items-center">
-                      View More <ChevronRight size="20" />
-                    </Link> */}
+                    {
+                      domain?.domain_type === "primary" && (
+                        <Link to={`/email`} className="text-green-600 font-medium hover:text-opacity-90 flex items-center">
+                          View More <ChevronRight size="20" />
+                        </Link>
+                      )
+                    }
                   </div>
                 </div>
               ))

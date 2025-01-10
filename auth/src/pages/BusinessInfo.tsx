@@ -30,6 +30,9 @@ const BusinessInfo: React.FC = () => {
   console.log("form data...", formData);
   const region = location.state.formData.region;
   
+  const [isNumberValid, setIsNumberValid] = useState(false);
+  console.log({isNumberValid});
+  
   const [stateName, setStateName] = useState("");
   const [cityName, setCityName] = useState("");
   const [countries, setCountries] = useState([]);
@@ -151,6 +154,15 @@ const BusinessInfo: React.FC = () => {
     });
   };
 
+  const removePrefix = (input:string, prefix:string) => {
+    if(input.startsWith(prefix)) {
+      return input.slice(prefix.length);
+    } else if(input.startsWith('0')) {
+      return input.slice(1);
+    }
+    return input;
+  }
+
   const handlePhoneChange = (value: string) => {
     setFormData((prevData) => ({ ...prevData, phone_no: value }));
   };
@@ -159,29 +171,33 @@ const BusinessInfo: React.FC = () => {
     // Handle form submission or navigate to another route
     // navigate("/adddomain");
     e.preventDefault();
-    try {
-      const result = await dispatch(udpateBusinessDataThunk({
-        user_id: location.state.customer_id,
-        first_name: location.state.formData.first_name,
-        last_name: location.state.formData.last_name,
-        email: location.state.formData.email,
-        phone_no: formData?.phone_no,
-        address: formData?.address,
-        state: '',
-        city: '',
-        country: region,
-        password: '',
-        business_name: formData?.business_name,
-        business_state: formData?.business_state,
-        business_city: formData?.business_city,
-        business_zip_code: formData?.business_zip_code,
-        token: location.state.token
-      })).unwrap();
-      // console.log("result...", result);
-      toast.success("Business Information updated successfully");
-      navigate("/adddomain", {state: {customer_id: location.state.customer_id, formData: formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: 'business_info'}});
-    } catch (error) {
-      toast.error("Error updating Business Information");
+    if(location.state.phone_no === formData?.phone_no || isNumberValid) {
+      try {
+        const result = await dispatch(udpateBusinessDataThunk({
+          user_id: location.state.customer_id,
+          first_name: location.state.formData.first_name,
+          last_name: location.state.formData.last_name,
+          email: location.state.formData.email,
+          phone_no: formData?.phone_no,
+          address: formData?.address,
+          state: '',
+          city: '',
+          country: region,
+          password: '',
+          business_name: formData?.business_name,
+          business_state: formData?.business_state,
+          business_city: formData?.business_city,
+          business_zip_code: formData?.business_zip_code,
+          token: location.state.token
+        })).unwrap();
+        // console.log("result...", result);
+        toast.success("Business Information updated successfully");
+        navigate("/adddomain", {state: {customer_id: location.state.customer_id, formData: formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: 'business_info'}});
+      } catch (error) {
+        toast.error("Error updating Business Information");
+      }
+    } else {
+      toast.warning("Please enter a valid phone number");
     }
   };
 
@@ -382,7 +398,19 @@ const BusinessInfo: React.FC = () => {
           <PhoneInput
             country={"in"}
             value={formData?.phone_no}
-            onChange={handlePhoneChange}
+            onChange={(inputPhone, countryData, event, formattedValue) => {
+              handlePhoneChange(inputPhone);
+              if(countryData?.format?.length === formattedValue.length) {
+                const newValue = removePrefix(inputPhone, countryData?.dialCode);
+                if (newValue.startsWith('0')) {
+                  setIsNumberValid(false);
+                } else {
+                  setIsNumberValid(true);
+                }
+              } else {
+                setIsNumberValid(false);
+              }
+            }}
             inputClass="react-tel-input outline-none"
             dropdownClass="peer"
             containerClass="relative outline-none w-full"

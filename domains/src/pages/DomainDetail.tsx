@@ -88,7 +88,7 @@ const SelectedDomain: React.FC = () => {
     }
   }
   return (
-    <div>
+    <div className="">
       <main>
         <Link to="/domain">
           <h2 className="text-green-500 font-medium text-sm sm:text-md lg:text-2xl flex items-center gap-1 mb-3">

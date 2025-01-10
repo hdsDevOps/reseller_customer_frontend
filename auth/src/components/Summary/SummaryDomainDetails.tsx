@@ -27,7 +27,7 @@ const SummaryDomainDetails = ({state, handleContactModalOpen, handleBusinessModa
   }, [plan]);
   
   const findAmount = async(array) => {
-    const data = await array.find(item => item.currency_code === defaultCurrencySlice).price;
+    const data = await array.find(item => item.currency_code === defaultCurrencySlice)?.price;
     const amount = await data.find(item => item.type === state.period)?.discount_price;
     setAmount(amount);
   };

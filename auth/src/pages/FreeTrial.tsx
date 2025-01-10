@@ -4,19 +4,36 @@ import { IoChevronBackSharp } from "react-icons/io5";
 import { FaCrown } from "react-icons/fa";
 import { format } from "date-fns";
 import { currencyList } from "../components/CurrencyList";
-import { useAppSelector } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import { plansAndPricesListThunk } from "store/user.thunk";
 
 const FreeTrial: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useAppDispatch();
 
   console.log("location state...", location.state);
-  const plan = location.state.plan;
+  // const plan = location.state.plan;
+  const [plan, setPlan] = useState(location.state.plan);
+  console.log("plan...", plan?.amount_details);
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
   const [today, setToday] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [amount, setAmount] = useState(0);
+
+  useEffect(() => {
+    const getPlans = async() => {
+      try {
+        const result = await dispatch(plansAndPricesListThunk({subscription_id: location.state.plan.id})).unwrap();
+        setPlan(result?.data[0]);
+      } catch (error) {
+        setPlan(location.state.plan);
+      }
+    };
+
+    getPlans();
+  }, [location.state]);
   
   useEffect(() => {
     const dayToday = new Date();
@@ -29,17 +46,17 @@ const FreeTrial: React.FC = () => {
     setExpiryDate(format(expiryDateValue, "MMMM dd, yyyy"))
   }, []);
 
-  const findAmount = async(array) => {
-    const data = await array.find(item => item.currency_code === defaultCurrencySlice).price;
+  const findAmount = async(array, defaultCurrencySlice) => {
+    const data = await array?.find(item => item?.currency_code === defaultCurrencySlice)?.price;
     console.log(data)
-    const amount = await data.find(item => item.type === location.state.period)?.discount_price;
-    console.log(amount);
+    const amount = await data?.find(item => item?.type === location.state.period)?.discount_price;
+    // console.log(amount);
     setAmount(amount);
   };
   
   useEffect(() => {
-    findAmount(location.state.plan.amount_details);
-  }, [location.state]);
+    findAmount(plan?.amount_details,defaultCurrencySlice);
+  }, [plan, defaultCurrencySlice]);
 
   return (
     <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative">
@@ -57,13 +74,13 @@ const FreeTrial: React.FC = () => {
 
         <div className="flex items-start gap-3 mb-4">
           <img
-            src={plan.icon_image}
-            alt={plan.plan_name}
+            src={plan?.icon_image}
+            alt={plan?.plan_name}
             className="w-8 h-8 my-auto"
           />
           <div>
             <h2 className="text-3xl uppercase xsm-max:text-xl font-medium flex items-start gap-2 flex-col-reverse">
-            <p className="text-xs text-gray-500 font-normal normal-case ">{location.state.period}</p>{plan.plan_name}</h2>
+            <p className="text-xs text-gray-500 font-normal normal-case ">{location.state.period}</p>{plan?.plan_name}</h2>
             
           </div>
         </div>
@@ -118,7 +135,7 @@ const FreeTrial: React.FC = () => {
             </a>.
         </p>
 
-        <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg" onClick={()=>navigate('/gemini-add', { state: location.state })}>
+        <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg" onClick={()=>navigate('/gemini-add', { state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: plan, period: location.state.period, selectedDomain: location.state.selectedDomain, token: location.state.token, emailData: location.state.emailData, from: location.state.from} })}>
           Start Free Trial
         </button>
       </div>

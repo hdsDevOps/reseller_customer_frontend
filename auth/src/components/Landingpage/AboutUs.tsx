@@ -10,7 +10,7 @@ const AboutUs = ({aboutUs, id}:any) => {
   const navigate = useNavigate();
   // console.log("aboutUs...", aboutUs);
   return (
-    <section className="max-w-screen-2xl mx-auto" id={id}>
+    <section className="max-w-screen-2xl mx-auto bg-top bg-cover" style={{ backgroundImage: `url(${Base_URL}/images/AboutUsSpiral.png)` }} id={id}>
       <div className="w-full relative my-2">
         <div className="bg-[#12A8334F] absolute inset-0 text-white flex flex-col gap-2 justify-center items-center">
           <h4 className="font-extrabold text-4xl">
@@ -25,7 +25,7 @@ const AboutUs = ({aboutUs, id}:any) => {
         />
       </div>
       <div className="w-full bg-cover bg-center"
-      style={{ backgroundImage: `url(${Base_URL}/images/AboutUsSpiral.png)` }}>
+      >
         <div className="grid-custom items-center lg:flex-row w-full">
           <div className="pb-11  w-full sm:pt-8 my-2 px-2 pl-5">
             <h2 className="font-semibold text-3xl text-greenbase">
@@ -57,3 +57,6 @@ const AboutUs = ({aboutUs, id}:any) => {
   );
 };
 export default AboutUs;
+
+
+// style={{ backgroundImage: `url(${Base_URL}/images/AboutUsSpiral.png)` }}

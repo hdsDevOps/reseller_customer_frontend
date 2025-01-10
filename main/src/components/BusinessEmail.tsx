@@ -398,7 +398,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                       className="text-xs sm:text-sm text-green-500 ml-3 cursor-pointer"
                       onClick={() => navigate("/upgrade-plan")}
                     >
-                      Upgrade plan
+                      Update plan
                     </span>
                   </p>
                 </div>

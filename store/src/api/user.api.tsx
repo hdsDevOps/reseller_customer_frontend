@@ -779,6 +779,15 @@ async function contactFormApi(
   }
 };
 
+async function getPaymetnMethodsApi(): Promise<any> {
+  try {
+    const result = await getApiCall(endPoints.getPaymetnMethods);
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 export const userApis = {
   userLoginApi,
   resendLoginOtpApi,
@@ -852,4 +861,6 @@ export const userApis = {
   getFaqsApi,
   getBannerApi,
   contactFormApi,
+
+  getPaymetnMethodsApi,
 };

@@ -123,114 +123,7 @@ const DomainSummary = ({state, plan}:any) => {
 
   const handleSubmitPurchase = async(e) => {
     e.preventDefault();
-    try {
-      await dispatch(udpateBusinessDataThunk({
-        user_id: state.customer_id,
-        first_name: state.formData.first_name,
-        last_name: state.formData.last_name,
-        email: state.formData.email,
-        phone_no: state.formData.phone_no,
-        address: state.formData.address,
-        state: '',
-        city: '',
-        country: state.formData.region,
-        password: '',
-        business_name: state.formData.business_name,
-        business_state: state.formData.business_state,
-        business_city: state.formData.business_city,
-        business_zip_code: state.formData.business_zip_code,
-        token: state.token
-      })).unwrap();
-      await dispatch(addSubscriptionWithoutLoginThunk({
-        product_type: "domain",
-        payment_cycle: "Yearly",
-        customer_id: state.customer_id,
-        description: "domain purchase",
-        domain: [state.selectedDomain],
-        last_payment: today,
-        next_payment: domainExpiryDate,
-        payment_method: "visa",
-        subscription_status: "Auto-renewal",
-        plan_name_id: "",
-        payment_details: [{
-          first_name: state.formData.first_name,
-          last_name: state.formData.last_name,
-          card_number: '123456789098',
-          billing_detail_id: '',
-        }],
-        plan_name: "",
-        workspace_status: "",
-        is_trial: false,
-        license_usage: state.license_usage,
-        token: state.token
-      })).unwrap();
-      await dispatch(addSubscriptionWithoutLoginThunk({
-        product_type: "google workspace",
-        payment_cycle: state.period,
-        customer_id: state.customer_id,
-        description: "google workspace purchase",
-        domain: [state.selectedDomain],
-        last_payment: today,
-        next_payment: planExpiryDate,
-        payment_method: "visa",
-        subscription_status: "Auto-renewal",
-        plan_name_id: state.plan.id,
-        payment_details: [{
-          first_name: state.formData.first_name,
-          last_name: state.formData.last_name,
-          card_number: '123456789098',
-          billing_detail_id: '',
-        }],
-        plan_name: state.plan.plan_name,
-        workspace_status: "trial",
-        is_trial: false,
-        license_usage: state.license_usage,
-        token: state.token
-      })).unwrap();
-      const domainData = await dispatch(addNewDomainWithoutLoginThunk({
-        customer_id: state.customer_id,
-        domain_name: state.selectedDomain,
-        domain_type: "primary",
-        subscription_id: "0",
-        business_name: state.formData.business_name,
-        business_email: state.formData.email,
-        license_usage: state.license_usage,
-        plan: "0",
-        payment_method: "visa",
-        domain_status: true,
-        billing_period: "Yearly",
-        renew_status: "Auto-renwal",
-        subscription_status: "Auto-renwal",
-        token: state.token
-      })).unwrap();
-      await dispatch(addEmailsWithoutLoginThunk({
-        user_id: state.customer_id,
-        domain_id: domainData?.domain_id,
-        emails: [
-          {
-            first_name: state.formData.first_name,
-            last_name: state.formData.last_name,
-            email: `${state.emailData.username}@${state.selectedDomain}`,
-            password: state.emailData.password,
-          }
-        ],
-        token: state.token
-      })).unwrap();
-      await dispatch(setUserAuthTokenToLSThunk({token: state.token})).unwrap();
-      await dispatch(setUserIdToLSThunk(state.customer_id)).unwrap();
-      navigate('/dashboard', {state: {from: 'otp'}});
-    } catch (error) {
-      toast.error("Error purchasing");
-      console.log(error)
-    }  finally {
-      try {
-        await dispatch(getUserAuthTokenFromLSThunk()).unwrap();
-        await dispatch(getUserIdFromLSThunk()).unwrap();
-        navigate('/dashboard', {state: {from: 'otp'}})
-      } catch (error) {
-        console.log("Error on token")
-      }
-    }
+    navigate('/Review', {state: {customer_id: state.customer_id, formData: state.formData, license_usage: state.license_usage, plan: state.plan, period: state.period, selectedDomain: state.selectedDomain, token: state.token, emailData: state.emailData, from: state.from, price: finalTotalPrice, currency: defaultCurrencySlice}})
   }
 
   return (
@@ -430,7 +323,7 @@ const DomainSummary = ({state, plan}:any) => {
             <p className="w-[65%] text-gray-400 text-[15px]">
               By purchasing, you accept the <span className="font-bold text-green-600">Customer Agreement</span> and
               acknowledge reading the <span className="font-bold text-green-600">Privacy Policy</span>. You also
-              agree to Auto renewal of your yearly subscription for ₹467.64, which
+              agree to Auto renewal of your yearly subscription, which
               can be disabled at any time through your account. Your card details
               will be saved for future purchases and subscription renewals.
             </p>

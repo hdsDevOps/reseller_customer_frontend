@@ -5,6 +5,9 @@ import { Bell, ShoppingCart } from "lucide-react";
 import Dropdown from './DropdownMenu'
 import NotificationCenter from "./Notification";
 
+const logoImage = 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo-2.png?alt=media&token=9315e750-1f5d-4032-ba46-1aeafa340a75';
+const logoImageSmall = 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899';
+
 export default function Header() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -27,17 +30,17 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white flex text-black px-2 items-center justify-between z-50 fixed top-0 left-0 right-0">
-    <a
-      href="#"
-      className="flex items-center justify-center"
-    >
-      <img 
-        src={process.env.BASE_URL + "/images/logo.jpeg"} 
-        alt="logo" 
-        className="w-16 h-16 object-cover" 
-      />
-    </a>
+    <header className="bg-white flex text-black px-2 items-center justify-between z-50 fixed top-0 left-0 right-0 h-[70px]">
+      <a
+        href="#"
+        className="flex items-center justify-center"
+      >
+        <img
+          src={logoImage}
+          alt="logo"
+          className="h-10 object-contain"
+        />
+      </a>
 
       <div className="flex items-center space-x-4">
         <button onClick={openModal} className="relative p-2 bg-[#DCEBDFCC] hover:bg-opacity-90 rounded-md">

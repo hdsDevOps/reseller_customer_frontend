@@ -95,6 +95,8 @@ const Summary: React.FC = () => {
   const [stateDropdownOpen, setStateDropdownOpen] = useState<Boolean>(false);
   const [cityDropdownOpen, setCityDropdownOpen] = useState<Boolean>(false);
   // console.log("isDropdownOpen", isDropdownOpen);
+  const [isNumberValid, setIsNumberValid] = useState(false);
+  console.log({isNumberValid});
   
   const handleClickOutsideCountry = (event: MouseEvent) => {
     if(countryRef.current && !countryRef.current.contains(event.target as Node)) {
@@ -146,6 +148,15 @@ const Summary: React.FC = () => {
       ...editData,
       [e.target.name]: e.target.value
     })
+  };
+
+  const removePrefix = (input:string, prefix:string) => {
+    if(input.startsWith(prefix)) {
+      return input.slice(prefix.length);
+    } else if(input.startsWith('0')) {
+      return input.slice(1);
+    }
+    return input;
   };
 
   const handlePhoneChange = (value: string) => {
@@ -229,27 +240,31 @@ const Summary: React.FC = () => {
   };
 
   const handleChangeBusinessFormData = () => {
-    if(
-      editData?.business_name !== "" && editData?.business_name?.trim() !== "" &&
-      editData?.region !== "" && editData?.region?.trim() !== "" &&
-      editData?.business_state !== "" && editData?.business_state?.trim() !== "" &&
-      editData?.business_city !== "" && editData?.business_city?.trim() !== "" &&
-      editData?.business_zip_code !== "" && editData?.business_zip_code?.trim() !== ""
-    ) {
-      setData({
-        ...data,
-        formData: {
-          ...data.formData,
-          business_name: editData?.business_name,
-          region: editData?.region,
-          business_state: editData?.business_state,
-          business_city: editData?.business_city,
-          business_zip_code: editData?.business_zip_code
-        },
-      });
-      setOpenBusinessModal(false);
+    if(isNumberValid) {
+      if(
+        editData?.business_name !== "" && editData?.business_name?.trim() !== "" &&
+        editData?.region !== "" && editData?.region?.trim() !== "" &&
+        editData?.business_state !== "" && editData?.business_state?.trim() !== "" &&
+        editData?.business_city !== "" && editData?.business_city?.trim() !== "" &&
+        editData?.business_zip_code !== "" && editData?.business_zip_code?.trim() !== ""
+      ) {
+        setData({
+          ...data,
+          formData: {
+            ...data.formData,
+            business_name: editData?.business_name,
+            region: editData?.region,
+            business_state: editData?.business_state,
+            business_city: editData?.business_city,
+            business_zip_code: editData?.business_zip_code
+          },
+        });
+        setOpenBusinessModal(false);
+      } else {
+        toast.warning("Please fill up all the fields");
+      }
     } else {
-      toast.warning("Please fill up all the fields");
+      toast.warning("Please enter a valid phone number");
     }
   }
 
@@ -367,7 +382,19 @@ const Summary: React.FC = () => {
                       >Phone Number</label>
                       <PhoneInput
                         country={country?.code?.toLowerCase()}
-                        onChange={handlePhoneChange}
+                        onChange={(inputPhone, countryData, event, formattedValue) => {
+                          handlePhoneChange(inputPhone);
+                          if(countryData?.format?.length === formattedValue.length) {
+                            const newValue = removePrefix(inputPhone, countryData?.dialCode);
+                            if (newValue.startsWith('0')) {
+                              setIsNumberValid(false);
+                            } else {
+                              setIsNumberValid(true);
+                            }
+                          } else {
+                            setIsNumberValid(false);
+                          }
+                        }}
                         value={editData?.phone_no}
                         placeholder='00000-00000'
                         inputProps={{

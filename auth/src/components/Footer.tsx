@@ -44,11 +44,11 @@ export default function Footer() {
   }, []);
 
   const socialIcons = [
-    {name: "Twitter", icon: <ImTwitter size="24" fill="white" />, color: '#1DA1F2', },
-    {name: "Facebook", icon: <GrFacebookOption size="26" fill="white" />, color: '#2f4572', },
-    {name: "Pinterest", icon: <FaPinterestP size="28" fill="white" />, color: '#941b20', },
-    {name: "Instagram", icon: <FaInstagram size="28" fill="white" />, color: '#3246a7', },
-    {name: "Youtube", icon: <FaYoutube size="28" fill="white" />, color: '#951c1b', },
+    {name: "Twitter", icon: <ImTwitter size="24" fill="white" />, color: 'bg-[#1DA1F2]', },
+    {name: "Facebook", icon: <GrFacebookOption size="26" fill="white" />, color: 'bg-[#2f4572]', },
+    {name: "Pinterest", icon: <FaPinterestP size="28" fill="white" />, color: 'bg-[#941b20]', },
+    {name: "Instagram", icon: <FaInstagram size="28" fill="white" />, color: 'bg-[#3246a7]', },
+    {name: "Youtube", icon: <FaYoutube size="28" fill="white" />, color: 'bg-[#951c1b]', },
   ];
 
   const [pesentYear, setPresentYear] = useState<string|Number>('2025');
@@ -75,7 +75,7 @@ export default function Footer() {
               {
                 footer?.marketing_section_data?.length > 0 && footer?.marketing_section_data?.map((data, index) => (
                   <li className="flex flex-col gap-2" key={index}>
-                    <a href={data?.value} target="_blank">Video</a>
+                    <a href={data?.value} target="_blank">{data?.name}</a>
                     <hr className="w-52 bg-[#808080] h-[0.15rem] rounded-md"></hr>
                   </li>
                 ))
@@ -117,7 +117,7 @@ export default function Footer() {
               <div className="flex gap-1">
                 {
                   footer?.social_section_data?.length > 0 && footer?.social_section_data?.map((data, index) => (
-                    <a className={`w-10 h-10 rounded-full flex items-center justify-center bg-[${socialIcons.find(item => item.name === data?.name)?.color}]`} href={data?.value} target="_blank" key={index}>
+                    <a className={`w-10 h-10 rounded-full flex items-center justify-center ${socialIcons.find(item => item.name === data?.name)?.color}`} href={data?.value} target="_blank" key={index}>
                       {socialIcons.find(item => item.name === data?.name)?.icon}
                     </a>
                   ))

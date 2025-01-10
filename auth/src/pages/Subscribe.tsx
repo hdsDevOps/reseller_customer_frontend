@@ -15,7 +15,7 @@ const Subscribe: React.FC = () => {
   const location = useLocation();
   const dispatch = useAppDispatch();
 
-  console.log("state...", location.state);
+  // console.log("state...", location.state);
 
   useEffect(() => {
     if(!location.state) {
@@ -32,7 +32,7 @@ const Subscribe: React.FC = () => {
     email: "",
     phone_no: "",
   });
-  console.log("form data...", formData);
+  // console.log("form data...", formData);
   const [count, setCount] = useState(1);
   const [countryDropdownOpen, setCountryDropdownOpen] = useState<Boolean>(false);
   const countryRef = useRef(null);
@@ -40,7 +40,9 @@ const Subscribe: React.FC = () => {
   const [countries, setCountries] = useState([]);
   const [country, setCountry] = useState({});
   // console.log("countries...", countries);
-  console.log("country...", country);
+  // console.log("country...", country);
+  const [isNumberValid, setIsNumberValid] = useState(false);
+  console.log({isNumberValid});
   
   const handleClickOutsideCountry = (event: MouseEvent) => {
     if(countryRef.current && !countryRef.current.contains(event.target as Node)) {
@@ -85,6 +87,15 @@ const Subscribe: React.FC = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const removePrefix = (input:string, prefix:string) => {
+    if(input.startsWith(prefix)) {
+      return input.slice(prefix.length);
+    } else if(input.startsWith('0')) {
+      return input.slice(1);
+    }
+    return input;
   };
 
   const handlePhoneChange = (value: string) => {
@@ -139,24 +150,28 @@ const Subscribe: React.FC = () => {
 
   const handleSubscribeSubmit = async(e) => {
     e.preventDefault();
-    try {
-      const result = await dispatch(resgiterCustomerThunk({
-        email: formData?.email,
-        password: '',
-        business_phone_number: '',
-        first_name: formData?.first_name,
-        last_name: formData?.last_name,
-        business_name: formData?.business_name,
-        region: formData?.region,
-        street_name: '',
-        state: '',
-        city: '',
-        zipcode: ''
-      })).unwrap();
-      console.log("result...", result);
-      navigate('/subscribeotp', { state: { plan: location.state.plan, period: location.state.period, formData: formData, customer_id: result?.customer_id, license_usage: count }});
-    } catch (error) {
-      toast.error("Error registering");
+    if(isNumberValid) {
+      try {
+        const result = await dispatch(resgiterCustomerThunk({
+          email: formData?.email,
+          password: '',
+          business_phone_number: '',
+          first_name: formData?.first_name,
+          last_name: formData?.last_name,
+          business_name: formData?.business_name,
+          region: formData?.region,
+          street_name: '',
+          state: '',
+          city: '',
+          zipcode: ''
+        })).unwrap();
+        console.log("result...", result);
+        navigate('/subscribeotp', { state: { plan: location.state.plan, period: location.state.period, formData: formData, customer_id: result?.customer_id, license_usage: count }});
+      } catch (error) {
+        toast.error("Error registering");
+      }
+    } else {
+      toast.warning("Please enter a valid phone number");
     }
   }
 
@@ -361,7 +376,19 @@ const Subscribe: React.FC = () => {
             <PhoneInput
               country={country?.iso2.toLowerCase() || "us"}
               value={formData.phone_no}
-              onChange={handlePhoneChange}
+              onChange={(inputPhone, countryData, event, formattedValue) => {
+                handlePhoneChange(inputPhone);
+                if(countryData?.format?.length === formattedValue.length) {
+                  const newValue = removePrefix(inputPhone, countryData?.dialCode);
+                  if (newValue.startsWith('0')) {
+                    setIsNumberValid(false);
+                  } else {
+                    setIsNumberValid(true);
+                  }
+                } else {
+                  setIsNumberValid(false);
+                }
+              }}
               inputClass="react-tel-input outline-none"
               dropdownClass="peer"
               containerClass="relative outline-none w-full"

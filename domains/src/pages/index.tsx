@@ -11,7 +11,7 @@ import { ToastContainer } from "react-toastify";
 
 const DomainApp: React.FC = () => {
   return (
-    <div>
+    <div className="mb-5">
       <ToastContainer />
       <Routes>
         <Route path="/domain" element={<DomainList />} />

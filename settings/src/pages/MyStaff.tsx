@@ -59,6 +59,8 @@ const MyStaff = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef();
   const [deleteId, setDeleteId] = useState("");
+  const [isNumberValid, setIsNumberValid] = useState(false);
+  console.log({isNumberValid});
   
   useEffect(() => {
     if(userTypes.length > 0 && type !== "") {
@@ -146,6 +148,15 @@ const MyStaff = () => {
       ...newStaff,
       [e.target.name]: e.target.value
     });
+  };
+
+  const removePrefix = (input:string, prefix:string) => {
+    if(input.startsWith(prefix)) {
+      return input.slice(prefix.length);
+    } else if(input.startsWith('0')) {
+      return input.slice(1);
+    }
+    return input;
   };
 
   const handlePhoneChange = (value: string) => {
@@ -260,10 +271,14 @@ const MyStaff = () => {
 
   const handleStaffSubmit = e => {
     e.preventDefault();
-    if(isEdit) {
-      handleEditStaff();
+    if(isNumberValid) {
+      if(isEdit) {
+        handleEditStaff();
+      } else {
+        handleAddStaff();
+      }
     } else {
-      handleAddStaff();
+      toast.warning("Please enter a valid phone number");
     }
   };
 
@@ -523,7 +538,19 @@ const MyStaff = () => {
                             >{form.label}</label>
                             <PhoneInput
                               country={"us"}
-                              onChange={handlePhoneChange}
+                              onChange={(inputPhone, countryData, event, formattedValue) => {
+                                handlePhoneChange(inputPhone);
+                                if(countryData?.format?.length === formattedValue.length) {
+                                  const newValue = removePrefix(inputPhone, countryData?.dialCode);
+                                  if (newValue.startsWith('0')) {
+                                    setIsNumberValid(false);
+                                  } else {
+                                    setIsNumberValid(true);
+                                  }
+                                } else {
+                                  setIsNumberValid(false);
+                                }
+                              }}
                               value={newStaff?.phone_no}
                               placeholder='00000-00000'
                               inputProps={{

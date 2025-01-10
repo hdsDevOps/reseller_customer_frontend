@@ -16,7 +16,7 @@ const BuyDomain: React.FC = () => {
 
   useEffect(() => {
     if(location.state) {
-      if(location.state.result.message === "Customer domain is Already Registered with a Google Workspace") {
+      if(location.state.result?.available === false) {
         setErrorMessage("Customer domain is Already Registered with a Google Workspace");
       } else {
         setErrorMessage("");
@@ -42,7 +42,7 @@ const BuyDomain: React.FC = () => {
     try {
       const fullDomainName = `${domains?.domain}${domains?.domain_extension}`;
       const result = await dispatch(checkDomainThunk(fullDomainName)).unwrap();
-      if(result?.message === "Domain is Still Available for Purchase , doesn't belong to anyone yet"){
+      if(result?.available){
         setAvailableDomains((prev) => [...prev, domains?.domain_extension]);
         setErrorMessage("");
       } else {
@@ -56,7 +56,7 @@ const BuyDomain: React.FC = () => {
       console.log("fullDomainName...", fullDomainName);
       try {
         const result = await dispatch(checkDomainThunk(fullDomainName)).unwrap();
-        if(result?.message === "Domain is Still Available for Purchase , doesn't belong to anyone yet"){
+        if(result?.available){
           setAvailableDomains((prev) => [...prev, extension]);
         } else {
           //

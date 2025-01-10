@@ -434,3 +434,10 @@ export const contactFormThunk = createAsyncThunk(
     return await userApis.contactFormApi( first_name, last_name, email, phone_no, subject, message );
   }
 );
+
+export const getPaymetnMethodsThunk = createAsyncThunk(
+  "users/getPaymetnMethods",
+  async () => {
+    return await userApis.getPaymetnMethodsApi();
+  }
+);

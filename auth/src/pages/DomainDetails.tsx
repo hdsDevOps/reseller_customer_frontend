@@ -43,11 +43,11 @@ const DomainDetails: React.FC = () => {
       try {
         const result = await dispatch(checkDomainThunk( `${domainName}${domainExtension}`)).unwrap();
         console.log("result...", result);
-        if(result?.message === "Domain is Still Available for Purchase , doesn't belong to anyone yet" || result?.message === "Customer domain is Available to be used with a google workspace") {
+        if(result?.available) {
           if(location.state.from === "business_info") {
             navigate('/selected-domain', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, selectedDomain: `${domainName}${domainExtension}`, type: 'new'}});
           }
-        } else if(result?.message === "Customer domain is Already Registered with a Google Workspace") {
+        } else{
           navigate('/domainlist', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, domain: {domainName, domainExtension}, type: 'new_error'}});
         }
       } catch (error) {
@@ -68,9 +68,9 @@ const DomainDetails: React.FC = () => {
       try {
         const result = await dispatch(checkDomainThunk( existingDomainName)).unwrap();
         console.log("result...", result);
-        if(result?.message === "Domain is Still Available for Purchase , doesn't belong to anyone yet" || result?.message === "Customer domain is Available to be used with a google workspace") {
+        if(result?.available) {
           toast.warning("Domain is Still Available for Purchase , doesn't belong to anyone yet");
-        } else if(result?.message === "Customer domain is Already Registered with a Google Workspace") {
+        } else{
           if(location.state.from === "business_info") {
             navigate('/signin-domain', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, domain_name: existingDomainName, type: 'existing'}});
           }

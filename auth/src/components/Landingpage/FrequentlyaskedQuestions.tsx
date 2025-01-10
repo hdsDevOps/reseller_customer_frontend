@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Accordion from "./Resources/Accordion";
 import { useAppDispatch } from "store/hooks";
 import { getFaqsThunk } from "store/user.thunk";
+import { Base_URL } from "../../Constant";
 
 const FrequentlyAskedQuestions = () => {
   const dispatch = useAppDispatch();
@@ -18,7 +19,7 @@ const FrequentlyAskedQuestions = () => {
     getFaqsList();
   }, []);
   const dottedline = (
-    <svg height="4" width="100%" className="mt-4">
+    <svg height="4" width="100%" className="mt-4 bg-center bg-covers">
       <line
         x1="0"
         y1="0"
@@ -29,7 +30,7 @@ const FrequentlyAskedQuestions = () => {
     </svg>
   );
   return (
-    <section className="sm:px-16 px-4 w-full mt-10">
+    <section className="sm:px-16 px-4 w-full mt-10 bg-cover bg-top" style={{ backgroundImage: `url(${Base_URL}/images/AboutUsSpiral.png)` }}>
       <div className="mb-2">
         <h2 className="text-greenbase font-semibold text-4xl">FAQ's</h2>
         {dottedline}

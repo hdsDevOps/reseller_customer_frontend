@@ -191,7 +191,7 @@ const HdsProfile = () => {
         }
     };
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-white min-h-screen mb-5">
       <main className="bg-white small:px-10 max-[365px]:px-1">
         <h2 className="text-2xl text-[#12A833] flex items-center font-medium cursor-pointer" onClick={() => {navigate(-1)}}>
             <IoArrowBackSharp color='#12A833' size={20}/> <span className='ml-2'>Profile</span>

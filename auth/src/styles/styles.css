@@ -20,3 +20,29 @@
     align-items: start;
   }
 }
+
+.promotion-div{
+  position: absolute;
+  bottom: 40px;
+  width: 325px;
+  height: 200px;
+  background-color: black;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@media screen and (min-width: 768px) {
+  .promotion-div {
+    left: 50%;
+    transform: initial;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .promotion-div {
+    width: 470px;
+    height: 289px;
+  }
+}
+
+/* absolute left-1/2 max-[768px]:transform max-[768px]:-translate-x-1/2 bottom-10 lg:w-[470px] w-[325px] lg:h-[289px] h-[200px] bg-black  */

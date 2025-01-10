@@ -4,14 +4,15 @@ import ReCAPTCHA from "react-google-recaptcha";
 import { HiOutlineEye } from "react-icons/hi";
 import { RiEyeCloseLine } from "react-icons/ri";
 import { IoChevronBackSharp } from "react-icons/io5";
+import { toast } from "react-toastify";
 
 // Update the site key with your actual reCAPTCHA site key
-const RECAPTCHA_SITE_KEY = "YOUR_RECAPTCHA_SITE_KEY";
+const RECAPTCHA_SITE_KEY = "6LdENbMqAAAAABasUqa4IoohS73SF0TVIxXDWHdy";
 
 const SignInForm: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  console.log("location state...", location.state);
+  // console.log("location state...", location.state);
   
   // Retrieve the domain from the location state
   const domain = location.state.selectedDomain;
@@ -21,8 +22,9 @@ const SignInForm: React.FC = () => {
     username: "",
     password: "",
   });
-  console.log("from data...", formData);
-  // const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  // console.log("form data...", formData);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  console.log("recaptchaToken...", recaptchaToken);
   const [charCount, setCharCount] = useState({
     username: 0,
     password: 0,
@@ -44,9 +46,9 @@ const SignInForm: React.FC = () => {
     setShowPassword(!showPassword);
   };
 
-  // const handleRecaptcha = (token: string | null) => {
-  //   setRecaptchaToken(token);
-  // };
+  const handleRecaptcha = (token: string | null) => {
+    setRecaptchaToken(token);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +57,11 @@ const SignInForm: React.FC = () => {
     // } else {
     //   console.log("Please complete the reCAPTCHA.");
     // }
-    navigate('/free-trial', { state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, selectedDomain: location.state.selectedDomain, token: location.state.token, emailData: formData, from: location.state.from} });
+    if(formData.username.includes("@")) {
+      toast.warning("Username cannot include @ symbol");
+    } else {
+      navigate('/free-trial', { state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, selectedDomain: location.state.selectedDomain, token: location.state.token, emailData: {username: `${formData.username}@${location.state.selectedDomain}`, password: formData.password}, from: location.state.from} });
+    }
   };
 
   return (
@@ -142,11 +148,11 @@ const SignInForm: React.FC = () => {
         {/* reCAPTCHA */}
         <div className="relative my-4">
           <ReCAPTCHA
-            sitekey={RECAPTCHA_SITE_KEY}
-            // onChange={handleRecaptcha}
+            sitekey="6LdENbMqAAAAAKCJtG-Hf4Q2qVblxiQ7WTRDp6Ps"
+            onChange={handleRecaptcha}
             className=""
           />
-          <div className="absolute left-0 top-1/2 transform -translate-y-1/2 flex items-center ml-2">
+          {/* <div className="absolute left-0 top-1/2 transform -translate-y-1/2 flex items-center ml-2">
             <input
               type="checkbox"
               id="recaptcha-checkbox"
@@ -156,7 +162,7 @@ const SignInForm: React.FC = () => {
             <label htmlFor="recaptcha-checkbox" className="ml-2 text-sm">
               I'm not a robot
             </label>
-          </div>
+          </div> */}
         </div>
 
         {/* Agreement and Continue Button */}

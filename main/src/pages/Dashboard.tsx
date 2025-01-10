@@ -49,7 +49,7 @@ const Dashboard: React.FC = () => {
   const listRef= useRef(null);
 
   const showListTable = [
-    { label: "Upgarde Plan", type: "link", link: "/upgrade-plan", },
+    { label: "Update Plan", type: "link", link: "/upgrade-plan", },
     { label: "Update payment method", type: "modal", link: "", },
     { label: "Renew Plan", type: "link", link: "/upgrade-plan", },
     { label: "Turn off auto-renew", type: "modal", link: "", },
@@ -293,7 +293,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div>
-      <main className="min-h-screen  pb-32">
+      <main className="min-h-screen pb-5">
         <h2 className="text-sm sm:text-xl lg:text-4xl font-medium text-green-500">
           Welcome to your Dashboard
         </h2>
@@ -338,9 +338,9 @@ const Dashboard: React.FC = () => {
                   <td className="px-2 pb-10 pt-3 text-center">{subscription?.payment_cycle}</td>
                   <td className="px-2 pb-10 pt-3 text-center">{subscription?.description}</td>
                   <td className="px-2 pb-10 pt-3 text-center">{subscription?.domain[0]}</td>
-                  <td className="px-2 pb-10 pt-3">{formatDate(subscription?.last_payment?._seconds, subscription?.last_payment?._nanoseconds)}</td>
-                  <td className="px-2 pb-10 pt-3">{formatDate(subscription?.next_payment?._seconds, subscription?.next_payment?._nanoseconds)}</td>
-                  <td className="px-2 pb-10 pt-3">
+                  <td className="px-2 pb-10 pt-3 text-center">{formatDate(subscription?.last_payment?._seconds, subscription?.last_payment?._nanoseconds)}</td>
+                  <td className="px-2 pb-10 pt-3 text-center">{formatDate(subscription?.next_payment?._seconds, subscription?.next_payment?._nanoseconds)}</td>
+                  <td className="px-2 pb-10 pt-3 text-center">
                     <button className={` border-2 px-2 py-1 rounded hover:text-white
                       ${
                         subscription?.subscription_status === "Auto-renewal" ?
@@ -352,7 +352,7 @@ const Dashboard: React.FC = () => {
                       subscription?.subscription_status === "Cancelled" ? "Cancelled" : subscription?.subscription_status
                     }</button>
                   </td>
-                  <td className="px-2 pb-10 pt-3">
+                  <td className="px-2 pb-10 pt-3 items-center flex justify-center my-auto">
                     <span className="flex items-center">
                       <img
                         src="/images/visa.png"
@@ -365,8 +365,8 @@ const Dashboard: React.FC = () => {
                     </span>
                   </td>
                   <td className="px-2 pb-10 pt-3 text-right">
-                    <button className="w-6 h-6 rounded-full border-2 border-green-500 flex justify-center items-center">
-                      <p className="mb-2" onClick={() => setShowList(true)}>...</p>
+                    <button className="w-6 h-6 rounded-full border-2 border-green-500 flex justify-center items-center" type="button" onClick={() => setShowList(!showList)}>
+                      <p className="mb-2">...</p>
                     </button>
                   </td>
                 </tr>

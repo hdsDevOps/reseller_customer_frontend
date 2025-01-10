@@ -115,16 +115,10 @@ const Login: React.FC = () => {
                   placeholder="Enter email"
                   className="custom-input"
                   data-testid="email"
-                  {...register("email", {
-                    required: "Email is required",
-                    pattern: {
-                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                      message: "Invalid email format",
-                    },
-                  })}
                   name="email"
                   onChange={updateUserDetails}
                   value={userDetails?.email}
+                  required
                 />
                 {errors.email && (
                   <p className="text-red-600 text-sm">{errors.email.message}</p>
@@ -141,13 +135,6 @@ const Login: React.FC = () => {
                     className="custom-input"
                     minLength={6}
                     required
-                    {...register("password", {
-                      required: "Password is required",
-                      minLength: {
-                        value: 6,
-                        message: "Password must be at least 8 characters",
-                      },
-                    })}
                     name="password"
                     onChange={updateUserDetails}
                     value={userDetails?.password}

@@ -31,11 +31,11 @@ const AddDomain: React.FC = () => {
     try {
       const result = await dispatch(checkDomainThunk(domain.domain+domain.domain_extension)).unwrap();
       console.log("check domain result...", result);
-      if(result?.message === "Customer domain is Already Registered with a Google Workspace") {
-        navigate('/domain-details', {state: {result, domain}});
-      } else if(result?.message === "Domain is Still Available for Purchase , doesn't belong to anyone yet") {
+      if(result?.available) {
         // navigate('/domain-details', {state: {result, domain}});
         toast.warning("This domain is still available for purchase");
+      } else {
+        navigate('/domain-details', {state: {result, domain}});
       }
       // navigate('/choose-domain', {state: {result, domain}});
     } catch (error) {
@@ -117,7 +117,7 @@ const AddDomain: React.FC = () => {
                   </select>
                 </div>
               </div>
-              <p className="text-gray-400 text-sm">Search available domains</p>
+              <p className="text-gray-400 text-sm">Enter your existing domain name</p>
             
               <div className="flex flex-start pb-2">
                 <button

@@ -30,10 +30,10 @@ const BuyDomain: React.FC = () => {
     try {
       const result = await dispatch(checkDomainThunk(domain.domain+domain.domain_extension)).unwrap();
       console.log("check domain result...", result);
-      if(result?.message === "Customer domain is Already Registered with a Google Workspace") {
-        navigate('/choose-domain', {state: {result, domain}});
-      } else if(result?.message === "Domain is Still Available for Purchase , doesn't belong to anyone yet" || result?.message === "Customer domain is Available to be used with a google workspace") {
+      if(result?.available) {
         navigate('/domain-details', {state: {result, domain}});
+      } else {
+        navigate('/choose-domain', {state: {result, domain}});
       }
       // navigate('/choose-domain', {state: {result, domain}});
     } catch (error) {

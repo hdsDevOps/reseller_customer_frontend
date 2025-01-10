@@ -22,12 +22,23 @@ const ContactUs = ({contact, id}:any) => {
   const dispatch = useAppDispatch();
   const [formData, setFormData] = useState(initialForm);
   // console.log("from data...", formData);
+  const [isNumberValid, setIsNumberValid] = useState(false);
+  console.log({isNumberValid});
 
   const handleChangeFormData = e => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const removePrefix = (input:string, prefix:string) => {
+    if(input.startsWith(prefix)) {
+      return input.slice(prefix.length);
+    } else if(input.startsWith('0')) {
+      return input.slice(1);
+    }
+    return input;
   };
 
   const handlePhoneChange = (value: string) => {
@@ -37,19 +48,23 @@ const ContactUs = ({contact, id}:any) => {
   const handleFormSubmit = async(e) => {
     e.preventDefault();
     try {
-      if(
-        formData?.first_name !== "" && formData?.first_name?.trim() !== "" &&
-        formData?.last_name !== "" && formData?.last_name?.trim() !== "" &&
-        formData?.email !== "" && formData?.email?.trim() !== "" &&
-        formData?.phone_no !== "" && formData?.phone_no?.trim() !== "" &&
-        formData?.subject !== "" && formData?.subject?.trim() !== "" &&
-        formData?.message !== "" && formData?.message?.trim() !== ""
-      ) {
-        const result = await dispatch(contactFormThunk(formData)).unwrap();
-        toast.success(result?.message);
-        setFormData(initialForm);
+      if(isNumberValid) {
+        if(
+          formData?.first_name !== "" && formData?.first_name?.trim() !== "" &&
+          formData?.last_name !== "" && formData?.last_name?.trim() !== "" &&
+          formData?.email !== "" && formData?.email?.trim() !== "" &&
+          formData?.phone_no !== "" && formData?.phone_no?.trim() !== "" &&
+          formData?.subject !== "" && formData?.subject?.trim() !== "" &&
+          formData?.message !== "" && formData?.message?.trim() !== ""
+        ) {
+          const result = await dispatch(contactFormThunk(formData)).unwrap();
+          toast.success(result?.message);
+          setFormData(initialForm);
+        } else {
+          toast.warning("Inputs cannot be empty");
+        }
       } else {
-        toast.warning("Inputs cannot be empty");
+        toast.warning("Please enter a valid phone number");
       }
     } catch (error) {
       toast.error("Error submiting the form");
@@ -62,7 +77,7 @@ const ContactUs = ({contact, id}:any) => {
       <div className="text-center mb-8">
         <h2 className="text-4xl font-semibold text-greenbase">Contact Us</h2>
         <p className="font-normal text-2xl mt-4">
-          Fill the form to contact us for more information
+          {contact?.content_description}
         </p>
       </div>
       <div className="flex gap-8 justify-center flex-col lg:flex-row">
@@ -94,7 +109,19 @@ const ContactUs = ({contact, id}:any) => {
             <PhoneInput
               country={"us"}
               value={formData?.phone_no}
-              onChange={handlePhoneChange}
+              onChange={(inputPhone, countryData, event, formattedValue) => {
+                handlePhoneChange(inputPhone);
+                if(countryData?.format?.length === formattedValue.length) {
+                  const newValue = removePrefix(inputPhone, countryData?.dialCode);
+                  if (newValue.startsWith('0')) {
+                    setIsNumberValid(false);
+                  } else {
+                    setIsNumberValid(true);
+                  }
+                } else {
+                  setIsNumberValid(false);
+                }
+              }}
               inputClass="!w-full !outline-none border !border-black/30 !bg-[#E7E8F4]"
               dropdownClass="peer"
               containerClass="relative !outline-none !w-full !border !border-[#E4E4E4] !rounded-[10px] !bg-[#E7E8F4]"

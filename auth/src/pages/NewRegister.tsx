@@ -34,7 +34,7 @@ const RegisterPage: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const [customer, setCustomer] = useState(initialCustomer);
-  console.log("customer...", customer);
+  // console.log("customer...", customer);
   const [showPassword, setShowPassword] = useState(false);
   const [showCPassword, setShowCPassword] = useState(false);
   const [password, setPassword] = useState("");
@@ -42,6 +42,9 @@ const RegisterPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [isNumberValid, setIsNumberValid] = useState(false);
+  // console.log({isNumberValid});
+
   const [countryDropdownOpen, setCountryDropdownOpen] = useState<Boolean>(false);
   const countryRef = useRef(null);
   const [countryName, setCountryName] = useState("");
@@ -110,10 +113,19 @@ const RegisterPage: React.FC = () => {
     });
   };
 
+  const removePrefix = (input:string, prefix:string) => {
+    if(input.startsWith(prefix)) {
+      return input.slice(prefix.length);
+    } else if(input.startsWith('0')) {
+      return input.slice(1);
+    }
+    return input;
+  };
+
   const handlePhoneChange = (value: string) => {
     setCustomer((prevData) => ({ ...prevData, business_phone_number: value }));
   };
-
+  
   const validateForm = () => {
     for (const key in customer) {
       if (customer[key].trim() === '') {
@@ -135,28 +147,33 @@ const RegisterPage: React.FC = () => {
       toast.warning("You must accept the terms and conditions");
       setLoading(false);
     } else {
-      if(validateForm()) {
-        try {
-          const result = await dispatch(resgiterCustomerThunk({
-            email: customer?.email,
-            password: customer?.password,
-            business_phone_number: customer?.business_phone_number,
-            first_name: customer?.first_name,
-            last_name: customer?.last_name,
-            business_name: customer?.business_name,
-            region: customer?.region,
-            street_name: customer?.street_name,
-            state: "",
-            city: "",
-            zipcode: customer?.zipcode
-          })).unwrap();
-          console.log("result...", result);
-          navigate("/otp?mode=signup", { state: {customer_id: result?.customer_id} })
-        } catch (error) {
-          toast.error("Error registering customer");
+      if(isNumberValid) {
+        if(validateForm()) {
+          try {
+            const result = await dispatch(resgiterCustomerThunk({
+              email: customer?.email,
+              password: customer?.password,
+              business_phone_number: customer?.business_phone_number,
+              first_name: customer?.first_name,
+              last_name: customer?.last_name,
+              business_name: customer?.business_name,
+              region: customer?.region,
+              street_name: customer?.street_name,
+              state: "",
+              city: "",
+              zipcode: customer?.zipcode
+            })).unwrap();
+            console.log("result...", result);
+            navigate("/otp?mode=signup", { state: {customer_id: result?.customer_id} })
+          } catch (error) {
+            toast.error("Error registering customer");
+          }
+        } else {
+          toast.warning("Please fill out all the fields");
+          setLoading(false);
         }
       } else {
-        toast.warning("Please fill out all the fields");
+        toast.warning("Please enter a valid phone number");
         setLoading(false);
       }
     }
@@ -334,7 +351,19 @@ const RegisterPage: React.FC = () => {
                       <PhoneInput
                         country={country?.iso2?.toLowerCase() || "us"}
                         value={customer?.business_phone_number}
-                        onChange={handlePhoneChange}
+                        onChange={(inputPhone, countryData, event, formattedValue) => {
+                          handlePhoneChange(inputPhone);
+                          if(countryData?.format?.length === formattedValue.length) {
+                            const newValue = removePrefix(inputPhone, countryData?.dialCode);
+                            if (newValue.startsWith('0')) {
+                              setIsNumberValid(false);
+                            } else {
+                              setIsNumberValid(true);
+                            }
+                          } else {
+                            setIsNumberValid(false);
+                          }
+                        }}
                         inputClass="!w-full !outline-none !border-0"
                         dropdownClass="peer"
                         containerClass="relative !outline-none !w-full !border !border-[#E4E4E4] !rounded-[10px]"
