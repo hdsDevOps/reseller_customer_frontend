@@ -36,7 +36,11 @@ declare module 'store/authSlice' {
     setUserDetails: (payload: any) => PayloadAction<any>;
     setUserAuthStatus: (payload: 'AUTHORIZED' | 'UN_AUTHORIZED' | 'PENDING' | 'UPGRADE') => PayloadAction<'AUTHORIZED' | 'UN_AUTHORIZED' | 'PENDING' | 'UPGRADE'>;
     resetUserSlice: () => PayloadAction<void>;
-  }
+  };
+
+  export const setItemsPerPageSlice: (payload: any) => PayloadAction<any>;
+  export const setBillingHistoryFilterSlice: (payload: any) => PayloadAction<any>;
+  export const setCurrentPageNumberSlice: (payload: any) => PayloadAction<any>;
 
   export default authSlice.reducer;
 }

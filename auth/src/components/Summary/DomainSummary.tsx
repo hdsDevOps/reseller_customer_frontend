@@ -9,7 +9,7 @@ import { RiCloseFill } from "react-icons/ri";
 import { IoMdClose } from "react-icons/io";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { addEmailsWithoutLoginThunk, addNewDomainWithoutLoginThunk, addSubscriptionWithoutLoginThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, udpateBusinessDataThunk } from "store/user.thunk";
+import { addEmailsWithoutLoginThunk, addNewDomainWithoutLoginThunk, addSubscriptionWithoutLoginThunk, getPromotionListThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, udpateBusinessDataThunk } from "store/user.thunk";
 import { format } from "date-fns";
 import { currencyList } from "../CurrencyList";
 
@@ -22,6 +22,13 @@ interface Voucher {
   voucher: AppliedVoucher;
 }
 
+const testingVouchers = [
+  { voucher_code: "HORD6290", discount_rate: 7.60 },
+  { voucher_code: "HORD6291", discount_rate: 8.60 },
+  { voucher_code: "HORD6292", discount_rate: 9.60 },
+  { voucher_code: "HORD6293", discount_rate: 10.60 },
+];
+
 const DomainSummary = ({state, plan}:any) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -29,14 +36,14 @@ const DomainSummary = ({state, plan}:any) => {
   
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
-  console.log("plan...", plan);
+  // console.log("plan...", plan);
 
   const [showVoucherInput, setShowVoucherInput] = useState(false);
   const [showAvailableVoucher, setShowAvailableVoucher] = useState(false);
   const [voucherCode, setVoucherCode] = useState("");
   const [appliedVoucher, setAppliedVoucher] = useState<Voucher | null>(null);
   // console.log("applied voucher...", appliedVoucher);
-  const [selectedVoucher] = useState<Voucher | null>(null);
+  const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
   const [isVoucherApplied, setIsVoucherApplied] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
   // console.log("total price...", totalPrice);
@@ -46,13 +53,16 @@ const DomainSummary = ({state, plan}:any) => {
   const [discountedPrice, setDiscountedPrice] = useState(0.00);
   const [preDiscountedPrice, setPreDiscountedPrice] = useState(0.00);
   // console.log({totalPrice, finalTotalPrice, taxAmount, taxedPrice, discountedPrice});
-  const vouchers = [
-    { voucher_code: "HORD6290", discount_rate: 8.60 },
-    { voucher_code: "HORD6291", discount_rate: 8.60 },
-    { voucher_code: "HORD6292", discount_rate: 8.60 },
-    { voucher_code: "HORD6293", discount_rate: 8.60 },
-  ];
+  const [vouchers, setVouchers] = useState(testingVouchers);
   const [voucherCodeSearch, setVoucherCodeSearch] = useState("");
+  const [filteredVouchers, setFilteredVouchers] = useState([...vouchers]);
+
+  useEffect(() => {
+    setFilteredVouchers([...vouchers]);
+  }, [vouchers]);
+
+  const [taxHover, setTaxHover] = useState(false);
+  const [voucherHover, setVoucherHover] = useState(false);
   
   const [today, setToday] = useState("");
   const [domainExpiryDate, setDomainExpiryDate] = useState("");
@@ -78,23 +88,34 @@ const DomainSummary = ({state, plan}:any) => {
     return amount;
   };
 
+  const getPromotionList = async() => {
+    try {
+      const result = await dispatch(getPromotionListThunk({promotion_id: ""})).unwrap();
+      console.log("promotions...", result);
+    } catch (error) {
+      //
+    }
+  }
+
+  useEffect(() => {
+    getPromotionList();
+  }, []);
+
   useEffect(() => {
     if(state.selectedDomain !== "") {
       const total = 648.00;
       setTotalPrice(parseFloat(total.toFixed(2)));
       setTaxedPrice(parseFloat(((total * taxAmount) / 100).toFixed(2)));
-      const discountedPercent = isVoucherApplied
-        ? appliedVoucher === null
-          ? 0.00
-          : parseFloat(appliedVoucher?.voucher?.discount_rate?.toFixed(2))
-        : 0.00;
+      const discountedPercent = appliedVoucher === null
+        ? 0.00
+        : parseFloat(appliedVoucher?.voucher?.discount_rate?.toFixed(2));
       const totalOutPrice = parseFloat((total + ((total * taxAmount) / 100)).toFixed(2));
       const discountedAMount = parseFloat(((totalOutPrice * discountedPercent) / 100).toFixed(2));
       setDiscountedPrice(discountedAMount);
 
-      const preDiscountedPercent = appliedVoucher === null
+      const preDiscountedPercent = selectedVoucher === null
         ? 0.00
-        : parseFloat(appliedVoucher?.voucher?.discount_rate?.toFixed(2));
+        : parseFloat(selectedVoucher?.voucher?.discount_rate?.toFixed(2));
       const preTotalOutPrice = parseFloat((total + ((total * taxAmount) / 100)).toFixed(2));
       const preDiscountedAMount = parseFloat(((preTotalOutPrice * preDiscountedPercent) / 100).toFixed(2));
       setPreDiscountedPrice(preDiscountedAMount);
@@ -104,13 +125,13 @@ const DomainSummary = ({state, plan}:any) => {
     } else {
       setTotalPrice(0);
     }
-  }, [isVoucherApplied, appliedVoucher]);
+  }, [appliedVoucher, selectedVoucher]);
 
   const handleVoucherInputSubmit = (e) => {
     e.preventDefault();
     const voucherFind = vouchers?.find(item => item?.voucher_code?.toLowerCase() === voucherCode?.toLowerCase());
     if(voucherFind){
-      setAppliedVoucher({voucher: voucherFind});
+      setSelectedVoucher({voucher: voucherFind});
       setShowVoucherInput(false);
     } else {
       toast.error(`No voucher found with voucher code: ${voucherCode}`);
@@ -118,13 +139,19 @@ const DomainSummary = ({state, plan}:any) => {
   };
 
   const handleApplyClick = () => {
-    setIsVoucherApplied(true);
+    setAppliedVoucher(selectedVoucher);
   };
 
   const handleSubmitPurchase = async(e) => {
     e.preventDefault();
     navigate('/Review', {state: {customer_id: state.customer_id, formData: state.formData, license_usage: state.license_usage, plan: state.plan, period: state.period, selectedDomain: state.selectedDomain, token: state.token, emailData: state.emailData, from: state.from, price: finalTotalPrice, currency: defaultCurrencySlice}})
-  }
+  };
+
+  const handleFilterCheckVoucher = (e) => {
+    e.preventDefault();
+    const voucherFilterList = vouchers?.filter(item => item?.voucher_code?.toLowerCase() === voucherCodeSearch?.toLowerCase());
+    setFilteredVouchers(voucherFilterList);
+  };
 
   return (
     <div className="">
@@ -146,15 +173,19 @@ const DomainSummary = ({state, plan}:any) => {
                 value={voucherCodeSearch}
                 onChange={e => {setVoucherCodeSearch(e.target.value);}}
               />
-              <button className="px-4 py-3 text-white transition-colors bg-black hover:bg-gray-800">
+              <button
+                className="px-4 py-3 text-white transition-colors bg-black hover:bg-gray-800"
+                type="button"
+                onClick={(e) => {handleFilterCheckVoucher(e)}}
+              >
                 Check
               </button>
             </div>
       
             <div className="w-full space-y-6">
               {
-                vouchers?.filter(item => item?.voucher_code?.toLowerCase().includes(voucherCodeSearch?.toLowerCase()))?.length > 0
-                ? vouchers?.filter(item => item?.voucher_code?.toLowerCase().includes(voucherCodeSearch?.toLowerCase()))?.map((voucher, index) => (
+                vouchers?.length > 0
+                ? filteredVouchers?.map((voucher, index) => (
                   <div key={index} className="flex flex-col items-start justify-center w-full">
                     <div className="flex items-center justify-between w-full mb-2">
                       <div className="flex items-center justify-center gap-10">
@@ -164,7 +195,7 @@ const DomainSummary = ({state, plan}:any) => {
                         <span className="font-bold text-[15px]">Save {voucher?.discount_rate}%</span>
                       </div>
                       <div className="flex items-center">
-                        {voucher?.voucher_code === appliedVoucher?.voucher?.voucher_code && isVoucherApplied ? (
+                        {voucher?.voucher_code === appliedVoucher?.voucher?.voucher_code && selectedVoucher?.voucher?.voucher_code === appliedVoucher?.voucher?.voucher_code ? (
                           <span className="text-gray-500 text-[20px] font-bold ">Applied</span>
                         ) : (
                           <button
@@ -172,6 +203,7 @@ const DomainSummary = ({state, plan}:any) => {
                             className="text-green-600 hover:text-green-700 text-[20px] font-bold"
                             onClick={e => {
                               e.preventDefault();
+                              setSelectedVoucher({voucher: voucher});
                               setAppliedVoucher({voucher: voucher});
                               setShowAvailableVoucher(false);
                               setIsVoucherApplied(false);
@@ -187,8 +219,7 @@ const DomainSummary = ({state, plan}:any) => {
                       eiusmod tempor. sit amet, consectetur.
                     </p>
                   </div>
-                ))
-                : (
+                )) : (
                   <p className="font-inter font-normal text-black text-base text-center">No Vouchers...</p>
                 )
               }
@@ -258,7 +289,7 @@ const DomainSummary = ({state, plan}:any) => {
             </button>
           </div>
 
-          {appliedVoucher && (
+          {selectedVoucher && (
             <div className="bg-transparent border border-gray-500 rounded-md p-4 flex justify-between items-center mt-4">
               <div className="flex items-center gap-2">
                 <div
@@ -270,19 +301,19 @@ const DomainSummary = ({state, plan}:any) => {
                     paddingBottom: "0.65rem",
                   }}
                 >
-                  {appliedVoucher?.voucher?.voucher_code}
+                  {selectedVoucher?.voucher?.voucher_code}
                 </div>
                 <p className="text-green-500">
-                  {isVoucherApplied ? `Saved ${currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}${discountedPrice}` : `You will save ${currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}${preDiscountedPrice}`}!
+                  {selectedVoucher?.voucher?.voucher_code === appliedVoucher?.voucher?.voucher_code ? `Saved ${currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}${discountedPrice}` : `You will save ${currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}${preDiscountedPrice}`}!
                 </p>
               </div>
               <p
                 className={`font-bold text-xl cursor-pointer ${
-                  isVoucherApplied ? "text-gray-500" : "text-green-500"
+                  selectedVoucher?.voucher?.voucher_code === appliedVoucher?.voucher?.voucher_code ? "text-gray-500" : "text-green-500"
                 }`}
-                onClick={!isVoucherApplied ? handleApplyClick : undefined} 
+                onClick={selectedVoucher?.voucher?.voucher_code !== appliedVoucher?.voucher?.voucher_code ? handleApplyClick : undefined} 
               >
-                {isVoucherApplied ? "Applied" : "Apply"}
+                {selectedVoucher?.voucher?.voucher_code === appliedVoucher?.voucher?.voucher_code ? "Applied" : "Apply"}
               </p>
             </div>
           )}
@@ -296,10 +327,38 @@ const DomainSummary = ({state, plan}:any) => {
           <div className="mt-3 flex justify-between items-center text-[16px]">
             <p className="flex items-center">
               Tax ({taxAmount}%)
-              <IoInformationCircleOutline className="text-greenbase text-[23px]" />
+              <IoInformationCircleOutline className="relative text-greenbase text-[23px] ml-1" onMouseOver={() => setTaxHover(true)} onMouseLeave={() => {setTaxHover(false)}} />
+              {
+                taxHover && (
+                  <div onMouseOver={() => setTaxHover(true)} onMouseLeave={() => {setTaxHover(false)}} className="absolute flex flex-col">
+                    <p className="font-inter font-medium text-base text-white bg-[#12A833] p-2 rounded-[10px] -mt-[120px] w-full max-w-[200px] z-10">Sales tax is calculated according to your billing address.</p>
+                    <div className="w-7 h-7 bg-[#12A833] rotate-45 -mt-4 mx-auto"></div>
+                  </div>
+                )
+              }
             </p>
             <p>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{taxedPrice}</p>
           </div>
+
+          {
+            appliedVoucher && (
+              <div className="mt-3 flex justify-between items-center text-[16px]">
+                <p className="flex items-center">
+                  Voucher Discount
+                  <IoInformationCircleOutline className="relative text-greenbase text-[23px] ml-1" onMouseOver={() => setVoucherHover(true)} onMouseLeave={() => {setVoucherHover(false)}} />
+                  {
+                    voucherHover && (
+                      <div onMouseOver={() => setVoucherHover(true)} onMouseLeave={() => {setVoucherHover(false)}} className="absolute flex flex-col ml-10">
+                        <p className="font-inter font-medium text-base text-white bg-[#12A833] p-2 rounded-[10px] -mt-[145px] w-full max-w-[200px] z-10">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam quis semper dolor. </p>
+                        <div className="w-7 h-7 bg-[#12A833] rotate-45 -mt-4 mx-auto"></div>
+                      </div>
+                    )
+                  }
+                </p>
+                <p>-{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{discountedPrice}</p>
+              </div>
+            )
+          }
 
           <div className="mt-6 border-t border-gray-300"></div>
 

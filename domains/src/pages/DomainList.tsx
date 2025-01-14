@@ -29,7 +29,8 @@ const DomainList: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   
-  const { customerId } = useAppSelector(state => state.auth);
+  const { customerId, userDetails } = useAppSelector(state => state.auth);
+  // console.log("userDetails....", userDetails);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState<boolean>(false);
   const [actionModalType, setActionModalType] = useState<string>("Cancel");
@@ -281,9 +282,9 @@ const DomainList: React.FC = () => {
                           onClick={() => {
                             setIsModalOpen(true);
                             setNewEmailsCount(
-                              domain?.emails?.length > 0 ? parseInt(domain?.license_usage) - domain?.emails?.length : parseInt(domain?.license_usage)
+                              domain?.emails?.length > 0 ? parseInt(userDetails?.license_usage) - domain?.emails?.length : parseInt(userDetails?.license_usage)
                             );
-                            setLicenseUsage(domain?.license_usage);
+                            setLicenseUsage(userDetails?.license_usage);
                             setDomainId(domain?.id);
                             setEmailsList(domain?.emails ? domain?.emails : []);
                           }}
@@ -312,7 +313,7 @@ const DomainList: React.FC = () => {
                             singleDomainTable.map((row, index) => {
                               if(row === "license_usage") {
                                 return (
-                                  <td className="p-2 text-gray-800 sm-max:text-xs w-[22%]" key={index}>{domain?.emails ? domain?.emails?.length : 0}/{domain[row]}</td>
+                                  <td className="p-2 text-gray-800 sm-max:text-xs w-[22%]" key={index}>{domain?.emails ? domain?.emails?.length : 0}/{userDetails?.license_usage}</td>
                                 )
                               } else if (row === "button") {
                                 return (

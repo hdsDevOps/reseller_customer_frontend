@@ -32,10 +32,22 @@ async function resendLoginOtpApi(
 
 async function verifyLoginOtpApi(
   customer_id: string,
-  otp: string,
+  otp: string
 ): Promise<any> {
   try {
     const result = await postApiCall(endPoints.verifyLoginOtp, { customer_id, otp });
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+async function verifyStaffLoginOtpApi(
+  otp: string,
+  staff_id: string,
+): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.verifyStaffLoginOtp, { otp, staff_id });
     return result;
   } catch (error: any) {
     throw error;
@@ -277,6 +289,19 @@ async function makeEmailAdminApi(
   }
 };
 
+async function makeEmailAdminWithoutLoginApi(
+  domain_id: string,
+  rec_id: string,
+  token: string
+): Promise<any> {
+  try {
+    const result = await postApiCall2(endPoints.makeEmailAdmin, { domain_id, rec_id }, token);
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 async function updateEmailUserDataApi(
   domain_id: string,
   uuid: string,
@@ -489,10 +514,12 @@ async function plansAndPricesListApi(
 };
 
 async function getProfileDataApi(
-  user_id:string
+  user_id:string,
+  staff_id:string,
+  is_staff:Boolean
 ): Promise<any> {
   try {
-    const result = await postApiCall(endPoints.getProfileData, { user_id });
+    const result = await postApiCall(endPoints.getProfileData, { user_id, staff_id, is_staff });
     return result;
   } catch (error: any) {
     throw error;
@@ -513,10 +540,12 @@ async function udpateProfileDataApi(
   business_name:string,
   business_state:string,
   business_city:string,
-  business_zip_code:string
+  business_zip_code:string,
+  staff_id:string,
+  is_staff:Boolean,
 ): Promise<any> {
   try {
-    const result = await postApiCall(endPoints.udpateProfileData, { user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, business_zip_code });
+    const result = await postApiCall(endPoints.udpateProfileData, { user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, business_zip_code, staff_id, is_staff });
     return result;
   } catch (error: any) {
     throw error;
@@ -550,10 +579,12 @@ async function udpateBusinessDataApi(
 
 async function uploadProfilePhotoApi(
   image:any,
-  user_id:string
+  user_id:string,
+  staff_id:string,
+  is_staff:Boolean,
 ): Promise<any> {
   try {
-    const result = await uploadImageApiCall(endPoints.uploadProfilePhoto, image, user_id);
+    const result = await uploadImageApiCall(endPoints.uploadProfilePhoto, image, user_id, staff_id, is_staff);
     return result;
   } catch (error: any) {
     throw error;
@@ -788,10 +819,20 @@ async function getPaymetnMethodsApi(): Promise<any> {
   }
 };
 
+async function getPromotionListApi(promotion_id:string): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.getPromotionList, { promotion_id });
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 export const userApis = {
   userLoginApi,
   resendLoginOtpApi,
   verifyLoginOtpApi,
+  verifyStaffLoginOtpApi,
 
   forgetPasswordApi,
   resendForgetPasswordOtpApi,
@@ -813,6 +854,7 @@ export const userApis = {
   changeEmailStatusApi,
   deleteEmailApi,
   makeEmailAdminApi,
+  makeEmailAdminWithoutLoginApi,
   updateEmailUserDataApi,
   resetEmailPasswordApi,
 
@@ -863,4 +905,6 @@ export const userApis = {
   contactFormApi,
 
   getPaymetnMethodsApi,
+
+  getPromotionListApi,
 };

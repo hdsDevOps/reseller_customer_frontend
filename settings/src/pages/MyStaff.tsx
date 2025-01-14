@@ -60,7 +60,9 @@ const MyStaff = () => {
   const dropdownRef = useRef();
   const [deleteId, setDeleteId] = useState("");
   const [isNumberValid, setIsNumberValid] = useState(false);
-  console.log({isNumberValid});
+  // console.log({isNumberValid});
+
+  const backgroundColors = ['bg-[#23B7E5]', 'bg-[#96D869]', 'bg-[#FD7E95]',];
   
   useEffect(() => {
     if(userTypes.length > 0 && type !== "") {
@@ -409,9 +411,9 @@ const MyStaff = () => {
             {
               staffs.length > 0 ? (
                 staffs?.map((staff,index) => {
-                  return <tr key={index}  className='px-4'>
+                  return <tr key={index}  className='mx-2'>
                   <td className='flex items-center min-w-40'>
-                    <div className='text-xs text-[#000000] font-semibold rounded-full p-[10px] mr-2 bg-gray-100'>{getInitials(staff?.first_name)}{getInitials(staff?.last_name)}</div>
+                    <div className={`text-xs text-[#000000] font-semibold rounded-full p-[10px] mr-2 ${backgroundColors[index % backgroundColors.length]}`}>{getInitials(staff?.first_name)}{getInitials(staff?.last_name)}</div>
                     <p className='text-xs text-[#000000] font-medium'>{staff?.first_name}&nbsp;{staff?.last_name}</p>
                   </td>
                   <td className='text-[#000000] text-xs font-montserrat min-w-40'>{staff?.email}</td>

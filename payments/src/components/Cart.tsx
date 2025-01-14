@@ -12,6 +12,8 @@ import { addNewDomainThunk, addToCartThunk, getCartThunk, getVouchersListThunk, 
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { toast } from "react-toastify";
 import { setCart } from "store/authSlice";
+import { currencyList } from "./CurrencyList";
+import { IoMdInformationCircleOutline } from "react-icons/io";
 
 interface Voucher {
   code: string;
@@ -21,17 +23,20 @@ interface Voucher {
 const Cart = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { customerId } = useAppSelector(state => state.auth);
+  const { customerId, defaultCurrencySlice } = useAppSelector(state => state.auth);
   const [showVoucherInput, setShowVoucherInput] = useState(false);
   const [showAvailableVouchers, setShowAvailableVouchers] = useState(false);
   const [voucherCode, setVoucherCode] = useState("");
+  const [voucherCodeSearch, setVoucherCodeSearch] = useState("");
+  console.log("voucherCodeSearch...", voucherCodeSearch);
   const [appliedVoucher, setAppliedVoucher] = useState<Voucher | null>(null);
-  // console.log("applied voucher...", appliedVoucher);
-  const [selectedVoucher] = useState<Voucher | null>(null);
+  console.log("applied voucher...", appliedVoucher);
+  const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
   const [isVoucherApplied, setIsVoucherApplied] = useState(false);
   const [cart, setCartItems] = useState([]);
   // console.log("cart...", cart);
   const [vouchers, setVouchers] = useState([]);
+  const [filterVouchers, setFilterVouchers] = useState([]);
   // console.log("vouchers..", vouchers);
   const [totalPrice, setTotalPrice] = useState(0);
   // console.log("total price...", totalPrice);
@@ -39,24 +44,42 @@ const Cart = () => {
   const [taxAmount, setTaxAmount] = useState(8.25);
   const [taxedPrice, setTaxedPrice] = useState(0.00);
   const [discountedPrice, setDiscountedPrice] = useState(0.00);
+  const [preDiscountedPrice, setPreDiscountedPrice] = useState(0.00);
+  const [voucherHover, setVoucherHover] = useState(false);
+
+  useEffect(() => {
+    const filterByCurrency = vouchers?.filter(v => v?.voucher?.voucher_code === defaultCurrencySlice);
+    setFilterVouchers(filterByCurrency);
+    // setFilterVouchers([...vouchers]);
+  }, [vouchers, defaultCurrencySlice]);
+
+  
 
   useEffect(() => {
     if(cart?.length > 0) {
-      const total = cart?.reduce((sum, product) => {
-        return parseFloat((sum + parseFloat(product?.price) * parseInt(product?.total_year)).toFixed(2));
-      }, 0);
+      const total = 648.00;
       setTotalPrice(parseFloat(total.toFixed(2)));
       setTaxedPrice(parseFloat(((total * taxAmount) / 100).toFixed(2)));
-      const discountedPercent = isVoucherApplied ? appliedVoucher === null ? 0.00 : parseFloat(parseFloat(appliedVoucher?.voucher?.discount_rate).toFixed(2)) : 0.00;
+      const discountedPercent = appliedVoucher === null
+        ? 0.00
+        : parseFloat(parseFloat(appliedVoucher?.voucher?.discount_rate)?.toFixed(2));
       const totalOutPrice = parseFloat((total + ((total * taxAmount) / 100)).toFixed(2));
       const discountedAMount = parseFloat(((totalOutPrice * discountedPercent) / 100).toFixed(2));
       setDiscountedPrice(discountedAMount);
+
+      const preDiscountedPercent = selectedVoucher === null
+        ? 0.00
+        : parseFloat(parseFloat(selectedVoucher?.voucher?.discount_rate)?.toFixed(2));
+      const preTotalOutPrice = parseFloat((total + ((total * taxAmount) / 100)).toFixed(2));
+      const preDiscountedAMount = parseFloat(((preTotalOutPrice * preDiscountedPercent) / 100).toFixed(2));
+      setPreDiscountedPrice(preDiscountedAMount);
+
       const finalDiscountedPrice = parseFloat((totalOutPrice - discountedAMount).toFixed(2));
       setFinalTotalPrice(finalDiscountedPrice);
     } else {
       setTotalPrice(0);
     }
-  }, [cart, isVoucherApplied, appliedVoucher]);
+  }, [cart, appliedVoucher, selectedVoucher]);
 
   const getCartDetails = async() => {
     try {
@@ -188,24 +211,32 @@ const Cart = () => {
     setAppliedVoucher(null);
   };
 
-  const handleVoucherChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setVoucherCode(e.target.value);
-  };
-
-  const handleVoucherCheck = () => {
-    const selectedVoucher = vouchers.find((v) => v?.voucher?.voucher_code === voucherCode);
-    if (selectedVoucher) {
-      setAppliedVoucher(selectedVoucher);
-      setShowAvailableVouchers(false);
+  const handleVoucherChange = (e) => {
+    e.preventDefault();
+    const filterByCurrency = vouchers?.filter(v => v?.voucher?.voucher_code === defaultCurrencySlice);
+    const voucherFind = filterByCurrency?.find((v) => v?.voucher?.voucher_code?.toLowerCase().includes(voucherCode?.toLowerCase()));
+    if(voucherFind) {
+      setSelectedVoucher(voucherFind);
     } else {
-      alert("Invalid voucher code!");
+      toast.error(`No voucher found with voucher code ${voucherCode}`);
     }
   };
 
-  const handleInputFocus = () => {
-    const randomIndex = Math.floor(Math.random() * vouchers.length);
-    const selectedVoucher = vouchers[randomIndex];
-    setVoucherCode(selectedVoucher.code);
+  const handleVoucherCheck = (e) => {
+    e.preventDefault();
+    // const voucherFilterList = vouchers?.filter(item => item?.voucher_code?.toLowerCase() === voucherCodeSearch?.toLowerCase());
+    // setFilteredVouchers(voucherFilterList);
+    if(voucherCodeSearch === "") {
+      setFilterVouchers([...vouchers])
+    } else {
+      const filterByCurrency = vouchers?.filter(v => v?.voucher?.voucher_code === defaultCurrencySlice);
+      const voucherFilterList = filterByCurrency?.find((v) => v?.voucher?.voucher_code === voucherCodeSearch);
+      if (voucherFilterList) {
+        setFilterVouchers([voucherFilterList]);
+      } else {
+        toast.error(`No voucher found with voucher code ${voucherCodeSearch}!`);
+      }
+    }
   };
 
   const toggleAvailableVouchers = () => {
@@ -215,6 +246,7 @@ const Cart = () => {
   const handleSelectVoucher = (voucher: Voucher) => {
     setVoucherCode(voucher.code);
     setAppliedVoucher(voucher);
+    setSelectedVoucher(voucher);
     setShowAvailableVouchers(false);
   };
 
@@ -334,7 +366,7 @@ const Cart = () => {
                     </div>
                     <div className="cart-delete-flex">
                       <div className="flex flex-col justify-center">
-                        <span className="text-xl font-inter font-bold text-black text-end">₹{item?.price}</span>
+                        <span className="text-xl font-inter font-bold text-black text-end">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{item?.price}</span>
                         <small className="font-inter font-medium text-[8px] text-gray-400 self-end">
                           <span className="capitalize">{item?.payment_cycle}</span> cycle
                         </small>
@@ -436,7 +468,7 @@ const Cart = () => {
                             </small>
                           </div>
                           <div className="text-xl font-normal text-black">
-                            <h2>{item?.total_year} X ₹{item?.price}</h2>
+                            <h2>{item?.total_year} X {currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{item?.price}</h2>
                           </div>
                         </div>
                       ))
@@ -465,8 +497,8 @@ const Cart = () => {
                           type="text"
                           placeholder="Enter your voucher code"
                           value={voucherCode}
-                          onFocus={handleInputFocus}
-                          onChange={handleVoucherChange}
+                          // onFocus={handleInputFocus}
+                          onChange={e => {setVoucherCode(e.target.value)}}
                           className="border-2 border-dashed border-gray-400 rounded-l-sm px-2 py-4 text-left w-full bg-transparent outline-none"
                           style={{
                             border: "2px dashed gray",
@@ -475,7 +507,7 @@ const Cart = () => {
                         />
                         <button
                           className="bg-black text-white p-4 rounded-r-sm"
-                          onClick={handleVoucherCheck}
+                          onClick={e => handleVoucherChange(e)}
                           style={{
                             height: "100%",
                             border: "2px dashed gray",
@@ -492,7 +524,7 @@ const Cart = () => {
                     </div>
                   )}
                 </div>
-                {appliedVoucher && (
+                {selectedVoucher && (
                   <div className="bg-transparent border border-gray-500 rounded-md p-4 flex justify-between items-center">
                     <div className="flex items-center gap-2">
                       <div
@@ -504,19 +536,19 @@ const Cart = () => {
                           paddingBottom: "0.65rem",
                         }}
                       >
-                        {appliedVoucher?.voucher?.voucher_code}
+                        {selectedVoucher?.voucher?.voucher_code}
                       </div>
                       <p className="text-green-500">
-                        {isVoucherApplied ? "Saved" : "You will save"} ₹{discountedPrice}!
+                        {selectedVoucher?.voucher?.voucher_code === appliedVoucher?.voucher?.voucher_code ? `Saved ${currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo} ${discountedPrice}` : `You will save ${currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo} ${preDiscountedPrice}`}
                       </p>
                     </div>
                     <p
                       className={`font-bold text-xl cursor-pointer ${
-                        isVoucherApplied ? "text-gray-500" : "text-green-500"
+                        appliedVoucher?.voucher?.voucher_code === selectedVoucher?.voucher?.voucher_code ? "text-gray-500" : "text-green-500"
                       }`}
-                      onClick={!isVoucherApplied ? handleApplyClick : undefined} 
+                      onClick={appliedVoucher?.voucher?.voucher_code !== selectedVoucher?.voucher?.voucher_code ? handleApplyClick : undefined} 
                     >
-                      {isVoucherApplied ? "Applied" : "Apply"}
+                      {appliedVoucher?.voucher?.voucher_code === selectedVoucher?.voucher?.voucher_code ? "Applied" : "Apply"}
                     </p>
                   </div>
                 )}
@@ -533,7 +565,7 @@ const Cart = () => {
                       </h1>
                     </div>
                     <div className="text-md font-bold text-black">
-                      <h2>₹{totalPrice.toFixed(2)}</h2>
+                      <h2>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{totalPrice.toFixed(2)}</h2>
                     </div>
                   </div>
                   <div className="flex items-start justify-between">
@@ -541,16 +573,35 @@ const Cart = () => {
                       <h1 className="text-sm font-normal">Tax ({taxAmount.toFixed(2)}%)</h1>
                     </div>
                     <div className="text-sm font-normal text-black">
-                      <h2>₹{taxedPrice.toFixed(2)}</h2>
+                      <h2>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{taxedPrice.toFixed(2)}</h2>
                     </div>
                   </div>
+                  {
+                    appliedVoucher && (
+                      <div className="flex justify-between items-center text-sm font-normal text-black mb-2">
+                        <p className="flex items-center">
+                          Voucher Discount
+                          <IoMdInformationCircleOutline className="relative text-greenbase text-[23px] ml-1" onMouseOver={() => setVoucherHover(true)} onMouseLeave={() => {setVoucherHover(false)}} />
+                          {
+                            voucherHover && (
+                              <div className="absolute flex flex-col ml-6">
+                                <p className="font-inter font-medium text-base text-white bg-[#12A833] p-2 rounded-[10px] -mt-[145px] w-full max-w-[200px] z-10">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam quis semper dolor. </p>
+                                <div className="w-7 h-7 bg-[#12A833] rotate-45 -mt-4 mx-auto"></div>
+                              </div>
+                            )
+                          }
+                        </p>
+                        <p>-{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{discountedPrice}</p>
+                      </div>
+                    )
+                  }
                   <div className="border border-black"></div>
                   <div className="flex items-start justify-between my-4">
                     <div className="flex flex-col">
                       <h1 className="text-xl font-bold flex item ">Total</h1>
                     </div>
                     <div className="text-xl font-bold text-black">
-                      <h2>₹{finalTotalPrice.toFixed(2)}</h2>
+                      <h2>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{finalTotalPrice.toFixed(2)}</h2>
                     </div>
                   </div>
                   <button
@@ -601,9 +652,9 @@ const Cart = () => {
                     <input
                       type="text"
                       placeholder="Enter your voucher code"
-                      value={voucherCode}
-                      onFocus={handleInputFocus}
-                      onChange={handleVoucherChange}
+                      value={voucherCodeSearch}
+                      // onFocus={handleInputFocus}
+                      onChange={e => {setVoucherCodeSearch(e.target.value)}}
                       className="border-2 border-dashed border-gray-400 rounded-l-sm px-2 py-4 text-left w-full bg-transparent outline-none"
                       style={{ border: "2px dashed gray", borderRight: "none" }}
                     />
@@ -621,7 +672,8 @@ const Cart = () => {
                   </div>
                 </div>
                 <div className="flex flex-col">
-                  {vouchers?.map((voucher: Voucher) => {
+                  {filterVouchers?.length > 0 
+                  ? filterVouchers?.map((voucher: Voucher) => {
                     if(voucher?.status === "active" && voucher?.used_date === null) {
                       return (
                         <div key={voucher.code} className="flex flex-col mb-4">
@@ -639,7 +691,13 @@ const Cart = () => {
                                 {voucher?.voucher?.voucher_code}
                               </div>
                               <p className="text-black font-semibold">
-                                {selectedVoucher?.code === voucher?.voucher?.voucher_code ? "Save" : "Saved"} {voucher?.voucher?.discount_rate}%
+                                {
+                                  appliedVoucher === null
+                                  ? "Save"
+                                  : appliedVoucher?.voucher?.voucher_code === voucher?.voucher?.voucher_code
+                                    ? "Saved"
+                                    : "Save"
+                                } {voucher?.voucher?.discount_rate}%
                               </p>
                             </div>
     
@@ -662,7 +720,9 @@ const Cart = () => {
                         </div>
                       )
                     }
-                  })}
+                  }) : (
+                    <p className="font-inter font-normal text-black text-base text-center">No Vouchers...</p>
+                  )}
                 </div>
               </div>
             )}

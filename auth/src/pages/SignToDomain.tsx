@@ -68,7 +68,7 @@ const SignInForm: React.FC = () => {
     <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative">
       <p
         className="flex items-center gap-1 text-green-600 cursor-pointer absolute left-4 top-2"
-        onClick={() => navigate(-1)}
+        onClick={() => navigate('/selected-domain', {state: location.state})}
       >
         <IoChevronBackSharp /> Back to previous page
       </p>

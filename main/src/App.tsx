@@ -1,5 +1,5 @@
 // src/index.tsx
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter, useNavigate } from "react-router-dom";
 import ReduxProvider from "store/ReduxProvider";
@@ -7,39 +7,50 @@ import UserAuth from "./hoc/UserAuth.hoc";
 import MainApp from "./pages";
 import AuthApp from "auth/AuthApp";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { getCartThunk, getDomainsListThunk, getPaymentMethodsThunk, getProfileDataThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, removeUserAuthTokenFromLSThunk, savedCardsListThunk } from 'store/user.thunk';
-import { setCart, setDomains, setPaymentMethodsState, setResellerToken, setSaveCards, setUserDetails } from 'store/authSlice';
+import { getCartThunk, getDomainsListThunk, getLandingPageThunk, getPaymentMethodsThunk, getProfileDataThunk, getStaffIdFromLSThunk, getStaffStatusFromLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, removeUserAuthTokenFromLSThunk, savedCardsListThunk } from 'store/user.thunk';
+import { setCart, setCustomerId, setDomains, setMetaDataSlice, setPaymentMethodsState, setResellerToken, setSaveCards, setStaffId, setStaffStatus, setTokenDetails, setUserDetails } from 'store/authSlice';
 import "auth/AuthCss";
 import "./index.css";
+import { HelmetProvider, Helmet } from 'react-helmet-async';
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { token, customerId, resellerToken, userDetails } = useAppSelector((state) => state.auth);
+  const { token, customerId, staffId, staffStatus, resellerToken, userDetails, metaDataSlice } = useAppSelector((state) => state.auth);
+  const [meta, setMeta] = useState({});
   // const token ="vvggg"
   // console.log(token, "...token");
   // console.log("resellerToken...", resellerToken);
   // console.log("user details...", userDetails);
+  // console.log({token, customerId, staffId, staffStatus});
+  console.log("meta data...", metaDataSlice);
 
   useEffect(() => {
-    const getUserAuthToken = async () => {
+    const getUserDetails = async () => {
       try {
-        await dispatch(getUserAuthTokenFromLSThunk()).unwrap();
-        await dispatch(getUserIdFromLSThunk()).unwrap();
+        const tokenResult = await dispatch(getUserAuthTokenFromLSThunk()).unwrap();
+        await dispatch(setTokenDetails(tokenResult));
+        const customerIdResult = await dispatch(getUserIdFromLSThunk()).unwrap();
+        await dispatch(setCustomerId(customerIdResult));
+        const staffIdResult = await dispatch(getStaffIdFromLSThunk()).unwrap();
+        await dispatch(setStaffId(staffIdResult));
+        const staffStatusResult = await dispatch(getStaffStatusFromLSThunk()).unwrap();
+        await dispatch(setStaffStatus(staffStatusResult === "true" ? true : false));
       } catch (error) {
         // console.error("Error fetching token:", error);
         navigate('/login');
       }
     };
 
-    getUserAuthToken();
+    getUserDetails();
   }, [token, dispatch, navigate]);
 
   useEffect(() => {
     const getProfileData = async() => {
       if(token) {
         try {
-          const result = await dispatch(getProfileDataThunk({user_id: customerId})).unwrap();
+          const result = await dispatch(getProfileDataThunk({user_id: customerId, staff_id: staffId, is_staff: staffStatus})).unwrap();
+          console.log("result...", result);
           await dispatch(setUserDetails(result?.customerData));
         } catch (error) {
           if(error?.message == "Request failed with status code 401") {
@@ -55,7 +66,7 @@ const App: React.FC = () => {
     };
 
     getProfileData();
-  }, [token, customerId]);
+  }, [token, customerId, staffId, staffStatus]);
 
   useEffect(() => {
     const setResellerTokenValue = async() => {
@@ -154,8 +165,34 @@ const App: React.FC = () => {
     getPaymentMethodsState();
   }, [customerId]);
 
+  useEffect(() => {
+    const getLandingPageData = async() => {
+      try {
+        const result = await dispatch(getLandingPageThunk()).unwrap();
+        // console.log("result...", result?.data?.seo);
+        await dispatch(setMetaDataSlice(result?.data?.seo));
+      } catch (error) {
+        //
+      }
+    };
+
+    getLandingPageData();
+  }, []);
+
   return (
     <Suspense fallback={<h2>Loading.....</h2>}>
+      {
+        metaDataSlice && (
+          <Helmet>
+            <title>{metaDataSlice?.title}</title>
+            <meta name="description" content={metaDataSlice?.desc?.join(", ")} />
+            <meta name="keywords" content={metaDataSlice?.keywords?.join(", ")} />
+            <meta property="og:image" content={metaDataSlice?.image_path} />
+            <meta property="og:image:alt" content={metaDataSlice?.alt_image} />
+            <meta property="og:url" content={metaDataSlice?.urllink} />
+          </Helmet>
+        )
+      }
       {token ? <MainApp /> : <AuthApp />}
       {/* <MainApp /> */}
     </Suspense>
@@ -167,13 +204,15 @@ if (!rootElement) throw new Error("Failed to find the root element");
 
 ReactDOM.render(
   <React.StrictMode>
-    <ReduxProvider>
-      <BrowserRouter>
-        <UserAuth>
-          <App />
-        </UserAuth>
-      </BrowserRouter>
-    </ReduxProvider>
+    <HelmetProvider>
+      <ReduxProvider>
+        <BrowserRouter>
+          <UserAuth>
+            <App />
+          </UserAuth>
+        </BrowserRouter>
+      </ReduxProvider>
+    </HelmetProvider>
   </React.StrictMode>,
   rootElement
 );

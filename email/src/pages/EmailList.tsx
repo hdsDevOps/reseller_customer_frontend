@@ -4,7 +4,7 @@ import { ChevronDown, ChevronRight, ChevronUp, CirclePlus, FilterX, Trash2, X } 
 import EmailModal from "../components/EmailModal";
 import ActionModal from "../components/ActionModal";
 import AddLicense from "../components/AddLicense";
-import { getDomainsListThunk, removeUserAuthTokenFromLSThunk,addEmailsThunk, changeEmailStatusThunk, deleteEmailThunk, makeEmailAdminThunk, updateEmailUserDataThunk, resetEmailPasswordThunk, updateLicenseUsageThunk } from 'store/user.thunk';
+import { getDomainsListThunk, removeUserAuthTokenFromLSThunk,addEmailsThunk, changeEmailStatusThunk, deleteEmailThunk, makeEmailAdminThunk, updateEmailUserDataThunk, resetEmailPasswordThunk, updateLicenseUsageThunk, getProfileDataThunk } from 'store/user.thunk';
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import axios from 'axios';
@@ -30,11 +30,11 @@ const EmailList: React.FC = () => {
   const location = useLocation();
   const searchRef = useRef();
 
-  const { customerId, userDetails, saveCardsState, paymentMethodsState } = useAppSelector(state => state.auth);
+  const { customerId, userDetails, saveCardsState, paymentMethodsState, token } = useAppSelector(state => state.auth);
   // console.log("userId...", customerId);
   console.log("user details...", userDetails);
-  console.log("save Cards State...", saveCardsState);
-  console.log("paymentMethodsState...", paymentMethodsState);
+  // console.log("save Cards State...", saveCardsState);
+  // console.log("paymentMethodsState...", paymentMethodsState);
   
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState<boolean>(false);
@@ -497,6 +497,7 @@ const EmailList: React.FC = () => {
       }
     } finally {
       getDomainsList();
+      getProfileData();
     }
   };
 
@@ -504,7 +505,18 @@ const EmailList: React.FC = () => {
     const cardStr = String(cardNumber);
     const hiddenCard = cardStr.replace(/^(\d{8})/, "**** **** ");
     return hiddenCard;
-  }
+  };
+
+  const handleBuyLicenseUsage = e => {
+    const count = Number(e.target.value);
+    count < 0
+    ? setNumUsers(0)
+    : userDetails?.workspace?.workspace_status === "trial" 
+      ? count + parseInt(userDetails?.license_usage) <= 10
+        ? setNumUsers(count)
+        : setNumUsers(10 - parseInt(userDetails?.license_usage))
+      : setNumUsers(count);
+  };
 
   return (
     <div>
@@ -931,9 +943,7 @@ const EmailList: React.FC = () => {
                   <input
                     type="number"
                     value={numUsers}
-                    onChange={(e) => {
-                      Number(e.target.value) < 0 ? setNumUsers(0) : setNumUsers(Number(e.target.value));
-                    }}
+                    onChange={(e) => {handleBuyLicenseUsage(e)}}
                     className="border-gray-300 border rounded p-2 w-16 text-center bg-white outline-none focus:ring-1 focus:ring-green-300"
                     placeholder="No."
                   />

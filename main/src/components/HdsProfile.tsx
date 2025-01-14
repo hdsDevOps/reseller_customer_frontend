@@ -18,7 +18,7 @@ import { RiCameraFill } from 'react-icons/ri';
 const HdsProfile = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const { userDetails, customerId } = useAppSelector(state => state.auth);
+    const { userDetails, customerId, staffId, staffStatus } = useAppSelector(state => state.auth);
     const [showModal,setShowModal] = useState<boolean>(false);
     const [showEditModal,setEditShowModal] = useState<boolean>(false);
     const displayModal=()=>{
@@ -114,7 +114,7 @@ const HdsProfile = () => {
                 return;
               } else {
                 const file = new File([blob], "resized-image.png", {type: 'image/png'});
-                const result = await dispatch(uploadProfilePhotoThunk({image: file, user_id: customerId})).unwrap();
+                const result = await dispatch(uploadProfilePhotoThunk({image: file, user_id: customerId, staff_id: staffId, is_staff: staffStatus})).unwrap();
                 // toast.success("Profile image updated successfully");
                 console.log("result...", result);
               }
@@ -163,7 +163,7 @@ const HdsProfile = () => {
                 return;
               } else {
                 const file = new File([blob], "resized-image.png", {type: 'image/png'});
-                const result = await dispatch(uploadProfilePhotoThunk({image: file, user_id: customerId})).unwrap();
+                const result = await dispatch(uploadProfilePhotoThunk({image: file, user_id: customerId, staff_id: staffId, is_staff: staffStatus})).unwrap();
                 console.log("result2...", result);
                 toast.success("Profile image updated successfully");
                 const getProfile = await dispatch(getProfileDataThunk({
@@ -190,6 +190,11 @@ const HdsProfile = () => {
           }
         }
     };
+
+    const getInitials = (name:string) => {
+        return name?.split(' ').map(word => word.charAt(0).toUpperCase());
+    };
+    
   return (
     <div className="bg-white min-h-screen mb-5">
       <main className="bg-white small:px-10 max-[365px]:px-1">
@@ -198,11 +203,20 @@ const HdsProfile = () => {
         </h2>
         <div className='flex justify-between items-center pt-4'>
             <div className='relative'>
-                <img
-                    src={userDetails?.profile_image || 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/profile-image.png?alt=media&token=faf9b1b9-7e08-496a-a6c1-355911d7b384'}
-                    className={`w-full h-full max-h-[93px] min-h-[93px] rounded-full object-contain border border-black`}
-                    alt='profile_image'
-                />
+                {
+                    userDetails?.profile_image
+                    ? (
+                        <img
+                            src={userDetails?.profile_image}
+                            className={`w-[93px] h-[93px] rounded-full object-contain border border-black`}
+                            alt='profile_image'
+                        />
+                    ) : (
+                        <div className='w-[93px] h-[93px] rounded-full object-contain border border-black bg-[#FF7272] items-center'>
+                            <p className='m-auto text-5xl px-[10px] py-4 text-white'>{getInitials(userDetails?.first_name || "J")}{getInitials(userDetails?.last_name || "D")}</p>
+                        </div>
+                    )
+                }
                 <div onClick={() => {setImageModal(true)}} className='border border-[#5A5A5A] bg-white rounded-full p-1 cursor-pointer absolute top-[4rem] left-[4rem]'>
                     <FaCamera size={16} color='#12A833'/>
                 </div>
@@ -218,7 +232,7 @@ const HdsProfile = () => {
             &nbsp;
             <span className='capitalize'>{userDetails?.last_name || "Doe"}</span>
         </h4>
-        <p className='text-sm text-[#434D64] pt-2 '>User</p>
+        <p className='text-sm text-[#434D64] pt-2 '>{staffStatus ? "Staff" : "User"}</p>
         <h2 className='text-lg font-bold text-[#14213D] mt-6'>Basic information</h2>
         <div className='grid xl:grid-cols-3 grid-cols-2 gap-3 mt-4'>
             <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative">
@@ -262,7 +276,7 @@ const HdsProfile = () => {
                     type="text"
                     id="8777593945"
                     className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-xs  bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                    value={userDetails?.phone_no}
+                    value={`+${userDetails?.phone_no}`}
                 />
                 <label
                     htmlFor="Phone Number"
@@ -298,7 +312,7 @@ const HdsProfile = () => {
                     type="text"
                     id="State"
                     className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                    value={userDetails?.state_name}
+                    value={userDetails?.state}
                 />
                 <label
                     htmlFor="State"
@@ -416,9 +430,10 @@ const HdsProfile = () => {
                                 <img
                                     ref={imgRef}
                                     src={
-                                        image === null ?
-                                        userDetails?.profile_image ? userDetails?.profile_image :
-                                        'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/profile-image.png?alt=media&token=faf9b1b9-7e08-496a-a6c1-355911d7b384' : image
+                                        image === null
+                                        ? userDetails?.profile_image
+                                            ? userDetails?.profile_image : 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/profile-image.png?alt=media&token=faf9b1b9-7e08-496a-a6c1-355911d7b384'
+                                        : image
                                     }
                                     alt='profile picture'
                                     className={`absolute top-0 left-0 transform scale-[${zoom}] duration-200 ease-in-out w-full h-full`}

@@ -27,7 +27,7 @@ declare module 'store/authSlice' {
   export const authSlice: Slice<UserDetailsState>;
 
   export const setTokenDetails: (state: UserDetailsState, action: PayloadAction<string>) => void;
-  export const setUserDetails: (state: UserDetailsState, action: PayloadAction<any>) => void;
+  export const setUserDetails;
   export const setUserAuthStatus: (state: UserDetailsState, action: PayloadAction<'AUTHORIZED' | 'UN_AUTHORIZED' | 'PENDING' | 'UPGRADE'>) => void;
   export const resetUserSlice: () => UserDetailsState;
 
@@ -52,5 +52,6 @@ declare module 'store/user.thunk' {
   export const updateEmailUserDataThunk;
   export const resetEmailPasswordThunk;
   export const updateLicenseUsageThunk;
+  export const getProfileDataThunk;
   // Add more thunk declarations as needed
 }

@@ -9,7 +9,7 @@ import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { getBannerThunk } from "store/user.thunk";
+import { getBannerThunk, getPromotionListThunk } from "store/user.thunk";
 import { currencyList } from "../CurrencyList";
 import { LuTvMinimalPlay } from "react-icons/lu";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
@@ -33,6 +33,17 @@ const HeroSection = ({id}:any) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalLink, setModalLink] = useState<string>("");
   const [videoId, setVideoId] = useState<string|null>(null);
+  const [activeBanner, setActiveBanner] = useState(0);
+  const [activeBannerData, setActiveBannerData] = useState(0);
+  // console.log("activeBanner....", activeBanner);
+  // console.log("banner...", activeBannerData);
+  // const [promotionId, setPromotionId] = useState(banner[activeBanner]?.)
+  const [activePromotion, setActivePromotion] = useState("");
+  console.log("activePromotion...", activePromotion);
+
+  useEffect(() => {
+    setActiveBannerData(banner[activeBanner]);
+  }, [banner, activeBanner]);
 
   const getBannerLists = async() => {
     try {
@@ -65,6 +76,28 @@ const HeroSection = ({id}:any) => {
     getYouTubeId();
   }, [modalLink]);
 
+  const getPromotionList = async() => {
+    if(activeBannerData?.show_promotion_status) {
+      if(activeBannerData?.promotion_id !== "") {
+        try {
+          const result = await dispatch(getPromotionListThunk({promotion_id: activeBannerData?.promotion_id})).unwrap();
+          // console.log("result...", result);
+          setActivePromotion(result);
+        } catch (error) {
+          setActivePromotion("");
+        }
+      } else {
+        setActivePromotion("");
+      }
+    } else {
+      setActivePromotion("");
+    }
+  };
+
+  useEffect(() => {
+    getPromotionList();
+  }, [banner, activeBannerData]);
+
   return (
     <div id={id}>
       <div className="w-full overflow-hidden whitespace-nowrap bg-[#12A833] bg-opacity-50 shadow-sm">
@@ -79,7 +112,7 @@ const HeroSection = ({id}:any) => {
       </div>
       {
         banner?.length > 0 && (
-          <Carousel showThumbs={false}>
+          <Carousel showThumbs={false} onChange={(currentIndex) => {setActiveBanner(currentIndex)}}>
             {
               banner?.map((item, index) => (
                 <div
@@ -90,7 +123,7 @@ const HeroSection = ({id}:any) => {
                   <div className="lg:col-span-3 col-span-5">
                     <div className="grid grid-cols-3 h-full">
                       <div className="sm:col-span-2 col-span-3 text-white bg-[#454545] bg-opacity-20 relative h-full">
-                        <div className="backdrop-blur-xl h-full"></div>
+                        <div className="backdrop-blur-xl h-full lg:block hidden"></div>
                         <div className="absolute top-0 md:py-[40px] py-3 md:px-[70px] px-3">
                           <h3 className="font-inter font-extrabold sm:text-[40px] text-[30px] text-white">{item?.title}</h3>
                           {/* <p className="!font-inter !font-normal !text-lg !text-white py-2" dangerouslySetInnerHTML={{__html: item?.description}}></p> */}
@@ -131,18 +164,11 @@ const HeroSection = ({id}:any) => {
                       <div className="col-span-1 sm:block hidden"></div>
                     </div>
                   </div>
-                  <div className="promotion-div">
-                    {/* <img
-                      src="https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/coupon-1.jpg?alt=media&token=069a7efa-12c6-4ca3-a156-c1113c7ed6e7"
-                      alt="coupon-1"
-                      className="w-[250px] h-[129px] object-cover mx-auto small-medium:col-span-2 sm:col-span-1 col-span-2"
-                    />
-                    <img
-                      src="https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/coupon-2.jpg?alt=media&token=1345dc5f-928e-4987-a7af-5075f9d38f7f"
-                      alt="coupon-2"
-                      className="w-[250px] h-[129px] object-cover medium:ml-[10px] small-medium:ml-0 sm:ml-2 ml-0 small-medium:mt-8 sm:mt-0 mt-8 small-medium:col-span-2 sm:col-span-1 col-span-2"
-                    /> */}
-                  </div>
+                  {
+                    item?.show_promotion_status && (
+                      <div className="promotion-div border border-black" dangerouslySetInnerHTML={{__html: activePromotion?.html_template}}></div>
+                    )
+                  }
                 </div>
               ))
             }

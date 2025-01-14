@@ -39,10 +39,15 @@ declare module "store/user.thunk" {
   }
 
   export const makeUserLoginThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserLoginPayload, {}>;
+  export const verifyStaffLoginOtpThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserLoginPayload, {}>;
   export const setUserAuthTokenToLSThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserLoginPayload, {}>;
   export const setUserIdToLSThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserLoginPayload, {}>;
+  export const setStaffIdToLSThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserLoginPayload, {}>;
+  export const setStaffStatusToLSThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserLoginPayload, {}>;
   export const getUserAuthTokenFromLSThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserLoginPayload, {}>;
   export const getUserIdFromLSThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserLoginPayload, {}>;
+  export const getStaffIdFromLSThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserLoginPayload, {}>;
+  export const getStaffStatusFromLSThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserLoginPayload, {}>;
 
   export const makeUserRegisterThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
   export const getLandingPageThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
@@ -59,6 +64,8 @@ declare module "store/user.thunk" {
   export const addEmailsWithoutLoginThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
   export const plansAndPricesListThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
   export const getPaymetnMethodsThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
+  export const getPromotionListThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
+  export const makeEmailAdminWithoutLoginThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
 }
 
 

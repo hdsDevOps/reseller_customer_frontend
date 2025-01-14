@@ -22,7 +22,7 @@ const SelectedDomain: React.FC = () => {
     <div className="relative flex flex-col items-center justify-center w-full h-full gap-6 p-4">
       <p
         className="absolute flex items-center gap-1 text-green-600 cursor-pointer left-4 top-2"
-        onClick={() => navigate(-1)}
+        onClick={() => navigate('/adddomain', {state: location.state})}
       >
         <IoChevronBackSharp /> Back to previous page
       </p>

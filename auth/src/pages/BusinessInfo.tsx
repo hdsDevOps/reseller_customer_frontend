@@ -167,6 +167,12 @@ const BusinessInfo: React.FC = () => {
     setFormData((prevData) => ({ ...prevData, phone_no: value }));
   };
 
+  useEffect(() => {
+    if(location.state.formData.phone_no === formData.phone_no) {
+      setIsNumberValid(true);
+    }
+  }, [location.state]);
+
   const handleSubmit = async(e) => {
     // Handle form submission or navigate to another route
     // navigate("/adddomain");
@@ -220,12 +226,12 @@ const BusinessInfo: React.FC = () => {
 
   return (
     <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative">
-      <p
+      {/* <p
         className="flex items-center gap-1 text-green-600 cursor-pointer absolute left-4 top-2"
         onClick={() => navigate(-1)}
       >
         <IoChevronBackSharp /> Back to previous page
-      </p>
+      </p> */}
 
       <form
         onSubmit={handleSubmit}

@@ -6,7 +6,7 @@ import { useAppSelector } from "store/hooks";
 
 const SummaryDomainDetails = ({state, handleContactModalOpen, handleBusinessModalOpen, plan}:any) => {
   // console.log("state....", state);
-  console.log("plan...", plan);
+  // console.log("plan...", plan);
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
   
   const [today, setToday] = useState("");

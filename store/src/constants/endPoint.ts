@@ -3,6 +3,7 @@ export const endPoints = {
     login: 'customerservices/customer/api/v1/login',
     resendLoginOtp: 'customerservices/customer/api/v1/resed_otp_login',
     verifyLoginOtp: 'customerservices/customer/api/v1/otpverify',
+    verifyStaffLoginOtp: 'customerservices/customer/api/v1/staff_verifyOTP',
 
     //forget password
     forgetPassword: 'customerservices/customer/api/v1/forgetpassword',
@@ -83,6 +84,7 @@ export const endPoints = {
     getBanner: 'customerservices/home/api/v1/get_banners',
     contactForm: 'customerservices/home/api/v1/contactform',
     plansAndPricesList: 'customerservices/home/api/v1/getsubscriptiondata',
+    getPromotionList: 'customerservices/home/api/v1/get_promotion_list',
 
     // get payment methods
     getPaymetnMethods: 'paymentservices/payment/api/v1/getpaymentmethod',

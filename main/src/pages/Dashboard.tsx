@@ -270,7 +270,7 @@ const Dashboard: React.FC = () => {
   const changeAutoRenewStatus = async(e) => {
     e.preventDefault();
     try {
-      const result = await dispatch(changeAutoRenewThunk({subscription_id: subscriptionId, status: "Manual", product_type: "google workspace"})).unwrap();
+      const result = await dispatch(changeAutoRenewThunk({subscription_id: subscriptionId, status: "manual", product_type: "google workspace"})).unwrap();
       console.log("result....", result);
       toast.success("Auto Renew Status updated");
     } catch (error) {
@@ -343,11 +343,11 @@ const Dashboard: React.FC = () => {
                   <td className="px-2 pb-10 pt-3 text-center">
                     <button className={` border-2 px-2 py-1 rounded hover:text-white
                       ${
-                        subscription?.subscription_status === "Auto-renewal" ?
+                        subscription?.subscription_status === "auto renewal" ?
                         "text-green-500 border-green-500  hover:bg-green-500" : "text-red-500 border-red-500  hover:bg-red-500"
                       }
                     `}>{
-                      subscription?.subscription_status === "Auto-renewal" ?
+                      subscription?.subscription_status === "auto renewal" ?
                       "Auto Renew" : subscription?.subscription_status === "Expired" ? "Expired" :
                       subscription?.subscription_status === "Cancelled" ? "Cancelled" : subscription?.subscription_status
                     }</button>

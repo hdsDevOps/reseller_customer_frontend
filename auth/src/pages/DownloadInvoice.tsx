@@ -5,7 +5,7 @@ import { BiCheck } from "react-icons/bi";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { addEmailsWithoutLoginThunk, addNewDomainWithoutLoginThunk, addSubscriptionWithoutLoginThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, udpateBusinessDataThunk } from "store/user.thunk";
+import { addEmailsWithoutLoginThunk, addNewDomainWithoutLoginThunk, addSubscriptionWithoutLoginThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, makeEmailAdminWithoutLoginThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, udpateBusinessDataThunk } from "store/user.thunk";
 import { currencyList } from "../components/CurrencyList";
 
 const DownloadInvoice: React.FC = () => {
@@ -98,7 +98,7 @@ const DownloadInvoice: React.FC = () => {
         last_payment: todayDate,
         next_payment: domainExpiryDate,
         payment_method: "visa",
-        subscription_status: "Auto-renewal",
+        subscription_status: "auto renewal",
         plan_name_id: "",
         payment_details: [{
           first_name: data?.formData?.first_name,
@@ -121,7 +121,7 @@ const DownloadInvoice: React.FC = () => {
         last_payment: todayDate,
         next_payment: planExpiryDate,
         payment_method: "visa",
-        subscription_status: "Auto-renewal",
+        subscription_status: "auto renewal",
         plan_name_id: data?.plan?.id,
         payment_details: [{
           first_name: data?.formData?.first_name,
@@ -164,6 +164,7 @@ const DownloadInvoice: React.FC = () => {
         ],
         token: data.token
       })).unwrap();
+      await dispatch(makeEmailAdminWithoutLoginThunk({domain_id: domainData?.domain_id, rec_id: `${data?.emailData?.username}`, token: data.token})).unwrap();
       await dispatch(setUserAuthTokenToLSThunk({token: data?.token})).unwrap();
       await dispatch(setUserIdToLSThunk(data?.customer_id)).unwrap();
       navigate('/dashboard', {state: {from: 'otp'}});

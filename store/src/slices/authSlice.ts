@@ -14,6 +14,8 @@ export interface UserDetailsState {
   userId: number | null;
   token: string | null;
   customerId: string | null;
+  staffId: string | null;
+  staffStatus: Boolean;
   resellerToken: string | null;
   cartState: [];
   domainsState: [];
@@ -21,6 +23,11 @@ export interface UserDetailsState {
   paymentMethodsState: [];
   defaultCurrencySlice: string;
   workSpaceFlowSlice: object;
+  billingHistoryFilterSlice: object|null;
+  paymentDetailsFilterSlice: object|null;
+  currentPageNumber: Number;
+  itemsPerPageSlice: Number;
+  metaDataSlice: object|null;
 }
 
 const initialState: UserDetailsState = {
@@ -29,6 +36,8 @@ const initialState: UserDetailsState = {
   userId: null,
   token: '',
   customerId:'',
+  staffId: '',
+  staffStatus: false,
   resellerToken: '',
   cartState: [],
   domainsState: [],
@@ -36,6 +45,11 @@ const initialState: UserDetailsState = {
   paymentMethodsState: [],
   defaultCurrencySlice: 'USD',
   workSpaceFlowSlice: {},
+  billingHistoryFilterSlice: null,
+  paymentDetailsFilterSlice: null,
+  currentPageNumber: 0,
+  itemsPerPageSlice: 20,
+  metaDataSlice: null,
 };
 
 const authSlice = createSlice({
@@ -50,6 +64,12 @@ const authSlice = createSlice({
     },
     setCustomerId: (state, action: PayloadAction<any>) => {
       state.customerId = action.payload;
+    },
+    setStaffId: (state, action: PayloadAction<any>) => {
+      state.staffId = action.payload;
+    },
+    setStaffStatus: (state, action: PayloadAction<any>) => {
+      state.staffStatus = action.payload;
     },
     setCart: (state, action: PayloadAction<any>) => {
       state.cartState = action.payload;
@@ -74,6 +94,21 @@ const authSlice = createSlice({
     },
     setWorkSpaceFlowSlice: (state, action: PayloadAction<any>) => {
       state.workSpaceFlowSlice = action.payload;
+    },
+    setBillingHistoryFilterSlice: (state, action: PayloadAction<any>) => {
+      state.billingHistoryFilterSlice = action.payload;
+    },
+    setPaymentDetailsFilterSlice: (state, action: PayloadAction<any>) => {
+      state.paymentDetailsFilterSlice = action.payload;
+    },
+    setCurrentPageNumberSlice: (state, action: PayloadAction<any>) => {
+      state.currentPageNumber = action.payload;
+    },
+    setItemsPerPageSlice: (state, action: PayloadAction<any>) => {
+      state.itemsPerPageSlice = action.payload;
+    },
+    setMetaDataSlice: (state, action: PayloadAction<any>) => {
+      state.metaDataSlice = action.payload;
     },
     resetUserSlice: (state) => {
       state.userAuthStatus = 'PENDING';
@@ -131,6 +166,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setTokenDetails, setUserDetails, setUserAuthStatus,  setResellerToken, resetUserSlice, setCart, setDomains, setSaveCards, setPaymentMethodsState, setDefaultCurrencySlice, setWorkSpaceFlowSlice } = authSlice.actions;
+export const { setTokenDetails, setUserDetails, setUserAuthStatus,  setResellerToken, resetUserSlice, setCart, setDomains, setSaveCards, setPaymentMethodsState, setDefaultCurrencySlice, setWorkSpaceFlowSlice, setCustomerId, setStaffId, setStaffStatus, setBillingHistoryFilterSlice, setPaymentDetailsFilterSlice, setCurrentPageNumberSlice, setItemsPerPageSlice, setMetaDataSlice } = authSlice.actions;
 
 export default authSlice.reducer;

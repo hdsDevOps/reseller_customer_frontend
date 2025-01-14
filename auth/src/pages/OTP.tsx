@@ -9,7 +9,7 @@ import { LuMoveLeft } from "react-icons/lu";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { verifyLoginOtpThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, resendLoginOtpThunk, verifyForgetPasswordOtpThunk, resendForgetPasswordOtpThunk, resendRegisterOtpThunk, verifyRegisterOtpThunk } from 'store/user.thunk';
+import { verifyLoginOtpThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, resendLoginOtpThunk, verifyForgetPasswordOtpThunk, resendForgetPasswordOtpThunk, resendRegisterOtpThunk, verifyRegisterOtpThunk, setStaffIdToLSThunk, getStaffIdFromLSThunk, verifyStaffLoginOtpThunk, setStaffStatusToLSThunk, getStaffStatusFromLSThunk } from 'store/user.thunk';
 
 const OTP: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -17,8 +17,11 @@ const OTP: React.FC = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const customerId = location?.state?.customer_id;
+  const staffId = location.state.staff_id;
   const email = location.state?.email;
   const mode = queryParams.get("mode");
+
+  console.log("state...", location.state);
   
   const otpRefs = useRef([]);
   const [otpValues, SetOptValues] = useState(["", "", "", "", "", "",]);
@@ -115,25 +118,58 @@ const OTP: React.FC = () => {
         // Set loading state to true
         setLoading(true);
         try {
-          const result = await dispatch(verifyLoginOtpThunk({
-            customer_id: customerId,
-            otp: otp
-          })).unwrap();
-          console.log("result...", result);
-          if(result?.status === 200) {
-            try {
-              await dispatch(setUserAuthTokenToLSThunk({token: result?.token})).unwrap();
-              await dispatch(setUserIdToLSThunk(customerId)).unwrap();
-              navigate('/dashboard', {state: {from: 'otp'}});
-            } catch (error) {
-              console.log("Error on token");
-            } finally {
+          if(location.state.is_staff) {
+            const result = await dispatch(verifyStaffLoginOtpThunk({
+              otp: otp,
+              staff_id: staffId
+            })).unwrap();
+            console.log("result...", result);
+            if(result?.status === 200) {
               try {
-                await dispatch(getUserAuthTokenFromLSThunk()).unwrap();
-                await dispatch(getUserIdFromLSThunk()).unwrap();
-                navigate('/dashboard', {state: {from: 'otp'}})
+                await dispatch(setUserAuthTokenToLSThunk({token: result?.token})).unwrap();
+                await dispatch(setUserIdToLSThunk(customerId)).unwrap();
+                await dispatch(setStaffIdToLSThunk(staffId)).unwrap();
+                await dispatch(setStaffStatusToLSThunk(location.state.is_staff)).unwrap();
+                navigate('/dashboard', {state: {from: 'otp'}});
               } catch (error) {
-                console.log("Error on token")
+                console.log("Error on token");
+              } finally {
+                try {
+                  await dispatch(getUserAuthTokenFromLSThunk()).unwrap();
+                  await dispatch(getUserIdFromLSThunk()).unwrap();
+                  await dispatch(getStaffIdFromLSThunk()).unwrap();
+                  await dispatch(getStaffStatusFromLSThunk()).unwrap();
+                  navigate('/dashboard', {state: {from: 'otp'}})
+                } catch (error) {
+                  console.log("Error on token")
+                }
+              }
+            }
+          } else {
+            const result = await dispatch(verifyLoginOtpThunk({
+              customer_id: customerId,
+              otp: otp
+            })).unwrap();
+            console.log("result...", result);
+            if(result?.status === 200) {
+              try {
+                await dispatch(setUserAuthTokenToLSThunk({token: result?.token})).unwrap();
+                await dispatch(setUserIdToLSThunk(customerId)).unwrap();
+                navigate('/dashboard', {state: {from: 'otp'}});
+                await dispatch(setStaffIdToLSThunk(staffId)).unwrap();
+                await dispatch(setStaffStatusToLSThunk(location.state.is_staff)).unwrap();
+              } catch (error) {
+                console.log("Error on token");
+              } finally {
+                try {
+                  await dispatch(getUserAuthTokenFromLSThunk()).unwrap();
+                  await dispatch(getUserIdFromLSThunk()).unwrap();
+                  await dispatch(getStaffIdFromLSThunk()).unwrap();
+                  await dispatch(getStaffStatusFromLSThunk()).unwrap();
+                  navigate('/dashboard', {state: {from: 'otp'}})
+                } catch (error) {
+                  console.log("Error on token")
+                }
               }
             }
           }

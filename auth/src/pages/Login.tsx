@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "store/hooks";
 import { HiOutlineEye } from "react-icons/hi";
 import { RiEyeCloseLine } from "react-icons/ri";
-import { makeUserLoginThunk } from "store/user.thunk";
+import { getStaffIdFromLSThunk, getStaffStatusFromLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, makeUserLoginThunk, setStaffIdToLSThunk, setStaffStatusToLSThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk } from "store/user.thunk";
 import { useForm, SubmitHandler } from "react-hook-form";
 import axios from "axios";
 
@@ -51,7 +51,29 @@ const Login: React.FC = () => {
       const result = await dispatch(makeUserLoginThunk(userDetails)).unwrap();
       console.log("result...", result);
       if(result?.message === "Login successful. Please check your email for OTP.") {
-        navigate("/otp?mode=signin", { state: { customer_id: result?.customer_id }});
+        navigate("/otp?mode=signin", { state: { customer_id: result?.customer_id, staff_id: result?.staff_id, is_staff: result?.is_staff }});
+      } else if(result?.message === "Login successful") {
+        try {
+          await dispatch(setUserAuthTokenToLSThunk({token: result?.token})).unwrap();
+          await dispatch(setUserIdToLSThunk(result?.customer_id)).unwrap();
+          await dispatch(setStaffIdToLSThunk(result?.staff_id)).unwrap();
+          await dispatch(setStaffStatusToLSThunk(result?.is_staff)).unwrap();
+          navigate('/dashboard', {state: {from: 'otp'}});
+        } catch (error) {
+          console.log("Error on token");
+        } finally {
+          setLoading(false);
+          try {
+            await dispatch(getUserAuthTokenFromLSThunk()).unwrap();
+            await dispatch(getUserIdFromLSThunk()).unwrap();
+            navigate('/dashboard', {state: {from: 'otp'}});
+            await dispatch(getStaffIdFromLSThunk()).unwrap();
+            await dispatch(getStaffStatusFromLSThunk()).unwrap();
+            navigate('/dashboard', {state: {from: 'otp'}});
+          } catch (error) {
+            console.log("Error on token")
+          }
+        }
       }
       // navigate("/otp?mode=signin");
     } catch (error) {

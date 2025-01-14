@@ -17,7 +17,7 @@ import { plansAndPricesListThunk } from "store/user.thunk";
 const Summary: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  console.log("location state...", location.state);
+  // console.log("location state...", location.state);
   const dispatch = useAppDispatch();
 
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
@@ -240,32 +240,32 @@ const Summary: React.FC = () => {
   };
 
   const handleChangeBusinessFormData = () => {
-    if(isNumberValid) {
-      if(
-        editData?.business_name !== "" && editData?.business_name?.trim() !== "" &&
-        editData?.region !== "" && editData?.region?.trim() !== "" &&
-        editData?.business_state !== "" && editData?.business_state?.trim() !== "" &&
-        editData?.business_city !== "" && editData?.business_city?.trim() !== "" &&
-        editData?.business_zip_code !== "" && editData?.business_zip_code?.trim() !== ""
-      ) {
-        setData({
-          ...data,
-          formData: {
-            ...data.formData,
-            business_name: editData?.business_name,
-            region: editData?.region,
-            business_state: editData?.business_state,
-            business_city: editData?.business_city,
-            business_zip_code: editData?.business_zip_code
-          },
-        });
-        setOpenBusinessModal(false);
-      } else {
-        toast.warning("Please fill up all the fields");
-      }
+    // if(isNumberValid) {
+    if(
+      editData?.business_name !== "" && editData?.business_name?.trim() !== "" &&
+      editData?.region !== "" && editData?.region?.trim() !== "" &&
+      editData?.business_state !== "" && editData?.business_state?.trim() !== "" &&
+      editData?.business_city !== "" && editData?.business_city?.trim() !== "" &&
+      editData?.business_zip_code !== "" && editData?.business_zip_code?.trim() !== ""
+    ) {
+      setData({
+        ...data,
+        formData: {
+          ...data.formData,
+          business_name: editData?.business_name,
+          region: editData?.region,
+          business_state: editData?.business_state,
+          business_city: editData?.business_city,
+          business_zip_code: editData?.business_zip_code
+        },
+      });
+      setOpenBusinessModal(false);
     } else {
-      toast.warning("Please enter a valid phone number");
+      toast.warning("Please fill up all the fields");
     }
+    // } else {
+    //   toast.warning("Please enter a valid phone number");
+    // }
   }
 
   return (
@@ -273,7 +273,7 @@ const Summary: React.FC = () => {
       {" "}
       <p
         className="absolute flex items-center gap-1 text-green-600 cursor-pointer left-4 top-2"
-        onClick={() => {navigate(-1), {state: data}}}
+        onClick={() => {navigate('/gemini-add', {state: data})}}
       >
         {" "}
         <IoChevronBackSharp /> Back to previous page{" "}

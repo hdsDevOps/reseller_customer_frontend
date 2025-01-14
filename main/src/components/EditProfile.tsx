@@ -18,7 +18,7 @@ interface EditProfileProps  {
 const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { userDetails, customerId } = useAppSelector(state => state.auth);
+  const { userDetails, customerId, staffId, staffStatus } = useAppSelector(state => state.auth);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showCPassword, setShowCPassword] = useState(false);
@@ -72,6 +72,12 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
   // console.log("isDropdownOpen", isDropdownOpen);
   const [isNumberValid, setIsNumberValid] = useState(false);
   console.log({isNumberValid});
+
+  useEffect(() => {
+    if(userDetails?.phone_no === data?.phone_no) {
+      setIsNumberValid(true);
+    }
+  }, [userDetails, data]);
   
   const handleClickOutsideCountry = (event: MouseEvent) => {
     if(countryRef.current && !countryRef.current.contains(event.target as Node)) {
@@ -115,31 +121,31 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
   }, []);
 
   useEffect(() => {
-    if(countries.length > 0 && countryName !== "") {
+    if(countries?.length > 0 && countryName !== "") {
       setCountryDropdownOpen(true);
     }
   }, [countries, countryName]);
 
   useEffect(() => {
-    if(states.length > 0 && stateName !== "") {
+    if(states?.length > 0 && stateName !== "") {
       setStateDropdownOpen(true);
     }
   }, [states, stateName]);
 
   useEffect(() => {
-    if(cities.length > 0 && cityName !== "") {
+    if(cities?.length > 0 && cityName !== "") {
       setCityDropdownOpen(true);
     }
   }, [cities, cityName]);
 
   useEffect(() => {
-    if(businessStates.length > 0 && businessStateName !== "") {
+    if(businessStates?.length > 0 && businessStateName !== "") {
       setBusinessCityDropdownOpen(true);
     }
   }, [businessStates, businessStateName]);
 
   useEffect(() => {
-    if(businessCities.length > 0 && businessCityName !== "") {
+    if(businessCities?.length > 0 && businessCityName !== "") {
       setBusinessCityDropdownOpen(true);
     }
   }, [businessCities, businessCityName]);
@@ -274,6 +280,71 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
     }
   }, [businessCountry, businessState]);
 
+  useEffect(() => {
+    if(countries?.length > 0 && userDetails?.region !== "" && userDetails?.region !== null) {
+      const countryFind = countries?.find(item => item?.name === userDetails?.region);
+      if(countryFind) {
+        setCountry(countryFind);
+      } else {
+        setCountry({});
+      }
+    } else {
+      setCountry({});
+    }
+  }, [countries, userDetails]);
+
+  useEffect(() => {
+    if(states?.length > 0 && userDetails?.state !== "" && userDetails?.state !== null) {
+      const stateFind = states?.find(item => item?.name === userDetails?.state);
+      if(stateFind) {
+        setState(stateFind);
+      } else {
+        setState({});
+      }
+    } else {
+      setState({});
+    }
+  }, [states, userDetails]);
+
+  useEffect(() => {
+    if(cities?.length > 0 && userDetails?.city !== "" && userDetails?.city !== null) {
+      const cityFind = cities?.find(item => item?.name === userDetails?.city);
+      if(cityFind) {
+        setCity(cityFind);
+      } else {
+        setCity({});
+      }
+    } else {
+      setCity({});
+    }
+  }, [cities, userDetails]);
+
+  useEffect(() => {
+    if(businessStates?.length > 0 && userDetails?.business_state !== "" && userDetails?.business_state !== null) {
+      const stateFind = businessStates?.find(item => item?.name === userDetails?.business_state);
+      if(stateFind) {
+        setBusinessState(stateFind);
+      } else {
+        setBusinessState({});
+      }
+    } else {
+      setBusinessState({});
+    }
+  }, [businessStates, userDetails]);
+
+  useEffect(() => {
+    if(businessCities?.length > 0 && userDetails?.business_city !== "" && userDetails?.business_city !== null) {
+      const cityFind = businessCities?.find(item => item?.name === userDetails?.business_city);
+      if(cityFind) {
+        setBusinessCity(cityFind);
+      } else {
+        setBusinessCity({});
+      }
+    } else {
+      setBusinessCity({});
+    }
+  }, [businessCities, userDetails]);
+
   const validateForm = () => {
     if(
       data?.first_name === "" || data?.first_name?.trim() === "" ||
@@ -317,9 +388,13 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
                 business_name: data?.business_name,
                 business_state: data?.business_state,
                 business_city: data?.business_city,
-                business_zip_code: data?.business_zip_code
+                business_zip_code: data?.business_zip_code,
+                staff_id: staffId,
+                is_staff: staffStatus
               })).unwrap();
-              console.log("result...", result);
+              toast.success(result?.message);
+              handleCloseShowModal();
+              await dispatch(setUserDetails(data));
             } else {
               toast.warning("Input fields cannot be empty");
             }
@@ -339,7 +414,9 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
               business_name: data?.business_name,
               business_state: data?.business_state,
               business_city: data?.business_city,
-              business_zip_code: data?.business_zip_code
+              business_zip_code: data?.business_zip_code,
+              staff_id: staffId,
+              is_staff: staffStatus
             })).unwrap();
             toast.success(result?.message);
             handleCloseShowModal();
@@ -411,7 +488,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
                           className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
                           value={data?.email}
                           name='email'
-                          onChange={handleChangeData}
+                          disabled
                       />
                       <label
                           htmlFor="email"
@@ -420,7 +497,6 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
                   </div>
                   <div className="!max-w-[378px] sm:col-span-1 col-span-2 mx-auto relative !w-full mb-2 !pb-1 !pt-[6px] mt-2">
                     <PhoneInput
-                      country={country?.iso2?.toLowerCase() || "us"}
                       value={data?.phone_no}
                       onChange={(inputPhone, countryData, event, formattedValue) => {
                         handlePhoneChange(inputPhone);
@@ -467,7 +543,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
                               setData({
                                   ...data,
                                   country: '',
-                                  state_name: '',
+                                  state: '',
                                   city: ''
                               });
                               setCountryName(e.target.value);
@@ -516,12 +592,12 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
                       <input
                           type="text"
                           className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                          value={data?.state_name || stateName}
-                          name='state_name'
+                          value={data?.state || stateName}
+                          name='state'
                           onChange={e => {
                               setData({
                                 ...data,
-                                state_name: "",
+                                state: "",
                                 city: ""
                               });
                               setStateName(e.target.value);
@@ -532,12 +608,12 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
                           onFocus={() => {setStateDropdownOpen(true)}}
                       />
                       <label
-                          htmlFor="state_name"
+                          htmlFor="state"
                           className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
                       >State</label>
                       {
                         stateDropdownOpen && (
-                          <div className='lg:w-[97%] w-[95%] max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+                          <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
                             {
                               states?.filter(name => name?.name.toLowerCase().includes(stateName.toLowerCase())).map((region, idx) => (
                                 <p
@@ -546,7 +622,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
                                   onClick={() => {
                                     setData({
                                       ...data,
-                                      state_name: region?.name,
+                                      state: region?.name,
                                       city: ""
                                     });
                                     setStateName("");
@@ -585,7 +661,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
                       >City</label>
                       {
                         cityDropdownOpen && (
-                          <div className='lg:w-[97%] w-[95%] max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+                          <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
                             {
                               cities?.filter(name => name?.name.toLowerCase().includes(cityName.toLowerCase())).map((city_name, idx) => (
                                 <p
@@ -705,7 +781,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
                                     setData({
                                       ...data,
                                       business_state: region?.name,
-                                      city: ""
+                                      business_city: ""
                                     });
                                     setBusinessStateName("");
                                     setBusinessCityName("");

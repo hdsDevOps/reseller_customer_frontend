@@ -353,7 +353,7 @@ const Review = () => {
           last_payment: todayDate,
           next_payment: domainExpiryDate,
           payment_method: "visa",
-          subscription_status: "Auto-renewal",
+          subscription_status: "auto renewal",
           plan_name_id: "",
           payment_details: [{
             first_name: data?.formData?.first_name,
@@ -376,7 +376,7 @@ const Review = () => {
           last_payment: todayDate,
           next_payment: planExpiryDate,
           payment_method: "visa",
-          subscription_status: "Auto-renewal",
+          subscription_status: "auto renewal",
           plan_name_id: data?.plan?.id,
           payment_details: [{
             first_name: data?.formData?.first_name,
@@ -402,7 +402,7 @@ const Review = () => {
           payment_method: "visa",
           domain_status: true,
           billing_period: "Yearly",
-          renew_status: "Auto-renwal",
+          renew_status: "auto renewal",
           subscription_status: "Auto-renwal",
           token: data?.token
         })).unwrap();
@@ -454,7 +454,7 @@ const Review = () => {
         <div className="flex max-[700px]:flex-col items-center justify-start min-[700px]:gap-10 max-[700px]:gap-2 mt-8">
           <button
             className="flex flex-row items-center justify-center gap-3"
-            onClick={() => navigate(-1)}
+            onClick={() => {navigate('/summary', {state: data})}}
             type='button'
           >
             <IoIosArrowBack />
@@ -462,12 +462,12 @@ const Review = () => {
               Back to previous page
             </h6>
           </button>
-          <h1 className="text-[30px] text-green-500 font-semibold ">
-            Review and checkout
-          </h1>
         </div>
 
         <div className='grid grid-cols-1 max-w-[961px] w-full mx-auto'>
+          <h1 className="text-[30px] text-green-500 font-semibold ">
+            Review and checkout
+          </h1>
           <div className='grid grid-cols-1 max-w-[961px] w-full gap-4'>
             <div className='flex min-[768px]:flex-row max-[768px]:flex-col gap-2 justify-between w-full'>
               <div className='flex flex-col gap-1'>
@@ -478,7 +478,7 @@ const Review = () => {
                 <p>Your first {data?.plan?.trial_period} days are at no charge ( limited to 10 users). You can <span className='text-[#12A833]'>cancel at any time</span>.</p>
                 <p>Recurs at the end of every month.</p>
               </div>
-              <div className='w-[140px] max-[768px]:w-full flex flex-col items-end text-end'>
+              <div className='w-[140px] max-[768px]:w-full flex flex-col items-end text-end ml-auto'>
                 <p className='font-inter font-normal text-xl text-black'>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{getPriceAmount(data?.plan?.amount_details, data?.period)}&nbsp;{data?.period === "Yearly" ? "yearly" : "monthly"}</p>
                 <p className='font-inter font-medium text-base text-black'>+applicable tax</p>
               </div>
@@ -493,9 +493,9 @@ const Review = () => {
                 <p>Your annual plan will begin {formattedDate}. You can <span className='text-[#12A833]'>cancel at any time</span>.</p>
                 <p>Charges today and recurs yearly on {formattedDate2}</p>
               </div>
-              <div className='w-[140px] max-[768px]:w-full flex flex-col items-end text-end'>
-                <p className='font-inter font-normal text-xl text-black'>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}99.99 yearly</p>
-                <p className='font-inter font-medium text-base text-black'>+applicable tax</p>
+              <div className='w-[140px] max-[768px]:w-full flex flex-col items-end text-end justify-end ml-auto'>
+                <p className='font-inter font-normal text-xl text-black text-end ml-auto'>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}99.99 yearly</p>
+                <p className='font-inter font-medium text-base text-black text-end ml-auto'>+applicable tax</p>
               </div>
             </div>
           </div>
@@ -605,7 +605,7 @@ const Review = () => {
                           />
                           {
                             stateDropdownOpen && (
-                              <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md'>
+                              <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md max-h-32 overflow-auto'>
                                 {
                                   states?.filter(name => name?.name.toLowerCase().includes(stateName.toLowerCase())).map((state, idx) => (
                                     <p
@@ -661,7 +661,7 @@ const Review = () => {
                           />
                           {
                             cityDropdownOpen && (
-                              <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md'>
+                              <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md max-h-32 overflow-auto'>
                                 {
                                   cities?.filter(name => name?.name.toLowerCase().includes(cityName.toLowerCase())).map((city, idx) => (
                                     <p

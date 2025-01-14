@@ -23,7 +23,7 @@ const ContactUs = ({contact, id}:any) => {
   const [formData, setFormData] = useState(initialForm);
   // console.log("from data...", formData);
   const [isNumberValid, setIsNumberValid] = useState(false);
-  console.log({isNumberValid});
+  // console.log({isNumberValid});
 
   const handleChangeFormData = e => {
     setFormData({

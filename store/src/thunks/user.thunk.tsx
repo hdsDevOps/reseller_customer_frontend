@@ -29,6 +29,20 @@ export const getUserIdFromLSThunk = createAsyncThunk(
   },
 );
 
+export const getStaffIdFromLSThunk = createAsyncThunk(
+  "users/getStaffIdFromLS",
+  async () => {
+    return localStorage.getItem("LS_KEY_STAFF_ID");
+  },
+);
+
+export const getStaffStatusFromLSThunk = createAsyncThunk(
+  "users/getStaffStatusnFromLS",
+  async () => {
+    return localStorage.getItem("LS_KEY_STAFF_STATUS");
+  },
+);
+
 export const setUserIdToLSThunk = createAsyncThunk(
   "users/setUserIdToLS",
   async (customerId: string) => {
@@ -36,10 +50,38 @@ export const setUserIdToLSThunk = createAsyncThunk(
   },
 );
 
+export const setStaffIdToLSThunk = createAsyncThunk(
+  "users/setStaffIdToLS",
+  async (staffId: string) => {
+    return localStorage.setItem("LS_KEY_STAFF_ID", staffId);
+  },
+);
+
+export const setStaffStatusToLSThunk = createAsyncThunk(
+  "users/setStaffStatusToLS",
+  async (is_staff: string) => {
+    return localStorage.setItem("LS_KEY_STAFF_STATUS", is_staff);
+  },
+);
+
 export const removeUserIdFromLSThunk = createAsyncThunk(
   "users/removeUserIdFromLS",
   async () => {
     return localStorage.removeItem("LS_KEY_USER_ID");
+  },
+);
+
+export const removeStaffIdFromLSThunk = createAsyncThunk(
+  "users/removeStaffIdFromLS",
+  async () => {
+    return localStorage.removeItem("LS_KEY_STAFF_ID");
+  },
+);
+
+export const removeStaffStatusFromLSThunk = createAsyncThunk(
+  "users/removeStaffStatusFromLS",
+  async () => {
+    return localStorage.removeItem("LS_KEY_STAFF_STATUS");
   },
 );
 
@@ -61,6 +103,13 @@ export const verifyLoginOtpThunk = createAsyncThunk(
   "users/verifyLogin",
   async ({ customer_id, otp }: any) => {
     return await userApis.verifyLoginOtpApi( customer_id, otp );
+  }
+);
+
+export const verifyStaffLoginOtpThunk = createAsyncThunk(
+  "users/verifyStaffLoginOtp",
+  async ({ otp, staff_id }: any) => {
+    return await userApis.verifyStaffLoginOtpApi( otp,staff_id );
   }
 );
 
@@ -183,6 +232,13 @@ export const makeEmailAdminThunk = createAsyncThunk(
   }
 );
 
+export const makeEmailAdminWithoutLoginThunk = createAsyncThunk(
+  "users/makeEmailAdminWithoutLogin",
+  async ({ domain_id, rec_id, token }: any) => {
+    return await userApis.makeEmailAdminWithoutLoginApi( domain_id, rec_id, token );
+  }
+);
+
 export const updateEmailUserDataThunk = createAsyncThunk(
   "users/updateEmailUserData",
   async ({ domain_id, uuid, first_name, last_name }: any) => {
@@ -297,15 +353,15 @@ export const plansAndPricesListThunk = createAsyncThunk(
 
 export const getProfileDataThunk = createAsyncThunk(
   "users/getProfileData",
-  async ({ user_id }: any) => {
-    return await userApis.getProfileDataApi( user_id );
+  async ({ user_id, staff_id, is_staff }: any) => {
+    return await userApis.getProfileDataApi( user_id, staff_id, is_staff );
   }
 );
 
 export const udpateProfileDataThunk = createAsyncThunk(
   "users/udpateProfileData",
-  async ({ user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, business_zip_code }: any) => {
-    return await userApis.udpateProfileDataApi( user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, business_zip_code );
+  async ({ user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, business_zip_code, staff_id, is_staff }: any) => {
+    return await userApis.udpateProfileDataApi( user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, business_zip_code, staff_id, is_staff );
   }
 );
 
@@ -318,8 +374,8 @@ export const udpateBusinessDataThunk = createAsyncThunk(
 
 export const uploadProfilePhotoThunk = createAsyncThunk(
   "users/uploadProfilePhoto",
-  async ({ image, user_id }: any) => {
-    return await userApis.uploadProfilePhotoApi( image, user_id );
+  async ({ image, user_id, staff_id, is_staff }: any) => {
+    return await userApis.uploadProfilePhotoApi( image, user_id, staff_id, is_staff );
   }
 );
 
@@ -439,5 +495,12 @@ export const getPaymetnMethodsThunk = createAsyncThunk(
   "users/getPaymetnMethods",
   async () => {
     return await userApis.getPaymetnMethodsApi();
+  }
+);
+
+export const getPromotionListThunk = createAsyncThunk(
+  "users/getPromotionList",
+  async ({promotion_id}:any) => {
+    return await userApis.getPromotionListApi(promotion_id);
   }
 );

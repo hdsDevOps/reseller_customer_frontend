@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { addDays, addMonths, endOfMonth, endOfWeek, format, startOfMonth, startOfWeek, subDays } from "date-fns";
 import { DateRangePicker } from "rsuite";
 import "rsuite/dist/rsuite.min.css";
+import { setCurrentPageNumberSlice, setBillingHistoryFilterSlice, setItemsPerPageSlice } from "store/authSlice";
 
 interface RangeType<T> {
   label: string;
@@ -79,14 +80,14 @@ const predefinedRanges: RangeType<Date>[] = [
 const BillingHistory: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { customerId } = useAppSelector(state => state.auth);
+  const { customerId, billingHistoryFilterSlice, currentPageNumber, itemsPerPageSlice } = useAppSelector(state => state.auth);
   const domainRef = useRef();
   const [isOpen, setIsOpen] = useState(false);
   const pdfRef = useRef<HTMLDivElement>(null);
   const invoiceRef = useRef<HTMLDivElement>(null);
   const [pdfDownload, setPdfDownload] = useState('hidden');
   const [domains, setDomains] = useState([]);
-  console.log(domains)
+  // console.log(domains);
   const [selectedDomain, setSelectedDomain] = useState("");
   const [search, setSearch] = useState("");
   const [domainDropdownOpen, setDomainDropdownOpen] = useState(false);
@@ -94,6 +95,23 @@ const BillingHistory: React.FC = () => {
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
+
+  const initialFilter = {
+    user_id: customerId,
+    start_date: "",
+    end_date: "",
+    domain: ""
+  };
+
+  const [billingHistoryFilter, setBillingHistoryFilter] = useState(billingHistoryFilterSlice === null ? initialFilter : billingHistoryFilterSlice);
+
+  useEffect(() => {
+    const setBillingHistoryFilterToSlice = async() => {
+      await dispatch(setBillingHistoryFilterSlice(billingHistoryFilter));
+    };
+
+    setBillingHistoryFilterToSlice();
+  }, [billingHistoryFilter]);
   
   const getDomainsList = async() => {
     try {
@@ -158,16 +176,11 @@ const BillingHistory: React.FC = () => {
   };
 
   const [BillingDetails, setBillingDetails] = useState([]);
-  // console.log("billing details...", BillingDetails);
+  console.log("billing details...", BillingDetails);
 
   const getBillingHistoryData = async() => {
     try {
-      const result = await dispatch(getBillingHistoryThunk({
-        user_id: customerId,
-        start_date: range[0] === null ? "" : formatDate2(range[0]),
-        end_date: range[1] === null ? "" : formatDate2(range[1]),
-        domain: selectedDomain
-      })).unwrap();
+      const result = await dispatch(getBillingHistoryThunk(billingHistoryFilter)).unwrap();
       setBillingDetails(result?.data);
     } catch (error) {
       setBillingDetails([]);
@@ -181,6 +194,41 @@ const BillingHistory: React.FC = () => {
       }
     }
   };
+  
+  const [currentPage, setCurrentPage] = useState(billingHistoryFilterSlice === null ? 0 : currentPageNumber);
+  const [itemsPerPage, setItemsPerPage] = useState(itemsPerPageSlice);
+  const indexOfLastItem = (currentPage + 1) * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = BillingDetails?.slice(indexOfFirstItem, indexOfLastItem);
+  // console.log("currentItems...", currentItems);
+  const totalPages = Math.ceil(BillingDetails?.length / itemsPerPage);
+  // console.log({currentPage, totalPages, lenght: currentItems?.length});
+
+  useEffect(() => {
+    if(BillingDetails?.length > 0 && totalPages < currentPage + 1) {
+      if(totalPages-1 < 0) {
+        setCurrentPage(0);
+      } else {
+        setCurrentPage(totalPages-1);
+      }
+    }
+  }, [totalPages, currentPage, BillingDetails]);
+
+  useEffect(() => {
+    const setCurrentPageNumberToSlice = async() => {
+      await dispatch(setCurrentPageNumberSlice(currentPage));
+    }
+
+    setCurrentPageNumberToSlice();
+  }, [currentPage]);
+
+  useEffect(() => {
+    const setItemsPerPageToSlice = async() => {
+      await dispatch(setItemsPerPageSlice(itemsPerPage)).unwrap();
+    }
+
+    setItemsPerPageToSlice();
+  }, [itemsPerPage]);
 
   useEffect(() => {
     getBillingHistoryData();
@@ -198,7 +246,7 @@ const BillingHistory: React.FC = () => {
 
   const exportPdf = async() => {
     const element = await pdfRef.current;
-    console.log("element...", element);
+    // console.log("element...", element);
 
     if(element) {
       const canvas = await html2canvas(element, {
@@ -206,7 +254,7 @@ const BillingHistory: React.FC = () => {
         useCORS: true,
         allowTaint: true
       });
-      console.log(canvas);
+      // console.log(canvas);
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
 
@@ -269,7 +317,7 @@ const BillingHistory: React.FC = () => {
       <div className="flex flex-col sm:flex-col md:flex-row  gap-4  justify-between p-4 bg-gray-100">
         <div className="flex flex-col sm:flex-col md:flex-row   gap-4">
           <DateRangePicker
-            ranges={predefinedRanges}
+            range={predefinedRanges}
             placeholder="Select Date Range"
             style={{ width: 200 }}
             onChange={handleChange}
@@ -299,7 +347,7 @@ const BillingHistory: React.FC = () => {
             />
             {
               domainDropdownOpen && (
-                <div className='w-full absolute mt-1 bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+                <div className='w-full absolute mt-1 bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md max-h-32 overflow-auto'>
                   {
                     domains?.filter(name => name?.domain_name.toLowerCase().includes(search.toLowerCase())).map((domain, idx) => (
                       <p
@@ -361,7 +409,7 @@ const BillingHistory: React.FC = () => {
           </thead>
           <tbody>
             {
-              BillingDetails?.length > 0 ? (BillingDetails?.map((detail, index) => (
+              BillingDetails?.length > 0 ? (currentItems?.map((detail, index) => (
                 <React.Fragment key={index}>
                   <tr className="text-xs text-gray-400">
                     <td className="px-2 pb-10 pt-3 text-center text-green-500">
@@ -403,15 +451,15 @@ const BillingHistory: React.FC = () => {
                     <td className="px-2 pb-10 pt-3 text-center text-green-500">
                       {detail?.amount}
                     </td>
-                    <td className="px-2 cursor-pointer flex items-center justify-center align-middle py-auto text-green-500 text-xl">
+                    <td className="cursor-pointer flex justify-center">
                       <button
                         type="button"
-                        className="mt-auto text-lg text-custom-green  flex items-center justify-center align-middle "
+                        className="flex items-center justify-center mt-4 w-4 h-4"
                         onClick={() => {downloadInvoice()}}
                         // disabled={!rolePermissionsSlice?.billing_history?.download ? true : false}
                         cypress-name="invoice_download"
                       >
-                        <FaDownload />
+                        <FaDownload className="text-green-500 w-full h-full" />
                       </button>
                       <div className={pdfDownload}>
                         <BillingInvoice pdfRef={invoiceRef} data={detail} />
@@ -427,6 +475,70 @@ const BillingHistory: React.FC = () => {
             }
           </tbody>
         </table>
+      </div>
+
+      <div className="flex justify-between items-center mt-12 relative bottom-2 right-0">
+        <div className="flex items-center gap-1">
+          <select
+            onChange={e => {
+              setItemsPerPage(parseInt(e.target.value));
+            }}
+            value={itemsPerPage}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={15}>15</option>
+            <option value={20} selected>20</option>
+            <option value={50}>50</option>
+          </select>
+          <label>items</label>
+        </div>
+        <div className="flex">
+          <button
+            onClick={() => {
+              setCurrentPage((prev) => Math.max(prev - 1, 0));
+            }}
+            disabled={currentPage === 0}
+            className={`px-3 py-1 text-sm ${
+              currentPage === 0
+                ? "bg-transparent text-gray-300"
+                : "bg-transparent hover:bg-green-500 hover:text-white"
+            } rounded-l transition`}
+          >
+            Prev
+          </button>
+
+          {/* Page numbers */}
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                setCurrentPage(index);
+              }}
+              className={`px-3 py-1 text-sm mx-1 rounded ${
+                currentPage === index
+                  ? "bg-green-500 text-white"
+                  : "bg-transparent text-black hover:bg-green-500 hover:text-white"
+              } transition`}
+            >
+              {index + 1}
+            </button>
+          ))}
+
+          <button
+            onClick={() => {
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1));
+            }}
+            disabled={currentPage === totalPages - 1}
+            className={`px-3 py-1 text-sm ${
+              currentPage === totalPages - 1
+                ? "bg-transparent text-gray-300"
+                : "bg-transparent hover:bg-green-500 hover:text-white"
+            } rounded-r transition`}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

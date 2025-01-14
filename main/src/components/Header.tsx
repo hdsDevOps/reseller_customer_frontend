@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { Bell, ShoppingCart } from "lucide-react";
@@ -15,6 +15,16 @@ export default function Header() {
   const { userDetails, cartState } = useAppSelector(state => state.auth);
 
   const[showNotification,setShowNotfication] = useState(false);
+  const [width, setWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleWidthChange = () => {
+      setWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleWidthChange);
+    return () => window.removeEventListener('resize', handleWidthChange);
+  }, []);
 
   const openModal = () => setShowNotfication(true);
   const closeModal = () => setShowNotfication(false);
@@ -28,6 +38,7 @@ export default function Header() {
   const getInitials = (name:string) => {
     return name?.split(' ').map(word => word.charAt(0).toUpperCase());
   };
+  
 
   return (
     <header className="bg-white flex text-black px-2 items-center justify-between z-50 fixed top-0 left-0 right-0 h-[70px]">
@@ -36,9 +47,9 @@ export default function Header() {
         className="flex items-center justify-center"
       >
         <img
-          src={logoImage}
+          src={width < 640 ? logoImageSmall : logoImage}
           alt="logo"
-          className="h-10 object-contain"
+          className="sm:h-10 h-14 object-contain"
         />
       </a>
 
@@ -59,9 +70,22 @@ export default function Header() {
           </span>
         </button>
         <div className="flex items-center justify-center space-x-2">
-        <button className="relative p-2 bg-[#FF7272] hover:bg-opacity-90 rounded-full">
-            <p className="text-white">{getInitials(userDetails?.first_name || "J")}{getInitials(userDetails?.last_name || "D")}</p>
-          </button>
+          {
+            userDetails?.profile_image
+            ? (
+              <button className="relative p-2 hover:bg-opacity-90 rounded-full">
+                <img
+                  src={userDetails?.profile_image}
+                  alt="Profile"
+                  className="w-8 h-8 rounded-full border-2 border-gray-300 object-cover cursor-pointer"
+                />
+              </button>
+            ) : (
+              <button className="relative p-2 bg-[#FF7272] hover:bg-opacity-90 rounded-full">
+                <p className="text-white">{getInitials(userDetails?.first_name || "J")}{getInitials(userDetails?.last_name || "D")}</p>
+              </button>
+            )
+          }
           <Dropdown />
         </div>
         

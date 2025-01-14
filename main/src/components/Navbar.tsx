@@ -90,6 +90,10 @@ const Sidebar = () => {
       : "flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-[#DCEBDFCC] pl-6 pr-4 w-full";
   };
 
+  const getInitials = (name:string) => {
+    return name?.split(' ').map(word => word.charAt(0).toUpperCase());
+  };
+
   return (
     <aside
       className={`fixed h-full sm:max-h-screen top-3 left-0 transition-all duration-300 ease-in-out bg-[#F0F0F0] text-black shadow-md flex flex-col ${
@@ -120,11 +124,20 @@ const Sidebar = () => {
       </div>
       <div className="p-[14px] flex-1 mt-2">
         <div className="bg-[#DAE8FF] shadow-sm p-[6px] rounded-md flex items-center gap-2 my-[10px]">
-          <img
-            src={userDetails?.profile_image || 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/profile-image.png?alt=media&token=faf9b1b9-7e08-496a-a6c1-355911d7b384'}
-            alt="Profile"
-            className="w-10 h-10 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full border-2 border-gray-300 object-cover cursor-pointer"
-          />
+          {
+            userDetails?.profile_image
+            ? (
+              <img
+                src={userDetails?.profile_image}
+                alt="Profile"
+                className="w-10 h-10 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full border-2 border-gray-300 object-cover cursor-pointer"
+              />
+            ) : (
+              <div className='w-10 h-10 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-[#FF7272] items-center'>
+                <p className='m-auto text-base px-[10px] py-2 sm:px-[5px] sm:py-0 sm:!-mt-1 md:!mt-0 md:px-[10px] md:py-2 text-white'>{getInitials(userDetails?.first_name || "J")}{getInitials(userDetails?.last_name || "D")}</p>
+              </div>
+            )
+          }
           <div className={`flex items-center gap-2 overflow-hidden ${isOpen ? "flex" : "hidden  sm:flex"}`}>
             <div className="flex flex-col text-xs ml-2">
               <span className="font-medium text-gray-600">{userDetails?.first_name}&nbsp;{userDetails?.last_name}</span>

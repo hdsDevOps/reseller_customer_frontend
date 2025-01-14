@@ -44,7 +44,7 @@ export async function postApiCall<T>(
   try {
     const fetchedData = await axiosInstance.post(endPoint, body);
     // console.log("data...", fetchedData);
-    if (fetchedData.data?.status === 200 || fetchedData.data?.status === 201) {
+    if (fetchedData.data?.status === 200 || fetchedData.data?.status === 201 || fetchedData?.status === 200 || fetchedData?.status === 201) {
       return fetchedData?.data;
     } else if (
       fetchedData.data?.status === 401 ||
@@ -184,12 +184,16 @@ export async function deleteApiCall(
 export async function uploadImageApiCall(
   endPoint: string,
   image: any,
-  user_id: string
+  user_id: string,
+  staff_id:string,
+  is_staff:Boolean,
 ): Promise<any | CustomError> {
   try {
     const formData = new FormData();
     formData.append("image", image);
     formData.append("user_id", user_id);
+    formData.append("staff_id", staff_id);
+    formData.append("is_staff", is_staff);
     const fetchedData = await axiosInstance.post(endPoint, formData, {
       headers:{
         "Content-Type": "multipart/form-data",

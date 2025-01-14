@@ -13,6 +13,7 @@ import { Download, X } from 'lucide-react';
 import html2canvas from 'html2canvas-pro';
 import jsPDF from "jspdf";
 import { toast } from "react-toastify";
+import { setCurrentPageNumberSlice, setItemsPerPageSlice } from "store/authSlice";
 
 interface RangeType<T> {
   label: string;
@@ -83,7 +84,7 @@ const logo = "";
 const PaymentDetails: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { customerId } = useAppSelector(state => state.auth);
+  const { customerId, paymentDetailsFilterSlice, itemsPerPageSlice, currentPageNumber } = useAppSelector(state => state.auth);
 
   const initialFilter = {
     customer_id: customerId,
@@ -135,6 +136,41 @@ const PaymentDetails: React.FC = () => {
     { label: "Cancel Subscription", type: "modal", link: "", },
     { label: "Transfer Subscription", type: "modal", link: "", },
   ];
+  
+  const [currentPage, setCurrentPage] = useState(paymentDetailsFilterSlice === null ? 0 : currentPageNumber);
+  const [itemsPerPage, setItemsPerPage] = useState(itemsPerPageSlice);
+  const indexOfLastItem = (currentPage + 1) * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = paymentDetails?.slice(indexOfFirstItem, indexOfLastItem);
+  // console.log("currentItems...", currentItems);
+  const totalPages = Math.ceil(paymentDetails?.length / itemsPerPage);
+  // console.log({currentPage, totalPages, lenght: currentItems?.length});
+
+  useEffect(() => {
+    if(paymentDetails?.length > 0 && totalPages < currentPage + 1) {
+      if(totalPages-1 < 0) {
+        setCurrentPage(0);
+      } else {
+        setCurrentPage(totalPages-1);
+      }
+    }
+  }, [totalPages, currentPage, paymentDetails]);
+
+  useEffect(() => {
+    const setCurrentPageNumberToSlice = async() => {
+      await dispatch(setCurrentPageNumberSlice(currentPage));
+    }
+
+    setCurrentPageNumberToSlice();
+  }, [currentPage]);
+
+  useEffect(() => {
+    const setItemsPerPageToSlice = async() => {
+      await dispatch(setItemsPerPageSlice(itemsPerPage));
+    }
+
+    setItemsPerPageToSlice();
+  }, [itemsPerPage]);
 
   useEffect(() => {
     if(domains.length > 0 && type !== "") {
@@ -486,7 +522,7 @@ const PaymentDetails: React.FC = () => {
           </thead>
           <tbody>
             {
-              paymentDetails.length > 0 ? paymentDetails.map((detail, index) => (
+              paymentDetails.length > 0 ? currentItems.map((detail, index) => (
                 <React.Fragment key={index}>
                   <tr className="text-xs text-gray-400 relative">
                     <td className="px-2 pb-10 pt-3 text-center">
@@ -509,14 +545,16 @@ const PaymentDetails: React.FC = () => {
                     </td>
                     <td className="px-2 pb-10 pt-3 text-center">
                       <button
-                        className={`w-[80px] h-[30px] rounded hover:text-white ${
+                        className={`w-[80px] h-[30px] rounded hover:text-white capitalize ${
                           detail?.subscription_status === "Cancelled"
-                            ? "text-red-700 border-2 border-red-500 hover:bg-red-500"
-                            : detail?.subscription_status === "Expired"
-                            ? "bg-gray-300 text-gray-700 border-2 border-gray-500 hover:bg-gray-700"
-                            : detail?.subscription_status === "Cancel Requested"
-                            ? "text-yellow-600 border-2 border-yellow-600 hover:bg-gray-300"
-                            : "text-green-500 border-2 border-green-500 hover:bg-green-500"
+                          ? "text-red-700 border-2 border-red-500 hover:bg-red-500"
+                          : detail?.subscription_status === "Expired"
+                          ? "bg-gray-300 text-gray-700 border-2 border-gray-500 hover:bg-gray-700"
+                          : detail?.subscription_status === "Cancel Requested"
+                          ? "text-yellow-600 border-2 border-yellow-600 hover:bg-gray-300"
+                          : detail?.subscription_status?.toLowerCase() === "manual"
+                          ? "text-yellow-600 border-2 border-yellow-600 hover:bg-gray-300"
+                          : "text-green-500 border-2 border-green-500 hover:bg-green-500"
                         }`}
                       >
                         {detail?.subscription_status}
@@ -574,7 +612,7 @@ const PaymentDetails: React.FC = () => {
                                   }
                                 }
                               } else if(list?.type === "modal") {
-                                if(list?.label === "Cancel Subscription" || list?.label === "Transfer Subscription") {
+                                if(list?.label === "Cancel Subscription") {
                                   if(detail?.product_type?.toLowerCase() === "google workspace") {
                                     return (
                                       <li
@@ -584,13 +622,50 @@ const PaymentDetails: React.FC = () => {
                                           setIsModalOpen(true);
                                           setModalType(list?.label);
                                           setSubscriptionId(detail?.id);
-                                          if(list?.label === "View Invoice") {
-                                            updateInvoiceData(detail?.payment_details);
-                                          } else {
-                                            setInvoiceData({});
-                                          }
+                                          setInvoiceData({});
                                         }}
                                       >{list?.label}</li>
+                                    )
+                                  } else if(detail?.product_type?.toLowerCase() === "domain")  {
+                                    return (
+                                      <li
+                                        key={idx}
+                                        className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
+                                        onClick={() => {
+                                          setIsModalOpen(true);
+                                          setModalType("Cancel Domain");
+                                          setSubscriptionId(detail?.id);
+                                          setInvoiceData({});
+                                        }}
+                                      >Cancel Domain</li>
+                                    )
+                                  }
+                                } else if(list?.label === "Transfer Subscription") {
+                                  if(detail?.product_type?.toLowerCase() === "google workspace") {
+                                    return (
+                                      <li
+                                        key={idx}
+                                        className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
+                                        onClick={() => {
+                                          setIsModalOpen(true);
+                                          setModalType(list?.label);
+                                          setSubscriptionId(detail?.id);
+                                          setInvoiceData({});
+                                        }}
+                                      >{list?.label}</li>
+                                    )
+                                  } else if(detail?.product_type?.toLowerCase() === "domain") {
+                                    return (
+                                      <li
+                                        key={idx}
+                                        className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
+                                        onClick={() => {
+                                          setIsModalOpen(true);
+                                          setModalType("Transfer Domain");
+                                          setSubscriptionId(detail?.id);
+                                          setInvoiceData({});
+                                        }}
+                                      >Transfer Domain</li>
                                     )
                                   }
                                 } else {
@@ -631,6 +706,72 @@ const PaymentDetails: React.FC = () => {
             }
           </tbody>
         </table>
+      </div>
+
+      
+
+      <div className="flex justify-between items-center mt-12 relative bottom-2 right-0">
+        <div className="flex items-center gap-1">
+          <select
+            onChange={e => {
+              setItemsPerPage(parseInt(e.target.value));
+            }}
+            value={itemsPerPage}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={15}>15</option>
+            <option value={20} selected>20</option>
+            <option value={50}>50</option>
+          </select>
+          <label>items</label>
+        </div>
+        <div className="flex">
+          <button
+            onClick={() => {
+              setCurrentPage((prev) => Math.max(prev - 1, 0));
+            }}
+            disabled={currentPage === 0}
+            className={`px-3 py-1 text-sm ${
+              currentPage === 0
+                ? "bg-transparent text-gray-300"
+                : "bg-transparent hover:bg-green-500 hover:text-white"
+            } rounded-l transition`}
+          >
+            Prev
+          </button>
+
+          {/* Page numbers */}
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                setCurrentPage(index);
+              }}
+              className={`px-3 py-1 text-sm mx-1 rounded ${
+                currentPage === index
+                  ? "bg-green-500 text-white"
+                  : "bg-transparent text-black hover:bg-green-500 hover:text-white"
+              } transition`}
+            >
+              {index + 1}
+            </button>
+          ))}
+
+          <button
+            onClick={() => {
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1));
+            }}
+            disabled={currentPage === totalPages - 1}
+            className={`px-3 py-1 text-sm ${
+              currentPage === totalPages - 1
+                ? "bg-transparent text-gray-300"
+                : "bg-transparent hover:bg-green-500 hover:text-white"
+            } rounded-r transition`}
+          >
+            Next
+          </button>
+        </div>
       </div>
       {
         isModalOpen && modalType === "Update payment method" ?
@@ -1107,6 +1248,134 @@ const PaymentDetails: React.FC = () => {
                       className="font-inter font-semibold min-[440px]:text-base max-[440px]:text-sm text-[#F0F0F3] text-center items-center py-[10px] bg-[#12A833] w-[79px] rounded-[10px]"
                       type="button"
                       onClick={(e) => {changeAutoRenewStatus(e)}}
+                    >Yes</button>
+                    <button
+                      className="font-inter font-semibold min-[440px]:text-base max-[440px]:text-sm text-[#F0F0F3] text-center items-center py-[10px] bg-[#EE1010] w-[79px] ml-[60px] rounded-[10px]"
+                      type="button"
+                      onClick={() => {
+                        setIsModalOpen(false);
+                        setModalType("");
+                        setSubscriptionId("");
+                      }}
+                    >Cancel</button>
+                  </div>
+                </DialogPanel>
+              </div>
+            </div>
+          </Dialog>
+        ) : modalType === "Cancel Domain" ?
+        (
+          <Dialog
+            open={isModalOpen}
+            as="div"
+            className="relative z-40 focus:outline-none"
+            onClose={() => {
+              setIsModalOpen(false);
+              setModalType("");
+              setSubscriptionId("");
+            }}
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-40 w-screen overflow-y-auto mt-16">
+              <div className="flex min-h-full items-center justify-center py-4">
+                <DialogPanel
+                  transition
+                  className="w-full max-w-[450px] rounded-xl bg-white p-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+                >
+                  <div className="flex justify-between items-center mb-6">
+                    <DialogTitle
+                      as="h3"
+                      className="min-[440px]:text-[28px] max-[440px]:text-[19px] font-semibold text-gray-900"
+                    >Cancel Domain</DialogTitle>
+                    <button
+                      type='button'
+                      className='text-3xl text-black'
+                      onClick={() => {
+                        setIsModalOpen(false);
+                        setModalType("");
+                        setSubscriptionId("");
+                      }}
+                    ><X /></button>
+                  </div>
+
+                  <div
+                    className="mt-8"
+                  >
+                    <p
+                      className="font-inter font-medium min-[440px]:text-xl max-[440px]:text-base text-[#222222] text-left"
+                    >Are you sure want to cancel your domain?</p>
+                  </div>
+
+                  <div
+                    className="flex flex-row justify-center items-center mt-14"
+                  >
+                    <button
+                      className="font-inter font-semibold min-[440px]:text-base max-[440px]:text-sm text-[#F0F0F3] text-center items-center py-[10px] bg-[#12A833] w-[79px] rounded-[10px]"
+                      type="button"
+                      // onClick={(e) => {changeAutoRenewStatus(e)}}
+                    >Yes</button>
+                    <button
+                      className="font-inter font-semibold min-[440px]:text-base max-[440px]:text-sm text-[#F0F0F3] text-center items-center py-[10px] bg-[#EE1010] w-[79px] ml-[60px] rounded-[10px]"
+                      type="button"
+                      onClick={() => {
+                        setIsModalOpen(false);
+                        setModalType("");
+                        setSubscriptionId("");
+                      }}
+                    >Cancel</button>
+                  </div>
+                </DialogPanel>
+              </div>
+            </div>
+          </Dialog>
+        ) : modalType === "Transfer Domain" ?
+        (
+          <Dialog
+            open={isModalOpen}
+            as="div"
+            className="relative z-40 focus:outline-none"
+            onClose={() => {
+              setIsModalOpen(false);
+              setModalType("");
+              setSubscriptionId("");
+            }}
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-40 w-screen overflow-y-auto mt-16">
+              <div className="flex min-h-full items-center justify-center py-4">
+                <DialogPanel
+                  transition
+                  className="w-full max-w-[450px] rounded-xl bg-white p-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+                >
+                  <div className="flex justify-between items-center mb-6">
+                    <DialogTitle
+                      as="h3"
+                      className="min-[440px]:text-[28px] max-[440px]:text-[19px] font-semibold text-gray-900"
+                    >Transfer Domain</DialogTitle>
+                    <button
+                      type='button'
+                      className='text-3xl text-black'
+                      onClick={() => {
+                        setIsModalOpen(false);
+                        setModalType("");
+                        setSubscriptionId("");
+                      }}
+                    ><X /></button>
+                  </div>
+
+                  <div
+                    className="mt-8"
+                  >
+                    <p
+                      className="font-inter font-medium min-[440px]:text-xl max-[440px]:text-base text-[#222222] text-left"
+                    >Are you sure want to transfer your domain?</p>
+                  </div>
+
+                  <div
+                    className="flex flex-row justify-center items-center mt-14"
+                  >
+                    <button
+                      className="font-inter font-semibold min-[440px]:text-base max-[440px]:text-sm text-[#F0F0F3] text-center items-center py-[10px] bg-[#12A833] w-[79px] rounded-[10px]"
+                      type="button"
+                      // onClick={(e) => {changeAutoRenewStatus(e)}}
                     >Yes</button>
                     <button
                       className="font-inter font-semibold min-[440px]:text-base max-[440px]:text-sm text-[#F0F0F3] text-center items-center py-[10px] bg-[#EE1010] w-[79px] ml-[60px] rounded-[10px]"
