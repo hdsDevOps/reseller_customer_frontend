@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { GoChevronLeft } from "react-icons/go";
 import { useNavigate } from "react-router-dom";
 import { LuPencilLine } from "react-icons/lu";
-import { RiDeleteBin6Line } from "react-icons/ri";
+import { RiCloseFill, RiDeleteBin6Line } from "react-icons/ri";
 import { FaLock } from "react-icons/fa6";
 import { BiSolidCheckShield } from "react-icons/bi";
 import { MdClose, MdOutlineAddShoppingCart } from "react-icons/md";
@@ -14,11 +14,17 @@ import { toast } from "react-toastify";
 import { setCart } from "store/authSlice";
 import { currencyList } from "./CurrencyList";
 import { IoMdInformationCircleOutline } from "react-icons/io";
+import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import CustomerAgreement from "./CustomerAgreement";
+import PrivacyPolicy from "./PrivacyPolicy";
 
 interface Voucher {
   code: string;
   discount: number;
-}
+};
+
+const logoImage = 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo-2.png?alt=media&token=9315e750-1f5d-4032-ba46-1aeafa340a75';
+const logoImageSmall = 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899';
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -46,14 +52,19 @@ const Cart = () => {
   const [discountedPrice, setDiscountedPrice] = useState(0.00);
   const [preDiscountedPrice, setPreDiscountedPrice] = useState(0.00);
   const [voucherHover, setVoucherHover] = useState(false);
+  const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
+  const [legalModalType, setLegalModalType] = useState("");
+
+  const handleLegalModalClose = () => {
+    setIsLegalModalOpen(false);
+    setLegalModalType("");
+  };
 
   useEffect(() => {
-    const filterByCurrency = vouchers?.filter(v => v?.voucher?.voucher_code === defaultCurrencySlice);
-    setFilterVouchers(filterByCurrency);
-    // setFilterVouchers([...vouchers]);
-  }, [vouchers, defaultCurrencySlice]);
-
-  
+    // const filterByCurrency = vouchers?.filter(v => v?.voucher?.voucher_code === defaultCurrencySlice);
+    // setFilterVouchers(filterByCurrency);
+    setFilterVouchers([...vouchers]);
+  }, [vouchers, defaultCurrencySlice]);  
 
   useEffect(() => {
     if(cart?.length > 0) {
@@ -608,7 +619,7 @@ const Cart = () => {
                     className="bg-green-600 rounded-lg text-white font-semibold py-3 hover:bg-opacity-90 flex items-center justify-center gap-3"
                     type="button"
                     disabled={cart.length > 0 ? false : true}
-                    onClick={() => {navigate('/review-and-check-out', { state: { cart, price: {totalPrice, finalTotalPrice, taxAmount, discountedPrice} } })}}
+                    onClick={() => {navigate('/review-and-check-out', { state: { cart, price: {totalPrice, finalTotalPrice, taxAmount, discountedPrice}, voucher_code: appliedVoucher } })}}
                   >
                     <FaLock /> Submit Purchase
                   </button>
@@ -623,9 +634,15 @@ const Cart = () => {
                       style={{ maxWidth: "20.5rem", lineHeight: "1.5rem" }}
                     >
                       By purchasing, you accept the{" "}
-                      <span className="text-green-500">Customer Agreement</span>{" "}
+                      <span className="text-green-500" onClick={() => {
+                        setIsLegalModalOpen(true);
+                        setLegalModalType("agreement");
+                      }}>Customer Agreement</span>{" "}
                       and acknowledge reading the{" "}
-                      <span className="text-green-500">Privacy Policy.</span>{" "}
+                      <span className="text-green-500" onClick={() => {
+                        setIsLegalModalOpen(true);
+                        setLegalModalType("privacy");
+                      }}>Privacy Policy.</span>{" "}
                       You also agree to Auto renewal of your yearly subscription
                       for, which can be disabled at any time through
                       your account. Your card details will be saved for future
@@ -729,6 +746,59 @@ const Cart = () => {
           </div>
         </div>
       </div>
+
+      {
+        isLegalModalOpen && (
+          <Dialog
+            open={isLegalModalOpen}
+            as="div"
+            className="relative z-50 focus:outline-none"
+            onClose={() => {
+              setIsLegalModalOpen(false);
+              setLegalModalType("");
+            }}
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 w-screen overflow-y-auto">
+              <div className="flex min-h-screen min-w-screen items-center justify-center">
+                <DialogPanel
+                  transition
+                  className="h-screen w-screen overflow-y-auto bg-white p-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0 flex flex-col"
+                >
+                  <div className="flex justify-between items-center mb-6">
+                    <DialogTitle
+                      as="h3"
+                      className="text-lg font-semibold text-gray-900"
+                    >
+                      <img
+                        src={logoImage}
+                        className="h-10 object-contain"
+                        alt="logo"
+                      />
+                    </DialogTitle>
+                    <div className='btn-close-bg'>
+                      <button
+                        type='button'
+                        className='text-black items-center'
+                        onClick={() => {
+                          setIsLegalModalOpen(false);
+                          setLegalModalType("");
+                        }}
+                      ><RiCloseFill className="w-6 h-6" /></button>
+                    </div>
+                  </div>
+                  {
+                    legalModalType === "agreement"
+                    ? <CustomerAgreement />
+                    : legalModalType === "privacy"
+                    ? <PrivacyPolicy />
+                    : ''
+                  }
+                </DialogPanel>
+              </div>
+            </div>
+          </Dialog>
+        )
+      }
     </div>
   );
 };

@@ -330,6 +330,13 @@ export const getVouchersListThunk = createAsyncThunk(
   }
 );
 
+export const useVoucherThunk = createAsyncThunk(
+  "users/useVoucher",
+  async ({ record_id }: any) => {
+    return await userApis.useVoucherApi( record_id );
+  }
+);
+
 export const getBillingHistoryThunk = createAsyncThunk(
   "users/getBillingHistory",
   async ({ user_id, start_date, end_date, domain }: any) => {

@@ -15,8 +15,8 @@ import { ToastContainer } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { getProfileDataThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
 import Footer from "../components/Footer";
+import Dashboard from "./Dashboard";
 
-const Dashboard = React.lazy(() => import("./Dashboard"));
 const routes = [
   { path: "/", element: <Dashboard /> },
   { path: "/dashboard", element: <Dashboard /> },

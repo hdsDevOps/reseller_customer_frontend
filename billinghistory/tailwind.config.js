@@ -8,6 +8,9 @@ export default{
       screens: {
         // "sm-max": { "min": "320px" , "max": "767px" },
       },
+      fontFamily: {
+        koulen: ["Koulen", "serif"],
+      }
     },
   },
   plugins: [

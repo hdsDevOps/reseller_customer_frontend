@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-const EmailList = React.lazy(() => import("./EmailList"));
+import EmailList from "./EmailList";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from "react-toastify";
 

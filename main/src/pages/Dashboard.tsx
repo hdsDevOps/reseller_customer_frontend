@@ -24,22 +24,30 @@ const Dashboard: React.FC = () => {
   const dispatch = useAppDispatch();
   const { customerId, userDetails } = useAppSelector(state => state.auth);
   const navigate = useNavigate();
+  // console.log("state...", location.state);
+  const isInitialRender = useRef(true);
   useEffect(() => {
-    if(location.state) {
-      console.log(location.state);
-      if(location.state?.from === "otp") {
-        toast.success("Successfully logged in");
-      } else if(location.state?.from === "registration") {
-        toast.success("Successfully registered");
-      }
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      return;
     }
-  }, []);
+    
+    if(location.state?.from === "otp") {
+      toast.success(`Successfully logged in ${Math.random() * 3}`);
+      // console.log(`Successfully logged in ${Math.random() * 3}`)
+    } else if(location.state?.from === "registration") {
+      toast.success("Successfully registered");
+      // console.log("Resgisisin")
+    } else {
+      //
+    }
+  }, [location.state]);
   const [isSubscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
   const [subscriptionsList, setSubscriptionList] = useState([]);
   // console.log("subscriptionsList...", subscriptionsList);
   const [subscription, setSubscription] = useState<object | null>(null);
   // console.log("subscription...", subscription);
-  console.log("user details...", userDetails);
+  // console.log("user details...", userDetails);
 
   const [selectedDomain, setSelectedDomain] = useState({});
   // console.log("selectedDomain...", selectedDomain);
@@ -164,7 +172,7 @@ const Dashboard: React.FC = () => {
         reason: cancelReason?.reason,
         subscription_status: "Cancel Requested"
       })).unwrap();
-      console.log("result...", result);
+      // console.log("result...", result);
     } catch (error) {
       if(error?.message == "Request failed with status code 401") {
         toast.error("Error making default payment method");
@@ -271,7 +279,7 @@ const Dashboard: React.FC = () => {
     e.preventDefault();
     try {
       const result = await dispatch(changeAutoRenewThunk({subscription_id: subscriptionId, status: "manual", product_type: "google workspace"})).unwrap();
-      console.log("result....", result);
+      // console.log("result....", result);
       toast.success("Auto Renew Status updated");
     } catch (error) {
       if(error?.message == "Request failed with status code 401") {
@@ -289,7 +297,7 @@ const Dashboard: React.FC = () => {
       setModalType("");
       setSubscriptionId("");
     }
-  }
+  };
 
   return (
     <div>

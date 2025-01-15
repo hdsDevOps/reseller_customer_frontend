@@ -12,21 +12,27 @@ import { useAppDispatch, useAppSelector } from "store/hooks";
 import { addEmailsWithoutLoginThunk, addNewDomainWithoutLoginThunk, addSubscriptionWithoutLoginThunk, getPromotionListThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, udpateBusinessDataThunk } from "store/user.thunk";
 import { format } from "date-fns";
 import { currencyList } from "../CurrencyList";
+import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import CustomerAgreement from "../CustomerAgreement";
+import PrivacyPolicy from "../PrivacyPolicy";
 
 interface AppliedVoucher {
-  voucher_code: string;
+  code: string;
   discount_rate: Number;
-}
+};
 
 interface Voucher {
   voucher: AppliedVoucher;
-}
+};
+
+const logoImage = 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo-2.png?alt=media&token=9315e750-1f5d-4032-ba46-1aeafa340a75';
+const logoImageSmall = 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899';
 
 const testingVouchers = [
-  { voucher_code: "HORD6290", discount_rate: 7.60 },
-  { voucher_code: "HORD6291", discount_rate: 8.60 },
-  { voucher_code: "HORD6292", discount_rate: 9.60 },
-  { voucher_code: "HORD6293", discount_rate: 10.60 },
+  { code: "HORD6290", discount_rate: 7.60 },
+  { code: "HORD6291", discount_rate: 8.60 },
+  { code: "HORD6292", discount_rate: 9.60 },
+  { code: "HORD6293", discount_rate: 10.60 },
 ];
 
 const DomainSummary = ({state, plan}:any) => {
@@ -53,13 +59,30 @@ const DomainSummary = ({state, plan}:any) => {
   const [discountedPrice, setDiscountedPrice] = useState(0.00);
   const [preDiscountedPrice, setPreDiscountedPrice] = useState(0.00);
   // console.log({totalPrice, finalTotalPrice, taxAmount, taxedPrice, discountedPrice});
-  const [vouchers, setVouchers] = useState(testingVouchers);
+  const [vouchers, setVouchers] = useState([]);
+  // console.log("vouchers...", vouchers);
   const [voucherCodeSearch, setVoucherCodeSearch] = useState("");
   const [filteredVouchers, setFilteredVouchers] = useState([...vouchers]);
+  const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
+  const [legalModalType, setLegalModalType] = useState("");
+
+  const handleLegalModalClose = () => {
+    setIsLegalModalOpen(false);
+    setLegalModalType("");
+  };
 
   useEffect(() => {
-    setFilteredVouchers([...vouchers]);
-  }, [vouchers]);
+    const filtered = vouchers?.filter((voucher) =>
+      voucher?.discount?.some((discount) => 
+        discount?.currency_code === defaultCurrencySlice
+      )
+    );
+    setFilteredVouchers([...filtered]);
+  }, [vouchers, defaultCurrencySlice]);
+
+  const getDiscountPrecent = (data) => {
+    return data?.find(item => item?.currency_code === defaultCurrencySlice)?.amount;
+  }
 
   const [taxHover, setTaxHover] = useState(false);
   const [voucherHover, setVoucherHover] = useState(false);
@@ -91,7 +114,7 @@ const DomainSummary = ({state, plan}:any) => {
   const getPromotionList = async() => {
     try {
       const result = await dispatch(getPromotionListThunk({promotion_id: ""})).unwrap();
-      console.log("promotions...", result);
+      setVouchers(result);
     } catch (error) {
       //
     }
@@ -108,7 +131,7 @@ const DomainSummary = ({state, plan}:any) => {
       setTaxedPrice(parseFloat(((total * taxAmount) / 100).toFixed(2)));
       const discountedPercent = appliedVoucher === null
         ? 0.00
-        : parseFloat(appliedVoucher?.voucher?.discount_rate?.toFixed(2));
+        : parseFloat(getDiscountPrecent(appliedVoucher?.voucher?.discount));
       const totalOutPrice = parseFloat((total + ((total * taxAmount) / 100)).toFixed(2));
       const discountedAMount = parseFloat(((totalOutPrice * discountedPercent) / 100).toFixed(2));
       setDiscountedPrice(discountedAMount);
@@ -129,7 +152,7 @@ const DomainSummary = ({state, plan}:any) => {
 
   const handleVoucherInputSubmit = (e) => {
     e.preventDefault();
-    const voucherFind = vouchers?.find(item => item?.voucher_code?.toLowerCase() === voucherCode?.toLowerCase());
+    const voucherFind = vouchers?.find(item => item?.code?.toLowerCase() === voucherCode?.toLowerCase());
     if(voucherFind){
       setSelectedVoucher({voucher: voucherFind});
       setShowVoucherInput(false);
@@ -149,7 +172,7 @@ const DomainSummary = ({state, plan}:any) => {
 
   const handleFilterCheckVoucher = (e) => {
     e.preventDefault();
-    const voucherFilterList = vouchers?.filter(item => item?.voucher_code?.toLowerCase() === voucherCodeSearch?.toLowerCase());
+    const voucherFilterList = vouchers?.filter(item => item?.code?.toLowerCase() === voucherCodeSearch?.toLowerCase());
     setFilteredVouchers(voucherFilterList);
   };
 
@@ -190,12 +213,12 @@ const DomainSummary = ({state, plan}:any) => {
                     <div className="flex items-center justify-between w-full mb-2">
                       <div className="flex items-center justify-center gap-10">
                         <div className="px-5 py-3 font-medium text-green-800 bg-green-200 border-2 border-gray-400 border-dashed">
-                          <h1 className="font-bold text-black">{voucher?.voucher_code}</h1>
+                          <h1 className="font-bold text-black">{voucher?.code}</h1>
                         </div>
-                        <span className="font-bold text-[15px]">Save {voucher?.discount_rate}%</span>
+                        <span className="font-bold text-[15px]">Save {getDiscountPrecent(voucher?.discount)}%</span>
                       </div>
                       <div className="flex items-center">
-                        {voucher?.voucher_code === appliedVoucher?.voucher?.voucher_code && selectedVoucher?.voucher?.voucher_code === appliedVoucher?.voucher?.voucher_code ? (
+                        {voucher?.code === appliedVoucher?.voucher?.code && selectedVoucher?.voucher?.code === appliedVoucher?.voucher?.code ? (
                           <span className="text-gray-500 text-[20px] font-bold ">Applied</span>
                         ) : (
                           <button
@@ -301,19 +324,19 @@ const DomainSummary = ({state, plan}:any) => {
                     paddingBottom: "0.65rem",
                   }}
                 >
-                  {selectedVoucher?.voucher?.voucher_code}
+                  {selectedVoucher?.voucher?.code}
                 </div>
                 <p className="text-green-500">
-                  {selectedVoucher?.voucher?.voucher_code === appliedVoucher?.voucher?.voucher_code ? `Saved ${currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}${discountedPrice}` : `You will save ${currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}${preDiscountedPrice}`}!
+                  {selectedVoucher?.voucher?.code === appliedVoucher?.voucher?.code ? `Saved ${currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}${discountedPrice}` : `You will save ${currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}${preDiscountedPrice}`}!
                 </p>
               </div>
               <p
                 className={`font-bold text-xl cursor-pointer ${
-                  selectedVoucher?.voucher?.voucher_code === appliedVoucher?.voucher?.voucher_code ? "text-gray-500" : "text-green-500"
+                  selectedVoucher?.voucher?.code === appliedVoucher?.voucher?.code ? "text-gray-500" : "text-green-500"
                 }`}
-                onClick={selectedVoucher?.voucher?.voucher_code !== appliedVoucher?.voucher?.voucher_code ? handleApplyClick : undefined} 
+                onClick={selectedVoucher?.voucher?.code !== appliedVoucher?.voucher?.code ? handleApplyClick : undefined} 
               >
-                {selectedVoucher?.voucher?.voucher_code === appliedVoucher?.voucher?.voucher_code ? "Applied" : "Apply"}
+                {selectedVoucher?.voucher?.code === appliedVoucher?.voucher?.code ? "Applied" : "Apply"}
               </p>
             </div>
           )}
@@ -380,15 +403,78 @@ const DomainSummary = ({state, plan}:any) => {
           </div>
           <div className="w-[100%] flex items-center justify-center text-center mt-3">
             <p className="w-[65%] text-gray-400 text-[15px]">
-              By purchasing, you accept the <span className="font-bold text-green-600">Customer Agreement</span> and
-              acknowledge reading the <span className="font-bold text-green-600">Privacy Policy</span>. You also
-              agree to Auto renewal of your yearly subscription, which
-              can be disabled at any time through your account. Your card details
-              will be saved for future purchases and subscription renewals.
+              By purchasing, you accept the{" "}
+              <span className="text-green-500" onClick={() => {
+                setIsLegalModalOpen(true);
+                setLegalModalType("agreement");
+              }}>Customer Agreement</span>{" "}
+              and acknowledge reading the{" "}
+              <span className="text-green-500" onClick={() => {
+                setIsLegalModalOpen(true);
+                setLegalModalType("privacy");
+              }}>Privacy Policy.</span>{" "}
+              You also agree to Auto renewal of your yearly subscription
+              for, which can be disabled at any time through
+              your account. Your card details will be saved for future
+              purchases and subscription renewals.
             </p>
           </div>
         </div>
       )}
+      
+
+      {
+        isLegalModalOpen && (
+          <Dialog
+            open={isLegalModalOpen}
+            as="div"
+            className="relative z-50 focus:outline-none"
+            onClose={() => {
+              setIsLegalModalOpen(false);
+              setLegalModalType("");
+            }}
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 w-screen overflow-y-auto">
+              <div className="flex min-h-screen min-w-screen items-center justify-center">
+                <DialogPanel
+                  transition
+                  className="h-screen w-screen overflow-y-auto bg-white p-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0 flex flex-col"
+                >
+                  <div className="flex justify-between items-center mb-6">
+                    <DialogTitle
+                      as="h3"
+                      className="text-lg font-semibold text-gray-900"
+                    >
+                      <img
+                        src={logoImage}
+                        className="h-10 object-contain"
+                        alt="logo"
+                      />
+                    </DialogTitle>
+                    <div className='btn-close-bg'>
+                      <button
+                        type='button'
+                        className='text-black items-center'
+                        onClick={() => {
+                          setIsLegalModalOpen(false);
+                          setLegalModalType("");
+                        }}
+                      ><RiCloseFill className="w-6 h-6" /></button>
+                    </div>
+                  </div>
+                  {
+                    legalModalType === "agreement"
+                    ? <CustomerAgreement />
+                    : legalModalType === "privacy"
+                    ? <PrivacyPolicy />
+                    : ''
+                  }
+                </DialogPanel>
+              </div>
+            </div>
+          </Dialog>
+        )
+      }
     </div>
   );
 };

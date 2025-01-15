@@ -49,6 +49,7 @@ export const endPoints = {
 
     // voucher lists
     getVouchersList: 'customerservices/setting/api/v1/customer_voucher_list',
+    useVoucher: 'customerservices/setting/api/v1/use_voucher',
 
     // billing history
     getBillingHistory: 'customerservices/home/api/v1/getbillinghistory',

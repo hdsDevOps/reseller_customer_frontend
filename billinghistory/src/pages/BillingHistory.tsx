@@ -104,6 +104,7 @@ const BillingHistory: React.FC = () => {
   };
 
   const [billingHistoryFilter, setBillingHistoryFilter] = useState(billingHistoryFilterSlice === null ? initialFilter : billingHistoryFilterSlice);
+  // console.log("billingHistoryFilter...", billingHistoryFilter);
 
   useEffect(() => {
     const setBillingHistoryFilterToSlice = async() => {
@@ -165,6 +166,24 @@ const BillingHistory: React.FC = () => {
     if (!date[0] || !date[1]) return "Select Date Range";
     return `${format(date[0], 'MMM d')} - ${format(date[1], 'MMM d, yyyy')}`;
   };
+
+  useEffect(() => {
+    if(range === null) {
+      setBillingHistoryFilter({
+        user_id: customerId,
+        start_date: "",
+        end_date: "",
+        domain: selectedDomain
+      });
+    } else {
+      setBillingHistoryFilter({
+        user_id: customerId,
+        start_date: `${range[0] === null ? "" : format(range[0], "yyyy-MM-dd")}`,
+        end_date: `${range[1] === null ? "" : format(range[1], "yyyy-MM-dd")}`,
+        domain: selectedDomain
+      });
+    }
+  }, [customerId, selectedDomain, range]);
 
   const formatDate2 = (datee) => {
 
@@ -232,7 +251,7 @@ const BillingHistory: React.FC = () => {
 
   useEffect(() => {
     getBillingHistoryData();
-  }, [range, selectedDomain]);
+  }, [billingHistoryFilter]);
 
   const formatDate = (seconds, nanoseconds) => {
     const miliseconds = parseInt(seconds) * 1000 + parseInt(nanoseconds) / 1e6;
@@ -324,6 +343,8 @@ const BillingHistory: React.FC = () => {
             value={range}
             showHeader={false}
             renderValue={renderValue} // Custom render for the selected value
+            calendarSnapping={true}
+            cleanable
           />
           <div className="relative align-self-start" ref={domainRef}>
             <input
@@ -415,12 +436,12 @@ const BillingHistory: React.FC = () => {
                     <td className="px-2 pb-10 pt-3 text-center text-green-500">
                       {detail?.transaction_id}
                     </td>
-                    <td className="px-2 pb-10 pt-3 text-center flex items-center flex-col" style={{width: '180px'}}>
+                    <td className="px-2 pb-10 pt-3 text-center flex flex-col" style={{width: '180px'}}>
                       {formatDate(detail?.created_at?._seconds, detail?.created_at?._nanoseconds)}
-                      <small className="text-green-500 text-xs">{detail?.inovoice}</small>
+                      <small className="text-green-500 text-xs">{detail?.invoice}</small>
                     </td>
                     <td className="px-2 pb-10 pt-3 text-center" style={{width: '180px'}}>
-                      {detail?.production_type}
+                      {detail?.product_type}
                     </td>
                     <td className="px-2 pb-10 pt-3 text-center">
                       {detail?.description}
@@ -454,7 +475,7 @@ const BillingHistory: React.FC = () => {
                     <td className="cursor-pointer flex justify-center">
                       <button
                         type="button"
-                        className="flex items-center justify-center mt-4 w-4 h-4"
+                        className="flex items-center justify-center mt-3 w-4 h-4"
                         onClick={() => {downloadInvoice()}}
                         // disabled={!rolePermissionsSlice?.billing_history?.download ? true : false}
                         cypress-name="invoice_download"

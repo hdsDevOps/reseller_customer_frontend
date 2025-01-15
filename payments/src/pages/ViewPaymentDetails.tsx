@@ -94,7 +94,7 @@ function ViewPaymentDetails() {
       <div className='bg-[#F0F0F3] w-full grid grid-cols-1 gap-2 px-7 py-7 max-[385px]:px-2 rounded-lg'>
       <h3 className='font-inter font-medium max-[385px]:text-[28px] text-[22px] text-[#5A5A5A]'>Billing Details</h3>
 
-        <div className='flex flex-wrap my-2'>
+        <div className='flex flex-wrap my-2 max-w-[800px]'>
           <div className='flex flex-col w-[250px] px-2 max-[385px]:px-[2px]'>
             <label className='font-jakarta-plus font-semibold text-sm text-[#14213D]'>Subscription Type</label>
             <input

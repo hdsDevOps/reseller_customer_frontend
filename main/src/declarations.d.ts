@@ -115,4 +115,5 @@ declare module 'store/authSlice' {
   export const setPaymentMethodsState: (payload: string) => PayloadAction<string>;
   export const setUserDetails: (payload: string) => PayloadAction<string>;
   export const setMetaDataSlice;
+  export const setDefaultCurrencySlice;
 }

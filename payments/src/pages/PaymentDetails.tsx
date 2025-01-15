@@ -13,7 +13,7 @@ import { Download, X } from 'lucide-react';
 import html2canvas from 'html2canvas-pro';
 import jsPDF from "jspdf";
 import { toast } from "react-toastify";
-import { setCurrentPageNumberSlice, setItemsPerPageSlice } from "store/authSlice";
+import { setCurrentPageNumberSlice, setItemsPerPageSlice, setPaymentDetailsFilterSlice } from "store/authSlice";
 
 interface RangeType<T> {
   label: string;
@@ -107,8 +107,8 @@ const PaymentDetails: React.FC = () => {
 
   const [paymentDetails, setPaymentDetails]= useState([]);
   // console.log("payment details...", paymentDetails);
-  const [filter, setFilter] = useState(initialFilter);
-  // console.log("filter...", filter);
+  const [filter, setFilter] = useState(paymentDetailsFilterSlice === null ? initialFilter : paymentDetailsFilterSlice);
+  console.log("filter...", filter);
   const [range, setRange] = useState<[Date | null, Date | null]>([null, null]);
   const [domains, setDomains] = useState([]);
   // console.log("domains...", domains);
@@ -125,6 +125,7 @@ const PaymentDetails: React.FC = () => {
   const [paymentMethods, setPaymentMethods] = useState([]);
   // console.log("paymentMethods...", paymentMethods);
   const [subscriptionId, setSubscriptionId] = useState("");
+  const [selectedDomain, setSelectedDomain] = useState(paymentDetailsFilterSlice === null ? "" : paymentDetailsFilterSlice?.domain_name);
 
   const showListTable = [
     { label: "Update Plan", type: "link", link: "/upgrade-plan", },
@@ -145,6 +146,18 @@ const PaymentDetails: React.FC = () => {
   // console.log("currentItems...", currentItems);
   const totalPages = Math.ceil(paymentDetails?.length / itemsPerPage);
   // console.log({currentPage, totalPages, lenght: currentItems?.length});
+
+  useEffect(() => {
+    const setPaymentDetailsFilterToSlice = async() => {
+      try {
+        await dispatch(setPaymentDetailsFilterSlice(filter));
+      } catch (error) {
+        //
+      }
+    };
+
+    setPaymentDetailsFilterToSlice();
+  }, [filter]);
 
   useEffect(() => {
     if(paymentDetails?.length > 0 && totalPages < currentPage + 1) {
@@ -226,11 +239,19 @@ const PaymentDetails: React.FC = () => {
   };
 
   useEffect(() => {
-    setFilter({
-      ...filter,
-      start_date: range[0] === null ? "" : formatDate2(range[0]),
-      end_date: range[1] === null ? "" : formatDate2(range[1])
-    });
+    if(range === null) {
+      setFilter({
+        ...filter,
+        start_date: "",
+        end_date: "",
+      });
+    } else {
+      setFilter({
+        ...filter,
+        start_date: `${range[0] === null ? "" : format(range[0], "yyyy-MM-dd")}`,
+        end_date: `${range[1] === null ? "" : format(range[1], "yyyy-MM-dd")}`,
+      });
+    }
   }, [range]);
 
   useEffect(() => {
@@ -239,6 +260,13 @@ const PaymentDetails: React.FC = () => {
       customer_id: customerId,
     });
   }, [customerId]);
+
+  useEffect(() => {
+    setFilter({
+      ...filter,
+      domain_name: selectedDomain,
+    });
+  }, [selectedDomain]);
 
   const getPaymentSubscriptionsList = async() => {
     try {
@@ -444,18 +472,17 @@ const PaymentDetails: React.FC = () => {
             value={range}
             showHeader={false}
             renderValue={renderValue} // Custom render for the selected value
+            calendarSnapping={true}
+            cleanable
           />
           <div className="relative" ref={domainRef}>
             <input
               type="text"
-              value={filter?.domain_name || type}
+              value={selectedDomain || type}
               className="border border-transparent bg-transparent text-gray-700 p-2 pr-8 appearance-none focus:outline-none focus:ring-1 focus:ring-green-500 w-auto"
               placeholder="Auto search domain list"
               onChange={(e) => {
-                setFilter({
-                  ...filter,
-                  domain_name: '',
-                });
+                setSelectedDomain("");
                 setType(e.target.value);
               }}
               onFocus={() => {setDomainDropdown(true)}}
@@ -470,10 +497,7 @@ const PaymentDetails: React.FC = () => {
                   {
                     domains.length > 0 && domains?.filter(domain => domain?.domain_name?.toLowerCase().includes(type.toLowerCase()))?.map((domain, index) => (
                       <p key={index} className="px-1 font-inter cursor-pointer" onClick={() => {
-                        setFilter({
-                          ...filter,
-                          domain_name: domain?.domain_name
-                        });
+                        setSelectedDomain(domain?.domain_name)
                         setType("");
                         setDomainDropdown(false);
                       }}>{domain?.domain_name}</p>

@@ -148,10 +148,18 @@ const SignInForm: React.FC = () => {
         {/* reCAPTCHA */}
         <div className="relative my-4">
           <ReCAPTCHA
-            sitekey="6LdENbMqAAAAAKCJtG-Hf4Q2qVblxiQ7WTRDp6Ps"
+            sitekey="6LcTDbgqAAAAAC7gj3OuMSauQGIeDl2FgFhE2R3O"
             onChange={handleRecaptcha}
             className=""
           />
+          {/* <button
+            className="g-recaptcha" 
+            data-sitekey="6LcTDbgqAAAAAC7gj3OuMSauQGIeDl2FgFhE2R3O" 
+            type="button"
+            onClick={() => {
+              console.log
+            }}
+          >Submit</button> */}
           {/* <div className="absolute left-0 top-1/2 transform -translate-y-1/2 flex items-center ml-2">
             <input
               type="checkbox"

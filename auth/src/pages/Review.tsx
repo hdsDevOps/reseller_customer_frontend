@@ -865,7 +865,7 @@ const Review = () => {
           </button>
           <div
             className="absolute right-0 w-10 h-10 bg-center bg-no-repeat bg-contain bottom-11"
-            style={{ backgroundImage: `url("/images/messaageIcon.png")` }}
+            style={{ backgroundImage: `url("https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/messaageIcon.png?alt=media&token=a078fd41-6617-4089-b891-b54970394dbf")` }}
           ></div>
         </div>
       </form>

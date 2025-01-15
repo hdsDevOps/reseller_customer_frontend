@@ -91,6 +91,9 @@ declare module 'store/user.thunk' {
   export const getDomainsListThunk;
   export const getVouchersListThunk;
   export const getProfileDataThunk;
+  export const getPaymentMethodsThunk;
   // Add more thunk declarations as needed
   //
+  export const useVoucherThunk;
+  export const udpateProfileDataThunk;
 }

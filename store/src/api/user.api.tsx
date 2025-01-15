@@ -469,6 +469,17 @@ async function getVouchersListApi(
   }
 };
 
+async function useVoucherApi(
+  record_id:string
+): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.useVoucher, { record_id });
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 async function getBillingHistoryApi(
   user_id:string,
   start_date:string,
@@ -872,6 +883,7 @@ export const userApis = {
   deleteSettingApi,
 
   getVouchersListApi,
+  useVoucherApi,
 
   getBillingHistoryApi,
   addBillingHistoryApi,

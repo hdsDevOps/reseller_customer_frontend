@@ -8,22 +8,40 @@ import MainApp from "./pages";
 import AuthApp from "auth/AuthApp";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { getCartThunk, getDomainsListThunk, getLandingPageThunk, getPaymentMethodsThunk, getProfileDataThunk, getStaffIdFromLSThunk, getStaffStatusFromLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, removeUserAuthTokenFromLSThunk, savedCardsListThunk } from 'store/user.thunk';
-import { setCart, setCustomerId, setDomains, setMetaDataSlice, setPaymentMethodsState, setResellerToken, setSaveCards, setStaffId, setStaffStatus, setTokenDetails, setUserDetails } from 'store/authSlice';
+import { setCart, setCustomerId, setDefaultCurrencySlice, setDomains, setMetaDataSlice, setPaymentMethodsState, setResellerToken, setSaveCards, setStaffId, setStaffStatus, setTokenDetails, setUserDetails } from 'store/authSlice';
 import "auth/AuthCss";
 import "./index.css";
 import { HelmetProvider, Helmet } from 'react-helmet-async';
+import countryToCurrency, { Currencies, Countries } from "country-to-currency";
+import { currencyList } from "./components/CurrencyList";
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { token, customerId, staffId, staffStatus, resellerToken, userDetails, metaDataSlice } = useAppSelector((state) => state.auth);
-  const [meta, setMeta] = useState({});
+  const { token, customerId, staffId, staffStatus, resellerToken, userDetails, metaDataSlice, defaultCurrencySlice } = useAppSelector((state) => state.auth);
   // const token ="vvggg"
   // console.log(token, "...token");
   // console.log("resellerToken...", resellerToken);
   // console.log("user details...", userDetails);
   // console.log({token, customerId, staffId, staffStatus});
-  console.log("meta data...", metaDataSlice);
+  // console.log("meta data...", metaDataSlice);
+  // console.log("defaultCurrencySlice...", defaultCurrencySlice);
+
+  useEffect(() => {
+    const getIpData = async() => {
+      const response = await fetch('https://geolocation-db.com/json/');
+      const data = await response.json();
+      const currency = countryToCurrency[data?.country_code];
+      const findDefaultCurrency = currencyList.find(cash => cash.name === currency);
+      if(findDefaultCurrency) {
+        await dispatch(setDefaultCurrencySlice(findDefaultCurrency?.name));
+      } else {
+        await dispatch(setDefaultCurrencySlice("USD"));
+      }
+    };
+
+    getIpData();
+  } , []);
 
   useEffect(() => {
     const getUserDetails = async () => {
@@ -50,7 +68,7 @@ const App: React.FC = () => {
       if(token) {
         try {
           const result = await dispatch(getProfileDataThunk({user_id: customerId, staff_id: staffId, is_staff: staffStatus})).unwrap();
-          console.log("result...", result);
+          // console.log("result...", result);
           await dispatch(setUserDetails(result?.customerData));
         } catch (error) {
           if(error?.message == "Request failed with status code 401") {

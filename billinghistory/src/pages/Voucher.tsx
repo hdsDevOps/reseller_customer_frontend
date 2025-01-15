@@ -48,6 +48,17 @@ const VoucherCard: React.FC = () => {
     setModalOpen(false);
   };
 
+  const dateFormat = (date) => {
+    const miliseconds = parseInt(date?._seconds) * 1000 + parseInt(date?._nanoseconds) / 1e6;
+    const foundDate =  new Date(miliseconds);
+    const today = new Date(Date.now());
+    if(foundDate > today) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   return (
     <div className="flex flex-col gap-2 w-full">
       <div className="flex flex-col gap-1 mb-6">
@@ -61,21 +72,38 @@ const VoucherCard: React.FC = () => {
       </div>
       <div className="flex justify-center items-center gap-5 flex-wrap">
         {
-          voucherList?.length > 0 && voucherList?.map((coupon, index) => {
-            if(coupon?.status === "active") {
-              return (
-                <div className="max-w-[400px] max-h-[200px] relative w-full items-center" key={index}>
-                  <div className="w-full" dangerouslySetInnerHTML={{__html: coupon?.voucher?.template_details}} />
-                </div>
-              )
-            } else if(coupon?.status === "expired") {
-              return (
-                <div className="max-w-[400px] max-h-[200px] relative w-full items-center" key={index}>
-                  <div className="w-full" dangerouslySetInnerHTML={{__html: coupon?.voucher?.template_details}} />
-                </div>
-              )
-            }
-          })
+          voucherList?.length > 0 && voucherList?.map((coupon, index) => (
+            <div className="max-w-[400px] h-[200px] relative w-full items-center border border-black overflow-hidden" key={index}>
+              <div className={`w-full h-full ${
+                coupon?.status === "used"
+                ? "bg-gray-600 text-white"
+                : coupon?.status === "active"
+                ? dateFormat(coupon?.expire_date)
+                  ? ""
+                  : "bg-gray-600 text-white"
+                : ""
+              }`} dangerouslySetInnerHTML={{__html: coupon?.voucher?.template_details}} />
+              <div className={`absolute right-0 top-0 w-[80px] h-[30px] ${
+                coupon?.status === "used"
+                ? "bg-[#12A833]"
+                : coupon?.status === "active"
+                ? dateFormat(coupon?.expire_date)
+                  ? "hidden"
+                  : "bg-[#E02424]"
+                : "hidden"
+              } font-koulen font-normal text-base text-white transform rotate-0 flex justify-center items-center`}>
+                {
+                  coupon?.status === "used"
+                  ? "APPLIED"
+                  : coupon?.status === "active"
+                  ? dateFormat(coupon?.expire_date)
+                    ? ""
+                    : "EXPIRED"
+                  : ""
+                }
+              </div>
+            </div>
+          ))
         }
       </div>
       <VoucherModal isModalOpen={isModalOpen} closeModal={handleCloseModal} />

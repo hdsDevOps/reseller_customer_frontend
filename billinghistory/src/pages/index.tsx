@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-const BillingHistory = React.lazy(() => import("./BillingHistory"));
-const Voucher = React.lazy(() => import("./Voucher"));
+import BillingHistory from "./BillingHistory";
+import Voucher from "./Voucher";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from "react-toastify";
 
