@@ -39,6 +39,7 @@ declare module 'store/authSlice' {
   }
 
   export default authSlice.reducer;
+  export const setSaveCards;
 }
 
 
@@ -54,4 +55,6 @@ declare module 'store/user.thunk' {
   export const updateLicenseUsageThunk;
   export const getProfileDataThunk;
   // Add more thunk declarations as needed
+  export const savedCardsListThunk;
+  export const deleteCardThunk;
 }

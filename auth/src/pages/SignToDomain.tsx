@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
 import { HiOutlineEye } from "react-icons/hi";
 import { RiEyeCloseLine } from "react-icons/ri";
 import { IoChevronBackSharp } from "react-icons/io5";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 // Update the site key with your actual reCAPTCHA site key
-const RECAPTCHA_SITE_KEY = "6LdENbMqAAAAABasUqa4IoohS73SF0TVIxXDWHdy";
+const RECAPTCHA_SITE_KEY = "6LfFS7gqAAAAANx6APGgbqq8ambPmp1hCDD51FMV";
 
 const SignInForm: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ const SignInForm: React.FC = () => {
   
   // Retrieve the domain from the location state
   const domain = location.state.selectedDomain;
+  const captchaRef = useRef(null);
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [formData, setFormData] = useState({
@@ -25,6 +27,7 @@ const SignInForm: React.FC = () => {
   // console.log("form data...", formData);
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   console.log("recaptchaToken...", recaptchaToken);
+
   const [charCount, setCharCount] = useState({
     username: 0,
     password: 0,
@@ -46,9 +49,22 @@ const SignInForm: React.FC = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleRecaptcha = (token: string | null) => {
-    setRecaptchaToken(token);
+  const handleRecaptcha = (value) => {
+    setRecaptchaToken(value);
   };
+
+  const captchaValidation = async() => {
+    axios
+      .post("https://www.google.com/recaptcha/api/siteverify", {secret: "6LfFS7gqAAAAAF10F9sHTlrtunXSWLhB2iMJ1Snb", response: recaptchaToken})
+      .then(res => {
+        console.log(res);
+      })
+      .catch(err => console.log(err));
+  };
+
+  useEffect(() => {
+    captchaValidation();
+  }, [recaptchaToken]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,18 +164,10 @@ const SignInForm: React.FC = () => {
         {/* reCAPTCHA */}
         <div className="relative my-4">
           <ReCAPTCHA
-            sitekey="6LcTDbgqAAAAAC7gj3OuMSauQGIeDl2FgFhE2R3O"
+            sitekey={"6LfFS7gqAAAAANx6APGgbqq8ambPmp1hCDD51FMV"}
             onChange={handleRecaptcha}
             className=""
           />
-          {/* <button
-            className="g-recaptcha" 
-            data-sitekey="6LcTDbgqAAAAAC7gj3OuMSauQGIeDl2FgFhE2R3O" 
-            type="button"
-            onClick={() => {
-              console.log
-            }}
-          >Submit</button> */}
           {/* <div className="absolute left-0 top-1/2 transform -translate-y-1/2 flex items-center ml-2">
             <input
               type="checkbox"

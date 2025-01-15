@@ -20,7 +20,7 @@ const intialEmail = {
 
 const EmailList: React.FC = ({data, getDomainsList}) => {
   // console.log(data);
-  const { customerId } = useAppSelector(state => state.auth);
+  const { customerId, userDetails } = useAppSelector(state => state.auth);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLicenseModalOpen, setisLicenseModalOpen] = useState<boolean>(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState<boolean>(false);
@@ -40,19 +40,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
   const [isMakeAdminModalOpen, setIsMakeAdminModalOpen] = useState<Boolean>(false);
   const [isResetUserPasswordModalOpen, setIsResetUserPasswordModalOpen] = useState<Boolean>(false);
   const [isRenameUserAccountModalOpen, setIsRenameUserAccountModalOpen] = useState<Boolean>(false);
-
-  const EmailData = [
-    {
-      name: "Robert Clive",
-      role: ".Admin",
-      email: "robertclive@",
-      status: true,
-    },
-    { name: "Michel Henry", role: "", email: "michelhenry@", status: false },
-    { name: "Alice Johnson", role: "", email: "alicejohnson@", status: true },
-  ];
-
-  const [emailData, setEmailData] = useState(EmailData);
+  
   const modalRef = useRef(null);
   const listRef = useRef(null);
   const removeEmailRef = useRef(null);
@@ -379,7 +367,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                   <img
                     src="/images/google.jpg"
                     alt="Domain"
-                    className="h-full w-full sm:w-auto object-cover"
+                    className="h-full w-full max-w-[220px] sm:w-auto object-cover"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
@@ -413,13 +401,13 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                   onClick={() => {
                     setIsModalOpen(true);
                     setNewEmailsCount(
-                      data?.emails?.length > 0 ? parseInt(data?.license_usage) - data?.emails?.length : parseInt(data?.license_usage)
+                      data?.emails?.length > 0 ? parseInt(userDetails?.license_usage) - data?.emails?.length : parseInt(userDetails?.license_usage)
                     );
                   }}
                 >
                   Add Email
                 </button>
-                <p className="text-sm md:text-md">User Licenses: {data?.emails?.length > 0 ? data?.emails?.length : 0}/{data?.license_usage}</p>
+                <p className="text-sm md:text-md">User Licenses: {data?.emails?.length > 0 ? data?.emails?.length : 0}/{userDetails?.license_usage}</p>
               </div>
             </div>
 
@@ -597,13 +585,13 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                 <div className="flex items-center justify-between mb-4">
                   <h1 className="text-2xl font-bold">Add Email</h1>
                   <div className="flex items-center">
-                    <p className="text-sm text-green-500 mr-1">Add {(data?.emails?.length + newEmails.length)}/{data?.license_usage}</p>
+                    <p className="text-sm text-green-500 mr-1">Add {(data?.emails?.length + newEmails.length)}/{userDetails?.license_usage}</p>
                     <button
                       aria-label="Add Email"
                       className="text-green-500"
                       type='button'
                       onClick={() => {
-                        if((data?.emails?.length + newEmails.length) < data?.license_usage) {
+                        if((data?.emails?.length + newEmails.length) < userDetails?.license_usage) {
                           setNewEmails([...newEmails, intialEmail])
                           setPasswordVisible([...passwordVisible, false]);
                         } else {
@@ -746,6 +734,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
         <AddLicense
           isOpen={isLicenseModalOpen}
           onClose={() => setisLicenseModalOpen(false)}
+          getDomainsList={() => getDomainsList()}
         />
         {
           isRemoveUserModalOpen && (

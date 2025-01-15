@@ -4,7 +4,7 @@ import { ChevronDown, ChevronRight, ChevronUp, CirclePlus, FilterX, Trash2, X } 
 import EmailModal from "../components/EmailModal";
 import ActionModal from "../components/ActionModal";
 import AddLicense from "../components/AddLicense";
-import { getDomainsListThunk, removeUserAuthTokenFromLSThunk,addEmailsThunk, changeEmailStatusThunk, deleteEmailThunk, makeEmailAdminThunk, updateEmailUserDataThunk, resetEmailPasswordThunk, updateLicenseUsageThunk, getProfileDataThunk } from 'store/user.thunk';
+import { getDomainsListThunk, removeUserAuthTokenFromLSThunk,addEmailsThunk, changeEmailStatusThunk, deleteEmailThunk, makeEmailAdminThunk, updateEmailUserDataThunk, resetEmailPasswordThunk, updateLicenseUsageThunk, getProfileDataThunk, savedCardsListThunk, deleteCardThunk } from 'store/user.thunk';
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import axios from 'axios';
@@ -16,7 +16,7 @@ import { HiOutlineEye } from "react-icons/hi";
 import { RiDeleteBin6Line, RiEyeCloseLine } from "react-icons/ri";
 import AddPayment from "../components/AddPaymentMethods";
 import { MdOutlineMail } from "react-icons/md";
-import { setUserDetails } from "store/authSlice";
+import { setSaveCards, setUserDetails } from "store/authSlice";
 
 const intialEmail = {
   first_name:"",
@@ -77,8 +77,26 @@ const EmailList: React.FC = () => {
   const total = subtotal + tax;
 
   const [activeMethod, setActiveMethod] = useState("saved");
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>("stripe");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>("");
+  const [selectedCard, setSelectedCard] = useState<string | null>("");
 
+  useEffect(() => {
+    const defaultCard = saveCardsState?.find(card => card?.is_default);
+    if(defaultCard) {
+      setSelectedCard(defaultCard?.uuid)
+    } else {
+      setSelectedCard("");
+    }
+  }, [saveCardsState]);
+
+  useEffect(() => {
+    const defaultPayment = paymentMethodsState?.find(method => method?.default);
+    if(defaultPayment) {
+      setSelectedPaymentMethod(defaultPayment?.method_name);
+    } else {
+      setSelectedPaymentMethod("");
+    }
+  }, [paymentMethodsState]);
   const getProfileData = async() => {
     if(token) {
       try {
@@ -518,6 +536,26 @@ const EmailList: React.FC = () => {
       : setNumUsers(count);
   };
 
+  const getCardsList = async() => {
+    try {
+      const result = await dispatch(savedCardsListThunk({user_id: customerId})).unwrap();
+      await dispatch(setSaveCards(result?.cards));
+    } catch (error) {
+      //
+    }
+  };
+
+  const deleteCard = async(id) => {
+    try {
+      const result = await dispatch(deleteCardThunk({user_id: customerId, rec_id: id})).unwrap();
+      toast.success(result?.message);
+    } catch (error) {
+      toast.error("Error deleting card");
+    } finally {
+      getCardsList();
+    }
+  }
+
   return (
     <div>
       <main>
@@ -565,213 +603,215 @@ const EmailList: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-[#F7FAFF] flex items-start justify-start gap-8 md:gap-0 md:justify-between flex-col md:flex-row mt-2 py-4 px-2">
-            <div className="flex items-start flex-col sm:flex-row h-fit sm:h-24">
-              <div className="mr-4 flex-shrink-0 h-full">
-                <img
-                  src="/images/google.jpg"
-                  alt="Domain"
-                  className="h-full w-full sm:w-auto object-cover"
-                />
+          <div className="flex flex-col border-2 border-gray-200 rounded-md mt-2">
+            <div className="flex items-start justify-start gap-8 sm:gap-0 lg:justify-between flex-col lg:flex-row py-4 px-2">
+              <div className="flex items-start flex-col md:flex-row ">
+                <div className="md:mr-4 flex-shrink-0 h-full sm:h-24">
+                  <img
+                    src="/images/google.jpg"
+                    alt="Domain"
+                    className="h-full w-full max-w-[220px] sm:w-auto object-cover"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <p className="text-sm md:text-md lg:text-lg font-semibold text-gray-600">{selectedDomain?.domain_name}</p>
+                  {
+                    selectedDomain?.domain_type === "primary" && (
+                      <React.Fragment>
+                        <p className="text-sm md:text-md lg:text-lg font-semibold text-gray-600">
+                          {selectedDomain?.emails ? selectedDomain?.emails.length : 0}@{selectedDomain?.domain_name}.{" "}
+                          <span className="text-xs sm:text-sm text-green-500 ml-3 cursor-pointer" onClick={() => setIsLicenseModalOpen(true)}>
+                            Add user license
+                          </span>
+                        </p>
+                        <p className="text-sm md:text-md text-gray-600">
+                          Google Workspace Starter.{" "}
+                          <span className="text-xs sm:text-sm text-green-500 ml-3 cursor-pointer" onClick={() => navigate('/upgrade-plan')}>
+                            Upgrade plan
+                          </span>
+                        </p>
+                      </React.Fragment>
+                    )
+                  }
+                </div>
               </div>
-              <div className="flex flex-col gap-2">
-                <p className="text-sm md:text-md lg:text-lg font-semibold text-gray-600">{selectedDomain?.domain_name}</p>
-                {
-                  selectedDomain?.domain_type === "primary" && (
-                    <React.Fragment>
-                      <p className="text-sm md:text-md lg:text-lg font-semibold text-gray-600">
-                        {selectedDomain?.emails ? selectedDomain?.emails.length : 0}@{selectedDomain?.domain_name}.{" "}
-                        <span className="text-xs sm:text-sm text-green-500 ml-3 cursor-pointer" onClick={() => setIsLicenseModalOpen(true)}>
-                          Add user license
-                        </span>
-                      </p>
-                      <p className="text-sm md:text-md text-gray-600">
-                        Google Workspace Starter.{" "}
-                        <span className="text-xs sm:text-sm text-green-500 ml-3 cursor-pointer" onClick={() => navigate('/upgrade-plan')}>
-                          Upgrade plan
-                        </span>
-                      </p>
-                    </React.Fragment>
-                  )
-                }
-              </div>
+
+              {
+                selectedDomain?.domain_type === "primary" && (
+                  <div className="flex flex-col gap-4 md:ml-4">
+                    <button
+                      className="border-2 border-green-500 text-green-500 bg-white px-4 py-2 rounded-md mb-2 transition-transform duration-300 ease-in-out transform hover:scale-105"
+                      onClick={() => setIsModalOpen(true)}
+                    >
+                      Add Email
+                    </button>
+                    <p className="text-sm md:text-md">User Licenses: {selectedDomain?.emails ? selectedDomain?.emails.length : 0}/{userDetails?.license_usage}</p>
+                  </div>
+                )
+              }
             </div>
 
             {
               selectedDomain?.domain_type === "primary" && (
-                <div className="flex flex-col gap-4 md:ml-4">
-                  <button
-                    className="border-2 border-green-500 text-green-500 bg-white px-4 py-2 rounded-md mb-2 transition-transform duration-300 ease-in-out transform hover:scale-105"
-                    onClick={() => setIsModalOpen(true)}
-                  >
-                    Add Email
-                  </button>
-                  <p className="text-sm md:text-md">User Licenses: {selectedDomain?.emails ? selectedDomain?.emails.length : 0}/{userDetails?.license_usage}</p>
+                <div className="mt-2">
+                  <div className="w-full overflow-x-auto">
+                    <table className="w-full border-collapse">
+                      <thead className="bg-[#F7FAFF] mb-4">
+                        <tr>
+                          <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-medium">
+                            Name
+                          </th>
+                          <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-medium">
+                            Email
+                          </th>
+                          <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-medium">
+                            Status
+                          </th>
+                          <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-medium">
+                            Action
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedDomain?.emails?.map((row, index) => (
+                          <tr key={index} className="relative ">
+                            <td className="p-2 text-gray-600 font-semibold text-xs sm:text-sm md:text-md flex items-center">
+                              <span>{row?.first_name}&nbsp;{row?.last_name}</span>
+                              {row?. is_admin ? (
+                                <span className="p-2 text-gray-600 font-semibold text-xs sm:text-sm md:text-md flex items-center">
+                                  <ChevronRight />
+                                  <span className="text-gray-600 font-semibold text-xs sm:text-sm md:text-md">Admin</span>
+                                </span>
+                              ) : ""}
+                            </td>
+                            <td className="p-2 text-gray-500 text-xs sm:text-sm md:text-md">
+                              {row?.email}
+                            </td>
+                            <td className="p-2 text-gray-800 text-xs sm:text-sm md:text-md">
+                              <button
+                                className={`relative w-24 h-10 rounded-md border-2 flex justify-center items-center ${
+                                  row?.status
+                                    ? "border-green-500 bg-green-500"
+                                    : "border-red-500 bg-red-500"
+                                }`}
+                                onClick={() => toggleStatus(selectedDomain?.id, row?.email, row?.status)}
+                              >
+                                <span className="text-white text-xs">
+                                  {row.status ? "Active" : "Inactive"}
+                                </span>
+                              </button>
+                            </td>
+                            <td className="p-2 text-center relative">
+                              <button className="w-6 h-6 rounded-full border-2 border-green-500 flex justify-center items-center">
+                                <p
+                                  className="mb-2"
+                                  onClick={(e) => toggleList(row?.uuid)}
+                                >
+                                  ...
+                                </p>
+                              </button>
+                              {
+                                showList === row?.uuid && (
+                                  <div
+                                    className="p-2 w-80 max-w-[12rem] absolute right-0 top-0 mt-9 z-10"
+                                    style={actionModalStyle}
+                                    onClick={(e) => {e.stopPropagation()}}
+                                    ref={listRef}
+                                  >
+                                    <ul className="bg-gray-100 rounded-xl shadow-md space-y-2 flex-grow flex-col items-start justify-center">
+                                      {row?.is_admin ? (
+                                        <>
+                                          <li>
+                                            <button
+                                              type="button"
+                                              className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
+                                              onClick={() => {
+                                                setIsResetUserPasswordModalOpen(true);
+                                                setSelectedEmail(row);
+                                              }}
+                                            >
+                                              Reset user password
+                                            </button>
+                                          </li>
+                                          <li>
+                                            <button
+                                              type="button"
+                                              className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
+                                              onClick={() => {
+                                                setIsRenameUserAccountModalOpen(true);
+                                                setSelectedEmail(row);
+                                              }}
+                                            >
+                                              Rename user account
+                                            </button>
+                                          </li>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <li>
+                                            <button
+                                              type="button"
+                                              className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
+                                              onClick={() => {
+                                                setIsRemoveUserModalOpen(true);
+                                                setSelectedEmail(row);
+                                              }}
+                                            >
+                                              Remove user account
+                                            </button>
+                                          </li>
+                                          <li>
+                                            <button
+                                              type="button"
+                                              className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
+                                              onClick={() => {
+                                                setIsMakeAdminModalOpen(true);
+                                                setSelectedEmail(row);
+                                              }}
+                                            >
+                                              Make admin
+                                            </button>
+                                          </li>
+                                          <li>
+                                            <button
+                                              type="button"
+                                              className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
+                                              onClick={() => {
+                                                setIsResetUserPasswordModalOpen(true);
+                                                setSelectedEmail(row);
+                                              }}
+                                            >
+                                              Reset user password
+                                            </button>
+                                          </li>
+                                          <li>
+                                            <button
+                                              type="button"
+                                              className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
+                                              onClick={() => {
+                                                setIsRenameUserAccountModalOpen(true);
+                                                setSelectedEmail(row);
+                                              }}
+                                            >
+                                              Rename user account
+                                            </button>
+                                          </li>
+                                        </>
+                                      )}
+                                    </ul>
+                                  </div>
+                                )
+                              }
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )
             }
           </div>
-
-          {
-            selectedDomain?.domain_type === "primary" && (
-              <div className="mt-2">
-                <div className="w-full overflow-x-auto">
-                  <table className="w-full border-collapse">
-                    <thead className="bg-[#F7FAFF] mb-4">
-                      <tr>
-                        <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-medium">
-                          Name
-                        </th>
-                        <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-medium">
-                          Email
-                        </th>
-                        <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-medium">
-                          Status
-                        </th>
-                        <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-medium">
-                          Action
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedDomain?.emails?.map((row, index) => (
-                        <tr key={index} className="relative ">
-                          <td className="p-2 text-gray-600 font-semibold text-xs sm:text-sm md:text-md flex items-center">
-                            <span>{row?.first_name}&nbsp;{row?.last_name}</span>
-                            {row?. is_admin ? (
-                              <span className="p-2 text-gray-600 font-semibold text-xs sm:text-sm md:text-md flex items-center">
-                                <ChevronRight />
-                                <span className="text-gray-600 font-semibold text-xs sm:text-sm md:text-md">Admin</span>
-                              </span>
-                            ) : ""}
-                          </td>
-                          <td className="p-2 text-gray-500 text-xs sm:text-sm md:text-md">
-                            {row?.email}
-                          </td>
-                          <td className="p-2 text-gray-800 text-xs sm:text-sm md:text-md">
-                            <button
-                              className={`relative w-24 h-10 rounded-md border-2 flex justify-center items-center ${
-                                row?.status
-                                  ? "border-green-500 bg-green-500"
-                                  : "border-red-500 bg-red-500"
-                              }`}
-                              onClick={() => toggleStatus(selectedDomain?.id, row?.email, row?.status)}
-                            >
-                              <span className="text-white text-xs">
-                                {row.status ? "Active" : "Inactive"}
-                              </span>
-                            </button>
-                          </td>
-                          <td className="p-2 text-center relative">
-                            <button className="w-6 h-6 rounded-full border-2 border-green-500 flex justify-center items-center">
-                              <p
-                                className="mb-2"
-                                onClick={(e) => toggleList(row?.uuid)}
-                              >
-                                ...
-                              </p>
-                            </button>
-                            {
-                              showList === row?.uuid && (
-                                <div
-                                  className="p-2 w-80 max-w-[12rem] absolute right-0 top-0 mt-9 z-10"
-                                  style={actionModalStyle}
-                                  onClick={(e) => {e.stopPropagation()}}
-                                  ref={listRef}
-                                >
-                                  <ul className="bg-gray-100 rounded-xl shadow-md space-y-2 flex-grow flex-col items-start justify-center">
-                                    {row?.is_admin ? (
-                                      <>
-                                        <li>
-                                          <button
-                                            type="button"
-                                            className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
-                                            onClick={() => {
-                                              setIsResetUserPasswordModalOpen(true);
-                                              setSelectedEmail(row);
-                                            }}
-                                          >
-                                            Reset user password
-                                          </button>
-                                        </li>
-                                        <li>
-                                          <button
-                                            type="button"
-                                            className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
-                                            onClick={() => {
-                                              setIsRenameUserAccountModalOpen(true);
-                                              setSelectedEmail(row);
-                                            }}
-                                          >
-                                            Rename user account
-                                          </button>
-                                        </li>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <li>
-                                          <button
-                                            type="button"
-                                            className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
-                                            onClick={() => {
-                                              setIsRemoveUserModalOpen(true);
-                                              setSelectedEmail(row);
-                                            }}
-                                          >
-                                            Remove user account
-                                          </button>
-                                        </li>
-                                        <li>
-                                          <button
-                                            type="button"
-                                            className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
-                                            onClick={() => {
-                                              setIsMakeAdminModalOpen(true);
-                                              setSelectedEmail(row);
-                                            }}
-                                          >
-                                            Make admin
-                                          </button>
-                                        </li>
-                                        <li>
-                                          <button
-                                            type="button"
-                                            className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
-                                            onClick={() => {
-                                              setIsResetUserPasswordModalOpen(true);
-                                              setSelectedEmail(row);
-                                            }}
-                                          >
-                                            Reset user password
-                                          </button>
-                                        </li>
-                                        <li>
-                                          <button
-                                            type="button"
-                                            className="w-full text-left text-sm text-black p-2 hover:bg-green-100"
-                                            onClick={() => {
-                                              setIsRenameUserAccountModalOpen(true);
-                                              setSelectedEmail(row);
-                                            }}
-                                          >
-                                            Rename user account
-                                          </button>
-                                        </li>
-                                      </>
-                                    )}
-                                  </ul>
-                                </div>
-                              )
-                            }
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )
-          }
         </div>
         {
           isModalOpen && (
@@ -780,13 +820,13 @@ const EmailList: React.FC = () => {
                 <div className="flex items-center justify-between mb-4">
                   <h1 className="text-2xl font-bold">Add Email</h1>
                   <div className="flex items-center">
-                    <p className="text-sm text-green-500 mr-1">Add {selectedDomain?.emails ? (selectedDomain?.emails?.length + newEmails.length) : newEmails?.length}/{selectedDomain?.license_usage}</p>
+                    <p className="text-sm text-green-500 mr-1">Add {selectedDomain?.emails ? (selectedDomain?.emails?.length + newEmails.length) : newEmails?.length}/{userDetails?.license_usage}</p>
                     <button
                       aria-label="Add Email"
                       className="text-green-500"
                       type='button'
                       onClick={() => {
-                        if((selectedDomain?.emails?.length + newEmails.length) < selectedDomain?.license_usage) {
+                        if((selectedDomain?.emails?.length + newEmails.length) < userDetails?.license_usage) {
                           setNewEmails([...newEmails, intialEmail])
                           setPasswordVisible([...passwordVisible, false]);
                         } else {
@@ -1034,7 +1074,7 @@ const EmailList: React.FC = () => {
                               <input
                                 type="radio"
                                 id="saved-method"
-                                checked={activeMethod === "saved" && selectedPaymentMethod === card?.card_id || card?.is_default}
+                                checked={activeMethod === "saved" && selectedCard === card?.uuid}
                                 onChange={() => handlePaymentMethodChange(card?.card_id)}
                                 className="mr-2 radio radio-xs radio-success"
                                 aria-labelledby="saved-method-label"
@@ -1063,7 +1103,7 @@ const EmailList: React.FC = () => {
                                 </button>
                               )
                             }
-                            <RiDeleteBin6Line className="text-red-500 text-lg cursor-pointer" />
+                            <RiDeleteBin6Line className="text-red-500 text-lg cursor-pointer" onClick={() => {deleteCard(card?.uuid)}} />
                           </div>
                         )) : (
                           <p className="text-center">No saved cards</p>

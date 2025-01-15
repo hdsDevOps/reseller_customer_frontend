@@ -24,6 +24,18 @@ const Subscribe: React.FC = () => {
   }, [location.state]);
 
   const [step, setStep] = useState(1);
+  const [ipCountry, setIpCountry] = useState("");
+
+  useEffect(() => {
+    const getIpData = async() => {
+      const response = await fetch('https://geolocation-db.com/json/');
+      const data = await response.json();
+      console.log("first...", data);
+      setIpCountry(data?.country_name);
+    };
+
+    getIpData();
+  } , []);
   const [formData, setFormData] = useState({
     business_name: "",
     region: "",
@@ -81,6 +93,19 @@ const Subscribe: React.FC = () => {
         console.log("error...", err);
       })
   }, []);
+
+  useEffect(() => {
+    if(countries?.length > 0 && ipCountry !== "") {
+      const foundIpCountry = countries?.find((count) => count?.name?.toLowerCase() === ipCountry?.toLowerCase());
+      if(foundIpCountry) {
+        setFormData({
+          ...formData,
+          region: foundIpCountry?.name,
+        });
+        setCountry(foundIpCountry);
+      }
+    }
+  }, [countries, ipCountry]);
 
   const handleChange = (e) => {
     setFormData({

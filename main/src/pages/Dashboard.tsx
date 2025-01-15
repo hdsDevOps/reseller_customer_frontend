@@ -231,7 +231,7 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     getDomainsList();
-  }, []);
+  }, [customerId]);
 
   const getSubscriptionList = async() => {
     try {

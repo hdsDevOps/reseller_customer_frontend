@@ -78,6 +78,7 @@ export const endPoints = {
     // saved cards
     savedCardsList: 'customerservices/user/api/v1/card_list',
     saveCards: 'customerservices/user/api/v1/update_card',
+    deleteCard: 'customerservices/user/api/v1/delete_card',
 
     // landing page
     getLandingPage: 'customerservices/home/api/v1/gethomedata',

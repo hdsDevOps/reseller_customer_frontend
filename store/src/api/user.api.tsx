@@ -778,6 +778,18 @@ async function saveCardsApi(
   }
 };
 
+async function deleteCardApi(
+  user_id:string,
+  rec_id:string
+): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.deleteCard, { user_id, rec_id });
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 async function getLandingPageApi(): Promise<any> {
   try {
     const result = await getApiCall(endPoints.getLandingPage);
@@ -910,6 +922,7 @@ export const userApis = {
 
   savedCardsListApi,
   saveCardsApi,
+  deleteCardApi,
 
   getLandingPageApi,
   getFaqsApi,

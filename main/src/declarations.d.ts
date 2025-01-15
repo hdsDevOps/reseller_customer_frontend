@@ -98,6 +98,7 @@ declare module 'store/user.thunk' {
   export const cancelSubscriptionThunk;
   export const changeAutoRenewThunk;
   export const getLandingPageThunk;
+  export const deleteCardThunk;
 }
 
 declare module 'store/authSlice' {

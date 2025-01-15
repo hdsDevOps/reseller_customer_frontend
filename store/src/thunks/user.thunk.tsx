@@ -470,6 +470,13 @@ export const saveCardsThunk = createAsyncThunk(
   }
 );
 
+export const deleteCardThunk = createAsyncThunk(
+  "users/deleteCard",
+  async ({ user_id, rec_id }: any) => {
+    return await userApis.deleteCardApi( user_id, rec_id );
+  }
+);
+
 export const getLandingPageThunk = createAsyncThunk(
   "users/getLandingPage",
   async () => {
