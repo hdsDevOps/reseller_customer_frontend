@@ -6,6 +6,8 @@ import { RiEyeCloseLine } from "react-icons/ri";
 import { IoChevronBackSharp } from "react-icons/io5";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { useAppDispatch } from "store/hooks";
+import { verifyReCaptchaThunk } from "store/user.thunk";
 
 // Update the site key with your actual reCAPTCHA site key
 const RECAPTCHA_SITE_KEY = "6LfFS7gqAAAAANx6APGgbqq8ambPmp1hCDD51FMV";
@@ -13,6 +15,7 @@ const RECAPTCHA_SITE_KEY = "6LfFS7gqAAAAANx6APGgbqq8ambPmp1hCDD51FMV";
 const SignInForm: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useAppDispatch();
   // console.log("location state...", location.state);
   
   // Retrieve the domain from the location state
@@ -26,7 +29,8 @@ const SignInForm: React.FC = () => {
   });
   // console.log("form data...", formData);
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
-  console.log("recaptchaToken...", recaptchaToken);
+  // console.log("recaptchaToken...", recaptchaToken);
+  const [recaptchaValid, setRecaptchaValid] = useState<Boolean>(false);
 
   const [charCount, setCharCount] = useState({
     username: 0,
@@ -54,12 +58,12 @@ const SignInForm: React.FC = () => {
   };
 
   const captchaValidation = async() => {
-    axios
-      .post("https://www.google.com/recaptcha/api/siteverify", {secret: "6LfFS7gqAAAAAF10F9sHTlrtunXSWLhB2iMJ1Snb", response: recaptchaToken})
-      .then(res => {
-        console.log(res);
-      })
-      .catch(err => console.log(err));
+    try {
+      const result = await dispatch(verifyReCaptchaThunk({re_captcha_token: recaptchaToken})).unwrap();
+      setRecaptchaValid(result?.success);
+    } catch (error) {
+      setRecaptchaValid(false);
+    }
   };
 
   useEffect(() => {
@@ -68,15 +72,14 @@ const SignInForm: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // if (recaptchaToken) {
-    //   console.log("Form submitted with:", formData, recaptchaToken);
-    // } else {
-    //   console.log("Please complete the reCAPTCHA.");
-    // }
-    if(formData.username.includes("@")) {
-      toast.warning("Username cannot include @ symbol");
+    if(recaptchaValid) {
+      if(formData.username.includes("@")) {
+        toast.warning("Username cannot include @ symbol");
+      } else {
+        navigate('/free-trial', { state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, selectedDomain: location.state.selectedDomain, token: location.state.token, emailData: {username: `${formData.username}@${location.state.selectedDomain}`, password: formData.password}, from: location.state.from} });
+      }
     } else {
-      navigate('/free-trial', { state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, selectedDomain: location.state.selectedDomain, token: location.state.token, emailData: {username: `${formData.username}@${location.state.selectedDomain}`, password: formData.password}, from: location.state.from} });
+      toast.error("Please click on I'm not a robot.");
     }
   };
 

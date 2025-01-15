@@ -518,3 +518,10 @@ export const getPromotionListThunk = createAsyncThunk(
     return await userApis.getPromotionListApi(promotion_id);
   }
 );
+
+export const verifyReCaptchaThunk = createAsyncThunk(
+  "users/verifyReCaptcha",
+  async ({re_captcha_token}:any) => {
+    return await userApis.verifyReCaptchaApi(re_captcha_token);
+  }
+);

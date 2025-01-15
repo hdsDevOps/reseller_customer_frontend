@@ -851,6 +851,15 @@ async function getPromotionListApi(promotion_id:string): Promise<any> {
   }
 };
 
+async function verifyReCaptchaApi(re_captcha_token:string): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.verifyReCaptcha, { re_captcha_token });
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 export const userApis = {
   userLoginApi,
   resendLoginOtpApi,
@@ -932,4 +941,6 @@ export const userApis = {
   getPaymetnMethodsApi,
 
   getPromotionListApi,
+
+  verifyReCaptchaApi,
 };

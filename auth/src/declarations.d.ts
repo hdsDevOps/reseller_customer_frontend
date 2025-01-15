@@ -66,6 +66,7 @@ declare module "store/user.thunk" {
   export const getPaymetnMethodsThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
   export const getPromotionListThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
   export const makeEmailAdminWithoutLoginThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
+  export const verifyReCaptchaThunk;
 }
 
 

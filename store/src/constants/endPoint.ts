@@ -90,6 +90,9 @@ export const endPoints = {
 
     // get payment methods
     getPaymetnMethods: 'paymentservices/payment/api/v1/getpaymentmethod',
+
+    // verify google recaptcha
+    verifyReCaptcha: 'customerservices/customer/api/v1/verify_recaptcha',
 };
 
 export const resellerEndPoints = {
