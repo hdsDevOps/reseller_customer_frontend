@@ -208,6 +208,9 @@ const App: React.FC = () => {
             <meta property="og:image" content={metaDataSlice?.image_path} />
             <meta property="og:image:alt" content={metaDataSlice?.alt_image} />
             <meta property="og:url" content={metaDataSlice?.urllink} />
+            <meta name="twitter:card" content={metaDataSlice?.alt_image} />
+            <meta name="twitter:image" content={metaDataSlice?.image_path} />
+            <meta itemProp="image" content={metaDataSlice?.image_path} />
           </Helmet>
         )
       }
