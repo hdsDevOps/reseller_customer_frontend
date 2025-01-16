@@ -12,10 +12,10 @@ const FreeTrial: React.FC = () => {
   const location = useLocation();
   const dispatch = useAppDispatch();
 
-  console.log("location state...", location.state);
+  // console.log("location state...", location.state);
   // const plan = location.state.plan;
   const [plan, setPlan] = useState(location.state.plan);
-  console.log("plan...", plan?.amount_details);
+  // console.log("plan...", plan?.amount_details);
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
   const [today, setToday] = useState("");

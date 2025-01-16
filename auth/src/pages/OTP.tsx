@@ -21,7 +21,7 @@ const OTP: React.FC = () => {
   const email = location.state?.email;
   const mode = queryParams.get("mode");
 
-  console.log("state...", location.state);
+  // console.log("state...", location.state);
   
   const otpRefs = useRef([]);
   const [otpValues, SetOptValues] = useState(["", "", "", "", "", "",]);

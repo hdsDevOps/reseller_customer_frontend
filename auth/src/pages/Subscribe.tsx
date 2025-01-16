@@ -14,6 +14,13 @@ const Subscribe: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
+  
+  useEffect(() => {
+    const section = document.getElementById("top_subscribe");
+    if(section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  })
 
   // console.log("state...", location.state);
 
@@ -201,7 +208,7 @@ const Subscribe: React.FC = () => {
   }
 
   return (
-    <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative">
+    <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative" id="top_subscribe">
         <p className="flex items-center gap-1 text-green-600 cursor-pointer absolute left-4 top-2" onClick={handleBack}>
           <IoChevronBackSharp /> Back to previous page
         </p>
@@ -289,7 +296,7 @@ const Subscribe: React.FC = () => {
               Number of employees, including you
             </h1>
             <p className="text-sm">
-              Your first {location.state.plan.trial_period} days are at no charge (limited to 10 users)
+              Your first {location?.state?.plan?.trial_period} days are at no charge (limited to 10 users)
             </p>
           </div>
 

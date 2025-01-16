@@ -204,7 +204,8 @@ const OTP: React.FC = () => {
                                     data-testid="resend-otp"
                                     type="button"
                                     onClick={(e) => {handleResendOtp(e)}}
-                                    className="text-red-600 underline ml-4"
+                                    className={`ml-4 ${timeLeft > 0 ? "text-[#858585]" : "text-red-600 underline"}`}
+                                    disabled={timeLeft > 0 ? true : false}
                                 >
                                     Resend OTP
                                 </button>{" "}

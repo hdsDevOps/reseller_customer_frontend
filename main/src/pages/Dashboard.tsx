@@ -4,7 +4,7 @@ import SubscriptionModal from "../components/SubscriptionModal";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { cancelSubscriptionThunk, changeAutoRenewThunk, getDomainsListThunk, getPaymentMethodsThunk, getPaymentSubscriptionsListThunk, makeDefaultPaymentMethodThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
+import { cancelSubscriptionThunk, changeAutoRenewThunk, getDomainsListThunk, getPaymentMethodsThunk, getPaymentSubscriptionsListThunk, makeDefaultPaymentMethodThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
 import { Download, Plus, X } from "lucide-react";
 import { format } from "date-fns";
 import html2canvas from 'html2canvas-pro';

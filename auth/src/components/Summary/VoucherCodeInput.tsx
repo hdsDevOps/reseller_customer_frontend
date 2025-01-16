@@ -4,11 +4,11 @@ import { IoMdClose } from "react-icons/io";
 const VoucherCodeInput = ({ onClose, handleSubmit, handleVoucherCodeChange, voucherCode }) => {
   return (
     <>
-      <form onSubmit={handleSubmit} className="flex items-center justify-center w-full max-w-[400px] mt-7">
+      <form onSubmit={handleSubmit} className="flex items-center justify-center w-full mt-7">
         <input
           type="text"
           placeholder="Enter voucher code"
-          className="p-3 border-2 border-black border-dashed focus:outline-none focus:ring-0"
+          className="flex-grow p-3 border-2 border-black border-dashed focus:outline-none focus:ring-0"
           value={voucherCode}
           onChange={handleVoucherCodeChange}
         />

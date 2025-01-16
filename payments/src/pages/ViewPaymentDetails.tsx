@@ -57,7 +57,7 @@ function ViewPaymentDetails() {
         </div>
 
         <div className='flex flex-wrap my-2'>
-          <div className='flex flex-col w-[250px] px-2 max-[385px]:px-[2px]'>
+          <div className='flex flex-col w-full max-w-[280px] px-2 max-[385px]:px-[2px]'>
             <label className='font-jakarta-plus font-semibold text-sm text-[#14213D]'>First Name</label>
             <input
               type='text'
@@ -66,7 +66,7 @@ function ViewPaymentDetails() {
             />
           </div>
 
-          <div className='flex flex-col w-[250px] px-2 max-[385px]:px-[2px]'>
+          <div className='flex flex-col w-full max-w-[280px] px-2 max-[385px]:px-[2px]'>
             <label className='font-jakarta-plus font-semibold text-sm text-[#14213D]'>Last Name</label>
             <input
               type='text'
@@ -75,7 +75,7 @@ function ViewPaymentDetails() {
             />
           </div>
 
-          <div className='flex flex-col w-[250px] px-2 max-[385px]:px-[2px] relative'>
+          <div className='flex flex-col w-full max-w-[280px] px-2 max-[385px]:px-[2px] relative'>
             <label className='font-jakarta-plus font-semibold text-sm text-[#14213D]'>Card Number</label>
             <input
               type='text'
@@ -94,8 +94,8 @@ function ViewPaymentDetails() {
       <div className='bg-[#F0F0F3] w-full grid grid-cols-1 gap-2 px-7 py-7 max-[385px]:px-2 rounded-lg'>
       <h3 className='font-inter font-medium max-[385px]:text-[28px] text-[22px] text-[#5A5A5A]'>Billing Details</h3>
 
-        <div className='flex flex-wrap my-2 max-w-[800px]'>
-          <div className='flex flex-col w-[250px] px-2 max-[385px]:px-[2px]'>
+        <div className='flex flex-wrap my-2 max-w-[1000px]'>
+          <div className='flex flex-col w-full max-w-[280px] px-2 max-[385px]:px-[2px]'>
             <label className='font-jakarta-plus font-semibold text-sm text-[#14213D]'>Subscription Type</label>
             <input
               type='text'
@@ -104,7 +104,7 @@ function ViewPaymentDetails() {
             />
           </div>
 
-          <div className='flex flex-col w-[250px] px-2 max-[385px]:px-[2px]'>
+          <div className='flex flex-col w-full max-w-[280px] px-2 max-[385px]:px-[2px]'>
             <label className='font-jakarta-plus font-semibold text-sm text-[#14213D]'>Domain Name</label>
             <input
               type='text'
@@ -113,7 +113,7 @@ function ViewPaymentDetails() {
             />
           </div>
 
-          <div className='flex flex-col w-[250px] px-2 max-[385px]:px-[2px]'>
+          <div className='flex flex-col w-full max-w-[280px] px-2 max-[385px]:px-[2px]'>
             <label className='font-jakarta-plus font-semibold text-sm text-[#14213D]'>Phone Number</label>
             <input
               type='text'
@@ -122,7 +122,7 @@ function ViewPaymentDetails() {
             />
           </div>
 
-          <div className='flex flex-col w-[250px] px-2 max-[385px]:px-[2px]'>
+          <div className='flex flex-col w-full max-w-[280px] px-2 max-[385px]:px-[2px]'>
             <label className='font-jakarta-plus font-semibold text-sm text-[#14213D]'>Email Address</label>
             <input
               type='text'
@@ -131,7 +131,7 @@ function ViewPaymentDetails() {
             />
           </div>
 
-          <div className='flex flex-col w-[250px] px-2 max-[385px]:px-[2px]'>
+          <div className='flex flex-col w-full max-w-[280px] px-2 max-[385px]:px-[2px]'>
             <label className='font-jakarta-plus font-semibold text-sm text-[#14213D]'>Country</label>
             <input
               type='text'
@@ -140,7 +140,7 @@ function ViewPaymentDetails() {
             />
           </div>
 
-          <div className='flex flex-col w-[250px] px-2 max-[385px]:px-[2px]'>
+          <div className='flex flex-col w-full max-w-[280px] px-2 max-[385px]:px-[2px]'>
             <label className='font-jakarta-plus font-semibold text-sm text-[#14213D]'>Date Due</label>
             <input
               type='text'

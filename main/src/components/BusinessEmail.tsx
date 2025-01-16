@@ -393,7 +393,11 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
               </div>
 
               <div className="flex flex-col  sm:mt-3 lg:mt-0">
-                <button className="border-2 border-green-500 text-green-500 bg-white px-4 py-2 rounded-3xl mb-2 transition-transform duration-300 ease-in-out transform hover:scale-105">
+                <button
+                  className="border-2 border-green-500 text-green-500 bg-white px-4 py-2 rounded-3xl mb-2 transition-transform duration-300 ease-in-out transform hover:scale-105"
+                  type="button"
+                  onClick={() => {window.open("https://accounts.google.com/AddSession/signinchooser?hl=en-GB&continue=https%3A%2F%2Fwww.google.com%3Fhl%3Den-GB&ec=GAlA8wE&ddm=1&flowName=GlifWebSignIn&flowEntry=AddSession")}}
+                >
                   Go to Gmail
                 </button>
                 <button
@@ -432,7 +436,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                   </thead>
                   <tbody>
                     {data?.emails?.map((row, index) => (
-                      <tr key={index}>
+                      <tr key={index} className="relative">
                         <td
                           className={`px-2 py-6 text-gray-600 font-semibold text-xs sm:text-sm md:text-md`}
                         >
@@ -467,12 +471,14 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                           </button>
                         </td>
                         <td
-                          className={`px-2 py-6 text-right relative`}
+                          className={`px-2 py-6 text-right`}
                         >
-                          <button className="w-8 h-8 rounded-full border-2 border-green-500 flex justify-center items-center text-md">
+                          <button
+                            onClick={() => toggleList(row?.uuid)} // Pass event to the handler
+                            className="w-8 h-8 rounded-full border-2 border-green-500 flex justify-center items-center text-md"
+                          >
                             <p
                               className="mb-2"
-                              onClick={() => toggleList(row?.uuid)} // Pass event to the handler
                             >
                               ...
                             </p>

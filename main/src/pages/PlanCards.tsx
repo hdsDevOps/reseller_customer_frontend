@@ -21,7 +21,7 @@ const flagList = [
 const PlanCard: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { customerId, cartState } = useAppSelector(state => state.auth);
+  const { customerId, cartState, defaultCurrencySlice } = useAppSelector(state => state.auth);
   const [isYearly, setIsYearly] = useState(false);
   const [renewalDate, setRenewalDate] = useState(format(new Date(), "dd-MM-yyyy"));
   // console.log("renewal date...", renewalDate);
@@ -32,7 +32,6 @@ const PlanCard: React.FC = () => {
   const [selectedCheckbox, setSelectedCheckbox] = useState<number | null>(null);
   // console.log("check...", selectedCheckbox);
 
-  const default_currency = 'INR';
   const [currencyLogo, setCurrencyLogo] = useState("$");
   // console.log("currency logo...", currencyLogo);
 
@@ -69,7 +68,7 @@ const PlanCard: React.FC = () => {
   }, [isYearly]);
 
   const getAmount = (amount, period) => {
-    const amountDetails =  amount?.find(item => item?.currency_code === default_currency);
+    const amountDetails =  amount?.find(item => item?.currency_code === defaultCurrencySlice);
     if(amountDetails === undefined) {
       return {type: '', price: 0, discount_price: 0};
     } else {
@@ -87,9 +86,9 @@ const PlanCard: React.FC = () => {
 
   useEffect(() => {
     setCurrencyLogo(
-      flagList.find(item => item.name === default_currency) === undefined ? "$" : flagList.find(item => item.name === default_currency)?.logo
+      flagList.find(item => item.name === defaultCurrencySlice) === undefined ? "$" : flagList.find(item => item.name === defaultCurrencySlice)?.logo
     )
-  }, [default_currency]);
+  }, [defaultCurrencySlice]);
 
   const cartAddAmount = (item, period) => {
     const data = getAmount(item?.amount_details, period);

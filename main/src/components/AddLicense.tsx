@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { MdOutlineAddShoppingCart } from "react-icons/md";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, X } from "lucide-react";
 import AddPayment from "./AddPaymentMethods";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { deleteCardThunk, getProfileDataThunk, removeUserAuthTokenFromLSThunk, savedCardsListThunk, updateLicenseUsageThunk } from "store/user.thunk";
+import { deleteCardThunk, getProfileDataThunk, getVouchersListThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk, savedCardsListThunk, updateLicenseUsageThunk, useVoucherThunk } from "store/user.thunk";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { setSaveCards, setUserDetails } from "store/authSlice";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { currencyList } from "./CurrencyList";
 
 interface EmailModalProps {
   isOpen: boolean;
@@ -17,18 +18,136 @@ interface EmailModalProps {
 
 const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList }) => {
   const navigate = useNavigate();
-  const { userDetails, customerId, token, saveCardsState, paymentMethodsState } = useAppSelector(state => state.auth);
+  const { userDetails, customerId, token, saveCardsState, paymentMethodsState, defaultCurrencySlice } = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
   const [numUsers, setNumUsers] = useState<number>(0);
   const [showDetails, setShowDetails] = useState<boolean>(true);
-  const subtotal = 70.6;
+  const [subtotal, setSubtotal] = useState(0);
   const taxRate = 0.0825;
-  const tax = subtotal * taxRate;
-  const total = subtotal + tax;
+  const [tax, setTax] = useState(0);
+  const [total, setTotal] = useState(0.00);
+  const [discountRate, setDiscountRate] = useState(0);
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [preDiscountRate, setPreDiscountRate] = useState(0);
+  const [preDiscountAmount, setPreDiscountAmount] = useState(0);
+  const [appliedVoucher, setAppliedVoucher] = useState<object|null>(null);
+  const [selectedVoucher, setSelectedVoucher] = useState<object|null>(null);
 
   const [activeMethod, setActiveMethod] = useState("saved");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>("");
   const [selectedCard, setSelectedCard] = useState<string | null>("");
+  const [activeSubscriptionPlan, setActiveSubscriptionPlan] = useState({});
+  // console.log(activeSubscriptionPlan);
+  // console.log(userDetails);
+  const [licensePrice, setLicensePrice] = useState(0);
+  // console.log(licensePrice);
+  // console.log({numUsers, licensePrice, subtotal, tax, total, preDiscountRate, preDiscountAmount, discountRate, discountAmount,});
+  const [vouchers, setVouchers] = useState([]);
+  const [voucherInputOpen, setVoucherInputOpen] = useState(false);
+  const [voucherCode, setVoucherCode] = useState("");
+
+  const dateFormat = (date) => {
+    const miliseconds = parseInt(date?._seconds) * 1000 + parseInt(date?._nanoseconds) / 1e6;
+    const foundDate =  new Date(miliseconds);
+    const today = new Date(Date.now());
+    if(foundDate > today) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const getVouchersList = async() => {
+    try {
+      const result = await dispatch(getVouchersListThunk({customer_id: customerId})).unwrap();
+      const list = [...result?.joinedData];
+      const filteredList = list?.filter(item => dateFormat(item?.used_date));
+      if(filteredList){
+        setVouchers(filteredList);
+      } else {
+        setVouchers([]);
+      }
+    } catch (error) {
+      setVouchers([]);
+      if(error?.message == "Authentication token is required") {
+        try {
+          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    getVouchersList();
+  }, [customerId]);
+
+  const handleApplyClick = () => {
+    setAppliedVoucher(selectedVoucher);
+    setVoucherInputOpen(false);
+  };
+
+  const handleSearchVoucher = () => {
+    if(vouchers?.length > 0) {
+      const foundVoucher = vouchers?.find(item => item?.voucher?.voucher_code?.toLowerCase()?.includes(voucherCode?.toLowerCase()));
+      if(foundVoucher) {
+        setSelectedVoucher(foundVoucher);
+      } else {
+        setSelectedVoucher(null);
+        toast.warning(`No voucher found with code ${voucherCode}`);
+      }
+    } else {
+      setSelectedVoucher(null);
+      toast.warning(`No voucher found with code ${voucherCode}`);
+    }
+  };
+
+  const getCurrencyValue = () => {
+    if(activeSubscriptionPlan?.amount_details?.length > 0) {
+      const amounts = activeSubscriptionPlan?.amount_details;
+      const amountData = amounts?.find(item => item?.currency_code === defaultCurrencySlice);
+      if(amountData) {
+        if(userDetails?.workspace?.payment_cycle) {
+          const price = amountData?.price?.find(item => item?.type?.toLowerCase() === userDetails?.workspace?.payment_cycle?.toLowerCase());
+          setLicensePrice(Number(price?.discount_price));
+        } else {
+          setLicensePrice(0);
+        }
+      } else {
+        setLicensePrice(0);
+      }
+    }
+  };
+
+  useEffect(() => {
+    getCurrencyValue();
+  }, [activeSubscriptionPlan, userDetails, defaultCurrencySlice]);
+
+  useEffect(() => {
+    const getPlansAndPricesList = async(id:string) => {
+      try {
+        const result = await dispatch(plansAndPricesListThunk({subscription_id: id})).unwrap();
+        setActiveSubscriptionPlan(result?.data[0]);
+      } catch (error) {
+        setActiveSubscriptionPlan({});
+        if(error?.message == "Request failed with status code 401") {
+          try {
+            const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+            navigate('/login');
+          } catch (error) {
+            //
+          }
+        }
+      }
+    }
+    if(userDetails?.workspace?.plan_name_id){
+      getPlansAndPricesList(userDetails?.workspace?.plan_name_id);
+    } else {
+      setActiveSubscriptionPlan({});
+    }
+  }, [userDetails]);
 
   useEffect(() => {
     const defaultCard = saveCardsState?.find(card => card?.is_default);
@@ -47,6 +166,65 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList 
       setSelectedPaymentMethod("");
     }
   }, [paymentMethodsState]);
+
+  useEffect(() => {
+    const sub_total = numUsers*licensePrice;
+    setSubtotal(sub_total);
+  }, [numUsers, licensePrice]);
+
+  useEffect(() => {
+    const tax_amount = subtotal * taxRate;
+    setTax(tax_amount);
+  }, [subtotal, taxRate]);
+
+  useEffect(() => {
+    const pre_discount_amount = (subtotal * preDiscountRate)/100;
+    setPreDiscountAmount(pre_discount_amount);
+  }, [subtotal, preDiscountRate]);
+
+  useEffect(() => {
+    const discount_amount = (subtotal * discountRate)/100;
+    setDiscountAmount(discount_amount);
+  }, [subtotal, discountRate]);
+
+  useEffect(() => {
+    const total_amount = subtotal + tax - discountAmount;
+    setTotal(total_amount);
+  }, [subtotal, tax, discountAmount]);
+
+  useEffect(() => {
+    if(selectedVoucher?.voucher?.discount_rate) {
+      setPreDiscountRate(Number(selectedVoucher?.voucher?.discount_rate));
+    } else {
+      setPreDiscountRate(0);
+    }
+  }, [selectedVoucher]);
+
+  useEffect(() => {
+    if(appliedVoucher?.voucher?.discount_rate) {
+      setDiscountRate(Number(appliedVoucher?.voucher?.discount_rate));
+    } else {
+      setDiscountRate(0);
+    }
+  }, [appliedVoucher]);
+
+  const useVoucher = async() => {
+    if(appliedVoucher) {
+      try {
+        const result = await dispatch(useVoucherThunk({record_id: appliedVoucher?.id})).unwrap();
+        console.log("result...", result);
+      } catch (error) {
+        if(error?.message == "Request failed with status code 401") {
+          try {
+            const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+            navigate('/login');
+          } catch (error) {
+            //
+          }
+        }
+      }
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -87,6 +265,11 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList 
           license_usage: updatedLicense
         })).unwrap();
         // console.log("result...", result);
+        await useVoucher();
+        setAppliedVoucher(null);
+        setSelectedVoucher(null);
+        setSubtotal(0);
+        setNumUsers(0);
         toast.success(result?.message);
         onclose;
       } else {
@@ -106,6 +289,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList 
     } finally {
       getDomainsList();
       getProfileData();
+      getVouchersList();
     }
   };
 
@@ -180,7 +364,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList 
     //               i
     //             </span>
     //           </div>
-    //           <span className="flex items-center font-semibold">₹{subtotal.toFixed(2)}</span>
+    //           <span className="flex items-center font-semibold">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{subtotal.toFixed(2)}</span>
     //         </div>
     //         <p className="underline mb-4 font-semibold mt-2">Enter voucher code</p>
     //       </div>
@@ -189,7 +373,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList 
     //     <div className="border-b border-gray-300 py-2 mb-4">
     //       <div className="flex justify-between font-semibold mb-3">
     //         <span>Subtotal</span>
-    //         <span>₹{subtotal.toFixed(2)}</span>
+    //         <span>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{subtotal.toFixed(2)}</span>
     //       </div>
     //       <div className="flex justify-between">
     //         <div className="flex items-center">
@@ -198,7 +382,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList 
     //             i
     //           </span>
     //         </div>
-    //         <span className="gap-2">₹{tax.toFixed(2)}</span>
+    //         <span className="gap-2">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{tax.toFixed(2)}</span>
     //       </div>
     //     </div>
 
@@ -221,7 +405,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList 
     //             )}
     //           </p>
     //         </span>
-    //         <span>₹{total.toFixed(2)}</span>
+    //         <span>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{total.toFixed(2)}</span>
     //       </div>
     //     </div>
 
@@ -275,15 +459,71 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList 
                     i
                   </span>
                 </div>
-                <span className="flex items-center font-semibold">₹{subtotal.toFixed(2)}</span>
+                <span className="flex items-center font-semibold">{numUsers} <X className="text-black w-3 h-3" /> {currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{licensePrice?.toFixed(2)}</span>
               </div>
-              <p className="underline mb-4 font-semibold mt-2">Enter voucher code</p>
+              <p className="underline mb-4 font-semibold mt-2 cursor-pointer" onClick={() => {setVoucherInputOpen(true)}}>Enter voucher code</p>
+
+              {
+                voucherInputOpen && (
+                  <div className="flex items-center justify-center w-full mt-7">
+                    <input
+                      type="text"
+                      placeholder="Enter voucher code"
+                      className="flex-grow p-3 border-2 border-black border-dashed focus:outline-none focus:ring-0"
+                      value={voucherCode}
+                      onChange={(e) => {setVoucherCode(e.target.value)}}
+                    />
+                    <button
+                      className="px-4 py-3 text-white transition-colors bg-black hover:bg-gray-800"
+                      type="button"
+                      onClick={() => handleSearchVoucher()}
+                    >
+                      Check
+                    </button>
+                    <button className="w-6 h-6 my-auto" onClick={() => {
+                      setVoucherInputOpen(false);
+                      setVoucherCode("");
+                    }}>
+                      <X className="w-full h-full"/>
+                    </button>
+                  </div>
+                )
+              }
+              
+              {selectedVoucher && (
+                <div className="bg-transparent border border-gray-500 rounded-md p-4 flex justify-between items-center mt-4">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="px-6 rounded-sm text-xs"
+                      style={{
+                        border: "2px dashed gray",
+                        backgroundColor: "#12A83333",
+                        paddingTop: "0.65rem",
+                        paddingBottom: "0.65rem",
+                      }}
+                    >
+                      {selectedVoucher?.voucher?.voucher_code}
+                    </div>
+                    <p className="text-green-500">
+                      {selectedVoucher?.voucher?.voucher_code === appliedVoucher?.voucher?.voucher_code ? `Saved ${currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}${discountAmount?.toFixed(2)}` : `You will save ${currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}${preDiscountAmount?.toFixed(2)}`}!
+                    </p>
+                  </div>
+                  <p
+                    className={`font-bold text-xl cursor-pointer ${
+                      selectedVoucher?.voucher?.voucher_code === appliedVoucher?.voucher?.voucher_code ? "text-gray-500" : "text-green-500"
+                    }`}
+                    onClick={selectedVoucher?.voucher?.voucher_code !== appliedVoucher?.voucher?.voucher_code ? handleApplyClick : undefined} 
+                  >
+                    {selectedVoucher?.voucher?.voucher_code === appliedVoucher?.voucher?.voucher_code ? "Applied" : "Apply"}
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="border-b border-gray-300 py-2 mb-4">
               <div className="flex justify-between font-semibold mb-3">
                 <span>Subtotal</span>
-                <span>₹{subtotal.toFixed(2)}</span>
+                <span>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{subtotal?.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <div className="flex items-center">
@@ -292,8 +532,21 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList 
                     i
                   </span>
                 </div>
-                <span className="gap-2">₹{tax.toFixed(2)}</span>
+                <span className="gap-2">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{tax.toFixed(2)}</span>
               </div>
+              {
+                appliedVoucher && (
+                  <div className="flex justify-between">
+                    <div className="flex items-center">
+                      Voucher discount
+                      <span className="border-2 border-green-500 rounded-full h-5 w-5 flex items-center justify-center text-green-500 font-bold ml-1">
+                        i
+                      </span>
+                    </div>
+                    <span className="gap-2">{discountAmount > 0 ? "-" : ""}{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{discountAmount.toFixed(2)}</span>
+                  </div>
+                )
+              }
             </div>
           </>
         )}
@@ -317,7 +570,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList 
                 )}
               </p>
             </span>
-            <span>₹{total.toFixed(2)}</span>
+            <span>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{total.toFixed(2)}</span>
           </div>
         </div>
 
@@ -436,7 +689,9 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList 
             className="bg-red-500 text-white py-2 px-4 rounded"
             onClick={() => {
               onClose();
-
+              setNumUsers(0);
+              setAppliedVoucher(null);
+              setSelectedVoucher(null);
             }}
           >
             Cancel

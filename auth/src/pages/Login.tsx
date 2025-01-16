@@ -49,7 +49,7 @@ const Login: React.FC = () => {
     setLoading(true);
     try {
       const result = await dispatch(makeUserLoginThunk(userDetails)).unwrap();
-      console.log("result...", result);
+      // console.log("result...", result);
       if(result?.message === "Login successful. Please check your email for OTP.") {
         navigate("/otp?mode=signin", { state: { customer_id: result?.customer_id, staff_id: result?.staff_id, is_staff: result?.is_staff }});
       } else if(result?.message === "Login successful") {

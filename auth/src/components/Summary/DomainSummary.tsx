@@ -59,6 +59,7 @@ const DomainSummary = ({state, plan}:any) => {
   const [discountedPrice, setDiscountedPrice] = useState(0.00);
   const [preDiscountedPrice, setPreDiscountedPrice] = useState(0.00);
   // console.log({totalPrice, finalTotalPrice, taxAmount, taxedPrice, discountedPrice});
+  // console.log({preDiscountedPrice});
   const [vouchers, setVouchers] = useState([]);
   // console.log("vouchers...", vouchers);
   const [voucherCodeSearch, setVoucherCodeSearch] = useState("");
@@ -138,7 +139,7 @@ const DomainSummary = ({state, plan}:any) => {
 
       const preDiscountedPercent = selectedVoucher === null
         ? 0.00
-        : parseFloat(selectedVoucher?.voucher?.discount_rate?.toFixed(2));
+        : parseFloat(getDiscountPrecent(selectedVoucher?.voucher?.discount));
       const preTotalOutPrice = parseFloat((total + ((total * taxAmount) / 100)).toFixed(2));
       const preDiscountedAMount = parseFloat(((preTotalOutPrice * preDiscountedPercent) / 100).toFixed(2));
       setPreDiscountedPrice(preDiscountedAMount);
@@ -302,7 +303,6 @@ const DomainSummary = ({state, plan}:any) => {
               >
                 Have a voucher code?
               </button>
-              {showVoucherInput && <VoucherCodeInput onClose={() => setShowVoucherInput(false)} handleSubmit={handleVoucherInputSubmit} handleVoucherCodeChange={e => setVoucherCode(e.target.value)} voucherCode={voucherCode} />}
             </div>
             <button
               className="ml-4 text-xs text-gray-500 rounded-[6px] px-3 py-2 bg-green-100 summary-domain-details-items"
@@ -311,6 +311,7 @@ const DomainSummary = ({state, plan}:any) => {
               Available vouchers
             </button>
           </div>
+          {showVoucherInput && <VoucherCodeInput onClose={() => setShowVoucherInput(false)} handleSubmit={handleVoucherInputSubmit} handleVoucherCodeChange={e => setVoucherCode(e.target.value)} voucherCode={voucherCode} />}
 
           {selectedVoucher && (
             <div className="bg-transparent border border-gray-500 rounded-md p-4 flex justify-between items-center mt-4">

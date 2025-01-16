@@ -57,4 +57,7 @@ declare module 'store/user.thunk' {
   // Add more thunk declarations as needed
   export const savedCardsListThunk;
   export const deleteCardThunk;
+  export const getVouchersListThunk;
+  export const plansAndPricesListThunk;
+  export const useVoucherThunk;
 }

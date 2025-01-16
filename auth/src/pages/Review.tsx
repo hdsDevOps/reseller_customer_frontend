@@ -838,15 +838,15 @@ const Review = () => {
                 By clicking{" "}
                 <span className="font-bold text-black">Agree and continue</span>, you
                 agree to the{" "}
-                <a href="#" className="font-semibold text-green-500">
+                <a className="font-semibold text-green-500">
                   Google Workspace Agreement
                 </a>
                 ,{" "}
-                <a href="#" className="font-semibold text-green-500">
+                <a className="font-semibold text-green-500">
                   Google Workspace purchase Agreement
                 </a>
                 , and{" "}
-                <a href="#" className="font-semibold text-green-500 ">
+                <a className="font-semibold text-green-500 ">
                   Supplemental Terms and Conditions
                 </a>{" "}
                 for Google Workspace Free Trial Agreement.

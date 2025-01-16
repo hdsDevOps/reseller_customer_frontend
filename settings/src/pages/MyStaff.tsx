@@ -372,7 +372,7 @@ const MyStaff = () => {
               type='text'
               placeholder='Name,Email,Phone'
               className='max-w-[315px] bg-white py-2 pl-3 w-full border text-sm text-[#7E7E7E] font-inter font-light border-[#E4E4E4]'
-              value={filter?.search_text || type2}
+              value={type2}
               onChange={(e) => {
                 setType2(e.target.value);
               }}
@@ -385,7 +385,6 @@ const MyStaff = () => {
                   ...filter,
                   search_text: type2.replace('+', '')
                 });
-                setType("");
               }}
             > search</button>
           </div>

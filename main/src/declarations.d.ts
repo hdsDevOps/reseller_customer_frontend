@@ -99,6 +99,8 @@ declare module 'store/user.thunk' {
   export const changeAutoRenewThunk;
   export const getLandingPageThunk;
   export const deleteCardThunk;
+  export const getVouchersListThunk;
+  export const useVoucherThunk;
 }
 
 declare module 'store/authSlice' {
