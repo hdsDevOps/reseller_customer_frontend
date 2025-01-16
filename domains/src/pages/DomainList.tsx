@@ -313,7 +313,15 @@ const DomainList: React.FC = () => {
                             singleDomainTable.map((row, index) => {
                               if(row === "license_usage") {
                                 return (
-                                  <td className="p-2 text-gray-800 sm-max:text-xs w-[22%]" key={index}>{domain?.emails ? domain?.emails?.length : 0}/{userDetails?.license_usage}</td>
+                                  <td className="p-2 text-gray-800 sm-max:text-xs w-[22%]" key={index}>{
+                                    domain?.domain_type === "primary"
+                                    ? `${
+                                        domain?.emails
+                                        ? domain?.emails?.length
+                                        : 0
+                                      }/${userDetails?.license_usage}`
+                                    : ""
+                                  }</td>
                                 )
                               } else if (row === "button") {
                                 return (
