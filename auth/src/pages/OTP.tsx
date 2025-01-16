@@ -80,8 +80,13 @@ const OTP: React.FC = () => {
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>, index: number) => {
-    if(e.key === "Backspace" && !otpValues[index - 1] && index > 1) {
-      otpRefs.current[index - 2]?.focus();
+    if(e.key === "Backspace") {
+      const newOtpValues = [...otpValues];
+      newOtpValues[index - 1] = "";
+      SetOptValues(newOtpValues);
+      if(!otpValues[index - 1] && index > 1) {
+        otpRefs.current[index - 2]?.focus();
+      }
     }
   };
 
