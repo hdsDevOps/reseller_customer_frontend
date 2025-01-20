@@ -6,7 +6,7 @@ import { IoChevronBackSharp } from "react-icons/io5";
 import "./cumtel.css";
 import { useAppDispatch } from "store/hooks";
 import axios from "axios";
-import { udpateBusinessDataThunk } from "store/user.thunk";
+import { hereMapSearchThunk, udpateBusinessDataThunk } from "store/user.thunk";
 import { toast } from "react-toastify";
 
 //user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, business_zip_code
@@ -32,6 +32,14 @@ const BusinessInfo: React.FC = () => {
   
   const [isNumberValid, setIsNumberValid] = useState(false);
   console.log({isNumberValid});
+
+  const [address, setAddress] = useState("");
+  // console.log("address...", address);
+  const [addressList, setAddressList] = useState([]);
+  // console.log("addressList...", addressList);
+  const [addressObject, setAddressObject] = useState<object|null>(null);
+  console.log("addressObject...", addressObject);
+  const [isAddressDropdownOpen, setIsAddressDropdownOpen] = useState(false);
   
   const [stateName, setStateName] = useState("");
   const [cityName, setCityName] = useState("");
@@ -154,6 +162,64 @@ const BusinessInfo: React.FC = () => {
     });
   };
 
+  useEffect(() => {
+    if(addressObject !== null) {
+      if(states?.length > 0) {
+        const findState = states?.find(state => state?.name?.toLowerCase()?.includes(addressObject?.address?.state?.toLowerCase()));
+        console.log("findState...", findState);
+        setState(findState);
+        setCity({});
+        setStateName("");
+        setCityName("");
+        setFormData({
+          ...formData,
+          business_state: findState?.name,
+          business_city: ''
+        });
+      }
+    }
+  }, [addressObject, states]);
+
+  useEffect(() => {
+    if(addressObject !== null) {
+      if(cities?.length > 0) {
+        const findCity = cities?.find(city => city?.name?.toLowerCase()?.includes(addressObject?.address?.city?.toLowerCase()));
+        console.log("findState...", findCity);
+        setCity(findCity);
+        setCityName("");
+        setFormData({
+          ...formData,
+          business_city: findCity?.name
+        });
+      }
+    }
+  }, [addressObject, cities]);
+
+  useEffect(() => {
+    if(addressList?.length > 0 && address?.length > 0) {
+      setIsAddressDropdownOpen(true);
+    } else {
+      setIsAddressDropdownOpen(false);
+    }
+  }, [addressList, address]);
+
+  const findAddress = async() => {
+    try {
+      const result = await dispatch(hereMapSearchThunk({address: address})).unwrap();
+      // console.log("result...", result);
+      setAddressList(result?.data?.items);
+    } catch (error) {
+      setAddressList([]);
+      // console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if(address?.length > 0) {
+      findAddress();
+    }
+  }, [address]);
+
   const removePrefix = (input:string, prefix:string) => {
     if(input.startsWith(prefix)) {
       return input.slice(prefix.length);
@@ -161,7 +227,7 @@ const BusinessInfo: React.FC = () => {
       return input.slice(1);
     }
     return input;
-  }
+  };
 
   const handlePhoneChange = (value: string) => {
     setFormData((prevData) => ({ ...prevData, phone_no: value }));
@@ -268,8 +334,14 @@ const BusinessInfo: React.FC = () => {
             name="address"
             type="text"
             placeholder="123 Main St"
-            value={formData?.address}
-            onChange={handleChange}
+            value={formData?.address || address}
+            onChange={(e) => {
+              setFormData({
+                ...formData,
+                address: ""
+              });
+              setAddress(e.target.value);
+            }}
             className="peer form-input"
           />
           <label
@@ -278,6 +350,30 @@ const BusinessInfo: React.FC = () => {
           >
             Street Name
           </label>
+          {
+            isAddressDropdownOpen && (
+              <div className='w-full max-h-32 absolute mt-0 bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+                {
+                  addressList?.map((addressItem, idx) => (
+                    <p
+                      key={idx}
+                      className="py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer"
+                      onClick={() => {
+                        setFormData({
+                          ...formData,
+                          address: addressItem?.address?.label,
+                          business_zip_code: addressItem?.address?.postalCode,
+                        });
+                        setAddressObject(addressItem);
+                        setAddress("");
+                        setIsAddressDropdownOpen(false);
+                      }}
+                    >{addressItem?.address?.label}</p>
+                  ))
+                }
+              </div>
+            )
+          }
         </div>
 
         <div className="relative w-full mb-2" ref={stateRef}>
