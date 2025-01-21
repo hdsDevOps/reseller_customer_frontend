@@ -308,19 +308,26 @@ const BillingHistory: React.FC = () => {
     if (imgData.startsWith('data:image/png;base64,')) {
       const pdf = new jsPDF('p', 'mm', 'a4');
 
-      const fixedPdfWidth = 80;
-      const imgWidth = canvas.width / 2;
-      const imgHeight = canvas.height / 2;
+      const pdfWidth = 210;
+      const PdfHeight = 297;
 
-      const aspectRatio = imgHeight / imgWidth;
-      const adjustedHeight = fixedPdfWidth * aspectRatio;
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
 
-      pdf.addImage(imgData, 'PNG', 0, 0, fixedPdfWidth, adjustedHeight);
+      const scaleFactor = Math.min(pdfWidth / imgWidth, PdfHeight / imgHeight);
+
+      const adjustedWidth = imgWidth * scaleFactor;
+      const adjustedHeight = imgHeight * scaleFactor;
+
+      const xOffset = (pdfWidth - adjustedWidth) / 2;
+      const yOffset = (PdfHeight - adjustedHeight) / 2;
+
+      pdf.addImage(imgData, 'PNG', xOffset, yOffset, adjustedWidth, adjustedHeight);
 
       pdf.save('invoice.pdf');
     } else {
       console.error("Image data is invalid or empty", imgData);
-    }
+    };
 
     setPdfDownload('hidden');
   };

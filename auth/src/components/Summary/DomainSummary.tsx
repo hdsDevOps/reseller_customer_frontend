@@ -43,12 +43,13 @@ const DomainSummary = ({state, plan}:any) => {
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
   // console.log("plan...", plan);
+  console.log("state...", state);
 
   const [showVoucherInput, setShowVoucherInput] = useState(false);
   const [showAvailableVoucher, setShowAvailableVoucher] = useState(false);
   const [voucherCode, setVoucherCode] = useState("");
   const [appliedVoucher, setAppliedVoucher] = useState<Voucher | null>(null);
-  // console.log("applied voucher...", appliedVoucher);
+  console.log("applied voucher...", appliedVoucher);
   const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
   const [isVoucherApplied, setIsVoucherApplied] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -91,6 +92,12 @@ const DomainSummary = ({state, plan}:any) => {
   const [today, setToday] = useState("");
   const [domainExpiryDate, setDomainExpiryDate] = useState("");
   const [planExpiryDate, setPlanExpiryDate] = useState("");
+
+  const [domainPrice, setDomainPrice] = useState(0);
+
+  useEffect(() => {
+    setDomainPrice(state?.selectedDomain?.price[defaultCurrencySlice]);
+  }, [defaultCurrencySlice, state]);
   
   useEffect(() => {
     const dayToday = new Date();
@@ -126,8 +133,8 @@ const DomainSummary = ({state, plan}:any) => {
   }, []);
 
   useEffect(() => {
-    if(state.selectedDomain !== "") {
-      const total = 648.00;
+    if(state?.selectedDomain?.domain !== "") {
+      const total = domainPrice;
       setTotalPrice(parseFloat(total.toFixed(2)));
       setTaxedPrice(parseFloat(((total * taxAmount) / 100).toFixed(2)));
       const discountedPercent = appliedVoucher === null
@@ -149,7 +156,7 @@ const DomainSummary = ({state, plan}:any) => {
     } else {
       setTotalPrice(0);
     }
-  }, [appliedVoucher, selectedVoucher]);
+  }, [appliedVoucher, selectedVoucher, domainPrice]);
 
   const handleVoucherInputSubmit = (e) => {
     e.preventDefault();
@@ -168,7 +175,7 @@ const DomainSummary = ({state, plan}:any) => {
 
   const handleSubmitPurchase = async(e) => {
     e.preventDefault();
-    navigate('/Review', {state: {customer_id: state.customer_id, formData: state.formData, license_usage: state.license_usage, plan: state.plan, period: state.period, selectedDomain: state.selectedDomain, token: state.token, emailData: state.emailData, from: state.from, price: finalTotalPrice, currency: defaultCurrencySlice}})
+    navigate('/Review', {state: {customer_id: state.customer_id, formData: state.formData, license_usage: state.license_usage, plan: state.plan, period: state.period, selectedDomain: state.selectedDomain, token: state.token, emailData: state.emailData, from: state.from, price: totalPrice, discountedPrice: discountedPrice, taxedPrice: taxedPrice, finalTotalPrice: finalTotalPrice, currency: defaultCurrencySlice, voucher: appliedVoucher,  }});
   };
 
   const handleFilterCheckVoucher = (e) => {
@@ -282,13 +289,13 @@ const DomainSummary = ({state, plan}:any) => {
           <div className="summary-domain-details items-start mt-5">
             <div>
               <h5 className="text-[25px] font-bold">
-                {state.selectedDomain} <span className="text-[15px] font-light items-center">(Domain)</span>
+                {state?.selectedDomain?.domain} <span className="text-[15px] font-light items-center">(Domain)</span>
               </h5>
               <p className="text-[11px] font-extralight text-gray-400">
                 1 year commitment
               </p>
             </div>
-            <p className="text-[26px] font-medium">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}648.00</p>
+            <p className="text-[26px] font-medium">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{domainPrice}</p>
           </div>
 
           <div className="summary-domain-details items-start mt-4 text-start w-full">

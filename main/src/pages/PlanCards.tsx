@@ -25,18 +25,18 @@ const PlanCard: React.FC = () => {
   const [isYearly, setIsYearly] = useState(false);
   const [renewalDate, setRenewalDate] = useState(format(new Date(), "dd-MM-yyyy"));
   // console.log("renewal date...", renewalDate);
-  console.log("cartState...", cartState);
+  // console.log("cartState...", cartState);
 
   const toggleBilling = () => setIsYearly(!isYearly);
   const subscription_status = false;
   const [selectedCheckbox, setSelectedCheckbox] = useState<number | null>(null);
-  // console.log("check...", selectedCheckbox);
+  console.log("check...", selectedCheckbox);
 
   const [currencyLogo, setCurrencyLogo] = useState("$");
   // console.log("currency logo...", currencyLogo);
 
   const [plansList, setPlansList] = useState([]);
-  console.log("plans list...", plansList);
+  // console.log("plans list...", plansList);
 
   const getPlansAndPricesList = async() => {
     try {
@@ -101,8 +101,9 @@ const PlanCard: React.FC = () => {
     const newCart = [
       ...cartItems,
       {
-        payment_cycle: isYearly ? "yearly" : "monthly",
-        price: cartAddAmount(item, isYearly ? "Yearly" : selectedCheckbox === null ? "Yearly Subscription with monthly billing" : "Monthly")?.price,
+        payment_cycle: isYearly ? "Yearly" : selectedCheckbox === null ? "Yearly Subscription with monthly billing" : "Monthly",
+        price: cartAddAmount(item, isYearly ? "Yearly" : selectedCheckbox === null ? "Yearly Subscription with monthly billing" : "Monthly")?.discount_price,
+        currency: defaultCurrencySlice,
         product_name: item?.plan_name,
         product_type: "google workspace",
         total_year: 1,
@@ -111,6 +112,7 @@ const PlanCard: React.FC = () => {
         is_trial: true
       }
     ];
+    console.log({newCart, item});
     try {
       await dispatch(addToCartThunk({
         user_id: customerId,
@@ -119,7 +121,7 @@ const PlanCard: React.FC = () => {
       dispatch(setCart(newCart));
       navigate('/add-cart');
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       if(error?.error == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -207,13 +209,13 @@ const PlanCard: React.FC = () => {
                         type="checkbox"
                         // id={`monthly-billing-${index}`}
                         className="w-6 h-6 border-2 border-black rounded-[3px] mr-2"
-                        onClick={() => {setSelectedCheckbox(index)}}
+                        onClick={() => {setSelectedCheckbox(prev => prev === index ? null : index)}}
                         checked={selectedCheckbox === index ? true : false}
                       />
                       <label
                         htmlFor={`monthly-billing-${index}`}
                         className="text-gray-700"
-                      >Or {currencyLogo}{getAmount(plan?.amount_details, "Monthly")?.price || 0} per user / month when billed monthly (without yearly commitment)</label>
+                      >Or {currencyLogo}{getAmount(plan?.amount_details, "Monthly")?.discount_price || 0} per user / month when billed monthly (without yearly commitment)</label>
                     </div>
                   )
                 }

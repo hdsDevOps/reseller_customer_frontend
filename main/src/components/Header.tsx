@@ -13,7 +13,7 @@ export default function Header() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const { userDetails, cartState, defaultCurrencySlice } = useAppSelector(state => state.auth);
+  const { userDetails, cartState, defaultCurrencySlice, notificationsList } = useAppSelector(state => state.auth);
 
   const[showNotification,setShowNotfication] = useState(false);
   const [width, setWidth] = useState(window.innerWidth);
@@ -57,7 +57,7 @@ export default function Header() {
         <button onClick={openModal} className="relative p-2 bg-[#DCEBDFCC] hover:bg-opacity-90 rounded-md">
           <Bell className="w-6 h-6 text-black" />
           <span className="absolute top-0 right-0 flex items-center justify-center w-3 h-3 bg-black text-white rounded-full text-[8px] font-semibold">
-            4
+            {notificationsList?.length}
           </span>
         </button>
         {showNotification && <NotificationCenter onClose={closeModal}/> }

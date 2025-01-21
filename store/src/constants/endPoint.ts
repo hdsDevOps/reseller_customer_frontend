@@ -93,8 +93,16 @@ export const endPoints = {
 
     // verify google recaptcha
     verifyReCaptcha: 'customerservices/customer/api/v1/verify_recaptcha',
+
+    // payment gateways
+    stripePay: 'paymentservices/payments/api/v1/make_stripe_payment',
+    paystackPay: 'paymentservices/payments/api/v1/make_paystack_payment',
+
+    // here platform
+    hereMapSearch: 'customerservices/user/api/v1/get_address',
 };
 
 export const resellerEndPoints = {
     checkDomain: 'api/v1/domain/check-availability/?domain_name=',
+    domainAvailability: 'api/v1/domain/check-availability/?domain_name=',
 };

@@ -3,20 +3,25 @@ import { MdOutlineAddShoppingCart } from "react-icons/md";
 import { ChevronDown, ChevronUp, X } from "lucide-react";
 import AddPayment from "./AddPaymentMethods";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { deleteCardThunk, getProfileDataThunk, getVouchersListThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk, savedCardsListThunk, updateLicenseUsageThunk, useVoucherThunk } from "store/user.thunk";
+import { addBillingHistoryThunk, deleteCardThunk, getProfileDataThunk, getVouchersListThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk, savedCardsListThunk, stripePayThunk, updateLicenseUsageThunk, useVoucherThunk } from "store/user.thunk";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { setSaveCards, setUserDetails } from "store/authSlice";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { currencyList } from "./CurrencyList";
+import StripeCheckout from "react-stripe-checkout";
+import { PaystackButton } from "react-paystack";
+import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import { format } from "date-fns";
 
 interface EmailModalProps {
   isOpen: boolean;
   onClose: () => void;
   getDomainsList: () => void;
+  selectedDomain: object|null;
 }
 
-const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList }) => {
+const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList, selectedDomain }) => {
   const navigate = useNavigate();
   const { userDetails, customerId, token, saveCardsState, paymentMethodsState, defaultCurrencySlice } = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
@@ -35,16 +40,21 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList 
 
   const [activeMethod, setActiveMethod] = useState("saved");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>("");
+  console.log("selectedPaymentMethod...", selectedPaymentMethod);
   const [selectedCard, setSelectedCard] = useState<string | null>("");
   const [activeSubscriptionPlan, setActiveSubscriptionPlan] = useState({});
   // console.log(activeSubscriptionPlan);
-  // console.log(userDetails);
+  console.log(userDetails);
   const [licensePrice, setLicensePrice] = useState(0);
   // console.log(licensePrice);
   // console.log({numUsers, licensePrice, subtotal, tax, total, preDiscountRate, preDiscountAmount, discountRate, discountAmount,});
   const [vouchers, setVouchers] = useState([]);
   const [voucherInputOpen, setVoucherInputOpen] = useState(false);
   const [voucherCode, setVoucherCode] = useState("");
+  
+  const [todayDate, setTodayDate] = useState("");
+  const [domainExpiryDate, setDomainExpiryDate] = useState("");
+  const [planExpiryDate, setPlanExpiryDate] = useState("");
 
   const dateFormat = (date) => {
     const miliseconds = parseInt(date?._seconds) * 1000 + parseInt(date?._nanoseconds) / 1e6;
@@ -56,6 +66,36 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList 
       return false;
     }
   };
+
+  const dateFormat2 = (date) => {
+    const miliseconds = parseInt(date?._seconds) * 1000 + parseInt(date?._nanoseconds) / 1e6;
+    const foundDate =  new Date(miliseconds);
+    if(foundDate === "Invalid Date") {
+      return "Invalid Date";
+    } else {
+      return format(foundDate, "yyyy-MM-dd");
+    }
+  };
+
+  useEffect(() => {
+    const dayToday = new Date();
+    setTodayDate(format(dayToday, "yyyy-MM-dd"));
+
+    setPlanExpiryDate(dateFormat2(userDetails?.workspace?.next_payment));
+  }, [userDetails])
+
+  useEffect(() => {
+    if(paymentMethodsState?.length > 0) {
+      const defaultPayment = paymentMethodsState?.find(method => method?.deafult);
+      if(defaultPayment) {
+        setSelectedPaymentMethod(defaultPayment?.method_name);
+      } else {
+        setSelectedPaymentMethod("");
+      }
+    } else {
+      setSelectedPaymentMethod("");
+    }
+  }, [paymentMethodsState]);
 
   const getVouchersList = async() => {
     try {
@@ -122,7 +162,11 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList 
   };
 
   useEffect(() => {
-    getCurrencyValue();
+    if(userDetails?.workspace?.workspace_status === "trial") {
+      setLicensePrice(0);
+    } else {
+      getCurrencyValue();
+    }
   }, [activeSubscriptionPlan, userDetails, defaultCurrencySlice]);
 
   useEffect(() => {
@@ -254,8 +298,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList 
     }
   };
   
-  const changeLicenseUsage = async(e) => {
-    e.preventDefault();
+  const changeLicenseUsage = async() => {
     try {
       if(numUsers > 0) {
         const originalLicense = parseInt(userDetails?.license_usage);
@@ -330,105 +373,148 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList 
     }
   };
 
+  const addBillingHistory = async(paymentResult, madePaymentMethod) => {
+    try {
+      await dispatch(addBillingHistoryThunk({
+        user_id: customerId,
+        transaction_id: `${
+          madePaymentMethod === "Stripe"
+          ? paymentResult?.balance_transaction
+          : madePaymentMethod === "paystack"
+          ? paymentResult?.transaction
+          : ""
+        }`,
+        date: todayDate,
+        invoice: `${
+          madePaymentMethod === "Stripe"
+          ? paymentResult?.payment_method_details?.card?.network_transaction_id
+          : madePaymentMethod === "paystack"
+          ? paymentResult?.reference
+          : ""
+        }`,
+        product_type: "user license",
+        description: "purchase user license",
+        domain: selectedDomain?.domain_name,
+        payment_method: madePaymentMethod,
+        payment_status: "Success",
+        amount: `${currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}${total}`,
+        transaction_data: paymentResult
+      }));
+    } catch (error) {
+      console.log("error");
+    }
+  };
+
+  const makePayment = async(token) => {
+    const body = {
+      token,
+      product: {
+        name: `${userDetails?.first_name} ${userDetails?.last_name}`,
+        price: total,
+        productBy: "test",
+        currency: defaultCurrencySlice,
+        description: 'purchasing user license',
+        domain: "",
+        workspace: {
+          plan: activeSubscriptionPlan,
+          license_usage: numUsers,
+          plan_period: userDetails?.workspace?.payment_cycle,
+          trial_plan: userDetails?.workspace?.workspace_status === "trial" ? "yes" : "no"
+        },
+        customer_id: customerId,
+        email: userDetails?.email,
+        voucher: appliedVoucher?.id
+      }
+    };
+    const headers={
+      "Content-Type":"application/json"
+    };
+    try {
+      const result = await dispatch(stripePayThunk(body)).unwrap();
+      console.log("result...", result);
+      if(result?.message === "Payment successful") {
+        setTimeout(() => {
+          // navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: result?.charge}});
+          addBillingHistory(result?.charge, "Stripe");
+          changeLicenseUsage();
+          onClose();
+        }, 3000);
+      } else {
+        toast.error("Error on payment method");
+      }
+    } catch (error) {
+      toast.error("Error on payment method");
+    }
+  };
+
+  const payStackConfig = {
+    reference: (new Date()).getTime().toString(),
+    email: userDetails?.email,
+    amount: total * 100,
+    publicKey: 'pk_test_8f89b2c7e1b29dedea53c372de55e3c6e5d1a20e',
+    currency: defaultCurrencySlice,
+    firstName: userDetails?.first_name,
+    lastName: userDetails?.last_name,
+    channels: ['card']
+  };
+  
+  const body = {
+    reference: (new Date()).getTime().toString(),
+    email: userDetails?.email,
+    amount: total * 100,
+    publicKey: 'pk_test_8f89b2c7e1b29dedea53c372de55e3c6e5d1a20e',
+    currency: defaultCurrencySlice,
+    firstName: userDetails?.first_name,
+    lastName: userDetails?.last_name,
+    name: `${userDetails?.first_name} ${userDetails?.last_name}`,
+    description: 'purchasing user license',
+    domain: "",
+    workspace: {
+      plan: activeSubscriptionPlan,
+      license_usage: numUsers,
+      plan_period: userDetails?.workspace?.payment_cycle,
+      trial_plan: userDetails?.workspace?.workspace_status === "trial" ? "yes" : "no" 
+    },
+    customer_id: customerId,
+    voucher: appliedVoucher?.id
+  };
+
+  const handlePaystackSuccessAction = async(reference) => {
+    // Implementation for whatever you want to do with reference and after success call.
+    const response = await fetch('https://api.customer.gworkspace.withhordanso.com/paymentservices/payments/api/v1/make_paystack_payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const responseData = await response;
+    if (responseData.status) {
+      // console.log(reference);
+      setTimeout(() => {
+        // navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: reference}})
+        changeLicenseUsage();
+        addBillingHistory(reference, "paystack");
+        onClose();
+      }, 3000);
+    } else {
+      toast.error("Error on payment method");
+    }
+  };
+  
+  const handlePaystackCloseAction = () => {
+    // implementation for  whatever you want to do when the Paystack dialog closed.
+    console.log('closed')
+  };
+
+  const componentProps = {
+    ...payStackConfig,
+    text: 'Submit',
+    onSuccess: (reference) => handlePaystackSuccessAction(reference),
+    onClose: handlePaystackCloseAction,
+  };
+
   return (
-    // <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-    //   <div className="bg-white p-6 rounded-lg shadow-md max-w-3xl w-full mx-2  h-[95vh] xl:h-full overflow-y-scroll">
-    //     <div className="flex items-center justify-between mb-4">
-    //       <h1 className="text-xl font-bold">Add User License</h1>
-    //       <button className="flex items-center gap-1 text-green-500 border-2 border-green-500 hover:bg-green-500 hover:text-white transition duration-200 ease-in-out py-2 px-4 rounded-lg text-xs sm:text-sm">
-    //         Add to Cart <MdOutlineAddShoppingCart />
-    //       </button>
-    //     </div>
-
-    //     {showDetails && (
-    //       <div className="flex items-center justify-between mb-4">
-    //         <p className="text-base font-semibold">No. of additional user</p>
-    //         <input
-    //           type="number"
-    //           value={numUsers}
-    //           onChange={(e) => setNumUsers(Number(e.target.value))}
-    //           className="border-gray-300 border rounded p-2 w-16 text-center bg-white outline-none focus:ring-1 focus:ring-green-300"
-    //           placeholder="No."
-    //         />
-    //       </div>
-    //     )}
-
-    //     {showDetails && (
-    //       <div className="border-y border-gray-300 py-2 my-6">
-    //         <div className="flex justify-between items-center mt-2">
-    //           <div className="flex items-center gap-1">
-    //             <p>
-    //             {numUsers + parseInt(userDetails?.license_usage)} users, Year subscription (price adjusted to current cycle) users, Year subscription (price adjusted to current cycle)
-    //             </p>
-    //             <span className="border-2 border-green-500 rounded-full h-5 w-5 flex items-center justify-center text-green-500 font-bold mr-1">
-    //               i
-    //             </span>
-    //           </div>
-    //           <span className="flex items-center font-semibold">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{subtotal.toFixed(2)}</span>
-    //         </div>
-    //         <p className="underline mb-4 font-semibold mt-2">Enter voucher code</p>
-    //       </div>
-    //     )}
-
-    //     <div className="border-b border-gray-300 py-2 mb-4">
-    //       <div className="flex justify-between font-semibold mb-3">
-    //         <span>Subtotal</span>
-    //         <span>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{subtotal.toFixed(2)}</span>
-    //       </div>
-    //       <div className="flex justify-between">
-    //         <div className="flex items-center">
-    //           Tax (8.25%)
-    //           <span className="border-2 border-green-500 rounded-full h-5 w-5 flex items-center justify-center text-green-500 font-bold ml-1">
-    //             i
-    //           </span>
-    //         </div>
-    //         <span className="gap-2">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{tax.toFixed(2)}</span>
-    //       </div>
-    //     </div>
-
-    //     <div className="border-b border-gray-300 py-2 mb-4">
-    //       <div className="flex justify-between font-bold">
-    //         <span className="flex items-center gap-2">
-    //           Total
-    //           <p 
-    //             className="text-green-500 font-normal cursor-pointer flex items-center"
-    //             onClick={() => setShowDetails(!showDetails)}
-    //           >
-    //              {showDetails ? (
-    //               <>
-    //                 Hide details <ChevronUp className="w-4 h-4 ml-1" />
-    //               </>
-    //             ) : (
-    //               <>
-    //                 Show details <ChevronDown className="w-4 h-4 ml-1" />
-    //               </>
-    //             )}
-    //           </p>
-    //         </span>
-    //         <span>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{total.toFixed(2)}</span>
-    //       </div>
-    //     </div>
-
-    //     <AddPayment />
-
-    //     <div className="flex justify-start gap-4 mt-4">
-    //       <button
-    //         className="bg-green-500 text-white py-2 px-4 rounded"
-    //         onClick={onClose}
-    //       >
-    //         Submit
-    //       </button>
-    //       <button
-    //         className="bg-red-500 text-white py-2 px-4 rounded"
-    //         onClick={onClose}
-    //       >
-    //         Cancel
-    //       </button>
-    //     </div>
-    //   </div>
-    // </div>
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-      <form className="bg-white p-6 rounded-lg shadow-md max-w-3xl w-full mx-2  max-h-[95vh] xl:max-h-full overflow-y-scroll" onSubmit={changeLicenseUsage}>
+      <div className="bg-white p-6 rounded-lg shadow-md max-w-3xl w-full mx-2  max-h-[95vh] xl:max-h-full overflow-y-scroll">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-xl font-bold">Add User License</h1>
           {/* <button className="flex items-center gap-1 text-green-500 border-2 border-green-500 hover:bg-green-500 hover:text-white transition duration-200 ease-in-out py-2 px-4 rounded-lg text-xs sm:text-sm">
@@ -649,8 +735,11 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList 
                         type="radio"
                         id={method?.id}
                         name="payment-method"
-                        checked={selectedPaymentMethod === method?.id || method?.default} // Check if method is 'stripe'
-                        onChange={() => handlePaymentMethodChange(method?.id)}
+                        checked={selectedPaymentMethod === method?.method_name} // Check if method is 'stripe'
+                        onClick={() => {
+                          setSelectedPaymentMethod(method?.method_name);
+                          console.log(method?.method_name);
+                        }}
                         className="mr-2 radio radio-xs radio-success"
                         title={method?.method_name}
                       />
@@ -679,12 +768,47 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList 
         </div>
 
         <div className="flex justify-start gap-4 mt-4">
-          <button
-            className="bg-green-500 text-white py-2 px-4 rounded"
-            type="submit"
-          >
-            Submit
-          </button>
+          {
+            selectedPaymentMethod?.toLowerCase() === "stripe"
+            ? (
+              <button
+                className="bg-green-500 text-white py-2 px-4 rounded"
+                type="button"
+              >
+                <StripeCheckout
+                  name='Hordanso'
+                  description="Purchasing google workspace and domain"
+                  image="https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899"
+                  ComponentClass="div"
+                  panelLabel="Submit"
+                  // amount={data?.finalTotalPrice * 100}
+                  // currency={defaultCurrencySlice}
+                  stripeKey="pk_test_51HCGY4HJst0MFfZtYup1hAW3VcsAmcJJ4lwg9fDjPLvStToUiLixgF679sFDyWfVH1awUIU3UGOd2TyAYDUkJrPF002WD2USoG"
+                  email={userDetails?.email}
+                  // billingAddress
+                  token={makePayment}
+                  allowRememberMe
+                >Submit</StripeCheckout>
+              </button>
+            ) : selectedPaymentMethod?.toLowerCase() === "paystack"
+            ? (
+              <button
+                className="bg-green-500 text-white py-2 px-4 rounded"
+                type="button"
+                // onClick={() => {() => initializePayment(handleSuccess, handleClose)}}
+              >
+                <PaystackButton {...componentProps} />
+              </button>
+            ) : (
+              <button
+                className="bg-green-500 text-white py-2 px-4 rounded"
+                type="button"
+                onClick={() => {toast.warning("Please select a payment method")}}
+              >
+                Submit
+              </button>
+            )
+          }
           <button
             className="bg-red-500 text-white py-2 px-4 rounded"
             onClick={() => {
@@ -697,7 +821,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList 
             Cancel
           </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 };

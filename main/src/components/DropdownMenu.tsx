@@ -7,8 +7,52 @@ import { setDefaultCurrencySlice } from "store/authSlice";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { RiCloseFill } from "react-icons/ri";
 import { currencyList } from "./CurrencyList";
+import { getSettingsListThunk } from "store/user.thunk";
 
 
+
+const initialRolePermissions = [
+  {
+      "name": "Dashboard",
+      "value": false
+  },
+  {
+      "name": "Profile",
+      "value": false
+  },
+  {
+      "name": "Domain",
+      "value": false
+  },
+  {
+      "name": "Payment Subscription",
+      "value": false
+  },
+  {
+      "name": "Email",
+      "value": false
+  },
+  {
+      "name": "Payment Method",
+      "value": false
+  },
+  {
+      "name": "Vouhcers",
+      "value": false
+  },
+  {
+      "name": "My Staff",
+      "value": false
+  },
+  {
+      "name": "Billing History",
+      "value": false
+  },
+  {
+      "name": "Settings",
+      "value": false
+  }
+];
 
 const flagList = [
   {flag: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/european-flag.png?alt=media&token=bb4a2892-0544-4e13-81a6-88c3477a2a64', name: 'EUR', logo: '€',},
@@ -23,11 +67,29 @@ const flagList = [
 const DropdownMenu = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { userDetails, defaultCurrencySlice } = useAppSelector(state => state.auth);
+  const { userDetails, defaultCurrencySlice, rolePermission, customerId, roleId } = useAppSelector(state => state.auth);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState(defaultCurrencySlice);
   // console.log("first...", defaultCurrencySlice);
   const [currencyModal, setCurrencyModal] = useState(false);
+  
+  const [rolePermissions, setRolePermissions] = useState(initialRolePermissions);
+  // console.log("rolePermissions...", rolePermissions);
+
+  const getRolePermission = async() => {
+    try {
+      const result = await dispatch(getSettingsListThunk({user_type: "", user_id: customerId})).unwrap();
+      const rolePermissionsObject = await result?.settings?.find(item => item?.id === roleId);
+      // console.log("rolePermissionsObject...", rolePermissionsObject);
+      setRolePermissions(rolePermissionsObject?.permissions);
+    } catch (error) {
+      setRolePermissions(initialRolePermissions);
+    }
+  };
+
+  useEffect(() => {
+    getRolePermission();
+  }, [roleId, customerId]);
 
   useEffect(() => {
     setSelectedCurrency(defaultCurrencySlice);
@@ -48,7 +110,17 @@ const DropdownMenu = () => {
     } catch (error) {
       //
     }
-  }
+  };
+
+  const checkPermission = () => {
+    if(rolePermission?.length > 0) {
+      return rolePermission?.find(item => item?.name === "Profile")?.value;
+    } else {
+      return false;
+    }
+  };
+
+
   return (
     <div className="relative">
       <button
@@ -75,19 +147,24 @@ const DropdownMenu = () => {
             </div>
           </li>
           <li className="border-t border-gray-200 my-1"></li>
-          <li
-            onClick={() => {
-              navigate('/profile');
-              setIsOpen(false);
-            }}
-          >
-            <a
-              className="flex items-center space-x-2 p-2 hover:bg-gray-100 text-xs"
-            >
-              <Settings className="text-gray-500 w-4 h-4" />
-              <span>Profile Settings</span>
-            </a>
-          </li>
+          {/* {
+            checkPermission() && ( */}
+              <li
+                onClick={() => {
+                  navigate('/profile');
+                  setIsOpen(false);
+                }}
+              >
+                <a
+                  className="flex items-center space-x-2 p-2 hover:bg-gray-100 text-xs"
+                >
+                  <Settings className="text-gray-500 w-4 h-4" />
+                  <span>Profile Settings</span>
+                </a>
+              </li>
+            {/* )
+          } */}
+          
           <li>
             <a
               onClick={() => {setCurrencyModal(true)}}

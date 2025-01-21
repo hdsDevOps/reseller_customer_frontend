@@ -9,11 +9,13 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { BiSolidEditAlt } from "react-icons/bi";
 import { TbInfoTriangleFilled } from "react-icons/tb";
-import { addEmailsWithoutLoginThunk, addNewDomainWithoutLoginThunk, addSubscriptionWithoutLoginThunk, getPaymetnMethodsThunk, udpateBusinessDataThunk } from "store/user.thunk";
+import { addEmailsWithoutLoginThunk, addNewDomainWithoutLoginThunk, addSubscriptionWithoutLoginThunk, getPaymetnMethodsThunk, paystackPayThunk, stripePayThunk, udpateBusinessDataThunk } from "store/user.thunk";
 import { format } from "date-fns";
 import { currencyList } from "../components/CurrencyList";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { RiCloseFill } from "react-icons/ri";
+import StripeCheckout from "react-stripe-checkout";
+import { PaystackButton } from "react-paystack";
 
 const initialTaxForm = {
   tax_status: 'Business',
@@ -115,6 +117,8 @@ const Review = () => {
   const [todayDate, setTodayDate] = useState("");
   const [domainExpiryDate, setDomainExpiryDate] = useState("");
   const [planExpiryDate, setPlanExpiryDate] = useState("");
+
+  const [processingModalOpen, setProcessingModalOpen] = useState(false);
     
   useEffect(() => {
     const dayToday = new Date();
@@ -190,6 +194,12 @@ const Review = () => {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [primaryContact, setPrimaryContact] = useState(initialContact);
   // console.log("primaryContact...", primaryContact);
+  
+  const [domainPrice, setDomainPrice] = useState(0);
+
+  useEffect(() => {
+    setDomainPrice(data?.selectedDomain?.price[defaultCurrencySlice]);
+  }, [defaultCurrencySlice, state]);
 
   const handleChangeContactFormData = () => {
     setData({
@@ -321,6 +331,118 @@ const Review = () => {
     setIsChecked(!isChecked);
   };
 
+  const makePayment = async(token) => {
+    const body = {
+      token,
+      product: {
+        name: `${data?.formData?.first_name} ${data?.formData?.last_name}`,
+        price: data?.finalTotalPrice,
+        productBy: "test",
+        currency: defaultCurrencySlice,
+        description: 'purchasing google workspace and domain',
+        domain: {
+          domain_name: data?.selectedDomain?.domain,
+          type: "new",
+          year: 1
+        },
+        workspace: {
+          plan: data?.plan,
+          license_usage: data?.license_usage,
+          plan_period: data?.period,
+          trial_plan: "yes"
+        },
+        customer_id: data?.customer_id,
+        email: data?.email,
+        voucher: data?.voucher?.voucher?.id || ""
+      }
+    };
+    const headers={
+      "Content-Type":"application/json"
+    };
+    try {
+      setProcessingModalOpen(true);
+      const result = await dispatch(stripePayThunk(body)).unwrap();
+      console.log("result...", result);
+      if(result?.message === "Payment successful") {
+        setTimeout(() => {
+          navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: result?.charge, currency: defaultCurrencySlice, date: new Date() }});
+        }, 3000);
+      } else {
+        toast.error("Error on payment method");
+      }
+    } catch (error) {
+      toast.error("Error on payment method");
+    }
+  };
+
+  const payStackConfig = {
+    reference: (new Date()).getTime().toString(),
+    email: data?.formData?.email,
+    amount: data?.finalTotalPrice * 100,
+    publicKey: 'pk_test_8f89b2c7e1b29dedea53c372de55e3c6e5d1a20e',
+    currency: defaultCurrencySlice,
+    firstName: data?.formData?.first_name,
+    lastName: data?.formData?.last_name,
+    channels: ['card']
+  };
+
+  
+  const body = {
+    reference: (new Date()).getTime().toString(),
+    email: data?.formData?.email,
+    amount: data?.finalTotalPrice * 100,
+    publicKey: 'pk_test_8f89b2c7e1b29dedea53c372de55e3c6e5d1a20e',
+    currency: defaultCurrencySlice,
+    firstName: data?.formData?.first_name,
+    lastName: data?.formData?.last_name,
+    name: `${data?.formData?.first_name} ${data?.formData?.last_name}`,
+    description: 'purchasing google workspace and domain',
+    domain: {
+      domain_name: data?.selectedDomain?.domain,
+      type: "new",
+      year: 1
+    },
+    workspace: {
+      plan: data?.plan,
+      license_usage: data?.license_usage,
+      plan_period: data?.period,
+      trial_plan: "yes" 
+    },
+    customer_id: data?.customer_id,
+    voucher: data?.voucher?.voucher?.id || ""
+  };
+
+  const handlePaystackSuccessAction = async(reference) => {
+    // Implementation for whatever you want to do with reference and after success call.
+    const response = await fetch('https://api.customer.gworkspace.withhordanso.com/paymentservices/payments/api/v1/make_paystack_payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const responseData = await response;
+    if (responseData.status) {
+      setProcessingModalOpen(true);
+      // console.log(reference);
+      setTimeout(() => {
+        navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: reference, currency: defaultCurrencySlice, date: new Date() }});
+      }, 3000);
+    } else {
+      toast.error("Error on payment method");
+    }
+  };
+  
+  const handlePaystackCloseAction = () => {
+    // implementation for  whatever you want to do when the Paystack dialog closed.
+    console.log('closed')
+  };
+
+  const componentProps = {
+    ...payStackConfig,
+    text: 'Agree and continue',
+    onSuccess: (reference) => handlePaystackSuccessAction(reference),
+    onClose: handlePaystackCloseAction,
+  };
+
   const handleSubmit2 = async(e) => {
     e.preventDefault();
     if(paymentMethod === "") {
@@ -349,7 +471,7 @@ const Review = () => {
           payment_cycle: "Yearly",
           customer_id: data?.customer_id,
           description: "domain purchase",
-          domain: [data?.selectedDomain],
+          domain: [data?.selectedDomain?.domain],
           last_payment: todayDate,
           next_payment: domainExpiryDate,
           payment_method: "visa",
@@ -372,7 +494,7 @@ const Review = () => {
           payment_cycle: data?.period,
           customer_id: data?.customer_id,
           description: "google workspace purchase",
-          domain: [data?.selectedDomain],
+          domain: [data?.selectedDomain?.domain],
           last_payment: todayDate,
           next_payment: planExpiryDate,
           payment_method: "visa",
@@ -392,7 +514,7 @@ const Review = () => {
         })).unwrap();
         const domainData = await dispatch(addNewDomainWithoutLoginThunk({
           customer_id: data?.customer_id,
-          domain_name: data?.selectedDomain,
+          domain_name: data?.selectedDomain?.domain,
           domain_type: "primary",
           subscription_id: "0",
           business_name: data?.formData?.business_name,
@@ -444,13 +566,16 @@ const Review = () => {
     } else {
       toast.success("OK");
       // window.location.href="http://localhost:3000/download-invoice";
-      navigate('/download-invoice', {state: {...data, payment_method: paymentMethod}});
+      // navigate('/download-invoice', {state: {...data, payment_method: paymentMethod}});
     }
-  }
+  };
 
   return (
     <>
-      <form className="flex flex-col w-full" onSubmit={handleSubmit}>
+      <div
+        className="flex flex-col w-full"
+        // onSubmit={handleSubmit}
+      >
         <div className="flex max-[700px]:flex-col items-center justify-start min-[700px]:gap-10 max-[700px]:gap-2 mt-8">
           <button
             className="flex flex-row items-center justify-center gap-3"
@@ -488,13 +613,13 @@ const Review = () => {
               <div className='flex flex-col gap-1'>
                 <div className='flex gap-2'>
                   <h4 className="font-inter font-normal text-xl text-black">Domain</h4>
-                  <h4 className="font-inter font-normal text-xl text-black">{data?.selectedDomain}</h4>
+                  <h4 className="font-inter font-normal text-xl text-black">{data?.selectedDomain?.domain}</h4>
                 </div>
                 <p>Your annual plan will begin {formattedDate}. You can <span className='text-[#12A833]'>cancel at any time</span>.</p>
                 <p>Charges today and recurs yearly on {formattedDate2}</p>
               </div>
               <div className='w-[140px] max-[768px]:w-full flex flex-col items-end text-end justify-end ml-auto'>
-                <p className='font-inter font-normal text-xl text-black text-end ml-auto'>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}99.99 yearly</p>
+                <p className='font-inter font-normal text-xl text-black text-end ml-auto'>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{domainPrice} yearly</p>
                 <p className='font-inter font-medium text-base text-black text-end ml-auto'>+applicable tax</p>
               </div>
             </div>
@@ -857,18 +982,48 @@ const Review = () => {
 
         {/* Submit Button */}
         <div className='flex justify-between w-full'>
-          <button
-            className="w-[30%] px-2 py-2 mb-5 ml-5 font-medium text-white bg-green-500 rounded-[10px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 mx-auto"
-            type='submit'
-          >
-            Agree and continue
-          </button>
+          {
+            paymentMethod?.toLowerCase() === "stripe"
+            ? (
+              <button className="w-[30%] px-2 py-2 mb-5 ml-5 font-medium text-white bg-green-500 rounded-[10px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 mx-auto">
+                <StripeCheckout
+                  name='Hordanso'
+                  description="Purchasing google workspace and domain"
+                  image="https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899"
+                  ComponentClass="div"
+                  panelLabel="Submit"
+                  // amount={data?.finalTotalPrice * 100}
+                  // currency={defaultCurrencySlice}
+                  stripeKey="pk_test_51HCGY4HJst0MFfZtYup1hAW3VcsAmcJJ4lwg9fDjPLvStToUiLixgF679sFDyWfVH1awUIU3UGOd2TyAYDUkJrPF002WD2USoG"
+                  email={data?.formData?.email}
+                  // billingAddress
+                  token={makePayment}
+                  allowRememberMe
+                >Agree and continue</StripeCheckout>
+              </button>
+            ) : paymentMethod?.toLowerCase() === "paystack"
+            ? (
+              <button
+                className="w-[30%] px-2 py-2 mb-5 ml-5 font-medium text-white bg-green-500 rounded-[10px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 mx-auto"
+                // onClick={() => {() => initializePayment(handleSuccess, handleClose)}}
+              >
+                <PaystackButton {...componentProps} />
+              </button>
+            ) : (
+              <button
+                className="w-[30%] px-2 py-2 mb-5 ml-5 font-medium text-white bg-green-500 rounded-[10px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 mx-auto"
+                onClick={() => {toast.warning("Please select a payment method")}}
+              >
+                Agree and continue
+              </button>
+            )
+          }
           <div
             className="absolute right-0 w-10 h-10 bg-center bg-no-repeat bg-contain bottom-11"
             style={{ backgroundImage: `url("https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/messaageIcon.png?alt=media&token=a078fd41-6617-4089-b891-b54970394dbf")` }}
           ></div>
         </div>
-      </form>
+      </div>
 
       {
         isOpenModal && (
@@ -987,6 +1142,44 @@ const Review = () => {
                         setPrimaryContact(initialContact);
                       }}
                     >Cancel</button>
+                  </div>
+                </DialogPanel>
+              </div>
+            </div>
+          </Dialog>
+        )
+      }
+
+      {
+        processingModalOpen && (
+          <Dialog
+            open={processingModalOpen}
+            as="div"
+            className="relative z-10 focus:outline-none"
+            onClose={() => {
+              setProcessingModalOpen(true);
+            }}
+            // static
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-10 w-screen overflow-y-auto">
+              <div className="flex min-h-full items-center justify-center py-4">
+                <DialogPanel
+                  transition
+                  className="w-full max-w-[930px] bg-white p-4 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+                >
+                  <div className="flex justify-start pt-2 pb-4 items-center mb-6 border-b border-[#E4E4E4]">
+                    <DialogTitle
+                      as="h3"
+                      className="font-montserrat font-medium text-base text-black"
+                    >Your payment request is being processed...</DialogTitle>
+                  </div>
+                  <div className="pt-2 pb-4 w-full max-w-[600px] font-montserrat font-medium text-xs text-black">
+                    <ul>
+                      <li className="py-2">This is a secure payment gateway using 128 bit SSL encryption.</li>
+                      <li className="py-2">When you submit the transaction, the server will take about 1 to 5 seconds to process, but it 
+                      may take longer at certain times.</li>
+                      <li className="py-2">Please do not press “Submit” button once again or the “Back” or “Refresh” buttons.</li>
+                    </ul>
                   </div>
                 </DialogPanel>
               </div>

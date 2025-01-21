@@ -2,7 +2,7 @@ import { ArrowLeft, ChevronRight } from "lucide-react";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { checkDomainThunk } from 'store/reseller.thunk';
+import { checkDomainThunk, domainAvailabilityThunk } from 'store/reseller.thunk';
 import { removeUserAuthTokenFromLSThunk } from "store/user.thunk";
 
 const initialDomain = {
@@ -28,14 +28,14 @@ const BuyDomain: React.FC = () => {
     e.preventDefault();
     // console.log(domain);
     try {
-      const result = await dispatch(checkDomainThunk(domain.domain+domain.domain_extension)).unwrap();
+      const result = await dispatch(domainAvailabilityThunk(domain.domain+domain.domain_extension)).unwrap();
       console.log("check domain result...", result);
-      if(result?.available) {
-        navigate('/domain-details', {state: {result, domain}});
-      } else {
-        navigate('/choose-domain', {state: {result, domain}});
-      }
-      // navigate('/choose-domain', {state: {result, domain}});
+      // if(result?.availablity_status) {
+      //   navigate('/domain-details', {state: {result, domain}});
+      // } else {
+      //   navigate('/choose-domain', {state: {result, domain}});
+      // }
+      navigate('/choose-domain', {state: {result, domain}});
     } catch (error) {
       console.log(error);
       if(error?.message == "Authentication token is required") {

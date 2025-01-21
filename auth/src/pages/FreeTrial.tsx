@@ -135,7 +135,7 @@ const FreeTrial: React.FC = () => {
             </a>.
         </p>
 
-        <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg" onClick={()=>navigate('/gemini-add', { state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: plan, period: location.state.period, selectedDomain: location.state.selectedDomain, token: location.state.token, emailData: location.state.emailData, from: location.state.from} })}>
+        <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg" onClick={()=>navigate('/gemini-add', { state: { ...location.state, plan: plan, } })}>
           Start Free Trial
         </button>
       </div>

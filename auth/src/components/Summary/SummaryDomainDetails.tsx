@@ -68,8 +68,8 @@ const SummaryDomainDetails = ({state, handleContactModalOpen, handleBusinessModa
           Domain details
         </h2>
         <div className="mb-3 w-full max-w-[600px]">
-          <p className="text-gray-500">{state.selectedDomain}</p>
-          <p className="text-gray-500">$ 648.00 per year</p>
+          <p className="text-gray-500">{state?.selectedDomain?.domain}</p>
+          <p className="text-gray-500">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{state?.selectedDomain?.price[defaultCurrencySlice]}</p>
           <p className="text-gray-500">
             Your annual plan will begin <strong>{today}</strong>. You can{" "}
             <span className="text-blue-500 underline">cancel at any time</span>.

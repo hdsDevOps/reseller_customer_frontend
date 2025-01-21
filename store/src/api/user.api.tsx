@@ -365,6 +365,23 @@ async function getStaffListApi(
   }
 };
 
+async function addStaffWithoutLoginApi(
+  user_id:string,
+  first_name:string,
+  last_name:string,
+  email:string,
+  phone_no:string,
+  user_type_id:string,
+  token:string
+): Promise<any> {
+  try {
+    const result = await postApiCall2(endPoints.addStaff, { user_id, first_name, last_name, email, phone_no, user_type_id }, token);
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 async function addStaffApi(
   user_id:string,
   first_name:string,
@@ -414,6 +431,20 @@ async function getSettingsListApi(
 ): Promise<any> {
   try {
     const result = await postApiCall(endPoints.getSettingsList, { user_type, user_id });
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+async function addSettingWithoutLoginApi(
+  user_type:string,
+  user_id:string,
+  permissions:[],
+  token:string
+): Promise<any> {
+  try {
+    const result = await postApiCall2(endPoints.addSetting, { user_type, user_id, permissions }, token);
     return result;
   } catch (error: any) {
     throw error;
@@ -495,18 +526,21 @@ async function getBillingHistoryApi(
 };
 
 async function addBillingHistoryApi(
+  user_id: string,
   transaction_id: string,
   date: string,
-  invoice_no: string,
+  invoice: string,
   product_type: string,
   description: string,
   domain: string,
   payment_method: string,
   payment_status: string,
-  amount: string
+  amount: string,
+  transaction_data: object,
+  subscription_id:string
 ): Promise<any> {
   try {
-    const result = await postApiCall(endPoints.addBillingHistory, {  transaction_id, date, invoice_no, product_type, description, domain, payment_method, payment_status, amount });
+    const result = await postApiCall(endPoints.addBillingHistory, {  user_id, transaction_id, date, invoice, product_type, description, domain, payment_method, payment_status, amount, transaction_data,subscription_id });
     return result;
   } catch (error: any) {
     throw error;
@@ -619,6 +653,31 @@ async function makeDefaultPaymentMethodApi(
 ): Promise<any> {
   try {
     const result = await postApiCall(endPoints.makeDefaultPaymentMethod, { user_id, payment_method_id });
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+async function getPaymentMethodsWithoutLoginApi(
+  user_id:string,
+  token: string
+): Promise<any> {
+  try {
+    const result = await postApiCall2(endPoints.getPaymentMethods, { user_id }, token);
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+async function makeDefaultPaymentMethodWithoutLoginApi(
+  user_id:string,
+  payment_method_id:string,
+  token: string
+): Promise<any> {
+  try {
+    const result = await postApiCall2(endPoints.makeDefaultPaymentMethod, { user_id, payment_method_id }, token);
     return result;
   } catch (error: any) {
     throw error;
@@ -860,6 +919,33 @@ async function verifyReCaptchaApi(re_captcha_token:string): Promise<any> {
   }
 };
 
+async function stripePayApi(body:object): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.stripePay, body);
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+async function paystackPayApi(body:object): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.paystackPay, body);
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+async function hereMapSearchApi(address:object): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.hereMapSearch, address);
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 export const userApis = {
   userLoginApi,
   resendLoginOtpApi,
@@ -893,11 +979,13 @@ export const userApis = {
   getCartApi,
   addToCartApi,
 
+  addStaffWithoutLoginApi,
   getStaffListApi,
   addStaffApi,
   editStaffApi,
   deleteStaffApi,
 
+  addSettingWithoutLoginApi,
   getSettingsListApi,
   addSettingApi,
   editSettingApi,
@@ -918,6 +1006,9 @@ export const userApis = {
 
   getPaymentMethodsApi,
   makeDefaultPaymentMethodApi,
+
+  getPaymentMethodsWithoutLoginApi,
+  makeDefaultPaymentMethodWithoutLoginApi,
 
   getPaymentSubscriptionsListApi,
   addSubscriptionApi,
@@ -943,4 +1034,9 @@ export const userApis = {
   getPromotionListApi,
 
   verifyReCaptchaApi,
+
+  stripePayApi,
+  paystackPayApi,
+
+  hereMapSearchApi,
 };

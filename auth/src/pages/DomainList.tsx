@@ -3,55 +3,44 @@ import { GoArrowRight } from "react-icons/go";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoChevronBackSharp } from "react-icons/io5";
 import { toast } from "react-toastify";
-import { useAppDispatch } from "store/hooks";
-import { checkDomainThunk } from "store/reseller.thunk";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import { checkDomainThunk, domainAvailabilityThunk } from "store/reseller.thunk";
+import { currencyList } from "../components/CurrencyList";
 
 const DomainList: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
 
+  const { defaultCurrencySlice } = useAppSelector(state => state.auth);
+
   console.log("location state...", location.state);
-  const domainExistance = location.state.type;
-  const [domain_name, setDomainName] = useState(location.state.domain.domainName);
 
-  // Array of domains with their prices
-  const domains = [
-    { name: ".co.in", price: "₹648.00/year" },
-    { name: ".website", price: "₹2,069.00/year" },
-    { name: ".net", price: "₹5,069.00/year" },
-    { name: ".website", price: "₹2,069.00/year" },
-    { name: ".net", price: "₹2,069.00/year" },
-    { name: ".net", price: "₹5,069.00/year" },
-    { name: ".net", price: "₹5,069.00/year" },
-  ];
-
-  const [newDomain, setNewDomain] = useState({
-    name: location.state.domain.domainName,
-    extention: location.state.domain.domainExtension
-  });
-
-  const handleDomainClick = (domain: { name: string; price: string }) => {
-    navigate('/selected-domain', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, selectedDomain: `${domain_name}${domain?.name}`, type: 'new'}});
-    navigate('/selected-domain', { state: {  } });
+  const initialNewDomain = {
+    domain: location.state.selectedDomain.domain,
+    domain_extension: location.state.selectedDomain.domain_extension
   };
 
+  const [newDomain, setNewDomain] = useState(initialNewDomain);
+  const [domainResult, setDomainResult] = useState(location.state.result);
+
   const handleCheckDomain = async(e) => {
+    e.preventDefault();
     try {
-      const result = await dispatch(checkDomainThunk(`${newDomain?.name}${newDomain?.extention}`)).unwrap();
-      console.log("result...", result);
-      if(result?.message === "Domain is Still Available for Purchase , doesn't belong to anyone yet" || result?.message === "Customer domain is Available to be used with a google workspace") {
-        if(location.state.from === "business_info") {
-          navigate('/selected-domain', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, selectedDomain: `${newDomain?.name}${newDomain?.extention}`, type: 'new'}});
-        }
-      } else {
-        setDomainName(newDomain?.name);
-        toast.warning("This domain name is already in use. If you own this domain and would like to use Google Workspace, please follow the steps:")
-      }
+      const result = await dispatch(domainAvailabilityThunk(newDomain?.domain+newDomain?.domain_extension)).unwrap();
+      setDomainResult(result);
     } catch (error) {
-      toast.error("Error searching domain");
+      console.log(error);
+      setDomainResult(location.state.result);
     }
-  }
+  };
+
+  const handleDomainClick = (domain) => {
+    if(domainResult?.availablity_status === "true") {
+      navigate('/selected-domain', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, selectedDomain: domain, type: 'new'}});
+    }
+  };
+
 
   return (
     <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative">
@@ -70,18 +59,18 @@ const DomainList: React.FC = () => {
               type="text"
               placeholder="domain"
               className="w-full border-2 border-gray-200 bg-transparent rounded-md p-3 pr-32 focus:border-blue-500 focus:outline-none"
-              value={newDomain?.name}
+              value={newDomain?.domain}
               onChange={e => {setNewDomain({
                 ...newDomain,
-                name: e.target.value,
+                domain: e.target.value,
               })}}
             />
             <select
               className="absolute top-0 right-2 h-full border-0 bg-transparent text-black font-semibold"
-              value={newDomain?.extention}
+              value={newDomain?.domain_extension}
               onChange={e => {setNewDomain({
                 ...newDomain,
-                extention: e.target.value,
+                domain_extension: e.target.value,
               })}}
             >
               <option value=".com">.com</option>
@@ -98,9 +87,14 @@ const DomainList: React.FC = () => {
           </button>
         </div>
 
-        {domainExistance === "new" ? "text-[#12A833]" : (
-          <p className={`self-start text-sm ${ domainExistance === "new" ? "text-[#12A833]" : "text-red-600"}`}>This domain name is already in use. If you own this domain and would like to use Google Workspace, please follow the steps <span className="text-[#12A833]">here</span>.</p>
-        )}
+        {
+          domainResult?.availablity_status === "true"
+          ? (
+            <p className={`self-start text-sm text-[#12A833]`}>This domain name is available.</p>
+          ) : (
+            <p className={`self-start text-sm text-red-600`}>This domain name is already in use. If you own this domain and would like to use Google Workspace, please follow the steps <span className="text-[#12A833]">here</span>.</p>
+          )
+        }
 
         <div className="w-full max-w-3xl mt-8">
           <h1 className="self-start text-2xl font-semibold mt-6 mb-2">Choose a domain</h1>
@@ -115,18 +109,34 @@ const DomainList: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {domains.map((domain, index) => (
-                  <tr key={index} className="hover:bg-gray-100">
-                    <td className="py-2 px-4">{domain_name}{domain.name}</td>
-                    <td className="py-2 px-4">{domain.price}</td>
-                    <td className="py-2 px-4 text-right">
-                      <GoArrowRight
-                        className="text-green-500 cursor-pointer text-xl"
-                        onClick={() => handleDomainClick(domain)}
-                      />
-                    </td>
-                  </tr>
-                ))}
+                {
+                  domainResult?.availablity_status === "true" && (
+                    <tr className="hover:bg-gray-100">
+                      <td className="py-2 px-4">{domainResult?.available?.domain?.domain}</td>
+                      <td className="py-2 px-4">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{domainResult?.available?.domain?.price[defaultCurrencySlice]}</td>
+                      <td className="py-2 px-4 text-right">
+                        <GoArrowRight
+                          className="text-green-500 cursor-pointer text-xl"
+                          onClick={() => handleDomainClick(domainResult?.available?.domain)}
+                        />
+                      </td>
+                    </tr>
+                  )
+                }
+                {
+                  domainResult?.suggestions?.map((domainList, index) => (
+                    <tr key={index} className="hover:bg-gray-100">
+                      <td className="py-2 px-4">{domainList?.domain}</td>
+                      <td className="py-2 px-4">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{domainList?.price[defaultCurrencySlice]}</td>
+                      <td className="py-2 px-4 text-right">
+                        <GoArrowRight
+                          className="text-green-500 cursor-pointer text-xl"
+                          onClick={() => handleDomainClick(domainList)}
+                        />
+                      </td>
+                    </tr>
+                  ))
+                }
               </tbody>
             </table>
           </div>

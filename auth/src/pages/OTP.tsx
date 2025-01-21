@@ -9,7 +9,7 @@ import { LuMoveLeft } from "react-icons/lu";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { verifyLoginOtpThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, resendLoginOtpThunk, verifyForgetPasswordOtpThunk, resendForgetPasswordOtpThunk, resendRegisterOtpThunk, verifyRegisterOtpThunk, setStaffIdToLSThunk, getStaffIdFromLSThunk, verifyStaffLoginOtpThunk, setStaffStatusToLSThunk, getStaffStatusFromLSThunk } from 'store/user.thunk';
+import { verifyLoginOtpThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, resendLoginOtpThunk, verifyForgetPasswordOtpThunk, resendForgetPasswordOtpThunk, resendRegisterOtpThunk, verifyRegisterOtpThunk, setStaffIdToLSThunk, getStaffIdFromLSThunk, verifyStaffLoginOtpThunk, setStaffStatusToLSThunk, getStaffStatusFromLSThunk, setRoleIdToLSThunk, getRoleIdFromLSThunk } from 'store/user.thunk';
 
 const OTP: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -21,7 +21,7 @@ const OTP: React.FC = () => {
   const email = location.state?.email;
   const mode = queryParams.get("mode");
 
-  // console.log("state...", location.state);
+  console.log("state...", location.state);
   
   const otpRefs = useRef([]);
   const [otpValues, SetOptValues] = useState(["", "", "", "", "", "",]);
@@ -135,6 +135,7 @@ const OTP: React.FC = () => {
                 await dispatch(setUserIdToLSThunk(customerId)).unwrap();
                 await dispatch(setStaffIdToLSThunk(staffId)).unwrap();
                 await dispatch(setStaffStatusToLSThunk(location.state.is_staff)).unwrap();
+                await dispatch(setRoleIdToLSThunk(location.state?.role_id)).unwrap();
                 navigate('/dashboard', {state: {from: 'otp'}});
               } catch (error) {
                 console.log("Error on token");
@@ -144,6 +145,7 @@ const OTP: React.FC = () => {
                   await dispatch(getUserIdFromLSThunk()).unwrap();
                   await dispatch(getStaffIdFromLSThunk()).unwrap();
                   await dispatch(getStaffStatusFromLSThunk()).unwrap();
+                  await dispatch(getRoleIdFromLSThunk()).unwrap();
                   navigate('/dashboard', {state: {from: 'otp'}})
                 } catch (error) {
                   console.log("Error on token")
@@ -182,6 +184,11 @@ const OTP: React.FC = () => {
           // Handle login error
           console.error("Login error:", error);
           // toast.error()
+          if(error?.message === "Request failed with status code 400") {
+            toast.error("Please enter the correct OTP");
+          } else {
+            toast.error("OTP error");
+          }
         } finally {
           // Set loading state to false after request completes
           setLoading(false);
@@ -229,7 +236,7 @@ const OTP: React.FC = () => {
       }
     } else {
       // not entered 6 otps
-      toast.warning("Please enter all 6 otps")
+      toast.warning("Please enter the OTP");
     }
   };
 

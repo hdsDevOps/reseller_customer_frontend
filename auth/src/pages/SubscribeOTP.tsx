@@ -8,7 +8,7 @@ import { resendRegisterOtpThunk, verifyRegisterOtpThunk } from "store/user.thunk
 const OTP: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    // console.log("state....", location.state);
+    console.log("state....", location.state);
     const dispatch = useAppDispatch();
 
     const customerId = location.state.customer_id;
@@ -137,7 +137,7 @@ const OTP: React.FC = () => {
 
     const handleCloseModal = () => {
         setShowModal(false);
-        navigate("/businessinfo", {state: {customer_id: customerId, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: token}});
+        navigate("/businessinfo", {state: { ...location.state, customer_id: customerId, token: token}});
     };
 
     return (

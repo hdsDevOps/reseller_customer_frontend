@@ -4,7 +4,7 @@ import { ChevronDown, ChevronRight, ChevronUp, CirclePlus, FilterX, Trash2, X } 
 import EmailModal from "../components/EmailModal";
 import ActionModal from "../components/ActionModal";
 import AddLicense from "../components/AddLicense";
-import { getDomainsListThunk, removeUserAuthTokenFromLSThunk,addEmailsThunk, changeEmailStatusThunk, deleteEmailThunk, makeEmailAdminThunk, updateEmailUserDataThunk, resetEmailPasswordThunk, updateLicenseUsageThunk, getProfileDataThunk, savedCardsListThunk, deleteCardThunk, getVouchersListThunk, plansAndPricesListThunk, useVoucherThunk } from 'store/user.thunk';
+import { getDomainsListThunk, removeUserAuthTokenFromLSThunk,addEmailsThunk, changeEmailStatusThunk, deleteEmailThunk, makeEmailAdminThunk, updateEmailUserDataThunk, resetEmailPasswordThunk, updateLicenseUsageThunk, getProfileDataThunk, savedCardsListThunk, deleteCardThunk, getVouchersListThunk, plansAndPricesListThunk, useVoucherThunk, addBillingHistoryThunk, stripePayThunk } from 'store/user.thunk';
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import axios from 'axios';
@@ -18,6 +18,9 @@ import AddPayment from "../components/AddPaymentMethods";
 import { MdOutlineMail } from "react-icons/md";
 import { setSaveCards, setUserDetails } from "store/authSlice";
 import { currencyList } from "../components/CurrencyList";
+import { format } from "date-fns";
+import StripeCheckout from "react-stripe-checkout";
+import { PaystackButton } from "react-paystack";
 
 const intialEmail = {
   first_name:"",
@@ -95,6 +98,10 @@ const EmailList: React.FC = () => {
   const [vouchers, setVouchers] = useState([]);
   const [voucherInputOpen, setVoucherInputOpen] = useState(false);
   const [voucherCode, setVoucherCode] = useState("");
+  
+  const [todayDate, setTodayDate] = useState("");
+  const [domainExpiryDate, setDomainExpiryDate] = useState("");
+  const [planExpiryDate, setPlanExpiryDate] = useState("");
 
   const dateFormat = (date) => {
     const miliseconds = parseInt(date?._seconds) * 1000 + parseInt(date?._nanoseconds) / 1e6;
@@ -106,6 +113,28 @@ const EmailList: React.FC = () => {
       return false;
     }
   };
+
+  const dateFormat2 = (date) => {
+    const miliseconds = parseInt(date?._seconds) * 1000 + parseInt(date?._nanoseconds) / 1e6;
+    const foundDate =  new Date(miliseconds);
+    // console.log(foundDate);
+    // console.log(format(foundDate, "yyyy-MM-dd"));
+    if(foundDate === "Invalid Date") {
+      return "";
+    } else {
+      return format(foundDate, "yyyy-MM-dd");
+    }
+  };
+
+  useEffect(() => {
+    const dayToday = new Date();
+    setTodayDate(format(dayToday, "yyyy-MM-dd"));
+    
+    if(userDetails?.workspace) {
+      setPlanExpiryDate(dateFormat2(userDetails?.workspace?.next_payment));
+      // dateFormat2(userDetails?.workspace?.next_payment);
+    }
+  }, [userDetails]);
 
   const getVouchersList = async() => {
     try {
@@ -665,8 +694,7 @@ const EmailList: React.FC = () => {
     };
   }, []);
   
-  const changeLicenseUsage = async(e) => {
-    e.preventDefault();
+  const changeLicenseUsage = async() => {
     try {
       if(numUsers > 0) {
         const originalLicense = parseInt(userDetails?.license_usage);
@@ -682,12 +710,10 @@ const EmailList: React.FC = () => {
         setSubtotal(0);
         setNumUsers(0);
         toast.success(result?.message);
-        setIsLicenseModalOpen(false);
       } else {
         toast.warning("Number of user cannot be 0");
       }
     } catch (error) {
-      setIsLicenseModalOpen(false);
       toast.error("Error updating License Usage");
       if(error?.message == "Authentication token is required") {
         try {
@@ -739,7 +765,146 @@ const EmailList: React.FC = () => {
     } finally {
       getCardsList();
     }
-  }
+  };
+
+  const addBillingHistory = async(paymentResult, madePaymentMethod) => {
+    try {
+      await dispatch(addBillingHistoryThunk({
+        user_id: customerId,
+        transaction_id: `${
+          madePaymentMethod === "Stripe"
+          ? paymentResult?.balance_transaction
+          : madePaymentMethod === "paystack"
+          ? paymentResult?.transaction
+          : ""
+        }`,
+        date: todayDate,
+        invoice: `${
+          madePaymentMethod === "Stripe"
+          ? paymentResult?.payment_method_details?.card?.network_transaction_id
+          : madePaymentMethod === "paystack"
+          ? paymentResult?.reference
+          : ""
+        }`,
+        product_type: "user license",
+        description: "purchase user license",
+        domain: selectedDomain?.domain_name,
+        payment_method: madePaymentMethod,
+        payment_status: "Success",
+        amount: `${currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}${total}`,
+        transaction_data: paymentResult
+      }));
+    } catch (error) {
+      console.log("error");
+    }
+  };
+
+  const makePayment = async(token) => {
+    const body = {
+      token,
+      product: {
+        name: `${userDetails?.first_name} ${userDetails?.last_name}`,
+        price: total,
+        productBy: "test",
+        currency: defaultCurrencySlice,
+        description: 'purchasing user license',
+        domain: "",
+        workspace: {
+          plan: activeSubscriptionPlan,
+          license_usage: numUsers,
+          plan_period: userDetails?.workspace?.payment_cycle,
+          trial_plan: userDetails?.workspace?.workspace_status === "trial" ? "yes" : "no"
+        },
+        customer_id: customerId,
+        email: userDetails?.email,
+        voucher: appliedVoucher?.id
+      }
+    };
+    const headers={
+      "Content-Type":"application/json"
+    };
+    try {
+      const result = await dispatch(stripePayThunk(body)).unwrap();
+      console.log("result...", result);
+      if(result?.message === "Payment successful") {
+        setTimeout(() => {
+          // navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: result?.charge}});
+          addBillingHistory(result?.charge, "Stripe");
+          changeLicenseUsage();
+          setIsLicenseModalOpen(false);
+        }, 3000);
+      } else {
+        toast.error("Error on payment method");
+      }
+    } catch (error) {
+      toast.error("Error on payment method");
+    }
+  };
+
+  const payStackConfig = {
+    reference: (new Date()).getTime().toString(),
+    email: userDetails?.email,
+    amount: total * 100,
+    publicKey: 'pk_test_8f89b2c7e1b29dedea53c372de55e3c6e5d1a20e',
+    currency: defaultCurrencySlice,
+    firstName: userDetails?.first_name,
+    lastName: userDetails?.last_name,
+    channels: ['card']
+  };
+  
+  const body = {
+    reference: (new Date()).getTime().toString(),
+    email: userDetails?.email,
+    amount: total * 100,
+    publicKey: 'pk_test_8f89b2c7e1b29dedea53c372de55e3c6e5d1a20e',
+    currency: defaultCurrencySlice,
+    firstName: userDetails?.first_name,
+    lastName: userDetails?.last_name,
+    name: `${userDetails?.first_name} ${userDetails?.last_name}`,
+    description: 'purchasing user license',
+    domain: "",
+    workspace: {
+      plan: activeSubscriptionPlan,
+      license_usage: numUsers,
+      plan_period: userDetails?.workspace?.payment_cycle,
+      trial_plan: userDetails?.workspace?.workspace_status === "trial" ? "yes" : "no" 
+    },
+    customer_id: customerId,
+    voucher: appliedVoucher?.id
+  };
+
+  const handlePaystackSuccessAction = async(reference) => {
+    // Implementation for whatever you want to do with reference and after success call.
+    const response = await fetch('https://api.customer.gworkspace.withhordanso.com/paymentservices/payments/api/v1/make_paystack_payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const responseData = await response;
+    if (responseData.status) {
+      // console.log(reference);
+      setTimeout(() => {
+        // navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: reference}})
+        changeLicenseUsage();
+        addBillingHistory(reference, "paystack");
+        setIsLicenseModalOpen(false);
+      }, 3000);
+    } else {
+      toast.error("Error on payment method");
+    }
+  };
+  
+  const handlePaystackCloseAction = () => {
+    // implementation for  whatever you want to do when the Paystack dialog closed.
+    console.log('closed')
+  };
+
+  const componentProps = {
+    ...payStackConfig,
+    text: 'Submit',
+    onSuccess: (reference) => handlePaystackSuccessAction(reference),
+    onClose: handlePaystackCloseAction,
+  };
 
   return (
     <div>
@@ -862,7 +1027,7 @@ const EmailList: React.FC = () => {
                           <tr key={index} className="relative ">
                             <td className="p-2 text-gray-600 font-semibold text-xs sm:text-sm md:text-md flex items-center">
                               <span>{row?.first_name}&nbsp;{row?.last_name}</span>
-                              {row?. is_admin ? (
+                              {row?.is_admin ? (
                                 <span className="p-2 text-gray-600 font-semibold text-xs sm:text-sm md:text-md flex items-center">
                                   <ChevronRight />
                                   <span className="text-gray-600 font-semibold text-xs sm:text-sm md:text-md">Admin</span>
@@ -1155,7 +1320,7 @@ const EmailList: React.FC = () => {
         {
           isLicenseModalOpen && (
             <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-              <form className="bg-white p-6 rounded-lg shadow-md max-w-3xl w-full mx-2  max-h-[95vh] xl:max-h-full overflow-y-scroll" onSubmit={changeLicenseUsage}>
+              <div className="bg-white p-6 rounded-lg shadow-md max-w-3xl w-full mx-2  max-h-[95vh] xl:max-h-full overflow-y-scroll">
                 <div className="flex items-center justify-between mb-4">
                   <h1 className="text-xl font-bold">Add User License</h1>
                   {/* <button className="flex items-center gap-1 text-green-500 border-2 border-green-500 hover:bg-green-500 hover:text-white transition duration-200 ease-in-out py-2 px-4 rounded-lg text-xs sm:text-sm">
@@ -1376,8 +1541,8 @@ const EmailList: React.FC = () => {
                                 type="radio"
                                 id={method?.id}
                                 name="payment-method"
-                                checked={selectedPaymentMethod === method?.id || method?.default} // Check if method is 'stripe'
-                                onChange={() => handlePaymentMethodChange(method?.id)}
+                                checked={selectedPaymentMethod === method?.method_name} // Check if method is 'stripe'
+                                onClick={() => handlePaymentMethodChange(method?.method_name)}
                                 className="mr-2 radio radio-xs radio-success"
                                 title={method?.method_name}
                               />
@@ -1406,12 +1571,47 @@ const EmailList: React.FC = () => {
                 </div>
 
                 <div className="flex justify-start gap-4 mt-4">
-                  <button
-                    className="bg-green-500 text-white py-2 px-4 rounded"
-                    type="submit"
-                  >
-                    Submit
-                  </button>
+                {
+                  selectedPaymentMethod?.toLowerCase() === "stripe"
+                  ? (
+                    <button
+                      className="bg-green-500 text-white py-2 px-4 rounded"
+                      type="button"
+                    >
+                      <StripeCheckout
+                        name='Hordanso'
+                        description="Purchasing google workspace and domain"
+                        image="https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899"
+                        ComponentClass="div"
+                        panelLabel="Submit"
+                        // amount={data?.finalTotalPrice * 100}
+                        // currency={defaultCurrencySlice}
+                        stripeKey="pk_test_51HCGY4HJst0MFfZtYup1hAW3VcsAmcJJ4lwg9fDjPLvStToUiLixgF679sFDyWfVH1awUIU3UGOd2TyAYDUkJrPF002WD2USoG"
+                        email={userDetails?.email}
+                        // billingAddress
+                        token={makePayment}
+                        allowRememberMe
+                      >Submit</StripeCheckout>
+                    </button>
+                  ) : selectedPaymentMethod?.toLowerCase() === "paystack"
+                  ? (
+                    <button
+                      className="bg-green-500 text-white py-2 px-4 rounded"
+                      type="button"
+                      // onClick={() => {() => initializePayment(handleSuccess, handleClose)}}
+                    >
+                      <PaystackButton {...componentProps} />
+                    </button>
+                  ) : (
+                    <button
+                      className="bg-green-500 text-white py-2 px-4 rounded"
+                      type="button"
+                      onClick={() => {toast.warning("Please select a payment method")}}
+                    >
+                      Submit
+                    </button>
+                  )
+                }
                   <button
                     className="bg-red-500 text-white py-2 px-4 rounded"
                     onClick={() => {
@@ -1424,7 +1624,7 @@ const EmailList: React.FC = () => {
                     Cancel
                   </button>
                 </div>
-              </form>
+              </div>
             </div>
           )
         }

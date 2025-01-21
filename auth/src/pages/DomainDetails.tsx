@@ -5,7 +5,7 @@ import { IoChevronBackSharp } from "react-icons/io5";
 import "./cumtel.css";
 import { useAppDispatch } from "store/hooks";
 import { toast } from "react-toastify";
-import { checkDomainThunk } from "store/reseller.thunk";
+import { checkDomainThunk, domainAvailabilityThunk } from "store/reseller.thunk";
 
 const DomainDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -41,14 +41,16 @@ const DomainDetails: React.FC = () => {
     } else {
       setDomainError(false);
       try {
-        const result = await dispatch(checkDomainThunk( `${domainName}${domainExtension}`)).unwrap();
+        const result = await dispatch(domainAvailabilityThunk( `${domainName}${domainExtension}`)).unwrap();
         console.log("result...", result);
-        if(result?.available) {
+        if(result?.availablity_status === "false") {
           if(location.state.from === "business_info") {
-            navigate('/selected-domain', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, selectedDomain: `${domainName}${domainExtension}`, type: 'new'}});
+            navigate('/domainlist', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, selectedDomain: {domain: domainName, domain_extension: domainExtension}, result: result, type: 'new'}});
           }
         } else{
-          navigate('/domainlist', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, domain: {domainName, domainExtension}, type: 'new_error'}});
+          if(location.state.from === "business_info") {
+            navigate('/domainlist', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, selectedDomain: {domain: domainName, domain_extension: domainExtension}, result: result, type: 'new_error'}});
+          }
         }
       } catch (error) {
         toast.error("Error searching for the domain");

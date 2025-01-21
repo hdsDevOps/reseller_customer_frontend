@@ -11,39 +11,39 @@ interface NotificationCenterProps {
 const NotificationCenter: React.FC<NotificationCenterProps> = ({ onClose }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { customerId } = useAppSelector(state => state.auth);
+  const { customerId, notificationsList } = useAppSelector(state => state.auth);
   const handleModalContentClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
 
-  const [notificationsList, setNotificationsList] = useState([]);
+  // const [notificationsList, setNotificationsList] = useState([]);
   console.log("notificationsList...", notificationsList);
   const [lastId, setLastId] = useState("");
 
-  const getNotificationsList = async() => {
-    try {
-      const result = await dispatch(getNotificationsListThunk({
-        user_id: customerId,
-        last_id: lastId,
-        per_page: 10
-      })).unwrap();
-      console.log("result...", result);
-    } catch (error) {
-      setNotificationsList([...notificationsList]);
-      if(error?.message == "Authentication token is required") {
-        try {
-          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
-          navigate('/login');
-        } catch (error) {
-          //
-        }
-      }
-    }
-  };
+  // const getNotificationsList = async() => {
+  //   try {
+  //     const result = await dispatch(getNotificationsListThunk({
+  //       user_id: customerId,
+  //       last_id: lastId,
+  //       per_page: 10
+  //     })).unwrap();
+  //     console.log("result...", result);
+  //   } catch (error) {
+  //     setNotificationsList([...notificationsList]);
+  //     if(error?.message == "Authentication token is required") {
+  //       try {
+  //         const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+  //         navigate('/login');
+  //       } catch (error) {
+  //         //
+  //       }
+  //     }
+  //   }
+  // };
 
-  useEffect(() => {
-    getNotificationsList();
-  }, [lastId]);
+  // useEffect(() => {
+  //   getNotificationsList();
+  // }, [lastId]);
 
   const readNotification = async(id) => {
     try {
@@ -89,23 +89,39 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({ onClose }) => {
         className="bg-white w-full max-w-[420px] flex flex-col justify-center rounded-xl px-4 absolute right-4 top-[4.5rem]"
         onClick={handleModalContentClick}>
         <div className='flex justify-between mt-4 '>
-          <p className='text-[#000000] text-lg font-bold'>NotificationCenter</p>
+          <p className='text-[#000000] text-lg font-bold'>Notifications</p>
           <ToggleSwitch/>
         </div>
-        <div className='flex items-center mt-4'>
-          <img src='./images/user-profile-image.png'/>
-          <div className='w-full ml-2 mr-4'>
-            <p className='text-[#000000] text-sm font-semibold'>Frankie sulliva commented on your post</p>
-            <p className='text-[#000000] pl-2 mt-2 text-xs border border-[#E5E7EB] rounded-lg '>This is a notification template. Here is it </p>
-            <div className='flex justify-between mt-2'>
-              <p className='text-[10px] font-semibold text-[#000000]'>Friday 2:20pm</p>
-              <p className='text-[10px] font-semibold text-[#000000]'>Sep 20, 2024</p>
-            </div>
+        <div className='flex flex-col mb-10'>
+          <div className='flex flex-col'>
+            {
+              notificationsList?.length > 0
+              ? notificationsList?.map((notification, index) => (
+                <div></div>
+              )) : (
+                <p className='font-inter font-semibold text-[10px] text-black text-center'>No notifications...</p>
+              )
+            }
           </div>
-          <div className='bg-[#1C64F2] h-2 w-2 rounded-full'></div>
+          {/* <div className='flex items-center mt-4'>
+            <img src='./images/user-profile-image.png'/>
+            <div className='w-full ml-2 mr-4'>
+              <p className='text-[#000000] text-sm font-semibold'>Frankie sulliva commented on your post</p>
+              <p className='text-[#000000] pl-2 mt-2 text-xs border border-[#E5E7EB] rounded-lg '>This is a notification template. Here is it </p>
+              <div className='flex justify-between mt-2'>
+                <p className='text-[10px] font-semibold text-[#000000]'>Friday 2:20pm</p>
+                <p className='text-[10px] font-semibold text-[#000000]'>Sep 20, 2024</p>
+              </div>
+            </div>
+            <div className='bg-[#1C64F2] h-2 w-2 rounded-full'></div>
+          </div> */}
+          {
+            notificationsList?.length > 4 && (
+              <button className='bg-[#80AC8A] text-[8px] font-bold text-white text-center px-3 w-fit mx-auto rounded-lg mt-10'>See more</button>
+            )
+          }
         </div>
-        <button className='bg-[#80AC8A] text-[8px] font-bold text-white text-center px-3 w-fit mx-auto rounded-lg my-10'>See more</button>
-    </div>
+      </div>
     </div>
   );
 };

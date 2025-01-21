@@ -14,6 +14,7 @@ import { currencyList } from "../CurrencyList";
 import { LuTvMinimalPlay } from "react-icons/lu";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import ReactPlayer from "react-player";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 
 const HeroSection = ({id}:any) => {
@@ -39,7 +40,30 @@ const HeroSection = ({id}:any) => {
   // console.log("banner...", activeBannerData);
   // const [promotionId, setPromotionId] = useState(banner[activeBanner]?.)
   const [activePromotion, setActivePromotion] = useState("");
-  console.log("activePromotion...", activePromotion);
+  // console.log("activePromotion...", activePromotion);
+  const [hovering, setHovering] = useState(false);
+  const [currentTransform, setCurrentTransform] = useState(0);
+  const scrollRef = useRef(null);
+
+  const handleMouseOver = () => {
+    if(scrollRef.current) {
+      const computedStyle = window.getComputedStyle(scrollRef.current);
+      const matrix = new DOMMatrix(computedStyle.transform);
+      setCurrentTransform(matrix.m41);
+      setHovering(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if(scrollRef.current) {
+      scrollRef.current.style.transform = `translateX(${currentTransform}px)`;
+      scrollRef.current.style.animation = "none";
+      setTimeout(() => {
+        scrollRef.current.style.animation = "";
+      }, 0);
+    }
+    setHovering(false);
+  }
 
   useEffect(() => {
     setActiveBannerData(banner[activeBanner]);
@@ -60,6 +84,7 @@ const HeroSection = ({id}:any) => {
 
   const getAmountByCurrency = (array) => {
     const amount = array?.find((item) => item?.currency_code === defaultCurrencySlice);
+    console.log(amount);
     return amount;
   };
 
@@ -98,13 +123,56 @@ const HeroSection = ({id}:any) => {
     getPromotionList();
   }, [banner, activeBannerData]);
 
+  const customPrevArrow = (onClickHandler, hasPrev) => (
+    <button
+      type="button"
+      onClick={onClickHandler}
+      style={{
+        position: 'absolute',
+        top: '50%',
+        left: "15px",
+        transform: 'translateY(-50%)',
+        zIndex: 2,
+        backgroundColor: 'transparent',
+        border: 'none',
+        cursor: 'pointer',
+        opacity: hasPrev ? 1 : 0,
+      }}
+    >
+      <ChevronLeft className="w-10 h-10 text-white bg-black bg-opacity-50 rounded-full" />
+    </button>
+  );
+
+  const CustomNextArrow = (onClickHandler, hasNext) => (
+    <button
+      type="button"
+      onClick={onClickHandler}
+      style={{
+        position: "absolute",
+        top: "50%",
+        right: "15px",
+        transform: "translateY(-50%)",
+        zIndex: 2,
+        backgroundColor: "transparent",
+        border: "none",
+        cursor: "pointer",
+        opacity: hasNext ? 1 : 0,
+      }}
+    >
+      <ChevronRight className="w-10 h-10 text-white bg-black bg-opacity-50 rounded-full" />
+    </button>
+  );
+
+
   return (
     <div id={id}>
       <div className="w-full overflow-hidden whitespace-nowrap bg-[#12A833] bg-opacity-50 shadow-sm">
-        <div className="inline-block animate-scroll">
+        {/* <div className={`inline-block ${hovering ? "" : "animate-scroll"}`} style={hovering ? {transform: `translateX(${currentTransform}px)`} : {}} ref={scrollRef} onMouseOver={handleMouseOver} onMouseLeave={handleMouseLeave}> */}
+        <div className="scroll-text">
           <div className="flex items-center py-[2px] pb-1">
             <p className="font-inter font-normal text-base text-white">
-              Gemini for Workspace: Google's AI-powered assistant seamlessly integrated into Gmail, Docs, Sheets, and more. Discover the future of productivity. <span className="font-bold">LEARN MORE</span>
+              Gemini for Workspace: Google's AI-powered assistant seamlessly integrated into Gmail, Docs, Sheets, and more. Discover the future of productivity.{" "}
+              <span className="font-bold cursor-pointer" onClick={() => {navigate('/ai')}}>LEARN MORE</span>
             </p>
             <FaArrowRightLong className="w-9 h-6 text-white" />
           </div>
@@ -112,7 +180,7 @@ const HeroSection = ({id}:any) => {
       </div>
       {
         banner?.length > 0 && (
-          <Carousel showThumbs={false} onChange={(currentIndex) => {setActiveBanner(currentIndex)}}>
+          <Carousel showThumbs={false} onChange={(currentIndex) => {setActiveBanner(currentIndex)}} renderArrowPrev={(onClickHandler, hasPrev) => customPrevArrow(onClickHandler, hasPrev)} renderArrowNext={(onClickHandler, hasNext) => CustomNextArrow(onClickHandler, hasNext)}>
             {
               banner?.map((item, index) => (
                 <div
@@ -152,7 +220,11 @@ const HeroSection = ({id}:any) => {
                             }
                           </div>
 
-                          <h4 className="font-inter font-extrabold text-2xl text-white sm:mt-14 mt-8">Starting at {currencyList.find(item => item.name === defaultCurrencySlice)?.logo}{getAmountByCurrency(item?.currency_details)?.amount}/mth</h4>
+                          {
+                            getAmountByCurrency(item?.currency_details)?.amount && (
+                              <h4 className="font-inter font-extrabold text-2xl text-white sm:mt-14 mt-8">Starting at {currencyList.find(item => item.name === defaultCurrencySlice)?.logo}{getAmountByCurrency(item?.currency_details)?.amount}/mth</h4>
+                            )
+                          }
 
                           <button
                             type="button"

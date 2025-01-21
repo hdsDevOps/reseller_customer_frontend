@@ -7,13 +7,13 @@ import ProductivityAndCollaboration from "./ProductivityTable";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch } from "store/hooks";
-import { checkDomainThunk } from "store/reseller.thunk";
+import { checkDomainThunk, domainAvailabilityThunk } from "store/reseller.thunk";
 import { plansAndPricesListThunk } from "store/user.thunk";
 import { Base_URL } from "../../Constant";
 
 const initialDomain = {
   domain: '',
-  extention: '.com'
+  domain_extension: '.com'
 };
 
 const PlanandPrice = ({id}:any) => {
@@ -48,13 +48,9 @@ const PlanandPrice = ({id}:any) => {
   const handleDomainSearch = async(e) => {
     e.preventDefault();
     try {
-      const result = await dispatch(checkDomainThunk({domain: `${domain?.domain}${domain?.extention}`})).unwrap();
+      const result = await dispatch(domainAvailabilityThunk(domain?.domain+domain?.domain_extension)).unwrap();
       console.log("result...", result);
-      if(result?.message === "Domain is Still Available for Purchase , doesn't belong to anyone yet" || result?.message === "Customer domain is Available to be used with a google workspace") {
-        navigate('/selected-domain', {state: {selectedDomain: `${domain.domain}${domain.extention}`, from: 'home', type: 'new'}});
-      } else if(result?.message === "Customer domain is Already Registered with a Google Workspace") {
-        navigate('/domainlist', {state: {domain: {domainName: domain.domain, domainExtension: domain.extention}, from: 'home', type: 'new_error'}});
-      }
+      navigate('/domainlist', {state: {selectedDomain: domain, result: result, from: 'home', type: 'new'}});
     } catch (error) {
       toast.error("Error finding domain");
     }
@@ -65,7 +61,7 @@ const PlanandPrice = ({id}:any) => {
         <div className="relative flex justify-center flex-1 w-full bg-white">
           <input className="bg-transparent border py-6 px-10  w-full rounded-md shadow-md font-normal text-2x" placeholder="Type your desired domain here." onChange={handleDomainChange} name="domain" value={domain?.domain} />
           <div className="flex justify-center items-center absolute top-5 right-[2rem]">
-            <select onChange={handleDomainChange} name="extention" value={domain?.extention}>
+            <select onChange={handleDomainChange} name="domain_extension" value={domain?.domain_extension}>
               <option value=".com">.com</option>
               <option value=".co.in">.co.in</option>
               <option value=".website">.website</option>

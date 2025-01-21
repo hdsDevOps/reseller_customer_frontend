@@ -96,4 +96,10 @@ declare module 'store/user.thunk' {
   //
   export const useVoucherThunk;
   export const udpateProfileDataThunk;
+  export const plansAndPricesListThunk;
+  export const addBillingHistoryThunk;
+  export const stripePayThunk;
+  export const paystackPayThunk;
+  export const getBillingHistoryThunk;
+  export const getBillingHistoryThunk;
 }

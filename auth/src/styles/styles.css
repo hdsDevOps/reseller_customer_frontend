@@ -46,3 +46,27 @@
 }
 
 /* absolute left-1/2 max-[768px]:transform max-[768px]:-translate-x-1/2 bottom-10 lg:w-[470px] w-[325px] lg:h-[289px] h-[200px] bg-black  */
+
+
+.scroll-text{
+  display: inline-block;
+  /* padding: 10px 0; */
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  color: white;
+  animation: scroll 20s linear infinite;
+  animation-play-state: running;
+}
+
+.scroll-text:hover {
+  animation-play-state: paused;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}

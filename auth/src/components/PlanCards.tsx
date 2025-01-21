@@ -2,12 +2,14 @@ import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
 import { FaClover } from "react-icons/fa6";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { currencyList } from "./CurrencyList";
 import { useAppSelector } from "store/hooks";
 
 const PlanCard: React.FC = ({plans}:any) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  console.log(location.state);
   
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
@@ -148,11 +150,11 @@ const PlanCard: React.FC = ({plans}:any) => {
                         >
                           Gemini add-on available
                         </button>
-                        <button type="button" onClick={() => {navigate('/subscribe', { state: {plan: plan, period: `${
+                        <button type="button" onClick={() => {navigate('/subscribe', { state: { ...location.state, plan: plan, period: `${
                           isYearly ? 'Yearly' : 
                           checkbox ? 'Monthly' :
                           'Yearly Subscription with monthly billing'
-                        }`} })}} className="bg-black text-white py-2 px-3 w-full sm:py-2 sm:px-4 rounded-lg">
+                        }`} })}}className="bg-black text-white py-2 px-3 w-full sm:py-2 sm:px-4 rounded-lg">
                           Start Trial
                         </button>
                         {

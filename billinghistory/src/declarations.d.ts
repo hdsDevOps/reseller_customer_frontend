@@ -53,4 +53,6 @@ declare module 'store/user.thunk' {
   export const getBillingHistoryThunk;
   export const getDomainsListThunk;
   // Add more thunk declarations as needed
+  export const getPaymentMethodsThunk;
+  export const getPaymentSubscriptionsListThunk;
 }

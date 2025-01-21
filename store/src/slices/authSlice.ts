@@ -28,7 +28,12 @@ export interface UserDetailsState {
   currentPageNumber: Number;
   itemsPerPageSlice: Number;
   metaDataSlice: object|null;
+  roleId: string;
+  rolePermission: [];
+  notificationsList: [];
 }
+
+
 
 const initialState: UserDetailsState = {
   userAuthStatus: 'PENDING',
@@ -50,6 +55,9 @@ const initialState: UserDetailsState = {
   currentPageNumber: 0,
   itemsPerPageSlice: 20,
   metaDataSlice: null,
+  roleId: "",
+  rolePermission: [],
+  notificationsList: [],
 };
 
 const authSlice = createSlice({
@@ -110,6 +118,15 @@ const authSlice = createSlice({
     setMetaDataSlice: (state, action: PayloadAction<any>) => {
       state.metaDataSlice = action.payload;
     },
+    setRoleIdSlice: (state, action: PayloadAction<any>) => {
+      state.roleId = action.payload;
+    },
+    setRolePermissionsSlice: (state, action: PayloadAction<any>) => {
+      state.rolePermission = action.payload;
+    },
+    setNotificationsListSlice: (state, action: PayloadAction<any>) => {
+      state.notificationsList = action.payload;
+    },
     resetUserSlice: (state) => {
       state.userAuthStatus = 'PENDING';
       state.userDetails = {};
@@ -166,6 +183,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setTokenDetails, setUserDetails, setUserAuthStatus,  setResellerToken, resetUserSlice, setCart, setDomains, setSaveCards, setPaymentMethodsState, setDefaultCurrencySlice, setWorkSpaceFlowSlice, setCustomerId, setStaffId, setStaffStatus, setBillingHistoryFilterSlice, setPaymentDetailsFilterSlice, setCurrentPageNumberSlice, setItemsPerPageSlice, setMetaDataSlice } = authSlice.actions;
+export const { setTokenDetails, setUserDetails, setUserAuthStatus,  setResellerToken, resetUserSlice, setCart, setDomains, setSaveCards, setPaymentMethodsState, setDefaultCurrencySlice, setWorkSpaceFlowSlice, setCustomerId, setStaffId, setStaffStatus, setBillingHistoryFilterSlice, setPaymentDetailsFilterSlice, setCurrentPageNumberSlice, setItemsPerPageSlice, setMetaDataSlice, setRoleIdSlice, setNotificationsListSlice } = authSlice.actions;
 
 export default authSlice.reducer;

@@ -67,6 +67,18 @@ declare module "store/user.thunk" {
   export const getPromotionListThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
   export const makeEmailAdminWithoutLoginThunk: import("@reduxjs/toolkit").AsyncThunk<any, UserRegisterPayload, {}>;
   export const verifyReCaptchaThunk;
+  export const stripePayThunk;
+  export const addBillingHistoryThunk;
+  export const paystackPayThunk;
+  export const hereMapSearchThunk;
+  export const makeDefaultPaymentMethodThunk;
+  export const getPaymentMethodsWithoutLoginThunk;
+  export const makeDefaultPaymentMethodWithoutLoginThunk;
+  export const addStaffWithoutLoginThunk;
+  export const addSettingWithoutLoginThunk;
+  export const getRoleIdFromLSThunk;
+  export const setRoleIdToLSThunk;
+  export const removeRoleIdFromLSThunk;
 }
 
 
@@ -78,11 +90,13 @@ declare module 'store/authSlice' {
   export const setDefaultCurrencySlice: (payload: string) => PayloadAction<string>;
   // Other exports
   export const setWorkSpaceFlowSlice: (payload: string) => PayloadAction<string>;
+  export const setRoleIdSlice;
 }
 
 declare module 'store/reseller.thunk' {
   import { createAsyncThunk } from "@reduxjs/toolkit";
 
   export const checkDomainThunk;
+  export const domainAvailabilityThunk;
 }
 // checkDomainThunk

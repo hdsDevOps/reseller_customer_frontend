@@ -5,7 +5,7 @@ import ActionModal from "../components/ActionModal";
 import AddLicense from "../components/AddLicense";
 import "../index.css";
 import { toast } from "react-toastify";
-import { CirclePlus, Dot, Trash2, X } from "lucide-react";
+import { ChevronRight, CirclePlus, Dot, Trash2, X } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { addEmailsThunk, changeEmailStatusThunk, deleteEmailThunk, makeEmailAdminThunk, removeUserAuthTokenFromLSThunk, resetEmailPasswordThunk, updateEmailUserDataThunk } from "store/user.thunk";
 import { HiOutlineEye } from "react-icons/hi";
@@ -19,7 +19,7 @@ const intialEmail = {
 }
 
 const EmailList: React.FC = ({data, getDomainsList}) => {
-  // console.log(data);
+  console.log("data...", data);
   const { customerId, userDetails } = useAppSelector(state => state.auth);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLicenseModalOpen, setisLicenseModalOpen] = useState<boolean>(false);
@@ -441,7 +441,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                           className={`px-2 py-6 text-gray-600 font-semibold text-xs sm:text-sm md:text-md`}
                         >
                           <p className="text-gray-600 font-semibold text-xs sm:text-sm md:text-md flex">
-                            <span>{row.first_name}&nbsp;{row.last_name}</span>
+                            {/* <span>{row.first_name}&nbsp;{row.last_name}</span>
                             {
                               row?.is_admin ? (
                                 <>
@@ -449,7 +449,14 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                                   <span>Admin</span>
                                 </>
                               ) : ""
-                            }
+                            } */}
+                            <span>{row?.first_name}&nbsp;{row?.last_name}</span>
+                            {row?.is_admin ? (
+                              <span className="p-2 text-gray-600 font-semibold text-xs sm:text-sm md:text-md flex items-center">
+                                <Dot />
+                                <span className="text-gray-600 font-semibold text-xs sm:text-sm md:text-md">Admin</span>
+                              </span>
+                            ) : ""}
                           </p>
                         </td>
                         <td
@@ -741,6 +748,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
           isOpen={isLicenseModalOpen}
           onClose={() => setisLicenseModalOpen(false)}
           getDomainsList={() => getDomainsList()}
+          selectedDomain={data}
         />
         {
           isRemoveUserModalOpen && (

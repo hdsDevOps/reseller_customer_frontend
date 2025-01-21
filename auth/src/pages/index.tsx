@@ -31,6 +31,7 @@ import Receipt from "./Receipt";
 import RegisterText from "./RegisterText";
 import NewRegister from "./NewRegister";
 import DownloadInvoice from "./DownloadInvoice";
+import AI from "./AI";
 
 // const Register = React.lazy(() => import("./NewRegister"));
 
@@ -50,6 +51,7 @@ const AuthApp: React.FC = () => {
             <Route path="/faqs" element={<FrequentlyAskedQuestions />} />
             <Route path="/resources" element={<Resources />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/ai" element={<AI />} />
             {/* <Route path="/register" element={<Register />} /> */}
             <Route path="/otp" element={<OTP />} />
             <Route path="/forgotpassword" element={<ForgotPassword />} />

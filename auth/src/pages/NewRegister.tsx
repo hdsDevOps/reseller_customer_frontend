@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { IoIosArrowBack } from "react-icons/io";
+import { IoIosArrowBack, IoMdArrowDropdown } from "react-icons/io";
 import Input from "../utils/inputs/input";
 import { RiEyeCloseLine } from "react-icons/ri";
 import { IoIosArrowDown } from "react-icons/io";
@@ -9,13 +9,14 @@ import TermsAndConditions from "./Terms";
 import CheckBox from "../utils/inputs/checkbox";
 import { Link } from "react-router-dom";
 import { useAppDispatch } from "store/hooks";
-import { resgiterCustomerThunk } from "store/user.thunk";
+import { hereMapSearchThunk, resgiterCustomerThunk } from "store/user.thunk";
 import { HiOutlineEye } from "react-icons/hi";
 import axios from "axios";
 import { toast } from "react-toastify";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import "./cumtel.css"
+import { ChevronDown } from "lucide-react";
 
 const initialCustomer = {
   email: "",
@@ -52,6 +53,108 @@ const RegisterPage: React.FC = () => {
   const [country, setCountry] = useState({});
   // console.log("countries...", countries);
   // console.log("country...", country);
+
+  const [hereAddressList, setHereAddressList] = useState([]);
+  const [hereAddress, setHereAddress] = useState("");
+  const [hereDropdownOpen, setHereDropdownOpen] = useState(false);
+  const hereRef = useRef(null);
+  const [hereData, setHereData] = useState<object|null>(null);
+  // console.log({address: customer?.street_name, hereData, hereAddress});
+
+  useEffect(() => {
+    const getIpData = async() => {
+      const response = await fetch('https://geolocation-db.com/json/');
+      const data = await response.json();
+      // console.log(data);
+      if(data) {
+        const findCountry = countries?.find(country => country?.name?.toLowerCase() === data?.country_name?.toLowerCase());
+        console.log(findCountry);
+        if(findCountry) {
+          setCountry(findCountry);
+          setCustomer({
+            ...customer,
+            region: findCountry?.name
+          });
+        }
+      }
+    };
+
+    getIpData();
+  } , [countries]);
+
+  useEffect(() => {
+    if(hereData !== null) {
+      setCustomer({
+        ...customer,
+        street_name: hereData?.title
+      });
+    } else {
+      setCustomer({
+        ...customer,
+        street_name: "",
+        region: '',
+        zipcode: '',
+        business_phone_number: ''
+      });
+    }
+  }, [hereData]);
+  
+  const handleClickOutsideHere = (event: MouseEvent) => {
+    if(hereRef.current && !hereRef.current.contains(event.target as Node)) {
+      setCountryDropdownOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutsideHere);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutsideHere);
+    };
+  }, []);
+
+  useEffect(() => {
+    if(hereAddress === "") {
+      setHereDropdownOpen(false);
+      setHereAddressList([]);
+    } else {
+      if(hereAddressList?.length > 0) {
+        setHereDropdownOpen(true);
+      } else {
+        setHereDropdownOpen(false);
+      }
+    }
+  }, [hereAddressList, hereAddress]);
+
+  useEffect(() => {
+    if(hereData !== null && countries?.length > 0) {
+      const findCountry = countries?.find(country => country?.name?.toLowerCase() === hereData?.address?.countryName?.toLowerCase());
+      console.log(findCountry)
+      if(findCountry) {
+        setCountry(findCountry);
+        setCustomer({
+          ...customer,
+          region: findCountry?.name,
+          street_name: hereData?.title,
+          zipcode: hereData?.address?.postalCode
+        });
+      }
+    }
+  }, [hereData, countries]);
+
+  const getHereData = async() => {
+    try {
+      const result = await dispatch(hereMapSearchThunk({address: hereAddress})).unwrap();
+      setHereAddressList(result?.data?.items);
+    } catch (error) {
+      setHereAddressList([]);
+    }
+  };
+
+  useEffect(() => {
+    if(hereAddress !== "") {
+      getHereData();
+    }
+  }, [hereAddress]);
   
   const handleClickOutsideCountry = (event: MouseEvent) => {
     if(countryRef.current && !countryRef.current.contains(event.target as Node)) {
@@ -97,8 +200,8 @@ const RegisterPage: React.FC = () => {
     {name: 'first_name', label: "First name", type: "text", required: false, placeholder: "Enter First name", },
     {name: 'last_name', label: "Last name", type: "text", required: false, placeholder: "Enter Last name", },
     {name: 'business_name', label: "Business Name", type: "text", required: false, placeholder: "Enter Business Name", },
-    {name: 'street_name', label: "Street address", type: "text", required: false, placeholder: "Select Street address", },
-    {name: 'region', label: "Region/Country", type: "dropdown", required: false, placeholder: "Enter your Region", },
+    {name: 'street_name', label: "Street address", type: "text", required: false, placeholder: "Search Street address", },
+    {name: 'region', label: "Region/Country", type: "dropdown", required: false, placeholder: "Select your Region", },
     {name: 'zipcode', label: "Zip code", type: "number", required: false, placeholder: "Enter Zip code", },
     {name: 'email', label: "Email address", type: "email", required: false, placeholder: "Enter Email address", },
     {name: 'business_phone_number', label: "Business phone number", type: "text", required: false, placeholder: "Enter Business phone number", },
@@ -167,6 +270,7 @@ const RegisterPage: React.FC = () => {
             navigate("/otp?mode=signup", { state: {customer_id: result?.customer_id} })
           } catch (error) {
             toast.error("Error registering customer");
+            setLoading(false);
           }
         } else {
           toast.warning("Please fill out all the fields");
@@ -182,12 +286,15 @@ const RegisterPage: React.FC = () => {
 
   return (
     <section className="w-full mx-auto px-8 pt-3 pb-8">
-      <Link to="/login">
+      <button
+        type="button"
+        onClick={() => {navigate(-1)}}
+      >
         <div className="flex gap-1 heads-center cursor-pointer">
           <IoIosArrowBack className="w-4 h-4" />
           <p className="text-greenbase">Back to previous page</p>
         </div>
-      </Link>
+      </button>
 
       <div className="">
         <h1 className="font-bold md:text-4xl text-2xl text-greenbase flex justify-center pt-3">
@@ -319,6 +426,7 @@ const RegisterPage: React.FC = () => {
                           value={countryName || customer[head.name]}
                           onFocus={() => {setCountryDropdownOpen(true)}}
                         />
+                        <IoMdArrowDropdown className={`absolute right-3 top-8 pointer-events-none ${countryDropdownOpen ? "rotate-180" : ""}`} />
                         {
                           countryDropdownOpen && (
                             <div className="w-[95.5%] max-h-32 absolute mt-14 bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#C9C9C9]">
@@ -372,6 +480,51 @@ const RegisterPage: React.FC = () => {
                         htmlFor="business_phone_number"
                         className="absolute bg-white -top-3 left-3 text-gray-500 transition-all duration-300 ease-in-out origin-top-left peer-placeholder-shown:text-gray-400 peer-focus:text-blue-600 peer-focus:text-sm"
                       >{head?.label}</label>
+                    </div>
+                  )
+                } else if(head.name === "street_name") {
+                  return (
+                    <div
+                      key={index}
+                      className='flex flex-col px-2 mb-2  sm:col-span-1 col-span-2 relative'
+                      ref={hereRef}
+                    >
+                      <label
+                        className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
+                      >{head.label}</label>
+                      <input
+                        type={head.type}
+                        name={head.name}
+                        required={head.required}
+                        className='border border-[#E4E4E4] rounded-[10px] h-[54px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                        onChange={e => {
+                          setHereAddress(e.target.value);
+                          setHereData(null);
+                        }}
+                        placeholder={head?.placeholder}
+                        value={hereAddress || customer[head.name]}
+                        onFocus={() => {setHereDropdownOpen(true)}}
+                      />
+                      <IoMdArrowDropdown className={`absolute right-3 top-8 pointer-events-none ${hereDropdownOpen ? "rotate-180" : ""}`} />
+                      {
+                        hereDropdownOpen && (
+                          <div className="w-[95.5%] max-h-32 absolute mt-16 bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#C9C9C9]">
+                            {
+                              hereAddressList?.map((address, idx) => (
+                                <p
+                                  key={idx}
+                                  className="py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer"
+                                  onClick={() => {
+                                    setHereData(address);
+                                    setHereAddress("");
+                                    setHereDropdownOpen(false);
+                                  }}
+                                >{address?.title}</p>
+                              ))
+                            }
+                          </div>
+                        )
+                      }
                     </div>
                   )
                 } else {

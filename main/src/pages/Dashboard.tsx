@@ -4,20 +4,21 @@ import SubscriptionModal from "../components/SubscriptionModal";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { cancelSubscriptionThunk, changeAutoRenewThunk, getDomainsListThunk, getPaymentMethodsThunk, getPaymentSubscriptionsListThunk, makeDefaultPaymentMethodThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
+import { cancelSubscriptionThunk, changeAutoRenewThunk, getBillingHistoryThunk, getDomainsListThunk, getPaymentMethodsThunk, getPaymentSubscriptionsListThunk, makeDefaultPaymentMethodThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
 import { Download, Plus, X } from "lucide-react";
 import { format } from "date-fns";
 import html2canvas from 'html2canvas-pro';
 import jsPDF from "jspdf";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import { currencyList } from "../components/CurrencyList";
 
 const inititalCancel = {
   number: 0,
   reason: ""
 };
 
-// const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899";
-const logo = "";
+const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899";
+// const logo = "";
 
 const Dashboard: React.FC = () => {
   const location = useLocation();
@@ -33,7 +34,8 @@ const Dashboard: React.FC = () => {
     }
     
     if(location.state?.from === "otp") {
-      toast.success(`Successfully logged in ${Math.random() * 3}`);
+      toast.success(`Successfully logged`);
+      // toast.success(`Successfully logged in ${Math.random() * 3}`);
       // console.log(`Successfully logged in ${Math.random() * 3}`)
     } else if(location.state?.from === "registration") {
       toast.success("Successfully registered");
@@ -50,7 +52,7 @@ const Dashboard: React.FC = () => {
   // console.log("user details...", userDetails);
 
   const [selectedDomain, setSelectedDomain] = useState({});
-  // console.log("selectedDomain...", selectedDomain);
+  console.log("selectedDomain...", selectedDomain);
   // console.log("userDetails...", userDetails);
   const [activeStatus, setActiveStatus] = useState<Boolean>(false);
   const [showList, setShowList] = useState(false);
@@ -75,11 +77,49 @@ const Dashboard: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("");
   const [cancelReason, setCancelReason] = useState(inititalCancel);
-  const [invoiceData, setInvoiceData] = useState({});
+  const [invoiceData, setInvoiceData] = useState<object|null>(null);
+  console.log("invoiceData...", invoiceData);
   const pdfRef = useRef(null);
   const [paymentMethods, setPaymentMethods] = useState([]);
   // console.log("paymentMethods...", paymentMethods);
   const [subscriptionId, setSubscriptionId] = useState("");
+  
+  const [processingModalOpen, setProcessingModalOpen] = useState(false);
+
+  const [billingHistoryList, setBillingHistoryList] = useState([]);
+  console.log("billingHistoryList...", billingHistoryList);
+  const [billingHistoryData, setBillingHistoryData] = useState<object|null>(null);
+  console.log("billingHistoryData...", billingHistoryData);
+
+  const getBillingHistoryList = async() => {
+    try {
+      const result = await dispatch(getBillingHistoryThunk({user_id: customerId, start_date: "", end_date: "", domain: ""})).unwrap();
+      setBillingHistoryList(result?.data);
+    } catch (error) {
+      setBillingHistoryList([]);
+    }
+  };
+
+  useEffect(() => {
+    getBillingHistoryList();
+  }, [customerId]);
+  
+  useEffect(() => {
+    if(billingHistoryList?.length > 0 && invoiceData !== null) {
+      const foundData = billingHistoryList?.find(item => item?.subscription_id === invoiceData?.id);
+      setBillingHistoryData(foundData);
+    } else {
+      setBillingHistoryData(null);
+    }
+  }, [billingHistoryList, invoiceData]);
+  
+  const openProcessingModal = () => {
+    setProcessingModalOpen(true);
+  };
+
+  // const updateInvoiceData = (data) => {
+  //   setInvoiceData(data.length > 0 ? data[data.length - 1] : null);
+  // }
 
   const formatDate2 = (datee) => {
 
@@ -102,14 +142,21 @@ const Dashboard: React.FC = () => {
     if (imgData.startsWith('data:image/png;base64,')) {
       const pdf = new jsPDF('p', 'mm', 'a4');
 
-      const fixedPdfWidth = 150;
-      const imgWidth = canvas.width / 2;
-      const imgHeight = canvas.height / 2;
+      const pdfWidth = 210;
+      const PdfHeight = 297;
 
-      const aspectRatio = imgHeight / imgWidth;
-      const adjustedHeight = fixedPdfWidth * aspectRatio;
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
 
-      pdf.addImage(imgData, 'PNG', 0, 0, fixedPdfWidth, adjustedHeight);
+      const scaleFactor = Math.min(pdfWidth / imgWidth, PdfHeight / imgHeight);
+
+      const adjustedWidth = imgWidth * scaleFactor;
+      const adjustedHeight = imgHeight * scaleFactor;
+
+      const xOffset = (pdfWidth - adjustedWidth) / 2;
+      const yOffset = (PdfHeight - adjustedHeight) / 2;
+
+      pdf.addImage(imgData, 'PNG', xOffset, yOffset, adjustedWidth, adjustedHeight);
 
       pdf.save('invoice.pdf');
     } else {
@@ -412,9 +459,9 @@ const Dashboard: React.FC = () => {
                                         setModalType(list?.label);
                                         setSubscriptionId(detail?.id)
                                         if(list?.label === "View Invoice") {
-                                          updateInvoiceData(detail?.payment_details);
+                                          setInvoiceData(subscription);
                                         } else {
-                                          setInvoiceData({});
+                                          setInvoiceData(null);
                                         }
                                       }}
                                     >{list?.label}</li>
@@ -429,9 +476,9 @@ const Dashboard: React.FC = () => {
                                       setIsModalOpen(true);
                                       setModalType(list?.label);
                                       if(list?.label === "View Invoice") {
-                                        updateInvoiceData(detail?.payment_details);
+                                        setInvoiceData(subscription);
                                       } else {
-                                        setInvoiceData({});
+                                        setInvoiceData(null);
                                       }
                                     }}
                                   >{list?.label}</li>
@@ -561,7 +608,8 @@ const Dashboard: React.FC = () => {
               onClose={() => {
                 setIsModalOpen(false);
                 setModalType("");
-                setInvoiceData({});
+                setInvoiceData(null);
+                setBillingHistoryData(null);
               }}
             >
               <div className="fixed inset-0 bg-black bg-opacity-50 z-10 w-screen overflow-y-auto mt-16">
@@ -613,88 +661,129 @@ const Dashboard: React.FC = () => {
                         </div>
 
                         <div
-                          className='text-center py-1'
+                          className='text-center py-1 border-b border-black'
                         >
                           <h3 className='font-inter text-[black] text-lg'>Receipt from Hordanso LLC</h3>
-                          <p className='font-inter text-[#B3B7B8] text-sm'>Receipt #1567-5406</p>
+                          <p className='font-inter text-[#B3B7B8] text-sm'>Receipt #{billingHistoryData?.invoice}</p>
                         </div>
 
                         <div
-                          className='flex justify-between text-[#B3B7B8] px-20 py-5'
+                          className='flex justify-between text-[#B3B7B8] px-20 py-5 w-full overflow-x-auto'
                         >
-                          <div
-                            className='flex flex-col text-start font-inter'
-                          >
-                            <h6
-                              className='text-sm font-medium'
-                            >AMOUNT PAID</h6>
-                            <p
-                              className='text-sm'
-                            >$ {invoiceData?.amount}</p>
-                          </div>
-                          <div
-                            className='flex flex-col text-start'
-                          >
-                            <h6
-                              className='text-sm font-medium'
-                            >DATE PAID</h6>
-                            <p
-                              className='text-sm'
-                            >{formatDate(invoiceData?.created_at?._seconds || 0,invoiceData?.created_at?._nanoseconds || 0)}</p>
-                          </div>
-                          <div
-                            className='flex flex-col text-start'
-                          >
-                            <h6
-                              className='text-sm font-medium'
-                            >PAYMENT METHOD</h6>
-                            <div
-                              className='flex gap-1'
-                            >
-                              {/* <img
-                                src={visa}
-                                alt='visa'
-                                className='h-5'
-                              />
-                              <p
-                                className='text-sm'
-                              > - 5953</p> */}
-                              <p className='text-sm capitalize'>{invoiceData?.payment_method}</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <h5
-                          className='px-14 pb-6 font-inter font-bold text-sm text-[#B3B7B8]'
-                        >SUMMARY</h5>
-                      </div>
-
-                      <div
-                        className='bg-[#F6F8Fc] w-full pb-2'
-                      >
-                        <div
-                          className='flex items-center justify-between p-2'
-                        >
-                          <p
-                            className='text-[#9A9597] break-words break-all w-[600px]'
-                          >Automated Recharge: Messaging credits worth 18.19 USD added for The Jaiye Room. These credits will be used for SMS, Calls, Emails, phone numbers, etc. Please refer to Company Billing Page (https://app.hordanso.com/V2/location/Muygwiofec8362y9uncevb94309wcun98x2t4efwgrdswqdf/settings/company-billing/billing) for more details.</p>
-                          <p
-                            className='text-[#9A9597]'
-                          >${invoiceData?.amount}</p>
+                          <table className="w-full min-w-[400px]">
+                            <tbody>
+                              <tr>
+                                <td className="font-inter font-normal text-sm items-start text-start content-start">Inovice To</td>
+                                <td className="flex flex-col font-inter font-normal text-sm text-black content-start">
+                                  <p>{invoiceData?.payment_details[invoiceData?.payment_details?.length - 1]?.first_name} {invoiceData?.payment_details[invoiceData?.payment_details?.length - 1]?.last_name}</p>
+                                  <p>{invoiceData?.payment_details[invoiceData?.payment_details?.length - 1].email}</p>
+                                  <p>{invoiceData?.payment_details[invoiceData?.payment_details?.length - 1]?.region}</p>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td className="font-inter font-normal text-sm items-start text-start content-start">Payment Method</td>
+                                <td>
+                                  <img
+                                    src={paymentMethods?.find(item => item?.method_name?.toLowerCase() === billingHistoryData?.payment_method?.toLowerCase())?.method_image}
+                                    alt={billingHistoryData?.payment_method}
+                                    className="w-10 object-contain"
+                                  />
+                                </td>
+                              </tr>
+                              <tr>
+                                <td className="font-inter font-normal text-sm items-start text-start content-start">Payment Cycle</td>
+                                <td className="flex flex-col font-inter font-normal text-sm text-black content-start">{invoiceData?.payment_cycle}</td>
+                              </tr>
+                            </tbody>
+                          </table>
                         </div>
 
                         <div
-                          className='w-full h-px bg-[#9A9597] my-2 opacity-15'
-                        ></div>
-                        <div
-                          className='w-full flex justify-between items-center p-2'
+                          className='flex justify-between text-[#B3B7B8] px-20 py-5 w-full overflow-x-auto'
                         >
-                          <p
-                            className='text-[#4F5860] font-medium'
-                          >Amount charged</p>
-                          <p
-                            className='text-[#4F5860] font-medium'
-                          >${invoiceData?.amount}</p>
+                          <table className="w-full min-w-[400px]">
+                            <thead>
+                              <tr>
+                                <th className="w-[150px] text-left border-b border-black">Description</th>
+                                <th className="w-[50px] text-center border-b border-black">Qty</th>
+                                <th className="w-[100px] text-center border-b border-black">
+                                  {/* Unit Price */}
+                                </th>
+                                <th className="w-[100px] text-center border-b border-black">Amount</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {/* <tr>
+                                <td className="font-inter font-normal text-sm text-black content-start text-left py-1 border-b border-black">Domain</td>
+                                <td className="font-inter font-normal text-sm text-black content-start text-center py-1 border-b border-black">1</td>
+                                <td className="font-inter font-normal text-sm text-black text-right py-1 border-b border-black">
+                                  <div className="inline-block">
+                                    <span className="inline-block">1</span>
+                                    <X className="inline-block w-4 h-4 text-black mx-[2px]" />
+                                    <span className="inline-block">{currencyList?.find(item => item?.name === data?.currency)?.logo}{parseFloat(data?.selectedDomain?.price[data?.currency])?.toFixed(2)}</span>
+                                  </div>
+                                </td>
+                                <td className="font-inter font-normal text-sm text-black content-start text-right py-1 border-b border-black">{currencyList?.find(item => item?.name === data?.currency)?.logo}{data?.selectedDomain?.price[data?.currency]}</td>
+                              </tr> */}
+                              <tr>
+                                <td className="font-inter font-normal text-sm text-black content-start text-left py-1 border-b border-black capitalize">{billingHistoryData?.description}</td>
+                                <td className="font-inter font-normal text-sm text-black content-start text-center py-1 border-b border-black">
+                                {/* {data?.license_usage} */}
+                                1
+                                </td>
+                                <td className="font-inter font-normal text-sm text-black text-right py-1 border-b border-black">
+                                  {/* <div className="inline-block">
+                                    <span className="inline-block">{data?.license_usage}</span>
+                                    <X className="inline-block w-4 h-4 text-black mx-[2px]" />
+                                    <span className="inline-block">{currencyList?.find(item => item?.name === data?.currency)?.logo}{parseFloat(data?.plan?.amount_details?.find(amount => amount?.currency_code === data?.currency)?.price?.find(priceList => priceList?.type === data?.period)?.discount_price)?.toFixed(2)}</span>
+                                  </div> */}
+                                </td>
+                                <td className="font-inter font-normal text-sm text-black content-start text-right py-1 border-b border-black">
+                                  {billingHistoryData?.amount}
+                                </td>
+                              </tr>
+
+                              {/* <tr>
+                                <td></td>
+                                <td></td>
+                                <td className="font-inter font-normal text-sm text-black text-left py-1 border-b border-black">Voucher</td>
+                                <td className="font-inter font-normal text-sm text-black content-start text-right py-1 border-b border-black">
+                                  -{currencyList?.find(item => item?.name === data?.currency)?.logo}
+                                  {data?.discountedPrice}
+                                </td>
+                              </tr> */}
+
+                              {/* <tr>
+                                <td></td>
+                                <td></td>
+                                <td className="font-inter font-normal text-sm text-black text-left py-1 border-b border-black">Tax</td>
+                                <td className="font-inter font-normal text-sm text-black content-start text-right py-1 border-b border-black">
+                                  {currencyList?.find(item => item?.name === data?.currency)?.logo}
+                                  {data?.taxedPrice}
+                                </td>
+                              </tr> */}
+
+                              {/* <tr>
+                                <td></td>
+                                <td></td>
+                                <td className="font-inter font-normal text-sm text-black text-left py-1 border-b border-black">Total</td>
+                                <td className="font-inter font-normal text-sm text-black content-start text-right py-1 border-b border-black">
+                                  {currencyList?.find(item => item?.name === data?.currency)?.logo}
+                                  {data?.finalTotalPrice}
+                                </td>
+                              </tr> */}
+
+                              {/* <tr>
+                                <td></td>
+                                <td></td>
+                                <td className="font-inter font-normal text-sm text-black text-left py-1 border-b border-black">Amount Charged</td>
+                                <td className="font-inter font-normal text-sm text-black content-start text-right py-1 border-b border-black">
+                                  {currencyList?.find(item => item?.name === data?.currency)?.logo}
+                                  {data?.finalTotalPrice}
+                                </td>
+                              </tr> */}
+                            </tbody>
+                          </table>
                         </div>
                       </div>
 
@@ -702,36 +791,17 @@ const Dashboard: React.FC = () => {
                         className='px-16 py-8'
                       >
                         <div
-                          className='w-full h-px bg-[#9A9597] my-8 opacity-15'
+                          className='w-full h-px bg-[#9A9597] opacity-15'
                         ></div>
 
                         <h6
-                          className='my-8 text-[#7F8E96]'
+                          className='mt-4 text-[#7F8E96]'
                         >
                           If you have any questions, contact us at&nbsp;
                           <span className='text-[#12A833] font-medium'>stripe@hordanso.com</span>
                           &nbsp;or call us at&nbsp;
                           <span className='text-[#12A833] font-medium'>+1 469-893-0678</span>.
                         </h6>
-
-                        <div
-                          className='w-full h-px bg-[#9A9597] my-8 opacity-15'
-                        ></div>
-
-                        <p
-                          className='my-8 text-[#7F8E96]'
-                        >
-                          Something wrong with the email?&nbsp;
-                          <span className='text-[#12A833] font-medium'>View in your browser</span>.
-                        </p>
-
-                        <p
-                          className='my-8 text-[#7F8E96]'
-                        >
-                          You are viewing this email because you made a purchase at Hordanso LLC, which partners with&nbsp;
-                          <span className='text-[#12A833] font-medium'>Stripe</span>
-                          &nbsp;to provide marketing and payment processing.
-                        </p>
                       </div>
                     </div>
                   </DialogPanel>
@@ -964,6 +1034,44 @@ const Dashboard: React.FC = () => {
               </div>
             </Dialog>
           ) : ""
+        }
+
+        {
+          processingModalOpen && (
+            <Dialog
+              open={processingModalOpen}
+              as="div"
+              className="relative z-10 focus:outline-none"
+              onClose={() => {
+                setProcessingModalOpen(true);
+              }}
+              // static
+            >
+              <div className="fixed inset-0 bg-black bg-opacity-50 z-10 w-screen overflow-y-auto">
+                <div className="flex min-h-full items-center justify-center py-4">
+                  <DialogPanel
+                    transition
+                    className="w-full max-w-[930px] bg-white p-4 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+                  >
+                    <div className="flex justify-start pt-2 pb-4 items-center mb-6 border-b border-[#E4E4E4]">
+                      <DialogTitle
+                        as="h3"
+                        className="font-montserrat font-medium text-base text-black"
+                      >Your payment request is being processed...</DialogTitle>
+                    </div>
+                    <div className="pt-2 pb-4 w-full max-w-[600px] font-montserrat font-medium text-xs text-black">
+                      <ul>
+                        <li className="py-2">This is a secure payment gateway using 128 bit SSL encryption.</li>
+                        <li className="py-2">When you submit the transaction, the server will take about 1 to 5 seconds to process, but it 
+                        may take longer at certain times.</li>
+                        <li className="py-2">Please do not press “Submit” button once again or the “Back” or “Refresh” buttons.</li>
+                      </ul>
+                    </div>
+                  </DialogPanel>
+                </div>
+              </div>
+            </Dialog>
+          )
         }
       </main>
     </div>

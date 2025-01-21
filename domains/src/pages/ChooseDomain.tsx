@@ -4,19 +4,20 @@ import { GoArrowRight } from "react-icons/go";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { checkDomainThunk } from 'store/reseller.thunk';
+import { currencyList } from "../components/CurrencyList";
 
 const BuyDomain: React.FC = () => {
   const location = useLocation();
   console.log(location.state)
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { userAuthStatus = "" } = useAppSelector((state: any) => state.auth);
+  const { defaultCurrencySlice } = useAppSelector((state: any) => state.auth);
 
-  const [errorMessage, setErrorMessage ] = useState<string>("Customer domain is Already Registered with a Google Workspace");
+  const [errorMessage, setErrorMessage ] = useState<string>("");
 
   useEffect(() => {
     if(location.state) {
-      if(location.state.result?.available === false) {
+      if(location.state.result?.availablity_status === "false") {
         setErrorMessage("Customer domain is Already Registered with a Google Workspace");
       } else {
         setErrorMessage("");
@@ -36,46 +37,16 @@ const BuyDomain: React.FC = () => {
 
   const [availableDomains, setAvailableDomains] = useState<string[]>([]);
   // console.log("availableDomains...", availableDomains);
-  const availableList = async() => {
-    setAvailableDomains([]);
-    const domainLists = ['.com', '.co', '.org', '.co.in', '.website', '.net', '.in', '.co.uk'];
-    try {
-      const fullDomainName = `${domains?.domain}${domains?.domain_extension}`;
-      const result = await dispatch(checkDomainThunk(fullDomainName)).unwrap();
-      if(result?.available){
-        setAvailableDomains((prev) => [...prev, domains?.domain_extension]);
-        setErrorMessage("");
-      } else {
-        //
-      }
-    } catch (error) {
-      //
-    }
-    domainLists?.filter(item => item !== domains?.domain_extension)?.map(async(extension) => {
-      const fullDomainName = `${domains?.domain}${extension}`;
-      console.log("fullDomainName...", fullDomainName);
-      try {
-        const result = await dispatch(checkDomainThunk(fullDomainName)).unwrap();
-        if(result?.available){
-          setAvailableDomains((prev) => [...prev, extension]);
-        } else {
-          //
-        }
-      } catch (error) {
-        //
-      }
-    });
-  };
 
   useEffect(() => {
-    availableList();
-  }, [domains]);
+    setAvailableDomains(location.state.result.suggestions)
+  }, [location.state]);
 
   useEffect(() => {
     if(!location.state) {
       navigate('/login');
     }
-  }, []);
+  }, [location.state]);
 
   const handleChangeDomain = (e) => {
     setSearchDomain({
@@ -134,7 +105,7 @@ const BuyDomain: React.FC = () => {
             </button>
           </div>
           {
-            errorMessage === "Customer domain is Already Registered with a Google Workspace" ? (
+            errorMessage !== "" ? (
               <div className="text-red-600 text-sm left-0 lg:left-8 -bottom-16 md:-bottom-12">
                 This domain name is already in use. If you own this domain and would
                 like to use Google Workspace, <br /> please follow the steps <span className="text-green-500 cursor-pointer"> here.</span>
@@ -162,12 +133,23 @@ const BuyDomain: React.FC = () => {
                 </thead>
                 <tbody>
                   {
-                    availableDomains.length > 0 ? (
-                      availableDomains?.map((domain, index) => (
+                    location.state.result?.availablity_status === "true" && (
+                      <tr className="hover:bg-gray-100">
+                        <td className="py-2 px-4">{location.state.result?.available?.domain?.domain}</td>
+                        <td className="py-2 px-4">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{location.state.result?.available?.domain?.price[defaultCurrencySlice]}/year</td>
+                        <td className="py-2 px-4 text-right" onClick={() => {navigate('/domain-details', { state: { domain: location.state.result?.available?.domain }})}}>
+                          <GoArrowRight className="text-green-500 cursor-pointer text-xl" />
+                        </td>
+                      </tr>
+                    )
+                  }
+                  {
+                    availableDomains?.length > 0 ? (
+                      availableDomains?.map((domainList, index) => (
                         <tr key={index} className="hover:bg-gray-100">
-                          <td className="py-2 px-4">{domains?.domain}{domain}</td>
-                          <td className="py-2 px-4">$99.99/year</td>
-                          <td className="py-2 px-4 text-right" onClick={() => {navigate('/domain-details', { state: { domain: {domain: domains?.domain, domain_extension: domain} }})}}>
+                          <td className="py-2 px-4">{domainList?.domain}</td>
+                          <td className="py-2 px-4">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{domainList?.price[defaultCurrencySlice]}/year</td>
+                          <td className="py-2 px-4 text-right" onClick={() => {navigate('/domain-details', { state: { domain: domainList }})}}>
                             <GoArrowRight className="text-green-500 cursor-pointer text-xl" />
                           </td>
                         </tr>

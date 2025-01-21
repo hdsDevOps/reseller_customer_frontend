@@ -8,7 +8,7 @@ import { BiSolidCheckShield } from "react-icons/bi";
 import { MdClose, MdOutlineAddShoppingCart } from "react-icons/md";
 import { cartItems, recommendations } from "../utils/Utils";
 import "./Cart.css";
-import { addNewDomainThunk, addToCartThunk, getCartThunk, getVouchersListThunk, removeUserAuthTokenFromLSThunk } from 'store/user.thunk';
+import { addNewDomainThunk, addToCartThunk, getCartThunk, getVouchersListThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk } from 'store/user.thunk';
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { toast } from "react-toastify";
 import { setCart } from "store/authSlice";
@@ -23,20 +23,26 @@ interface Voucher {
   discount: number;
 };
 
+const initialCartPrice = {
+  total_year: 0,
+  price: 0
+}
+
 const logoImage = 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo-2.png?alt=media&token=9315e750-1f5d-4032-ba46-1aeafa340a75';
 const logoImageSmall = 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899';
 
 const Cart = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { customerId, defaultCurrencySlice } = useAppSelector(state => state.auth);
+  const { customerId, defaultCurrencySlice, userDetails } = useAppSelector(state => state.auth);
+  console.log(userDetails);
   const [showVoucherInput, setShowVoucherInput] = useState(false);
   const [showAvailableVouchers, setShowAvailableVouchers] = useState(false);
   const [voucherCode, setVoucherCode] = useState("");
   const [voucherCodeSearch, setVoucherCodeSearch] = useState("");
-  console.log("voucherCodeSearch...", voucherCodeSearch);
+  // console.log("voucherCodeSearch...", voucherCodeSearch);
   const [appliedVoucher, setAppliedVoucher] = useState<Voucher | null>(null);
-  console.log("applied voucher...", appliedVoucher);
+  // console.log("applied voucher...", appliedVoucher);
   const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
   const [isVoucherApplied, setIsVoucherApplied] = useState(false);
   const [cart, setCartItems] = useState([]);
@@ -54,21 +60,77 @@ const Cart = () => {
   const [voucherHover, setVoucherHover] = useState(false);
   const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
   const [legalModalType, setLegalModalType] = useState("");
+  const [cartPrice, setCartPrice] = useState([initialCartPrice]);
+  console.log("cartPrice...", cartPrice);
+  const [workspacePrice, setWorkspacePrice] = useState(0);
 
   const handleLegalModalClose = () => {
     setIsLegalModalOpen(false);
     setLegalModalType("");
   };
 
+  const getPlan = async() => {
+    if(userDetails?.workspace?.workspace_status === "trial") {
+      setWorkspacePrice(0);
+    } else {
+      const workspaceCart = cart?.find(item => item?.product_type === "google workspace");
+      if(workspaceCart) {
+        try {
+          const result = await dispatch(plansAndPricesListThunk({subscription_id: workspaceCart?.plan_name_id})).unwrap();
+          const amountArray = result?.data[0]?.amount_details;
+          const priceArray = amountArray?.find(amount => amount?.currency_code === defaultCurrencySlice)?.price;
+          const finalArray = priceArray?.find(price => price?.type?.toLowerCase() === workspaceCart?.payment_cycle?.toLowerCase());
+          setWorkspacePrice(finalArray?.discount_price);
+        } catch (error) {
+          setWorkspacePrice(0);
+        }
+      } else {
+        setWorkspacePrice(0);
+      }
+    }
+  };
+
+  useEffect(() => {
+    getPlan();
+  }, [cart, defaultCurrencySlice]);
+
+  const getDomainPrice = () => {
+    return 953.72;
+  };
+
+  const calculateCartAmount = (cart) => {
+    if(cart?.length > 0) {
+      const priceList = cart.map((item) => {
+        if(item?.product_type === "google workspace"){
+          return {total_year: item?.total_year, price: workspacePrice};
+        } else if(item?.product_type?.toLowerCase() === "domain") {
+          return {total_year: item?.total_year, price: 953.72};
+        }
+      });
+
+      setCartPrice(priceList);
+    } else {
+      setCartPrice([initialCartPrice]);
+    }
+  };
+
+  useEffect(() => {
+    calculateCartAmount(cart);
+  }, [cart, workspacePrice]);
+
   useEffect(() => {
     // const filterByCurrency = vouchers?.filter(v => v?.voucher?.voucher_code === defaultCurrencySlice);
     // setFilterVouchers(filterByCurrency);
     setFilterVouchers([...vouchers]);
-  }, [vouchers, defaultCurrencySlice]);  
+  }, [vouchers, defaultCurrencySlice]);
 
   useEffect(() => {
     if(cart?.length > 0) {
-      const total = 648.00;
+      const total = cartPrice?.reduce((totalCart, item) => {
+        const amountt = parseFloat(item?.price) * parseInt(item?.total_year);
+        return totalCart + amountt;
+      }, 0);
+      console.log("cartTotal...", total);
       setTotalPrice(parseFloat(total.toFixed(2)));
       setTaxedPrice(parseFloat(((total * taxAmount) / 100).toFixed(2)));
       const discountedPercent = appliedVoucher === null
@@ -90,7 +152,7 @@ const Cart = () => {
     } else {
       setTotalPrice(0);
     }
-  }, [cart, appliedVoucher, selectedVoucher]);
+  }, [cart, appliedVoucher, selectedVoucher, cartPrice]);
 
   const getCartDetails = async() => {
     try {
@@ -112,7 +174,7 @@ const Cart = () => {
 
   useEffect(() => {
     getCartDetails();
-  }, []);
+  }, [customerId]);
 
   const addToCart = async(e, product_name, product_type, price, payment_cycle, total_year) => {
     e.preventDefault();
@@ -280,7 +342,7 @@ const Cart = () => {
       <div className="flex flex-col md:flex-row items-center justify-between md:justify-between mb-6">
         <div
           className="flex items-center gap-1 text-green-500 text-lg cursor-pointer mr-3n whitespace-nowrap mr-2"
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate(-1)}
         >
           <GoChevronLeft />
           <p className="text-green-500 text-md">Back to previous page</p>
@@ -360,25 +422,56 @@ const Cart = () => {
                             <option value="3">3 year</option>
                           </select>
                         ) : (
-                          <select
-                            title="Qty"
-                            className="mt-1 bg-transparent border border-black rounded-md p-1 text-sm max-w-20 w-full"
-                            onChange={e => {
-                              handleChangeCartValue(e, index, e.target.value);
-                            }}
-                            value={item?.total_year}
-                          >
-                            <option value="1">Qty: 1</option>
-                            <option value="2">Qty: 2</option>
-                            <option value="3">Qty: 3</option>
-                          </select>
+                          <div className="flex mt-1 bg-transparent border border-black rounded-md p-1 text-sm max-w-20 w-full">
+                            <p>Qty:</p>
+                            <input
+                            className="max-w-full focus:outline-none border-0 h-full w-[40px] ml-1"
+                              type="number"
+                              onChange={e => {
+                                if(userDetails?.workspace?.workspace_status === "active") {
+                                  if(e.target.value < 0) {
+                                    handleChangeCartValue(e, index, 0)
+                                  } else {
+                                    handleChangeCartValue(e, index, e.target.value)
+                                  }
+                                } else {
+                                  if(e.target.value < 0) {
+                                    handleChangeCartValue(e, index, 0)
+                                  } else if(e.target.value > 10) {
+                                    handleChangeCartValue(e, index, 10)
+                                  } else {
+                                    handleChangeCartValue(e, index, e.target.value)
+                                  }
+                                }
+                                
+                              }}
+                              value={item?.total_year}
+                            />
+                            {/* <select
+                              title="Qty"
+                              className="mt-1 bg-transparent border border-black rounded-md p-1 text-sm max-w-20 w-full"
+                              onChange={e => {
+                                handleChangeCartValue(e, index, e.target.value);
+                              }}
+                              value={item?.total_year}
+                            >
+                              <option value="1">Qty: 1</option>
+                              <option value="2">Qty: 2</option>
+                              <option value="3">Qty: 3</option>
+                            </select> */}
+                          </div>
                         )
                       }
                     </div>
                     <div className="cart-delete-flex">
-                      <div className="flex flex-col justify-center">
-                        <span className="text-xl font-inter font-bold text-black text-end">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{item?.price}</span>
-                        <small className="font-inter font-medium text-[8px] text-gray-400 self-end">
+                      <div className="flex flex-col justify-start
+                     text-left">
+                        <span className="text-xl font-inter font-bold text-black text-end">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{
+                          item?.product_type === "google workspace"
+                          ? workspacePrice
+                          : item?.price
+                        }</span>
+                        <small className="font-inter font-medium text-[8px] text-gray-400 self-end max-w-[70px]">
                           <span className="capitalize">{item?.payment_cycle}</span> cycle
                         </small>
                       </div>
@@ -472,14 +565,18 @@ const Cart = () => {
                             </h1>
                             <small className="text-xs text-gray-400">
                               {
-                                item?.product_type === "Google workspace" ? 
+                                item?.product_type === "google workspace" ? 
                                 `${item?.total_year} users` :
                                 `${item?.total_year} years`
                               }, {item?.payment_cycle} commitment
                             </small>
                           </div>
                           <div className="text-xl font-normal text-black">
-                            <h2>{item?.total_year} X {currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{item?.price}</h2>
+                            <h2>{item?.total_year} X {currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{
+                              item?.product_type === "google workspace"
+                              ? workspacePrice
+                              : item?.price  
+                            }</h2>
                           </div>
                         </div>
                       ))
@@ -634,12 +731,12 @@ const Cart = () => {
                       style={{ maxWidth: "20.5rem", lineHeight: "1.5rem" }}
                     >
                       By purchasing, you accept the{" "}
-                      <span className="text-green-500" onClick={() => {
+                      <span className="text-green-500 cursor-pointer" onClick={() => {
                         setIsLegalModalOpen(true);
                         setLegalModalType("agreement");
                       }}>Customer Agreement</span>{" "}
                       and acknowledge reading the{" "}
-                      <span className="text-green-500" onClick={() => {
+                      <span className="text-green-500 cursor-pointer" onClick={() => {
                         setIsLegalModalOpen(true);
                         setLegalModalType("privacy");
                       }}>Privacy Policy.</span>{" "}

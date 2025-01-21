@@ -22,13 +22,15 @@ const Subscribe: React.FC = () => {
     }
   })
 
-  // console.log("state...", location.state);
+  console.log("state...", location.state);
 
   useEffect(() => {
     if(!location.state) {
       navigate('/');
     };
   }, [location.state]);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const [step, setStep] = useState(1);
   const [ipCountry, setIpCountry] = useState("");
@@ -138,8 +140,10 @@ const Subscribe: React.FC = () => {
   const decrement = () => setCount(count > 1 ? count - 1 : 1); // Ensure count doesn't go below 1
 
   const handleNext = () => {
-    if (step === 1 && formData.business_name) {
+    setIsLoading(true);
+    if (step === 1 && formData.business_name && formData.region) {
       setStep(2);
+      setIsLoading(false);
     } else if (step === 2) {
       navigate("/subscribeotp");
       
@@ -182,6 +186,7 @@ const Subscribe: React.FC = () => {
 
   const handleSubscribeSubmit = async(e) => {
     e.preventDefault();
+    setIsLoading(true);
     if(isNumberValid) {
       try {
         const result = await dispatch(resgiterCustomerThunk({
@@ -198,12 +203,14 @@ const Subscribe: React.FC = () => {
           zipcode: ''
         })).unwrap();
         console.log("result...", result);
-        navigate('/subscribeotp', { state: { plan: location.state.plan, period: location.state.period, formData: formData, customer_id: result?.customer_id, license_usage: count }});
+        navigate('/subscribeotp', { state: { ...location.state, formData: formData, customer_id: result?.customer_id, license_usage: count }});
       } catch (error) {
         toast.error("Error registering");
+        setIsLoading(false);
       }
     } else {
       toast.warning("Please enter a valid phone number");
+      setIsLoading(false);
     }
   }
 
@@ -332,7 +339,7 @@ const Subscribe: React.FC = () => {
                   : "bg-green-600 hover:bg-green-700"
               }`}
             >
-              Next
+              { isLoading ? "Loading..." : "Next"}
             </button>
           </div>
         </form>
@@ -444,7 +451,7 @@ const Subscribe: React.FC = () => {
                   : "bg-green-600 hover:bg-green-700"
               }`}
             >
-              Submit
+              { isLoading ? "Loading..." : "Submit"}
             </button>
           </div>
         </form>

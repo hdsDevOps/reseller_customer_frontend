@@ -2,6 +2,7 @@ import { ArrowLeft, ChevronRight } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAppDispatch } from 'store/hooks';
+import { plansAndPricesListThunk } from 'store/user.thunk';
 
 function ViewPaymentDetails() {
   const navigate = useNavigate();
@@ -9,6 +10,8 @@ function ViewPaymentDetails() {
   const dispatch = useAppDispatch();
 
   const locationData = location.state?.payment_details;
+  const [plan, setPlan] = useState<object|null>(null);
+  console.log("plan...", plan);
   const [data, setData] = useState({});
   useEffect(() => {
     if(locationData.length > 0) {
@@ -20,11 +23,34 @@ function ViewPaymentDetails() {
 
   console.log("data...", data);
 
+  const getPlanData = async(id:string) => {
+    try {
+      const result = await dispatch(plansAndPricesListThunk({subscription_id: id})).unwrap();
+      setPlan(result?.data[0]);
+    } catch (error) {
+      setPlan(null);
+    }
+  };
+
+  useEffect(() => {
+    if(data) {
+      getPlanData(data?.plan_id);
+    }
+  }, [data]);
+
   useEffect(() => {
     if(!location.state) {
       navigate('/');
     }
   }, []);
+
+  const maskeCardNumber = (cardNumber) => {
+    const formattedCardNumber = cardNumber?.replace(/(.{4})/g, "$1 ").trim();
+    const parts = formattedCardNumber?.split(" ");
+    const maskedParts = parts?.map((part, index) => (index < 3 ? "****" : part));
+    return maskedParts?.join(" ");
+  };
+
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="self-start">
@@ -62,7 +88,8 @@ function ViewPaymentDetails() {
             <input
               type='text'
               className='w-full py-2 px-3 border border-[#E4E4E4] bg-white rounded-lg font-jakarta-plus font-normal text-base text-gray-800 mt-1'
-              value={"Robert"}
+              value={data?.first_name}
+              disabled
             />
           </div>
 
@@ -71,7 +98,8 @@ function ViewPaymentDetails() {
             <input
               type='text'
               className='w-full py-2 px-3 border border-[#E4E4E4] bg-white rounded-lg font-jakarta-plus font-normal text-base text-gray-800 mt-1'
-              value={"Clive"}
+              value={data?.last_name}
+              disabled
             />
           </div>
 
@@ -80,7 +108,8 @@ function ViewPaymentDetails() {
             <input
               type='text'
               className='w-full py-2 px-3 border border-[#E4E4E4] bg-white rounded-lg font-jakarta-plus font-normal text-base text-gray-800 mt-1'
-              value={"**** **** **** 2354 "}
+              value={maskeCardNumber(data?.card_number)}
+              disabled
             />
             <img
               src={'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/visa.png?alt=media&token=793767a0-a14e-4f5a-a6e4-fc490119413a'}
@@ -100,7 +129,8 @@ function ViewPaymentDetails() {
             <input
               type='text'
               className='w-full py-2 px-3 border border-[#E4E4E4] bg-white rounded-lg font-jakarta-plus font-normal text-base text-gray-800 mt-1'
-              value={"Starter"}
+              value={plan?.plan_name}
+              disabled
             />
           </div>
 
@@ -109,7 +139,8 @@ function ViewPaymentDetails() {
             <input
               type='text'
               className='w-full py-2 px-3 border border-[#E4E4E4] bg-white rounded-lg font-jakarta-plus font-normal text-base text-gray-800 mt-1'
-              value={"demo@yopmail.com"}
+              value={data?.domain}
+              disabled
             />
           </div>
 
@@ -118,7 +149,8 @@ function ViewPaymentDetails() {
             <input
               type='text'
               className='w-full py-2 px-3 border border-[#E4E4E4] bg-white rounded-lg font-jakarta-plus font-normal text-base text-gray-800 mt-1'
-              value={"+2349165624735"}
+              value={"+"+data?.phone}
+              disabled
             />
           </div>
 
@@ -127,7 +159,8 @@ function ViewPaymentDetails() {
             <input
               type='text'
               className='w-full py-2 px-3 border border-[#E4E4E4] bg-white rounded-lg font-jakarta-plus font-normal text-base text-gray-800 mt-1'
-              value={"Robertclive@domain.co.in"}
+              value={data?.email}
+              disabled
             />
           </div>
 
@@ -136,7 +169,8 @@ function ViewPaymentDetails() {
             <input
               type='text'
               className='w-full py-2 px-3 border border-[#E4E4E4] bg-white rounded-lg font-jakarta-plus font-normal text-base text-gray-800 mt-1'
-              value={"Lorem ispium"}
+              value={data?.country}
+              disabled
             />
           </div>
 
@@ -145,7 +179,8 @@ function ViewPaymentDetails() {
             <input
               type='text'
               className='w-full py-2 px-3 border border-[#E4E4E4] bg-white rounded-lg font-jakarta-plus font-normal text-base text-gray-800 mt-1'
-              value={"Jan 30 2024"}
+              value={data?.due_date}
+              disabled
             />
           </div>
         </div>

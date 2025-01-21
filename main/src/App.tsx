@@ -7,8 +7,8 @@ import UserAuth from "./hoc/UserAuth.hoc";
 import MainApp from "./pages";
 import AuthApp from "auth/AuthApp";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { getCartThunk, getDomainsListThunk, getLandingPageThunk, getPaymentMethodsThunk, getProfileDataThunk, getStaffIdFromLSThunk, getStaffStatusFromLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, removeUserAuthTokenFromLSThunk, savedCardsListThunk } from 'store/user.thunk';
-import { setCart, setCustomerId, setDefaultCurrencySlice, setDomains, setMetaDataSlice, setPaymentMethodsState, setResellerToken, setSaveCards, setStaffId, setStaffStatus, setTokenDetails, setUserDetails } from 'store/authSlice';
+import { getCartThunk, getDomainsListThunk, getLandingPageThunk, getNotificationsListThunk, getPaymentMethodsThunk, getProfileDataThunk, getRoleIdFromLSThunk, getStaffIdFromLSThunk, getStaffStatusFromLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, removeUserAuthTokenFromLSThunk, savedCardsListThunk } from 'store/user.thunk';
+import { setCart, setCustomerId, setDefaultCurrencySlice, setDomains, setMetaDataSlice, setNotificationsListSlice, setPaymentMethodsState, setResellerToken, setRoleIdSlice, setSaveCards, setStaffId, setStaffStatus, setTokenDetails, setUserDetails } from 'store/authSlice';
 import "auth/AuthCss";
 import "./index.css";
 import { HelmetProvider, Helmet } from 'react-helmet-async';
@@ -18,7 +18,8 @@ import { currencyList } from "./components/CurrencyList";
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { token, customerId, staffId, staffStatus, resellerToken, userDetails, metaDataSlice, defaultCurrencySlice } = useAppSelector((state) => state.auth);
+  const { token, customerId, staffId, staffStatus, resellerToken, userDetails, metaDataSlice, defaultCurrencySlice, domainsState, notificationsList } = useAppSelector((state) => state.auth);
+  // console.log("notificationsList...", notificationsList);
   // const token ="vvggg"
   // console.log(token, "...token");
   // console.log("resellerToken...", resellerToken);
@@ -26,6 +27,23 @@ const App: React.FC = () => {
   // console.log({token, customerId, staffId, staffStatus});
   // console.log("meta data...", metaDataSlice);
   // console.log("defaultCurrencySlice...", defaultCurrencySlice);
+  // console.log("domainsState...", domainsState?.find(item => item?.domain_type === "primary"));
+
+  useEffect(() => {
+    const getNotificationsList = async() => {
+      try {
+        const result = await dispatch(getNotificationsListThunk({user_id: customerId, last_id: "", per_page: 5})).unwrap();
+        // console.log("result...", result?.data);
+        if(result?.data?.length > 0) {
+          await dispatch(setNotificationsListSlice(result?.data));
+        }
+      } catch (error) {
+        //
+      }
+    };
+
+    getNotificationsList();
+  }, [customerId]);
 
   useEffect(() => {
     const getIpData = async() => {
@@ -69,7 +87,9 @@ const App: React.FC = () => {
         try {
           const result = await dispatch(getProfileDataThunk({user_id: customerId, staff_id: staffId, is_staff: staffStatus})).unwrap();
           // console.log("result...", result);
+          const roleData = await dispatch(getRoleIdFromLSThunk()).unwrap();
           await dispatch(setUserDetails(result?.customerData));
+          await dispatch(setRoleIdSlice(roleData));
         } catch (error) {
           if(error?.message == "Request failed with status code 401") {
             try {

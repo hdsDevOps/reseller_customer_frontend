@@ -7,3 +7,10 @@ export const checkDomainThunk = createAsyncThunk(
     return await userApis.checkDomainApi(domain);
   }
 );
+
+export const domainAvailabilityThunk = createAsyncThunk(
+  "users/domainAvailability",
+  async (domain:string) => {
+    return await userApis.domainAvailabilityApi(domain);
+  }
+);

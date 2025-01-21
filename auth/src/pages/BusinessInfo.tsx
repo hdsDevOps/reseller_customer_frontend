@@ -264,7 +264,11 @@ const BusinessInfo: React.FC = () => {
         })).unwrap();
         // console.log("result...", result);
         toast.success("Business Information updated successfully");
-        navigate("/adddomain", {state: {customer_id: location.state.customer_id, formData: formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: 'business_info'}});
+        if(location.state?.from === "home") {
+          navigate("/signin-domain", {state: { ...location.state, formData: formData, }});
+        } else {
+          navigate("/adddomain", {state: { ...location.state, formData: formData, from: 'business_info'}});
+        }
       } catch (error) {
         toast.error("Error updating Business Information");
       }

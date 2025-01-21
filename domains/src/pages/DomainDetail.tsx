@@ -5,19 +5,15 @@ import { AiOutlineCheck } from "react-icons/ai";
 import { MdOutlineAddShoppingCart } from "react-icons/md";
 import { removeUserAuthTokenFromLSThunk, getCartThunk, addToCartThunk } from "store/user.thunk";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-
-const initialDomain = {
-  domain: '',
-  domain_extension: '.com',
-}
+import { currencyList } from "../components/CurrencyList";
 
 const SelectedDomain: React.FC = () => { 
   const location = useLocation();
-  // console.log(location.state);
+  console.log(location.state);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const { customerId } = useAppSelector(state => state.auth);
+  const { customerId, defaultCurrencySlice } = useAppSelector(state => state.auth);
 
   useEffect(() => {
     if(!location.state) {
@@ -25,7 +21,7 @@ const SelectedDomain: React.FC = () => {
     }
   }, []);
 
-  const [domain, setDomain] = useState(initialDomain);
+  const [domain, setDomain] = useState("");
   // console.log("domain...", domain);
 
   const [cart, setCart] = useState([]);
@@ -61,10 +57,10 @@ const SelectedDomain: React.FC = () => {
     try {
       const newCart = cart;
       const addCart = {
-        product_name: `${domain?.domain}${domain?.domain_extension}`,
-        product_type: "Domain",
-        price: "99.99",
-        payment_cycle: "yearly",
+        product_name: location.state.domain.domain,
+        product_type: "domain",
+        price: location.state.domain.price[defaultCurrencySlice],
+        payment_cycle: "Yearly",
         total_year: "1"
       }
       newCart.push(addCart)
@@ -100,11 +96,11 @@ const SelectedDomain: React.FC = () => {
           <div className="w-full max-w-3xl flex flex-col items-center justify-center gap-1 p-0 md:px-7">
             <div className="bg-white w-full border border-black rounded-sm py-4 p-3 flex justify-between items-center text-sm md:text-lg">
               <div className="text-xs sm:text-lg font-semibold">
-                {domain?.domain}{domain?.domain_extension}
+                {location.state.domain?.domain}
               </div>
               <div className="text-xs sm:text-lg flex items-center gap-2 font-semibold">
                 <small className="text-green-500 font-normal">Available</small>
-                <p>$99.99/year</p>
+                <p>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{location.state.domain?.price[defaultCurrencySlice]}/year</p>
               </div>
             </div>
 
@@ -114,7 +110,7 @@ const SelectedDomain: React.FC = () => {
                 <p className="text-gray-600">
                   You'll use this domain to set up Google Workspace, create
                   professional email addresses like{" "}
-                  <strong>sales@{domain?.domain}{domain?.domain_extension}</strong>, and sign in to Gmail, Docs,
+                  <strong>sales@{location.state.domain?.domain}</strong>, and sign in to Gmail, Docs,
                   Drive, Calendar, and more.
                 </p>
               </div>
@@ -122,7 +118,7 @@ const SelectedDomain: React.FC = () => {
               <div className="flex items-start gap-2 text-sm md:text-lg">
                 <AiOutlineCheck className="text-green-500 !w-4 !h-4" />
                 <p className="text-gray-600">
-                  You'll be able to purchase <strong>{domain?.domain}{domain?.domain_extension}</strong> after
+                  You'll be able to purchase <strong>{location.state.domain?.domain}</strong> after
                   creating your Google Workspace account.
                 </p>
               </div>

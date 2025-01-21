@@ -16,15 +16,15 @@ const SignInForm: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
-  // console.log("location state...", location.state);
+  console.log("location state...", location.state);
   
   // Retrieve the domain from the location state
-  const domain = location.state.selectedDomain;
+  const domain = location.state.selectedDomain?.domain?.domain;
   const captchaRef = useRef(null);
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [formData, setFormData] = useState({
-    username: "",
+    username: `${location.state.formData.first_name?.toLowerCase()}.${location.state.formData.last_name?.toLowerCase()}`,
     password: "",
   });
   // console.log("form data...", formData);
@@ -76,7 +76,7 @@ const SignInForm: React.FC = () => {
       if(formData.username.includes("@")) {
         toast.warning("Username cannot include @ symbol");
       } else {
-        navigate('/free-trial', { state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, selectedDomain: location.state.selectedDomain, token: location.state.token, emailData: {username: `${formData.username}@${location.state.selectedDomain}`, password: formData.password}, from: location.state.from} });
+        navigate('/free-trial', { state: { ...location.state, emailData: {username: `${formData.username}@${location.state.selectedDomain}`, password: formData.password} } });
       }
     } else {
       toast.error("Please click on I'm not a robot.");
@@ -207,6 +207,7 @@ const SignInForm: React.FC = () => {
         <button
           type="submit"
           className="bg-green-600 text-sm text-white p-[10px] px-4 rounded-lg mt-4"
+          disabled={!recaptchaValid}
         >
           Agree and Continue
         </button>

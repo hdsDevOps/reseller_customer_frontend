@@ -446,423 +446,423 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
   return (
     <div className='bg-slate-900/20   fixed inset-0 z-50 grid place-items-center overflow-y-scroll cursor-pointer'>
       <div className='bg-white w-full max-w-2xl flex flex-col  justify-center  pb-4  rounded-xl '>
-          <div className="flex justify-between items-center pt-2 pb-3 px-6">
-              <h3 className="text-[#0D121F] text-xl font-medium font-inter ">
-              Edit your profile
-              </h3>
-              <MdOutlineClose onClick={handleCloseShowModal} size={24} />
-          </div>
-          <div className='border-[#000000] border-b'></div>
-          <form onSubmit={handleSubmit} className='px-1'>
-              <h2 className='text-lg font-bold text-[#14213D] mt-6'>Basic information</h2>
-              <div className='grid xl:grid-cols-3 grid-cols-2 gap-3 mt-4 items-center'>
-                  <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                      <label
-                          htmlFor="first_name"
-                          className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                      >First Name</label>
-                      <input
-                          type="text"
-                          className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                          value={data?.first_name || "John"}
-                          name='first_name'
-                          onChange={handleChangeData}
-                      />
-                  </div>
-                  <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                      <input
-                          type="text"
-                          className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                          value={data?.last_name || "Doe"}
-                          name='last_name'
-                          onChange={handleChangeData}
-                      />
-                      <label
-                          htmlFor="last_name"
-                          className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                      >Last Name</label>
-                  </div>
-                  <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                      <input
-                          type="text"
-                          className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                          value={data?.email}
-                          name='email'
-                          disabled
-                      />
-                      <label
-                          htmlFor="email"
-                          className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                      >Email</label>
-                  </div>
-                  <div className="!max-w-[378px] sm:col-span-1 col-span-2 mx-auto relative !w-full mb-2 !pb-1 !pt-[6px] mt-2">
-                    <PhoneInput
-                      value={data?.phone_no}
-                      onChange={(inputPhone, countryData, event, formattedValue) => {
-                        handlePhoneChange(inputPhone);
-                        if(countryData?.format?.length === formattedValue.length) {
-                          const newValue = removePrefix(inputPhone, countryData?.dialCode);
-                          if (newValue.startsWith('0')) {
-                            setIsNumberValid(false);
-                          } else {
-                            setIsNumberValid(true);
-                          }
-                        } else {
-                          setIsNumberValid(false);
-                        }
-                      }}
-                      inputClass="!w-full !outline-none !border-0"
-                      dropdownClass="peer"
-                      containerClass="relative !outline-none !w-full !border !border-[#E4E4E4] !rounded-[10px]"
-                    />
-                    <label
-                      htmlFor="business_phone_number"
-                      className="absolute bg-white -top-3 left-3 text-gray-500 transition-all duration-300 ease-in-out origin-top-left peer-placeholder-shown:text-gray-400 peer-focus:text-blue-600 peer-focus:text-sm"
-                    >Phone Number</label>
-                  </div>
-                  <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                      <input
-                          type="text"
-                          className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                          value={data?.address}
-                          name='address'
-                          onChange={handleChangeData}
-                      />
-                      <label
-                          htmlFor="address"
-                          className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                      >Address</label>
-                  </div>
-                  <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                      <input
-                          type="text"
-                          className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                          value={data?.country || countryName}
-                          name='country'
-                          onChange={e => {
-                              setData({
-                                  ...data,
-                                  country: '',
-                                  state: '',
-                                  city: ''
-                              });
-                              setCountryName(e.target.value);
-                              setStateName('');
-                              setCityName('');
-                              setCountry({});
-                              setState({});
-                              setCity({});
-                          }}
-                          onFocus={() => {setCountryDropdownOpen(true)}}
-                      />
-                      <label
-                          htmlFor="country"
-                          className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                      >Country</label>
+        <div className="flex justify-between items-center pt-2 pb-3 px-6">
+          <h3 className="text-[#0D121F] text-xl font-medium font-inter ">
+          Edit your profile
+          </h3>
+          <MdOutlineClose onClick={handleCloseShowModal} size={24} />
+        </div>
+        <div className='border-[#000000] border-b'></div>
+        <form onSubmit={handleSubmit} className='px-1'>
+          <h2 className='text-lg font-bold text-[#14213D] mt-6'>Basic information</h2>
+          <div className='grid xl:grid-cols-3 grid-cols-2 gap-3 mt-4 items-center'>
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
+                <label
+                    htmlFor="first_name"
+                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+                >First Name</label>
+                <input
+                    type="text"
+                    className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
+                    value={data?.first_name || "John"}
+                    name='first_name'
+                    onChange={handleChangeData}
+                />
+            </div>
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
+                <input
+                    type="text"
+                    className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
+                    value={data?.last_name || "Doe"}
+                    name='last_name'
+                    onChange={handleChangeData}
+                />
+                <label
+                    htmlFor="last_name"
+                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+                >Last Name</label>
+            </div>
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
+                <input
+                    type="text"
+                    className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
+                    value={data?.email}
+                    name='email'
+                    disabled
+                />
+                <label
+                    htmlFor="email"
+                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+                >Email</label>
+            </div>
+            <div className="!max-w-[378px] sm:col-span-1 col-span-2 mx-auto relative !w-full mb-2 !pb-1 !pt-[6px] mt-2">
+              <PhoneInput
+                value={data?.phone_no}
+                onChange={(inputPhone, countryData, event, formattedValue) => {
+                  handlePhoneChange(inputPhone);
+                  if(countryData?.format?.length === formattedValue.length) {
+                    const newValue = removePrefix(inputPhone, countryData?.dialCode);
+                    if (newValue.startsWith('0')) {
+                      setIsNumberValid(false);
+                    } else {
+                      setIsNumberValid(true);
+                    }
+                  } else {
+                    setIsNumberValid(false);
+                  }
+                }}
+                inputClass="!w-full !outline-none !border-0"
+                dropdownClass="peer"
+                containerClass="relative !outline-none !w-full !border !border-[#E4E4E4] !rounded-[10px]"
+              />
+              <label
+                htmlFor="business_phone_number"
+                className="absolute bg-white -top-3 left-3 text-gray-500 transition-all duration-300 ease-in-out origin-top-left peer-placeholder-shown:text-gray-400 peer-focus:text-blue-600 peer-focus:text-sm"
+              >Phone Number</label>
+            </div>
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
+                <input
+                    type="text"
+                    className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
+                    value={data?.address}
+                    name='address'
+                    onChange={handleChangeData}
+                />
+                <label
+                    htmlFor="address"
+                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+                >Address</label>
+            </div>
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
+                <input
+                    type="text"
+                    className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
+                    value={data?.country || countryName}
+                    name='country'
+                    onChange={e => {
+                        setData({
+                            ...data,
+                            country: '',
+                            state: '',
+                            city: ''
+                        });
+                        setCountryName(e.target.value);
+                        setStateName('');
+                        setCityName('');
+                        setCountry({});
+                        setState({});
+                        setCity({});
+                    }}
+                    onFocus={() => {setCountryDropdownOpen(true)}}
+                />
+                <label
+                    htmlFor="country"
+                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+                >Country</label>
+                {
+                  countryDropdownOpen && (
+                    <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md'>
                       {
-                        countryDropdownOpen && (
-                          <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md'>
-                            {
-                              countries?.filter(name => name?.name.toLowerCase().includes(countryName.toLowerCase())).map((country, idx) => (
-                                <p
-                                  key={idx}
-                                  className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
-                                  dropdown-name="country-dropdown"
-                                  onClick={() => {
-                                    setData({
-                                      ...data,
-                                      country: country?.name
-                                    });
-                                    setCountryName("");
-                                    setStateName("");
-                                    setCityName("");
-                                    setCountry(country);
-                                    setState({});
-                                    setCity({});
-                                    setCountryDropdownOpen(false);
-                                  }}
-                                >{country?.name}</p>
-                              ))
-                            }
-                          </div>
-                        )
-                      }
-                  </div>
-                  <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                      <input
-                          type="text"
-                          className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                          value={data?.state || stateName}
-                          name='state'
-                          onChange={e => {
+                        countries?.filter(name => name?.name.toLowerCase().includes(countryName.toLowerCase())).map((country, idx) => (
+                          <p
+                            key={idx}
+                            className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                            dropdown-name="country-dropdown"
+                            onClick={() => {
                               setData({
                                 ...data,
-                                state: "",
+                                country: country?.name
+                              });
+                              setCountryName("");
+                              setStateName("");
+                              setCityName("");
+                              setCountry(country);
+                              setState({});
+                              setCity({});
+                              setCountryDropdownOpen(false);
+                            }}
+                          >{country?.name}</p>
+                        ))
+                      }
+                    </div>
+                  )
+                }
+            </div>
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
+                <input
+                    type="text"
+                    className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
+                    value={data?.state || stateName}
+                    name='state'
+                    onChange={e => {
+                        setData({
+                          ...data,
+                          state: "",
+                          city: ""
+                        });
+                        setStateName(e.target.value);
+                        setCityName("");
+                        setState({});
+                        setCity({});
+                    }}
+                    onFocus={() => {setStateDropdownOpen(true)}}
+                />
+                <label
+                    htmlFor="state"
+                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+                >State</label>
+                {
+                  stateDropdownOpen && (
+                    <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+                      {
+                        states?.filter(name => name?.name.toLowerCase().includes(stateName.toLowerCase())).map((region, idx) => (
+                          <p
+                            key={idx}
+                            className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                            onClick={() => {
+                              setData({
+                                ...data,
+                                state: region?.name,
                                 city: ""
                               });
-                              setStateName(e.target.value);
+                              setStateName("");
                               setCityName("");
-                              setState({});
+                              setState(region);
                               setCity({});
-                          }}
-                          onFocus={() => {setStateDropdownOpen(true)}}
-                      />
-                      <label
-                          htmlFor="state"
-                          className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                      >State</label>
-                      {
-                        stateDropdownOpen && (
-                          <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
-                            {
-                              states?.filter(name => name?.name.toLowerCase().includes(stateName.toLowerCase())).map((region, idx) => (
-                                <p
-                                  key={idx}
-                                  className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
-                                  onClick={() => {
-                                    setData({
-                                      ...data,
-                                      state: region?.name,
-                                      city: ""
-                                    });
-                                    setStateName("");
-                                    setCityName("");
-                                    setState(region);
-                                    setCity({});
-                                    setStateDropdownOpen(false);
-                                  }}
-                                  dropdown-name="state_dropdown"
-                                >{region?.name}</p>
-                              ))
-                            }
-                          </div>
-                        )
+                              setStateDropdownOpen(false);
+                            }}
+                            dropdown-name="state_dropdown"
+                          >{region?.name}</p>
+                        ))
                       }
-                  </div>
-                  <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                      <input
-                          type="text"
-                          className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                          value={data?.city || cityName}
-                          name='city'
-                          onChange={e => {
+                    </div>
+                  )
+                }
+            </div>
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
+                <input
+                    type="text"
+                    className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
+                    value={data?.city || cityName}
+                    name='city'
+                    onChange={e => {
+                        setData({
+                          ...data,
+                          city: ''
+                        });
+                        setCityName(e.target.value);
+                        setCity({});
+                    }}
+                    onFocus={() => {setCityDropdownOpen(true)}}
+                />
+                <label
+                    htmlFor="city"
+                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+                >City</label>
+                {
+                  cityDropdownOpen && (
+                    <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+                      {
+                        cities?.filter(name => name?.name.toLowerCase().includes(cityName.toLowerCase())).map((city_name, idx) => (
+                          <p
+                            key={idx}
+                            className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                            onClick={() => {
                               setData({
                                 ...data,
-                                city: ''
+                                city: city_name?.name
                               });
-                              setCityName(e.target.value);
-                              setCity({});
-                          }}
-                          onFocus={() => {setCityDropdownOpen(true)}}
-                      />
-                      <label
-                          htmlFor="city"
-                          className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                      >City</label>
-                      {
-                        cityDropdownOpen && (
-                          <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
-                            {
-                              cities?.filter(name => name?.name.toLowerCase().includes(cityName.toLowerCase())).map((city_name, idx) => (
-                                <p
-                                  key={idx}
-                                  className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
-                                  onClick={() => {
-                                    setData({
-                                      ...data,
-                                      city: city_name?.name
-                                    });
-                                    setCityName("");
-                                    setCity(city_name);
-                                    setCityDropdownOpen(false);
-                                  }}
-                                  dropdown-name="city-dropdown"
-                                >{city_name?.name}</p>
-                              ))
-                            }
-                          </div>
-                        )
+                              setCityName("");
+                              setCity(city_name);
+                              setCityDropdownOpen(false);
+                            }}
+                            dropdown-name="city-dropdown"
+                          >{city_name?.name}</p>
+                        ))
                       }
-                  </div>
-                  <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                      <input
-                          type={showPassword ? "text" : "password"}
-                          className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                          name='password'
-                          onChange={handleChangeData}
-                      />
-                      <label
-                          htmlFor="password"
-                          className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                      >Password</label>
-                      <button
-                          type='button'
-                          className='absolute right-2 -mt-[22px]'
-                          onClick={() => {setShowPassword(!showPassword)}}
-                      >
-                          {
-                              showPassword ?
-                              (<FaEye className='w-5' />) : 
-                              (<FaEyeSlash className='w-5' />)
-                          }
-                      </button>
-                  </div>
-                  <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                      <input
-                          type={showCPassword ? "text" : "password"}
-                          className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                          name='confirm_password'
-                          onChange={e => {setConfirmPassword(e.target.value)}}
-                      />
-                      <label
-                          htmlFor="confirm_password"
-                          className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                      >Confirm Password</label>
-                      <button
-                          type='button'
-                          className='absolute right-2 -mt-[22px]'
-                          onClick={() => {setShowCPassword(!showCPassword)}}
-                      >
-                          {
-                              showCPassword ?
-                              (<FaEye className='w-5' />) : 
-                              (<FaEyeSlash className='w-5' />)
-                          }
-                      </button>
-                  </div>
-              </div>
-              <h2 className='text-lg font-bold text-[#14213D] mt-6'>Business information</h2>
-              <div className='grid grid-cols-2 gap-3 mt-4 items-center'>
-                  <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                      <input
-                          type="text"
-                          className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                          value={data?.business_name}
-                          name='business_name'
-                          onChange={handleChangeData}
-                      />
-                      <label
-                          htmlFor="business_name"
-                          className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                      >Business Name</label>
-                  </div>
-                  <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                      <input
-                          type="text"
-                          className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                          value={data?.business_state || businessStateName}
-                          name='business_state'
-                          onChange={e => {
+                    </div>
+                  )
+                }
+            </div>
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
+                <input
+                    type={showPassword ? "text" : "password"}
+                    className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
+                    name='password'
+                    onChange={handleChangeData}
+                />
+                <label
+                    htmlFor="password"
+                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+                >Password</label>
+                <button
+                    type='button'
+                    className='absolute right-2 -mt-[22px]'
+                    onClick={() => {setShowPassword(!showPassword)}}
+                >
+                    {
+                        showPassword ?
+                        (<FaEye className='w-5' />) : 
+                        (<FaEyeSlash className='w-5' />)
+                    }
+                </button>
+            </div>
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
+                <input
+                    type={showCPassword ? "text" : "password"}
+                    className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
+                    name='confirm_password'
+                    onChange={e => {setConfirmPassword(e.target.value)}}
+                />
+                <label
+                    htmlFor="confirm_password"
+                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+                >Confirm Password</label>
+                <button
+                    type='button'
+                    className='absolute right-2 -mt-[22px]'
+                    onClick={() => {setShowCPassword(!showCPassword)}}
+                >
+                    {
+                        showCPassword ?
+                        (<FaEye className='w-5' />) : 
+                        (<FaEyeSlash className='w-5' />)
+                    }
+                </button>
+            </div>
+          </div>
+          <h2 className='text-lg font-bold text-[#14213D] mt-6'>Business information</h2>
+          <div className='grid grid-cols-2 gap-3 mt-4 items-center'>
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
+                <input
+                    type="text"
+                    className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
+                    value={data?.business_name}
+                    name='business_name'
+                    onChange={handleChangeData}
+                />
+                <label
+                    htmlFor="business_name"
+                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+                >Business Name</label>
+            </div>
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
+                <input
+                    type="text"
+                    className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
+                    value={data?.business_state || businessStateName}
+                    name='business_state'
+                    onChange={e => {
+                        setData({
+                          ...data,
+                          business_state: "",
+                          business_city: ""
+                        });
+                        setBusinessStateName(e.target.value);
+                        setBusinessCityName("");
+                        setBusinessState({});
+                        setBusinessCity({});
+                    }}
+                    onFocus={() => {setBusinessStateDropdownOpen(true)}}
+                />
+                <label
+                    htmlFor="business_state"
+                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+                >Business State</label>
+                {
+                  businessStateDropdownOpen && (
+                    <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+                      {
+                        businessStates?.filter(name => name?.name.toLowerCase().includes(businessStateName.toLowerCase())).map((region, idx) => (
+                          <p
+                            key={idx}
+                            className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                            onClick={() => {
                               setData({
                                 ...data,
-                                business_state: "",
+                                business_state: region?.name,
                                 business_city: ""
                               });
-                              setBusinessStateName(e.target.value);
+                              setBusinessStateName("");
                               setBusinessCityName("");
-                              setBusinessState({});
+                              setBusinessState(region);
                               setBusinessCity({});
-                          }}
-                          onFocus={() => {setBusinessStateDropdownOpen(true)}}
-                      />
-                      <label
-                          htmlFor="business_state"
-                          className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                      >Business State</label>
-                      {
-                        businessStateDropdownOpen && (
-                          <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
-                            {
-                              businessStates?.filter(name => name?.name.toLowerCase().includes(businessStateName.toLowerCase())).map((region, idx) => (
-                                <p
-                                  key={idx}
-                                  className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
-                                  onClick={() => {
-                                    setData({
-                                      ...data,
-                                      business_state: region?.name,
-                                      business_city: ""
-                                    });
-                                    setBusinessStateName("");
-                                    setBusinessCityName("");
-                                    setBusinessState(region);
-                                    setBusinessCity({});
-                                    setBusinessStateDropdownOpen(false);
-                                  }}
-                                  dropdown-name="state_dropdown"
-                                >{region?.name}</p>
-                              ))
-                            }
-                          </div>
-                        )
+                              setBusinessStateDropdownOpen(false);
+                            }}
+                            dropdown-name="state_dropdown"
+                          >{region?.name}</p>
+                        ))
                       }
-                  </div>
-                  <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                      <input
-                          type="text"
-                          className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                          value={data?.business_city || businessCityName}
-                          name='business_city'
-                          onChange={e => {
+                    </div>
+                  )
+                }
+            </div>
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
+                <input
+                    type="text"
+                    className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
+                    value={data?.business_city || businessCityName}
+                    name='business_city'
+                    onChange={e => {
+                        setData({
+                          ...data,
+                          business_city: ""
+                        });
+                        setBusinessCityName(e.target.value);
+                        setBusinessCity({});
+                    }}
+                    onFocus={() => {setBusinessCityDropdownOpen(true)}}
+                />
+                <label
+                    htmlFor="business_city"
+                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+                >Business City*</label>
+                {
+                  businessCityDropdownOpen && (
+                    <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+                      {
+                        businessCities?.filter(name => name?.name.toLowerCase().includes(businessCityName.toLowerCase())).map((region, idx) => (
+                          <p
+                            key={idx}
+                            className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                            onClick={() => {
                               setData({
                                 ...data,
-                                business_city: ""
+                                business_city: region?.name
                               });
-                              setBusinessCityName(e.target.value);
-                              setBusinessCity({});
-                          }}
-                          onFocus={() => {setBusinessCityDropdownOpen(true)}}
-                      />
-                      <label
-                          htmlFor="business_city"
-                          className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                      >Business City*</label>
-                      {
-                        businessCityDropdownOpen && (
-                          <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
-                            {
-                              businessCities?.filter(name => name?.name.toLowerCase().includes(businessCityName.toLowerCase())).map((region, idx) => (
-                                <p
-                                  key={idx}
-                                  className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
-                                  onClick={() => {
-                                    setData({
-                                      ...data,
-                                      business_city: region?.name
-                                    });
-                                    setBusinessCityName("");
-                                    setBusinessCity(region);
-                                    setBusinessCityDropdownOpen(false);
-                                  }}
-                                  dropdown-name="state_dropdown"
-                                >{region?.name}</p>
-                              ))
-                            }
-                          </div>
-                        )
+                              setBusinessCityName("");
+                              setBusinessCity(region);
+                              setBusinessCityDropdownOpen(false);
+                            }}
+                            dropdown-name="state_dropdown"
+                          >{region?.name}</p>
+                        ))
                       }
-                  </div>
-                  <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                      <label
-                          htmlFor="business_zip_code"
-                          className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                      >Zip code</label>
-                      <input
-                          type="text"
-                          className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                          value={data?.business_zip_code}
-                          name='business_zip_code'
-                          onChange={handleChangeData}
-                      />
-                  </div>
+                    </div>
+                  )
+                }
+            </div>
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
+                  <label
+                      htmlFor="business_zip_code"
+                      className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+                  >Zip code</label>
+                  <input
+                      type="text"
+                      className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
+                      value={data?.business_zip_code}
+                      name='business_zip_code'
+                      onChange={handleChangeData}
+                  />
               </div>
-              <div className='flex items-center justify-between mt-3 px-6'>
-                  <button
-                      type='submit' 
-                      className='text-white text-center bg-[#12A833] py-2 px-4 rounded-xl w-36  mb-4'
-                  >Update</button>
-              </div>
-          </form>
+          </div>
+          <div className='flex items-center justify-between mt-3 px-6'>
+            <button
+              type='submit' 
+              className='text-white text-center bg-[#12A833] py-2 px-4 rounded-xl w-36  mb-4'
+            >Update</button>
+          </div>
+        </form>
       </div>
     </div>
   )

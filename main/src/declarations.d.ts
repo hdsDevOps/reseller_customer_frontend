@@ -101,6 +101,12 @@ declare module 'store/user.thunk' {
   export const deleteCardThunk;
   export const getVouchersListThunk;
   export const useVoucherThunk;
+  export const stripePayThunk;
+  export const paystackPayThunk;
+  export const hereMapSearchThunk;
+  export const getRoleIdFromLSThunk;
+  export const getSettingsListThunk;
+  export const getBillingHistoryThunk;
 }
 
 declare module 'store/authSlice' {
@@ -111,6 +117,8 @@ declare module 'store/authSlice' {
   export const setCustomerId;
   export const setStaffId;
   export const setStaffStatus;
+  export const setRoleIdSlice;
+  export const setRolePermissionsSlice;
   // Other exports
   export const setCart: (payload: string) => PayloadAction<string>;
   export const setDomains: (payload: string) => PayloadAction<string>;
@@ -119,4 +127,5 @@ declare module 'store/authSlice' {
   export const setUserDetails: (payload: string) => PayloadAction<string>;
   export const setMetaDataSlice;
   export const setDefaultCurrencySlice;
+  export const setNotificationsListSlice: (payload: any) => PayloadAction<any>;
 }

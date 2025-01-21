@@ -43,6 +43,13 @@ export const getStaffStatusFromLSThunk = createAsyncThunk(
   },
 );
 
+export const getRoleIdFromLSThunk = createAsyncThunk(
+  "users/getRoleIdFromLS",
+  async () => {
+    return localStorage.getItem("LS_KEY_ROLE_ID");
+  },
+);
+
 export const setUserIdToLSThunk = createAsyncThunk(
   "users/setUserIdToLS",
   async (customerId: string) => {
@@ -64,6 +71,13 @@ export const setStaffStatusToLSThunk = createAsyncThunk(
   },
 );
 
+export const setRoleIdToLSThunk = createAsyncThunk(
+  "users/setRoleIdToLS",
+  async (roleId: string) => {
+    return localStorage.setItem("LS_KEY_ROLE_ID", roleId);
+  },
+);
+
 export const removeUserIdFromLSThunk = createAsyncThunk(
   "users/removeUserIdFromLS",
   async () => {
@@ -82,6 +96,13 @@ export const removeStaffStatusFromLSThunk = createAsyncThunk(
   "users/removeStaffStatusFromLS",
   async () => {
     return localStorage.removeItem("LS_KEY_STAFF_STATUS");
+  },
+);
+
+export const removeRoleIdFromLSThunk = createAsyncThunk(
+  "users/removeRoleIdFromLS",
+  async () => {
+    return localStorage.removeItem("LS_KEY_ROLE_ID");
   },
 );
 
@@ -274,6 +295,13 @@ export const getStaffListThunk = createAsyncThunk(
   }
 );
 
+export const addStaffWithoutLoginThunk = createAsyncThunk(
+  "users/addStaffWithoutLogin",
+  async ({ user_id, first_name, last_name, email, phone_no, user_type_id, token }: any) => {
+    return await userApis.addStaffWithoutLoginApi( user_id, first_name, last_name, email, phone_no, user_type_id, token );
+  }
+);
+
 export const addStaffThunk = createAsyncThunk(
   "users/addStaff",
   async ({ user_id, first_name, last_name, email, phone_no, user_type_id }: any) => {
@@ -299,6 +327,13 @@ export const getSettingsListThunk = createAsyncThunk(
   "users/getSettingsList",
   async ({ user_type, user_id }: any) => {
     return await userApis.getSettingsListApi( user_type, user_id );
+  }
+);
+
+export const addSettingWithoutLoginThunk = createAsyncThunk(
+  "users/addSettingWithoutLogin",
+  async ({ user_type, user_id, permissions, token }: any) => {
+    return await userApis.addSettingWithoutLoginApi( user_type, user_id, permissions, token );
   }
 );
 
@@ -346,8 +381,8 @@ export const getBillingHistoryThunk = createAsyncThunk(
 
 export const addBillingHistoryThunk = createAsyncThunk(
   "users/addBillingHistory",
-  async ({ transaction_id, date, invoice_no, product_type, description, domain, payment_method, payment_status, amount }: any) => {
-    return await userApis.addBillingHistoryApi( transaction_id, date, invoice_no, product_type, description, domain, payment_method, payment_status, amount );
+  async ({ user_id, transaction_id, date, invoice, product_type, description, domain, payment_method, payment_status, amount, transaction_data, subscription_id }: any) => {
+    return await userApis.addBillingHistoryApi( user_id, transaction_id, date, invoice, product_type, description, domain, payment_method, payment_status, amount, transaction_data, subscription_id );
   }
 );
 
@@ -397,6 +432,20 @@ export const makeDefaultPaymentMethodThunk = createAsyncThunk(
   "users/makeDefaultPaymentMethod",
   async ({ user_id, payment_method_id }: any) => {
     return await userApis.makeDefaultPaymentMethodApi( user_id, payment_method_id );
+  }
+);
+
+export const getPaymentMethodsWithoutLoginThunk = createAsyncThunk(
+  "users/getPaymentMethodsWithoutLogin",
+  async ({ user_id, token }: any) => {
+    return await userApis.getPaymentMethodsWithoutLoginApi( user_id, token );
+  }
+);
+
+export const makeDefaultPaymentMethodWithoutLoginThunk = createAsyncThunk(
+  "users/makeDefaultPaymentMethodWithoutLogin",
+  async ({ user_id, payment_method_id, token }: any) => {
+    return await userApis.makeDefaultPaymentMethodWithoutLoginApi( user_id, payment_method_id,token );
   }
 );
 
@@ -523,5 +572,26 @@ export const verifyReCaptchaThunk = createAsyncThunk(
   "users/verifyReCaptcha",
   async ({re_captcha_token}:any) => {
     return await userApis.verifyReCaptchaApi(re_captcha_token);
+  }
+);
+
+export const stripePayThunk = createAsyncThunk(
+  "users/stripePay",
+  async (body:any) => {
+    return await userApis.stripePayApi(body);
+  }
+);
+
+export const paystackPayThunk = createAsyncThunk(
+  "users/paystackPay",
+  async (body:any) => {
+    return await userApis.paystackPayApi(body);
+  }
+);
+
+export const hereMapSearchThunk = createAsyncThunk(
+  "users/hereMapSearch",
+  async (address:any) => {
+    return await userApis.hereMapSearchApi(address);
   }
 );

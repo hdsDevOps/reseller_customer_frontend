@@ -419,23 +419,27 @@ const MyStaff = () => {
                   <td className='text-[#000000] text-xs font-montserrat min-w-40'>+{staff?.phone_no}</td>
                   <td className='text-[#000000] text-xs font-montserrat min-w-40'>{getUserTypeName(staff?.user_type_id)}</td>
                   <td className='min-w-40 text-center'>
-                    <div className='flex justify-center gap-3'>
-                      <button
-                        type='button'
-                        onClick={() => {
-                          setShowModal(true);
-                          setIsEdit(true);
-                          setNewStaff(staff);
-                        }}
-                      ><BiSolidEditAlt className='text-gray-900 w-4 h-4 hover:text-gray-600' /></button>
-                      <button
-                        type='button'
-                        onClick={() => {
-                          setIsDeleteModalOpen(true);
-                          setDeleteId(staff?.id);
-                        }}
-                      ><RiDeleteBin6Line className='text-[#F24E1E] w-4 h-4 hover:text-[#f24f1ec7]' /></button>
-                    </div>
+                    {
+                      getUserTypeName(staff?.user_type_id) !== "Super Admin" && (
+                        <div className='flex justify-center gap-3'>
+                          <button
+                            type='button'
+                            onClick={() => {
+                              setShowModal(true);
+                              setIsEdit(true);
+                              setNewStaff(staff);
+                            }}
+                          ><BiSolidEditAlt className='text-gray-900 w-4 h-4 hover:text-gray-600' /></button>
+                          <button
+                            type='button'
+                            onClick={() => {
+                              setIsDeleteModalOpen(true);
+                              setDeleteId(staff?.id);
+                            }}
+                          ><RiDeleteBin6Line className='text-[#F24E1E] w-4 h-4 hover:text-[#f24f1ec7]' /></button>
+                        </div>
+                      )
+                    }
                   </td>
                 </tr>
                 })
@@ -584,13 +588,17 @@ const MyStaff = () => {
                             >
                               <option selected value="">{form.placheholder}</option>
                               {
-                                userTypes?.map((user, idx) => (
-                                  <option
-                                    value={user?.id}
-                                    key={idx}
-                                    className='text-[#1E1E1E]'
-                                  >{user?.user_type}</option>
-                                ))
+                                userTypes?.map((user, idx) => {
+                                  if(user?.user_type !== "Super Admin") {
+                                    return (
+                                      <option
+                                        value={user?.id}
+                                        key={idx}
+                                        className='text-[#1E1E1E]'
+                                      >{user?.user_type}</option>
+                                    )
+                                  }
+                                })
                               }
                             </select>
                           </div>

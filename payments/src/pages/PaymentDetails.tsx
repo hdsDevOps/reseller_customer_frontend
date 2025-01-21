@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import PaymentModal from "../components/PaymentModal";
 import DateSearch from "../components/DateSearch";
-import { cancelSubscriptionThunk, changeAutoRenewThunk, getDomainsListThunk, getPaymentMethodsThunk, getPaymentSubscriptionsListThunk, makeDefaultPaymentMethodThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
+import { cancelSubscriptionThunk, changeAutoRenewThunk, getBillingHistoryThunk, getDomainsListThunk, getPaymentMethodsThunk, getPaymentSubscriptionsListThunk, makeDefaultPaymentMethodThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { DateRangePicker } from "rsuite";
@@ -121,6 +121,7 @@ const PaymentDetails: React.FC = () => {
   const [modalType, setModalType] = useState("");
   const [cancelReason, setCancelReason] = useState(inititalCancel);
   const [invoiceData, setInvoiceData] = useState({});
+  console.log("invoiceData...",invoiceData);
   const pdfRef = useRef(null);
   const [paymentMethods, setPaymentMethods] = useState([]);
   // console.log("paymentMethods...", paymentMethods);
@@ -146,6 +147,33 @@ const PaymentDetails: React.FC = () => {
   // console.log("currentItems...", currentItems);
   const totalPages = Math.ceil(paymentDetails?.length / itemsPerPage);
   // console.log({currentPage, totalPages, lenght: currentItems?.length});
+
+  const [billingHistoryList, setBillingHistoryList] = useState([]);
+  console.log("billingHistoryList...", billingHistoryList);
+  const [billingHistoryData, setBillingHistoryData] = useState<object|null>(null);
+  console.log("billingHistoryData...", billingHistoryData);
+
+  const getBillingHistoryList = async() => {
+    try {
+      const result = await dispatch(getBillingHistoryThunk({user_id: customerId, start_date: "", end_date: "", domain: ""})).unwrap();
+      setBillingHistoryList(result?.data);
+    } catch (error) {
+      setBillingHistoryList([]);
+    }
+  };
+
+  useEffect(() => {
+    getBillingHistoryList();
+  }, [customerId]);
+  
+  useEffect(() => {
+    if(billingHistoryList?.length > 0 && invoiceData !== null) {
+      const foundData = billingHistoryList?.find(item => item?.subscription_id === invoiceData?.id);
+      setBillingHistoryData(foundData);
+    } else {
+      setBillingHistoryData(null);
+    }
+  }, [billingHistoryList, invoiceData]);
 
   useEffect(() => {
     const setPaymentDetailsFilterToSlice = async() => {
@@ -450,7 +478,14 @@ const PaymentDetails: React.FC = () => {
       setModalType("");
       setSubscriptionId("");
     }
-  }
+  };
+
+  const maskeCardNumber = (cardNumber) => {
+    const formattedCardNumber = cardNumber?.replace(/(.{4})/g, "$1 ").trim();
+    const parts = formattedCardNumber?.split(" ");
+    const maskedParts = parts?.map((part, index) => (index < 3 ? "****" : part));
+    return maskedParts?.join(" ");
+  };
 
   return (
     <div className="flex flex-col gap-2">
@@ -595,6 +630,7 @@ const PaymentDetails: React.FC = () => {
                             />
                             <span className="text-[0.75rem] text-gray-600 font-semibold text-nowrap">
                               {detail?.payment_method}
+                              {/* {maskeCardNumber(1212312312312312)} */}
                             </span>
                           </>
                         ) : (
@@ -702,7 +738,7 @@ const PaymentDetails: React.FC = () => {
                                         setModalType(list?.label);
                                         setSubscriptionId(detail?.id);
                                         if(list?.label === "View Invoice") {
-                                          updateInvoiceData(detail?.payment_details);
+                                          setInvoiceData(detail);
                                         } else {
                                           setInvoiceData({});
                                         }
@@ -934,88 +970,129 @@ const PaymentDetails: React.FC = () => {
                       </div>
 
                       <div
-                        className='text-center py-1'
+                        className='text-center py-1 border-b border-black'
                       >
                         <h3 className='font-inter text-[black] text-lg'>Receipt from Hordanso LLC</h3>
-                        <p className='font-inter text-[#B3B7B8] text-sm'>Receipt #1567-5406</p>
+                        <p className='font-inter text-[#B3B7B8] text-sm'>Receipt #{billingHistoryData?.invoice}</p>
                       </div>
 
                       <div
-                        className='flex justify-between text-[#B3B7B8] px-20 py-5'
+                        className='flex justify-between text-[#B3B7B8] px-20 py-5 w-full overflow-x-auto'
                       >
-                        <div
-                          className='flex flex-col text-start font-inter'
-                        >
-                          <h6
-                            className='text-sm font-medium'
-                          >AMOUNT PAID</h6>
-                          <p
-                            className='text-sm'
-                          >$ {invoiceData?.amount}</p>
-                        </div>
-                        <div
-                          className='flex flex-col text-start'
-                        >
-                          <h6
-                            className='text-sm font-medium'
-                          >DATE PAID</h6>
-                          <p
-                            className='text-sm'
-                          >{formatDate(invoiceData?.created_at?._seconds || 0,invoiceData?.created_at?._nanoseconds || 0)}</p>
-                        </div>
-                        <div
-                          className='flex flex-col text-start'
-                        >
-                          <h6
-                            className='text-sm font-medium'
-                          >PAYMENT METHOD</h6>
-                          <div
-                            className='flex gap-1'
-                          >
-                            {/* <img
-                              src={visa}
-                              alt='visa'
-                              className='h-5'
-                            />
-                            <p
-                              className='text-sm'
-                            > - 5953</p> */}
-                            <p className='text-sm capitalize'>{invoiceData?.payment_method}</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <h5
-                        className='px-14 pb-6 font-inter font-bold text-sm text-[#B3B7B8]'
-                      >SUMMARY</h5>
-                    </div>
-
-                    <div
-                      className='bg-[#F6F8Fc] w-full pb-2'
-                    >
-                      <div
-                        className='flex items-center justify-between p-2'
-                      >
-                        <p
-                          className='text-[#9A9597] break-words break-all w-[600px]'
-                        >Automated Recharge: Messaging credits worth 18.19 USD added for The Jaiye Room. These credits will be used for SMS, Calls, Emails, phone numbers, etc. Please refer to Company Billing Page (https://app.hordanso.com/V2/location/Muygwiofec8362y9uncevb94309wcun98x2t4efwgrdswqdf/settings/company-billing/billing) for more details.</p>
-                        <p
-                          className='text-[#9A9597]'
-                        >${invoiceData?.amount}</p>
+                        <table className="w-full min-w-[400px]">
+                          <tbody>
+                            <tr>
+                              <td className="font-inter font-normal text-sm items-start text-start content-start">Inovice To</td>
+                              <td className="flex flex-col font-inter font-normal text-sm text-black content-start">
+                                <p>{invoiceData?.payment_details[invoiceData?.payment_details?.length - 1]?.first_name} {invoiceData?.payment_details[invoiceData?.payment_details?.length - 1]?.last_name}</p>
+                                <p>{invoiceData?.payment_details[invoiceData?.payment_details?.length - 1].email}</p>
+                                <p>{invoiceData?.payment_details[invoiceData?.payment_details?.length - 1]?.region}</p>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="font-inter font-normal text-sm items-start text-start content-start">Payment Method</td>
+                              <td>
+                                <img
+                                  src={paymentMethods?.find(item => item?.method_name?.toLowerCase() === billingHistoryData?.payment_method?.toLowerCase())?.method_image}
+                                  alt={billingHistoryData?.payment_method}
+                                  className="w-10 object-contain"
+                                />
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="font-inter font-normal text-sm items-start text-start content-start">Payment Cycle</td>
+                              <td className="flex flex-col font-inter font-normal text-sm text-black content-start">{invoiceData?.payment_cycle}</td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
 
                       <div
-                        className='w-full h-px bg-[#9A9597] my-2 opacity-15'
-                      ></div>
-                      <div
-                        className='w-full flex justify-between items-center p-2'
+                        className='flex justify-between text-[#B3B7B8] px-20 py-5 w-full overflow-x-auto'
                       >
-                        <p
-                          className='text-[#4F5860] font-medium'
-                        >Amount charged</p>
-                        <p
-                          className='text-[#4F5860] font-medium'
-                        >${invoiceData?.amount}</p>
+                        <table className="w-full min-w-[400px]">
+                          <thead>
+                            <tr>
+                              <th className="w-[150px] text-left border-b border-black">Description</th>
+                              <th className="w-[50px] text-center border-b border-black">Qty</th>
+                              <th className="w-[100px] text-center border-b border-black">
+                                {/* Unit Price */}
+                              </th>
+                              <th className="w-[100px] text-center border-b border-black">Amount</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {/* <tr>
+                              <td className="font-inter font-normal text-sm text-black content-start text-left py-1 border-b border-black">Domain</td>
+                              <td className="font-inter font-normal text-sm text-black content-start text-center py-1 border-b border-black">1</td>
+                              <td className="font-inter font-normal text-sm text-black text-right py-1 border-b border-black">
+                                <div className="inline-block">
+                                  <span className="inline-block">1</span>
+                                  <X className="inline-block w-4 h-4 text-black mx-[2px]" />
+                                  <span className="inline-block">{currencyList?.find(item => item?.name === data?.currency)?.logo}{parseFloat(data?.selectedDomain?.price[data?.currency])?.toFixed(2)}</span>
+                                </div>
+                              </td>
+                              <td className="font-inter font-normal text-sm text-black content-start text-right py-1 border-b border-black">{currencyList?.find(item => item?.name === data?.currency)?.logo}{data?.selectedDomain?.price[data?.currency]}</td>
+                            </tr> */}
+                            <tr>
+                              <td className="font-inter font-normal text-sm text-black content-start text-left py-1 border-b border-black capitalize">{billingHistoryData?.description}</td>
+                              <td className="font-inter font-normal text-sm text-black content-start text-center py-1 border-b border-black">
+                              {/* {data?.license_usage} */}
+                              1
+                              </td>
+                              <td className="font-inter font-normal text-sm text-black text-right py-1 border-b border-black">
+                                {/* <div className="inline-block">
+                                  <span className="inline-block">{data?.license_usage}</span>
+                                  <X className="inline-block w-4 h-4 text-black mx-[2px]" />
+                                  <span className="inline-block">{currencyList?.find(item => item?.name === data?.currency)?.logo}{parseFloat(data?.plan?.amount_details?.find(amount => amount?.currency_code === data?.currency)?.price?.find(priceList => priceList?.type === data?.period)?.discount_price)?.toFixed(2)}</span>
+                                </div> */}
+                              </td>
+                              <td className="font-inter font-normal text-sm text-black content-start text-right py-1 border-b border-black">
+                                {billingHistoryData?.amount}
+                              </td>
+                            </tr>
+
+                            {/* <tr>
+                              <td></td>
+                              <td></td>
+                              <td className="font-inter font-normal text-sm text-black text-left py-1 border-b border-black">Voucher</td>
+                              <td className="font-inter font-normal text-sm text-black content-start text-right py-1 border-b border-black">
+                                -{currencyList?.find(item => item?.name === data?.currency)?.logo}
+                                {data?.discountedPrice}
+                              </td>
+                            </tr> */}
+
+                            {/* <tr>
+                              <td></td>
+                              <td></td>
+                              <td className="font-inter font-normal text-sm text-black text-left py-1 border-b border-black">Tax</td>
+                              <td className="font-inter font-normal text-sm text-black content-start text-right py-1 border-b border-black">
+                                {currencyList?.find(item => item?.name === data?.currency)?.logo}
+                                {data?.taxedPrice}
+                              </td>
+                            </tr> */}
+
+                            {/* <tr>
+                              <td></td>
+                              <td></td>
+                              <td className="font-inter font-normal text-sm text-black text-left py-1 border-b border-black">Total</td>
+                              <td className="font-inter font-normal text-sm text-black content-start text-right py-1 border-b border-black">
+                                {currencyList?.find(item => item?.name === data?.currency)?.logo}
+                                {data?.finalTotalPrice}
+                              </td>
+                            </tr> */}
+
+                            {/* <tr>
+                              <td></td>
+                              <td></td>
+                              <td className="font-inter font-normal text-sm text-black text-left py-1 border-b border-black">Amount Charged</td>
+                              <td className="font-inter font-normal text-sm text-black content-start text-right py-1 border-b border-black">
+                                {currencyList?.find(item => item?.name === data?.currency)?.logo}
+                                {data?.finalTotalPrice}
+                              </td>
+                            </tr> */}
+                          </tbody>
+                        </table>
                       </div>
                     </div>
 
@@ -1023,36 +1100,17 @@ const PaymentDetails: React.FC = () => {
                       className='px-16 py-8'
                     >
                       <div
-                        className='w-full h-px bg-[#9A9597] my-8 opacity-15'
+                        className='w-full h-px bg-[#9A9597] opacity-15'
                       ></div>
 
                       <h6
-                        className='my-8 text-[#7F8E96]'
+                        className='mt-4 text-[#7F8E96]'
                       >
                         If you have any questions, contact us at&nbsp;
                         <span className='text-[#12A833] font-medium'>stripe@hordanso.com</span>
                         &nbsp;or call us at&nbsp;
                         <span className='text-[#12A833] font-medium'>+1 469-893-0678</span>.
                       </h6>
-
-                      <div
-                        className='w-full h-px bg-[#9A9597] my-8 opacity-15'
-                      ></div>
-
-                      <p
-                        className='my-8 text-[#7F8E96]'
-                      >
-                        Something wrong with the email?&nbsp;
-                        <span className='text-[#12A833] font-medium'>View in your browser</span>.
-                      </p>
-
-                      <p
-                        className='my-8 text-[#7F8E96]'
-                      >
-                        You are viewing this email because you made a purchase at Hordanso LLC, which partners with&nbsp;
-                        <span className='text-[#12A833] font-medium'>Stripe</span>
-                        &nbsp;to provide marketing and payment processing.
-                      </p>
                     </div>
                   </div>
                 </DialogPanel>

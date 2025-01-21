@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ChartLine,
   Mail,
@@ -17,8 +17,54 @@ import {
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { CiCreditCard1 } from "react-icons/ci";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { setTokenDetails } from "store/authSlice";
-import { removeUserAuthTokenFromLSThunk, removeUserIdFromLSThunk } from 'store/user.thunk';
+import { setRolePermissionsSlice, setTokenDetails } from "store/authSlice";
+import { getSettingsListThunk, removeUserAuthTokenFromLSThunk, removeUserIdFromLSThunk } from 'store/user.thunk';
+import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+
+
+
+const initialRolePermissions = [
+  {
+      "name": "Dashboard",
+      "value": false
+  },
+  {
+      "name": "Profile",
+      "value": false
+  },
+  {
+      "name": "Domain",
+      "value": false
+  },
+  {
+      "name": "Payment Subscription",
+      "value": false
+  },
+  {
+      "name": "Email",
+      "value": false
+  },
+  {
+      "name": "Payment Method",
+      "value": false
+  },
+  {
+      "name": "Vouhcers",
+      "value": false
+  },
+  {
+      "name": "My Staff",
+      "value": false
+  },
+  {
+      "name": "Billing History",
+      "value": false
+  },
+  {
+      "name": "Settings",
+      "value": false
+  }
+];
 
 const links = [
   {
@@ -72,10 +118,32 @@ const Sidebar = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { userDetails } = useAppSelector(state => state.auth);
+  const { userDetails, roleId, customerId, rolePermission } = useAppSelector(state => state.auth);
   const [isOpen, setIsOpen] = useState(false);
   const [username] = useState("Robert Clive"); // Replace with actual username
   const [email] = useState("roberclive@domain.co.in"); // Replace with actual email
+  const [logOutModal, setLogOutModal] = useState(false);
+
+  // console.log("user details...", userDetails);
+  // console.log("role id...", roleId);
+
+  const [rolePermissions, setRolePermissions] = useState(initialRolePermissions);
+  // console.log("rolePermissions...", rolePermissions);
+
+  const getRolePermission = async() => {
+    try {
+      const result = await dispatch(getSettingsListThunk({user_type: "", user_id: customerId})).unwrap();
+      const rolePermissionsObject = await result?.settings?.find(item => item?.id === roleId);
+      // console.log("rolePermissionsObject...", rolePermissionsObject);
+      setRolePermissions(rolePermissionsObject?.permissions);
+    } catch (error) {
+      setRolePermissions(initialRolePermissions);
+    }
+  };
+
+  useEffect(() => {
+    getRolePermission();
+  }, [roleId, customerId]);
 
   const handleLogout = async () => {
     await dispatch(removeUserAuthTokenFromLSThunk());
@@ -92,6 +160,15 @@ const Sidebar = () => {
 
   const getInitials = (name:string) => {
     return name?.split(' ').map(word => word.charAt(0).toUpperCase());
+  };
+
+  const checkPermission = (label:String) => {
+    if(rolePermission?.length > 0) {
+      console.log(rolePermission?.find(item => item?.name === label))
+      return rolePermission?.find(item => item?.name === label)?.value;
+    } else {
+      return false;
+    }
   };
 
   return (
@@ -147,34 +224,39 @@ const Sidebar = () => {
         </div>
         <nav>
           <ul className="relative flex flex-col gap-2">
-            {links.map(({ path, label, icon }) => (
-              <li key={path} className={getLinkClass(path)}>
-                {location.pathname === path && (
-                  <div
-                    className="absolute -left-8 top-0 bottom-0 w-1.5 bg-green-500 rounded-r-lg"
-                    style={{ marginLeft: "1rem" }}
-                  ></div>
-                )}
-                <Link to={path} className="flex items-center gap-2 w-full">
-                  {React.cloneElement(icon, {
-                    className: `w-4 h-4 text-black ${
-                      isOpen ? "w-5 h-5" : "w-4 h-4 text-black"
-                    } ${
-                      location.pathname === path
-                        ? "text-gray-600"
-                        : "text-gray-500"
-                    }`,
-                  })}
-                  <span
-                    className={`text-sm ${
-                      isOpen ? "block" : "hidden"
-                    } lg:block`}
-                  >
-                    {label}
-                  </span>
-                </Link>
-              </li>
-            ))}
+            {links.map((link, index) => {
+              // console.log(checkPermission(label))
+              // if(rolePermission?.find(item => item?.name === link?.label)?.value) {
+                return(
+                  <li key={index} className={getLinkClass(link?.path)}>
+                    {location.pathname === link?.path && (
+                      <div
+                        className="absolute -left-8 top-0 bottom-0 w-1.5 bg-green-500 rounded-r-lg"
+                        style={{ marginLeft: "1rem" }}
+                      ></div>
+                    )}
+                    <Link to={link?.path} className="flex items-center gap-2 w-full">
+                      {React.cloneElement(link?.icon, {
+                        className: `w-4 h-4 text-black ${
+                          isOpen ? "w-5 h-5" : "w-4 h-4 text-black"
+                        } ${
+                          location.pathname === link?.path
+                            ? "text-gray-600"
+                            : "text-gray-500"
+                        }`,
+                      })}
+                      <span
+                        className={`text-sm ${
+                          isOpen ? "block" : "hidden"
+                        } lg:block`}
+                      >
+                        {link?.label}
+                      </span>
+                    </Link>
+                  </li>
+                )
+              // }
+            })}
           </ul>
         </nav>
       </div>
@@ -182,7 +264,8 @@ const Sidebar = () => {
         <div className="absolute top-0 left-0 right-0 w-full border-t-2 border-green-500 mb-2"></div>
         <button
           className="flex items-center gap-2 w-full p-2 rounded hover:bg-[#DCEBDFCC] text-green-500"
-          onClick={handleLogout}
+          // onClick={handleLogout}
+          onClick={() => {setLogOutModal(true)}}
         >
           <LogOut
             className={`w-5 h-5 ${
@@ -194,6 +277,57 @@ const Sidebar = () => {
           </span>
         </button>
       </div>
+      <Dialog
+        open={logOutModal}
+        as="div"
+        className="relative z-50 focus:outline-none"
+        onClose={() => {
+          setLogOutModal(false);
+        }}
+      >
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-10 w-screen mt-16">
+          <div className="flex min-h-full items-center justify-center p-4">
+            <DialogPanel
+            transition
+            className="w-full max-w-[400px] rounded-xl bg-white p-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <DialogTitle
+                as="h3"
+                className="text-lg font-semibold text-gray-900"
+                >Do you really want to log out?</DialogTitle>
+                <div className='btn-close-bg'>
+                <button
+                  type='button'
+                  className='text-3xl rotate-45 mt-[-8px] text-white'
+                  onClick={() => {
+                    setLogOutModal(false);
+                  }}
+                >+</button>
+                </div>
+              </div>
+              <div className="flex justify-center gap-10">
+                <button
+                  type="button"
+                  className="rounded-md bg-green-500 px-4 py-2 text-sm font-medium text-white hover:bg-green-600 focus:outline-none"
+                  onClick={handleLogout}
+                >
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLogOutModal(false);
+                  }}
+                  className="rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 focus:outline-none"
+                >
+                  No
+                </button>
+              </div>
+            </DialogPanel>
+          </div>
+        </div>
+      </Dialog>
     </aside>
   );
 };
