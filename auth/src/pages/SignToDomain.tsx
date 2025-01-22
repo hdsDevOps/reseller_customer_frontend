@@ -76,7 +76,7 @@ const SignInForm: React.FC = () => {
       if(formData.username.includes("@")) {
         toast.warning("Username cannot include @ symbol");
       } else {
-        navigate('/free-trial', { state: { ...location.state, emailData: {username: `${formData.username}@${location.state.selectedDomain}`, password: formData.password} } });
+        navigate('/free-trial', { state: { ...location.state, emailData: {username: `${formData.username}@${location.state.selectedDomain?.domain}`, password: formData.password} } });
       }
     } else {
       toast.error("Please click on I'm not a robot.");
@@ -123,7 +123,7 @@ const SignInForm: React.FC = () => {
             {charCount.username}/64
           </span>
           <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">
-            @{domain}
+            @{location.state.selectedDomain?.domain}
           </span>
         </div>
 

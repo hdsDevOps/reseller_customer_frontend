@@ -53,7 +53,7 @@ const SummaryDomainDetails = ({state, handleContactModalOpen, handleBusinessModa
           </p>
           <p className="text-gray-500">
             Your first {state.plan.trial_period} days are at no charge (limited to 10 users). You can{" "}
-            <span className="text-blue-500 underline">cancel at any time</span>.
+            <span className="text-[#12A833] underline">cancel at any time</span>.
           </p>
           <p className="text-gray-500">
             Recurs at the end of every {
@@ -72,7 +72,7 @@ const SummaryDomainDetails = ({state, handleContactModalOpen, handleBusinessModa
           <p className="text-gray-500">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{state?.selectedDomain?.price[defaultCurrencySlice]}</p>
           <p className="text-gray-500">
             Your annual plan will begin <strong>{today}</strong>. You can{" "}
-            <span className="text-blue-500 underline">cancel at any time</span>.
+            <span className="text-[#12A833] underline">cancel at any time</span>.
           </p>
           <p className="text-gray-500">
             Charges today and recurs yearly on {todayMinusYear}.

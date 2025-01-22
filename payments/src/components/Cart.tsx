@@ -35,7 +35,7 @@ const Cart = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { customerId, defaultCurrencySlice, userDetails } = useAppSelector(state => state.auth);
-  console.log(userDetails);
+  // console.log(userDetails);
   const [showVoucherInput, setShowVoucherInput] = useState(false);
   const [showAvailableVouchers, setShowAvailableVouchers] = useState(false);
   const [voucherCode, setVoucherCode] = useState("");
@@ -61,18 +61,67 @@ const Cart = () => {
   const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
   const [legalModalType, setLegalModalType] = useState("");
   const [cartPrice, setCartPrice] = useState([initialCartPrice]);
-  console.log("cartPrice...", cartPrice);
+  // console.log("cartPrice...", cartPrice);
   const [workspacePrice, setWorkspacePrice] = useState(0);
+  const [currentPlan, setCurrentPlan] = useState<object|null>(null);
+  // console.log("currentPlan...", currentPlan);
 
   const handleLegalModalClose = () => {
     setIsLegalModalOpen(false);
     setLegalModalType("");
   };
 
-  const getPlan = async() => {
-    if(userDetails?.workspace?.workspace_status === "trial") {
-      setWorkspacePrice(0);
+  const getPlansAndPricesList = async() => {
+    try {
+      const result = await dispatch(plansAndPricesListThunk({subscription_id: ""})).unwrap();
+      setPlansList(result?.data);
+    } catch (error) {
+      setPlansList([]);
+      if(error?.message == "Authentication token is required") {
+        try {
+          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    getPlansAndPricesList();
+  }, []);
+
+  const [plansList, setPlansList] = useState([]);
+  // console.log("plans list...", plansList);
+
+  useEffect(() => {
+    const current = plansList?.find(item => item?.id === userDetails?.workspace?.plan_name_id);
+    if(current){
+      setCurrentPlan(current);
     } else {
+      setCurrentPlan(null);
+    }
+  }, [plansList, userDetails]);
+
+  const getAmount = (amount, period) => {
+    const amountDetails =  amount?.find(item => item?.currency_code === defaultCurrencySlice);
+    if(amountDetails === undefined) {
+      return {type: '', price: 0, discount_price: 0};
+    } else {
+      return amountDetails?.price?.find(item => item?.type === period);
+    }
+  };
+
+  const cartAddAmount = (item, period) => {
+    const data = getAmount(item?.amount_details, period);
+    return data;
+  };
+
+  const getPlan = async() => {
+    // if(userDetails?.workspace?.workspace_status === "trial") {
+    //   setWorkspacePrice(0);
+    // } else {
       const workspaceCart = cart?.find(item => item?.product_type === "google workspace");
       if(workspaceCart) {
         try {
@@ -80,19 +129,20 @@ const Cart = () => {
           const amountArray = result?.data[0]?.amount_details;
           const priceArray = amountArray?.find(amount => amount?.currency_code === defaultCurrencySlice)?.price;
           const finalArray = priceArray?.find(price => price?.type?.toLowerCase() === workspaceCart?.payment_cycle?.toLowerCase());
-          setWorkspacePrice(finalArray?.discount_price);
+          console.log({pre: finalArray?.discount_price, final: parseFloat(cartAddAmount(currentPlan, userDetails?.workspace?.payment_cycle)?.discount_price)})
+          setWorkspacePrice(cartAddAmount(currentPlan, userDetails?.workspace?.payment_cycle)?.discount_price ? (parseFloat(finalArray?.discount_price) - parseFloat(cartAddAmount(currentPlan, userDetails?.workspace?.payment_cycle)?.discount_price))?.toFixed(2) : finalArray?.discount_price);
         } catch (error) {
           setWorkspacePrice(0);
         }
       } else {
         setWorkspacePrice(0);
       }
-    }
+    // }
   };
 
   useEffect(() => {
     getPlan();
-  }, [cart, defaultCurrencySlice]);
+  }, [cart, defaultCurrencySlice, currentPlan, userDetails]);
 
   const getDomainPrice = () => {
     return 953.72;
@@ -130,7 +180,7 @@ const Cart = () => {
         const amountt = parseFloat(item?.price) * parseInt(item?.total_year);
         return totalCart + amountt;
       }, 0);
-      console.log("cartTotal...", total);
+      // console.log("cartTotal...", total);
       setTotalPrice(parseFloat(total.toFixed(2)));
       setTaxedPrice(parseFloat(((total * taxAmount) / 100).toFixed(2)));
       const discountedPercent = appliedVoucher === null
@@ -191,9 +241,9 @@ const Cart = () => {
         user_id: customerId,
         products: newCart
       })).unwrap();
-      console.log("result...", result);
+      // console.log("result...", result);
     } catch (error) {
-      console.log("error")
+      // console.log("error")
       if(error?.message == "Authentication token is required") {
         try {
           await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -214,7 +264,7 @@ const Cart = () => {
         user_id: customerId,
         products: cartValue
       })).unwrap();
-      console.log("result...", result);
+      // console.log("result...", result);
       await dispatch(setCartItems(cartValue));
     } catch (error) {
       if(error?.message == "Authentication token is required") {
@@ -428,17 +478,17 @@ const Cart = () => {
                             className="max-w-full focus:outline-none border-0 h-full w-[40px] ml-1"
                               type="number"
                               onChange={e => {
-                                if(userDetails?.workspace?.workspace_status === "active") {
+                                if(userDetails?.workspace?.workspace_status === "trial") {
                                   if(e.target.value < 0) {
                                     handleChangeCartValue(e, index, 0)
+                                  } else if(e.target.value > 10) {
+                                    handleChangeCartValue(e, index, 10)
                                   } else {
                                     handleChangeCartValue(e, index, e.target.value)
                                   }
                                 } else {
                                   if(e.target.value < 0) {
                                     handleChangeCartValue(e, index, 0)
-                                  } else if(e.target.value > 10) {
-                                    handleChangeCartValue(e, index, 10)
                                   } else {
                                     handleChangeCartValue(e, index, e.target.value)
                                   }

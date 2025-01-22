@@ -5,7 +5,7 @@ import { BiCheck } from "react-icons/bi";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { addBillingHistoryThunk, addEmailsWithoutLoginThunk, addNewDomainWithoutLoginThunk, addSettingWithoutLoginThunk, addStaffWithoutLoginThunk, addSubscriptionWithoutLoginThunk, getPaymentMethodsWithoutLoginThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, makeDefaultPaymentMethodThunk, makeDefaultPaymentMethodWithoutLoginThunk, makeEmailAdminWithoutLoginThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, udpateBusinessDataThunk } from "store/user.thunk";
+import { addBillingHistoryThunk, addEmailsWithoutLoginThunk, addNewDomainWithoutLoginThunk, addSettingWithoutLoginThunk, addStaffWithoutLoginThunk, addSubscriptionWithoutLoginThunk, getPaymentMethodsWithoutLoginThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, makeDefaultPaymentMethodThunk, makeDefaultPaymentMethodWithoutLoginThunk, makeEmailAdminWithoutLoginThunk, plansAndPricesListThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, udpateBusinessDataThunk } from "store/user.thunk";
 import { currencyList } from "../components/CurrencyList";
 import { setDefaultCurrencySlice } from "store/authSlice";
 import { Dialog, DialogPanel } from "@headlessui/react";
@@ -143,6 +143,7 @@ const DownloadInvoice: React.FC = () => {
           business_zip_code: data?.formData?.business_zip_code,
           token: data?.token
         })).unwrap();
+        const planData = await dispatch(plansAndPricesListThunk({subscription_id: data?.plan?.id})).unwrap();
         const domainSubscription = await dispatch(addSubscriptionWithoutLoginThunk({
           product_type: "domain",
           payment_cycle: "Yearly",
@@ -226,7 +227,7 @@ const DownloadInvoice: React.FC = () => {
               ? "0000000000000000"
               : "0000000000000000"
             }`,
-            plan_id: data?.plan?.id,
+            plan_id: planData?.data[0],
             domain: data?.selectedDomain?.domain?.domain,
             phone: data?.formData?.phone_no,
             email: data?.formData?.email,
@@ -314,7 +315,7 @@ const DownloadInvoice: React.FC = () => {
             : ""
           }`,
           product_type: "google workspace",
-          description: "google workspace purchase",
+          description: `google workspace purchase ${data?.plan?.plan_name}`,
           domain: data?.selectedDomain?.domain,
           payment_method: data?.payment_method,
           payment_status: "Success",
@@ -412,79 +413,104 @@ const DownloadInvoice: React.FC = () => {
 
   return (
     <div>
-      <div className="min-w-full max-w-[500px] mx-auto py-1 border-b border-black0 flex items-center flex-col justify-center">
-        <div className="p-[10px] rounded-full mx-auto w-32 h-32 bg-[#1251D4] bg-opacity-5">
-          <div className="rounded-full bg-[#43C148] w-full h-full items-center align-middle">
-            {/* <BiCheck className="w-20 h-20 text-white" /> */}
-            <Check className="w-24 h-24 text-white mx-auto pt-[13px]" />
-          </div>
-        </div>
-
-        <p className="mt-7 mb-5 font-inter font-normal text-base text-black">Your payment has been processed successfully.</p>
-
-        <div className="min-w-full bg-white shadow-lg rounded-[20px] p-8">
-          <div className="flex flex-col">
-            {/* Date */}
-            <div className="flex justify-between py-[10px] items-center align-middle">
-              <p className="font-inter font-normal text-base text-[#8A8A8A] text-left">Date</p>
-              <p className="font-inter font-normal text-base text-black text-end !mt-0">{formattedDate3}</p>
-            </div>
-
-            {/* Customer */}
-            <div className="flex justify-between py-[10px]">
-              <p className="font-inter font-normal text-base text-[#8A8A8A] text-left">Customer</p>
-              <p className="font-inter font-normal text-base text-black text-end !mt-0">{data?.formData?.first_name} {data?.formData?.last_name}</p>
-            </div>
-
-            {/* Reference ID */}
-            <div className="flex justify-between py-[10px]">
-              <p className="font-inter font-normal text-base text-[#8A8A8A] text-left">Reference ID</p>
-              <p className="font-inter font-normal text-base text-black text-end !mt-0">
-                {
-                  data?.payment_method === "Stripe"
-                  ? data?.payment_result?.payment_method_details?.card?.network_transaction_id
-                  : data?.payment_method === "paystack"
-                  ? data?.payment_result?.reference
-                  : ""
-                }
-              </p>
-            </div>
-
-            {/* Payment method */}
-            <div className="flex justify-between py-[10px]">
-              <p className="font-inter font-normal text-base text-[#8A8A8A] text-left">Payment method</p>
-              <p className="font-inter font-normal text-base text-black text-end !mt-0 capitalize">{data?.payment_method}</p>
-            </div>
-
-            {/* Items */}
-            <div className="flex justify-between py-[10px]">
-              <p className="font-inter font-normal text-base text-[#8A8A8A] text-left">Items (2)</p>
-              <p className="font-inter font-normal text-base text-black text-end !mt-0 uppercase flex flex-col">
-                <span>{data?.selectedDomain?.domain}</span>
-                <span>{data?.plan?.plan_name}</span>
-              </p>
-            </div>
-
-            {/* Total */}
-            <div className="flex justify-between mt-3 py-[10px]">
-              <p className="font-inter font-normal text-base text-[#1D1B23] text-left">Total</p>
-              <p className="font-inter font-normal text-base text-black text-end !mt-0">{currencyList?.find(item => item?.name === data?.currency)?.logo}{data?.finalTotalPrice}</p>
-            </div>
-
-            {/* Download invoice  */}
-            <div className="flex justify-between mt-5 pt-[10px]">
-              <button type="button" className="font-inter font-semibold text-base text-[#12A833] underline text-left" onClick={() => {setInvoiceModal(true)}}>Download invoice</button>
+      {
+        disabled ? (
+          <div className="fixed top-0 bottom-0 left-0 right-0 inset-0 bg-white z-50 w-screen overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center py-4">
+              <div
+                className="w-full max-w-[930px] bg-white p-4 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+              >
+                <div className="flex justify-start pt-2 pb-4 items-center mb-6 border-b border-[#E4E4E4]">
+                  <h3
+                    className="font-montserrat font-medium text-base text-black"
+                  >Your payment request is being processed...</h3>
+                </div>
+                <div className="pt-2 pb-4 w-full max-w-[600px] font-montserrat font-medium text-xs text-black">
+                  <ul>
+                    <li className="py-2">This is a secure payment gateway using 128 bit SSL encryption.</li>
+                    <li className="py-2">When you submit the transaction, the server will take about 1 to 5 seconds to process, but it 
+                    may take longer at certain times.</li>
+                    <li className="py-2">Please do not press “Submit” button once again or the “Back” or “Refresh” buttons.</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="min-w-full max-w-[500px] mx-auto py-1 border-b border-black0 flex items-center flex-col justify-center">
+            <div className="p-[10px] rounded-full mx-auto w-32 h-32 bg-[#1251D4] bg-opacity-5">
+              <div className="rounded-full bg-[#43C148] w-full h-full items-center align-middle">
+                {/* <BiCheck className="w-20 h-20 text-white" /> */}
+                <Check className="w-24 h-24 text-white mx-auto pt-[13px]" />
+              </div>
+            </div>
 
-        <button
-          type="button"
-          className="font-inter font-semibold text-base text-[#F0F0F3] w-full max-w-[416px] text-center mx-auto py-2 my-5 rounded-[10px] bg-[#12A833]"
-          disabled={disabled}
-          onClick={(e) => handleGoToDashboard(e)}
-        >Go to Dashboard</button>
-      </div>
+            <p className="mt-7 mb-5 font-inter font-normal text-base text-black">Your payment has been processed successfully.</p>
+
+            <div className="min-w-full bg-white shadow-lg rounded-[20px] p-8">
+              <div className="flex flex-col">
+                {/* Date */}
+                <div className="flex justify-between py-[10px] items-center align-middle">
+                  <p className="font-inter font-normal text-base text-[#8A8A8A] text-left">Date</p>
+                  <p className="font-inter font-normal text-base text-black text-end !mt-0">{formattedDate3}</p>
+                </div>
+
+                {/* Customer */}
+                <div className="flex justify-between py-[10px]">
+                  <p className="font-inter font-normal text-base text-[#8A8A8A] text-left">Customer</p>
+                  <p className="font-inter font-normal text-base text-black text-end !mt-0">{data?.formData?.first_name} {data?.formData?.last_name}</p>
+                </div>
+
+                {/* Reference ID */}
+                <div className="flex justify-between py-[10px]">
+                  <p className="font-inter font-normal text-base text-[#8A8A8A] text-left">Reference ID</p>
+                  <p className="font-inter font-normal text-base text-black text-end !mt-0">
+                    {
+                      data?.payment_method === "Stripe"
+                      ? data?.payment_result?.payment_method_details?.card?.network_transaction_id
+                      : data?.payment_method === "paystack"
+                      ? data?.payment_result?.reference
+                      : ""
+                    }
+                  </p>
+                </div>
+
+                {/* Payment method */}
+                <div className="flex justify-between py-[10px]">
+                  <p className="font-inter font-normal text-base text-[#8A8A8A] text-left">Payment method</p>
+                  <p className="font-inter font-normal text-base text-black text-end !mt-0 capitalize">{data?.payment_method}</p>
+                </div>
+
+                {/* Items */}
+                <div className="flex justify-between py-[10px]">
+                  <p className="font-inter font-normal text-base text-[#8A8A8A] text-left">Items (2)</p>
+                  <p className="font-inter font-normal text-base text-black text-end !mt-0 uppercase flex flex-col">
+                    <span>{data?.selectedDomain?.domain}</span>
+                    <span>{data?.plan?.plan_name}</span>
+                  </p>
+                </div>
+
+                {/* Total */}
+                <div className="flex justify-between mt-3 py-[10px]">
+                  <p className="font-inter font-normal text-base text-[#1D1B23] text-left">Total</p>
+                  <p className="font-inter font-normal text-base text-black text-end !mt-0">{currencyList?.find(item => item?.name === data?.currency)?.logo}{data?.finalTotalPrice}</p>
+                </div>
+
+                {/* Download invoice  */}
+                <div className="flex justify-between mt-5 pt-[10px]">
+                  <button type="button" className="font-inter font-semibold text-base text-[#12A833] underline text-left" onClick={() => {setInvoiceModal(true)}}>Download invoice</button>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="font-inter font-semibold text-base text-[#F0F0F3] w-full max-w-[416px] text-center mx-auto py-2 my-5 rounded-[10px] bg-[#12A833]"
+              onClick={(e) => handleGoToDashboard(e)}
+            >Go to Dashboard</button>
+          </div>
+        )
+      } 
 
       <Dialog
         open={invoiceModal}
@@ -498,12 +524,16 @@ const DownloadInvoice: React.FC = () => {
           <div className="flex min-h-full items-center justify-center py-4">
             <DialogPanel
               transition
-              className="w-full max-w-[600px] max-h-[600px] overflow-auto rounded-xl bg-white py-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+              className="w-full max-w-[600px] max-h-[600px] overflow-auto bg-white py-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
             >
-              <div className="w-full flex justify-end mb-3 px-4">
+              <div className="w-full flex justify-between mb-3 px-4">
                 <Download
                   className="h-5 text-[#12A833] cursor-pointer"
                   onClick={() => {downloadInvoice()}}
+                />
+                <X
+                  className="h-5 text-[#12A833] cursor-pointer hover:text-[#E02424]"
+                  onClick={() => {setInvoiceModal(false)}}
                 />
               </div>
               <div

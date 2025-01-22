@@ -48,7 +48,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
   const resetUserPasswordRef = useRef(null);
   const renameAccountRef = useRef(null);
   const [newEmails, setNewEmails] = useState([]);
-  // console.log("newEmails...", newEmails);
+  console.log("newEmails...", newEmails);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -60,6 +60,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
       prevState.map((visibility, i) => (i === index ? !visibility : visibility))
     );
   };
+  const [emailClicked, setEmailClicked] = useState(false);
 
   const basicInformationTable = [
     { name: 'first_name', label: 'First Name', placholder: 'Enter your first name', type: 'text'},
@@ -111,14 +112,25 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
   };
 
   const handleEmailDataChange = (index, field, value) => {
-    setNewEmails((prev) => {
-      const array = [...prev];
-      array[index] = {
-        ...array[index],
-        [field]: value
-      }
-      return array;
-    })
+    if(field === "email") {
+      setNewEmails((prev) => {
+        const array = [...prev];
+        array[index] = {
+          ...array[index],
+          email: value+`@${data?.domain_name}`
+        }
+        return array;
+      })
+    } else {
+      setNewEmails((prev) => {
+        const array = [...prev];
+        array[index] = {
+          ...array[index],
+          [field]: value
+        }
+        return array;
+      })
+    }
   };
 
   const handleDeleteEmail = (index) => {
@@ -131,35 +143,64 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
     }
   };
 
+  const validateEmailData = () => {
+    if(newEmails?.length > 0) {
+      return newEmails?.every(item => {
+        if(
+          !item?.first_name?.trim() ||
+          !item?.last_name?.trim() ||
+          !item?.email?.trim() ||
+          !item?.password?.trim()
+        ) {
+          return false;
+        }
+        const emailBeforeAt = item?.email.split('@')[0].trim();
+
+        if(!emailBeforeAt) {
+          return false;
+        }
+        return true;
+      })
+    }
+  }
+
   const handleEmailSubmit = async(e) => {
     // e.preventDeault();
-    console.log({
-      user_id: customerId,
-      domain_id: data?.id,
-      emails: newEmails
-    })
-    try {
-      const result = await dispatch(addEmailsThunk({
-        user_id: customerId,
-        domain_id: data?.id,
-        emails: newEmails
-      })).unwrap();
-      toast.success(result?.message);
-    } catch (error) {
-      toast.error("Error adding email");
-      if(error?.message == "Authentication token is required") {
-        try {
-          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
-          navigate('/login');
-        } catch (error) {
-          //
+    // console.log({
+    //   user_id: customerId,
+    //   domain_id: data?.id,
+    //   emails: newEmails
+    // });
+    setEmailClicked(true);
+    if(!validateEmailData()) {
+      toast.warning("Please fill all the fields");
+      setEmailClicked(false);
+    } else {
+      try {
+        const result = await dispatch(addEmailsThunk({
+          user_id: customerId,
+          domain_id: data?.id,
+          emails: newEmails
+        })).unwrap();
+        toast.success(result?.message);
+        setIsModalOpen(false);
+        setEmailClicked(false);
+      } catch (error) {
+        toast.error("Error adding email");
+        setEmailClicked(false);
+        if(error?.message == "Authentication token is required") {
+          try {
+            const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+            navigate('/login');
+          } catch (error) {
+            //
+          }
         }
+      } finally {
+        getDomainsList();
+        setNewEmails([]);
+        setNewEmailsCount(0);
       }
-    } finally {
-      getDomainsList();
-      setIsModalOpen(false);
-      setNewEmails([]);
-      setNewEmailsCount(0);
     }
   };
   const handleClickOutsideOfList = e => {
@@ -345,7 +386,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
   }, []);
 
   return (
-    <div className=" relative">
+    <div className="relative">
       <main>
         <div className="flex flex-col gap-2 sm:gap-4">
           <div className="flex items-center justify-start">
@@ -371,19 +412,21 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <p className="text-sm md:text-md lg:text-lg font-semibold text-gray-600">
-                    {data?.emails ? data?.emails.length : 0} users@{data?.domain_name}.{" "}
+                  <p className="text-sm md:text-md lg:text-lg font-semibold text-gray-600 inline-block items-center content-center">
+                    <span className="inline-block items-center content-center">{userDetails?.license_usage ? userDetails?.license_usage : 0} users @{data?.domain_name}</span>
+                    <Dot className="inline-block items-center content-center" />
                     <span
-                      className="text-xs sm:text-sm text-green-500 ml-3 font-normal cursor-pointer"
+                      className="text-xs sm:text-sm text-green-500 font-normal cursor-pointer inline-block items-center content-center"
                       onClick={() => setisLicenseModalOpen(true)}
                     >
                       Add user license
                     </span>
                   </p>
                   <p className="text-sm md:text-md text-gray-600">
-                    Google Workspace Starter.{" "}
+                    <span className="inline-block items-center content-center">Google Workspace Starter</span>
+                    <Dot className="inline-block items-center content-center" />
                     <span
-                      className="text-xs sm:text-sm text-green-500 ml-3 cursor-pointer"
+                      className="text-xs sm:text-sm text-green-500 cursor-pointer inline-block items-center content-center"
                       onClick={() => navigate("/upgrade-plan")}
                     >
                       Update plan
@@ -416,9 +459,9 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
             </div>
 
             <div className="mt-2">
-              <div className="w-full overflow-x-auto">
+              <div className="w-full overflow-x-auto h-full min-h-[300px]">
                 <table className="w-full border-collapse">
-                  <thead className="bg-gray-200 mb-4">
+                  <thead className="bg-gray-200 mb-1">
                     <tr>
                       <th className="p-2 text-left text-xs sm:text-base md:text-lg text-gray-600 font-semibold">
                         Name
@@ -440,16 +483,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                         <td
                           className={`px-2 py-6 text-gray-600 font-semibold text-xs sm:text-sm md:text-md`}
                         >
-                          <p className="text-gray-600 font-semibold text-xs sm:text-sm md:text-md flex">
-                            {/* <span>{row.first_name}&nbsp;{row.last_name}</span>
-                            {
-                              row?.is_admin ? (
-                                <>
-                                  <span><Dot /></span>
-                                  <span>Admin</span>
-                                </>
-                              ) : ""
-                            } */}
+                          <p className="text-gray-600 font-semibold text-xs sm:text-sm md:text-md flex items-center content-center">
                             <span>{row?.first_name}&nbsp;{row?.last_name}</span>
                             {row?.is_admin ? (
                               <span className="p-2 text-gray-600 font-semibold text-xs sm:text-sm md:text-md flex items-center">
@@ -660,15 +694,18 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                                 type="text"
                                 placeholder="Enter email id"
                                 className="peer border-2 border-gray-200 rounded-xl p-[.63rem] bg-transparent w-full placeholder-transparent focus:border-blue-500 focus:outline-none"
-                                value={email?.email}
-                                onChange={(e) => {handleEmailDataChange(index, "email", e.target.value)} }
+                                value={email?.email.split('@')[0]}
+                                onChange={(e) => {handleEmailDataChange(index, "email", e.target.value.replace(/@/g, ''))} }
                               />
                               <label
                                 htmlFor="username"
                                 className="absolute bg-white -top-[10px] left-3 text-gray-500 transition-all duration-300 ease-in-out origin-top-left peer-placeholder-shown:text-gray-400 peer-focus:text-blue-600 peer-focus:text-sm"
                               >
-                                Email
+                                Username
                               </label>
+                              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">
+                                @{data?.domain_name}
+                              </span>
                             </div>
                             <div className="relative col-span-2">
                               <input
@@ -677,6 +714,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                                 placeholder="Enter password"
                                 className="peer border-2 border-gray-200 rounded-xl p-[.63rem] bg-transparent w-full placeholder-transparent focus:border-blue-500 focus:outline-none"
                                 value={email?.password}
+                                minLength={8}
                                 onChange={(e) => {handleEmailDataChange(index, "password", e.target.value)} }
                               />
                               <label
@@ -722,6 +760,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                     aria-label="Delete"
                     className="px-4 py-2 md:px-3 sm-max:px-2 sm-max:text-xs bg-green-600 text-white font-medium rounded-md hover:bg-opacity-90"
                     onClick={handleEmailSubmit}
+                    disabled={emailClicked}
                   >
                     Submit
                   </button>

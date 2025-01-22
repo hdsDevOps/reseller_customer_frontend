@@ -17,15 +17,19 @@ const VoucherModal: React.FC<VoucherModalProps> = ({ isModalOpen, closeModal }) 
 
         <div className="flex flex-col gap-1 mb-4">
           <h3 className="font-semibold text-lg">Step 1:</h3>
-          <p className="text-md">Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugiat atque in incidunt vero hic. Deserunt iusto amet sed expedita! Quis?</p>
+          <p className="text-md">Copy the voucher code from here.</p>
         </div>
         <div className="flex flex-col gap-1 mb-4">
           <h3 className="font-semibold text-lg">Step 2:</h3>
-          <p className="text-md">Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugiat atque in incidunt vero hic. Deserunt iusto amet sed expedita! Quis?</p>
+          <p className="text-md">Go to your cart during payment, and click on 'Have a Vouhcer Code' button.</p>
         </div>
         <div className="flex flex-col gap-1 mb-4">
           <h3 className="font-semibold text-lg">Step 3:</h3>
-          <p className="text-md">Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugiat atque in incidunt vero hic. Deserunt iusto amet sed expedita! Quis?</p>
+          <p className="text-md">Paste the code and check.</p>
+        </div>
+        <div className="flex flex-col gap-1 mb-4">
+          <h3 className="font-semibold text-lg">Step 4:</h3>
+          <p className="text-md">The voucher will be shown. Click on 'Apply' button.</p>
         </div>
         
       

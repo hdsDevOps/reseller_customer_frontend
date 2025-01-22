@@ -65,12 +65,38 @@ const PlanCard: React.FC = ({plans, handleLeftPlan, handleRightPlan, plansLength
         </p>
         <div className="flex items-center gap-2 mt-2">
           <p className="text-lg sm:text-xl font-medium">Monthly</p>
-          <input
+          {/* <input
             type="checkbox"
             className="toggle border-2 border-green-500 bg-green-500 [--tglbg:white] hover:bg-green-700"
             checked={isYearly}
             onChange={toggleBilling}
-          />
+          /> */}
+          {/* <label className="relative cursor-pointer">
+            <input type="checkbox" className="sr-only peer" checked={isYearly} onClick={toggleBilling} />
+            <div
+              className="sm:w-[70px] w-[40px] sm:h-[40px] h-[18px] flex items-center bg-white rounded-full sm:text-[7px] text-[6px] peer-checked:text-[#00D13B] text-[#00D13B] font-extrabold after:flex after:items-center after:justify-center peer sm:peer-checked:after:translate-x-full peer-checked:after:translate-x-[0px] after:absolute sm:after:left-[2px] after:left-[0px] peer-checked:after:border-[#00D13B] border-[#00D13B] after:bg-[#00D13B] after:border after:border-[#00D13B] after:rounded-full sm:after:h-7 after:h-7 sm:after:w-7 after:w-7 after:transition-all peer-checked:bg-[#00D13B]">
+            </div>
+          </label> */}
+          <label className="relative cursor-pointer flex items-center">
+            <input
+              type="checkbox"
+              className="sr-only peer"
+              checked={isYearly}
+              onChange={toggleBilling}
+            />
+            <div
+              className={`w-14 sm:h-8 h-7 rounded-full ${
+                isYearly ? "bg-green-500" : "bg-gray-300"
+              } flex items-center transition-all`}
+              // onClick={toggleBilling} // Ensures the toggle works even when clicking the container
+            >
+              <div
+                className={`sm:w-6 w-5 sm:h-6 h-5 bg-white rounded-full shadow-md transform transition-all ${
+                  isYearly ? "sm:translate-x-7 translate-x-8" : "translate-x-1"
+                }`}
+              ></div>
+            </div>
+          </label>
           <p className="text-lg sm:text-xl font-medium">Yearly</p>
         </div>
       </div>

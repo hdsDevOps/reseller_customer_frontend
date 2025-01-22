@@ -4,13 +4,14 @@ import SubscriptionModal from "../components/SubscriptionModal";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { cancelSubscriptionThunk, changeAutoRenewThunk, getBillingHistoryThunk, getDomainsListThunk, getPaymentMethodsThunk, getPaymentSubscriptionsListThunk, makeDefaultPaymentMethodThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
+import { addToCartThunk, cancelSubscriptionThunk, changeAutoRenewThunk, getBillingHistoryThunk, getDomainsListThunk, getPaymentMethodsThunk, getPaymentSubscriptionsListThunk, makeDefaultPaymentMethodThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
 import { Download, Plus, X } from "lucide-react";
 import { format } from "date-fns";
 import html2canvas from 'html2canvas-pro';
 import jsPDF from "jspdf";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { currencyList } from "../components/CurrencyList";
+import { setCart } from "store/authSlice";
 
 const inititalCancel = {
   number: 0,
@@ -23,7 +24,7 @@ const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.fir
 const Dashboard: React.FC = () => {
   const location = useLocation();
   const dispatch = useAppDispatch();
-  const { customerId, userDetails } = useAppSelector(state => state.auth);
+  const { customerId, userDetails, cartState, defaultCurrencySlice } = useAppSelector(state => state.auth);
   const navigate = useNavigate();
   // console.log("state...", location.state);
   const isInitialRender = useRef(true);
@@ -52,7 +53,7 @@ const Dashboard: React.FC = () => {
   // console.log("user details...", userDetails);
 
   const [selectedDomain, setSelectedDomain] = useState({});
-  console.log("selectedDomain...", selectedDomain);
+  // console.log("selectedDomain...", selectedDomain);
   // console.log("userDetails...", userDetails);
   const [activeStatus, setActiveStatus] = useState<Boolean>(false);
   const [showList, setShowList] = useState(false);
@@ -78,7 +79,7 @@ const Dashboard: React.FC = () => {
   const [modalType, setModalType] = useState("");
   const [cancelReason, setCancelReason] = useState(inititalCancel);
   const [invoiceData, setInvoiceData] = useState<object|null>(null);
-  console.log("invoiceData...", invoiceData);
+  // console.log("invoiceData...", invoiceData);
   const pdfRef = useRef(null);
   const [paymentMethods, setPaymentMethods] = useState([]);
   // console.log("paymentMethods...", paymentMethods);
@@ -86,10 +87,15 @@ const Dashboard: React.FC = () => {
   
   const [processingModalOpen, setProcessingModalOpen] = useState(false);
 
+  const [activePlan, setActivePlan] = useState<object|null>(null);
+  console.log("activePlan...", activePlan);
+
   const [billingHistoryList, setBillingHistoryList] = useState([]);
-  console.log("billingHistoryList...", billingHistoryList);
+  // console.log("billingHistoryList...", billingHistoryList);
   const [billingHistoryData, setBillingHistoryData] = useState<object|null>(null);
-  console.log("billingHistoryData...", billingHistoryData);
+  // console.log("billingHistoryData...", billingHistoryData);
+  const [renewalStatus, setRenewalStatus] = useState(false);
+  console.log("renewalStatus...", renewalStatus);
 
   const getBillingHistoryList = async() => {
     try {
@@ -103,6 +109,30 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     getBillingHistoryList();
   }, [customerId]);
+
+  const getPlanNameById = async() => {
+    try {
+      const result = await dispatch(plansAndPricesListThunk({
+        subscription_id: userDetails?.workspace?.plan_name_id
+      })).unwrap();
+      setActivePlan(result?.data[0]);
+    } catch (error) {
+      // console.log(error);
+      setActivePlan(null);
+      if(error?.error == "Request failed with status code 401") {
+        try {
+          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    getPlanNameById();
+  }, [userDetails]);
   
   useEffect(() => {
     if(billingHistoryList?.length > 0 && invoiceData !== null) {
@@ -128,6 +158,79 @@ const Dashboard: React.FC = () => {
 
     const formattedDate = format(date, "yyyy-MM-dd");
     return formattedDate;
+  };
+
+  const renewalDate = (datee) => {
+    const miliseconds = parseInt(datee?._seconds) * 1000 + parseInt(datee?._nanoseconds) / 1e6;
+
+    const date = new Date(miliseconds);
+    // const date = new Date();
+    const today = new Date();
+    console.log({date, today})
+
+    if(date < today) {
+      setRenewalStatus(true);
+    } else {
+      setRenewalStatus(false);
+    }
+  };
+
+  useEffect(() => {
+    renewalDate(userDetails?.workspace?.next_payment);
+  }, [userDetails?.workspace?.next_payment]);
+
+  const getAmount = (amount, period) => {
+    const amountDetails =  amount?.find(item => item?.currency_code === defaultCurrencySlice);
+    if(amountDetails === undefined) {
+      return {type: '', price: 0, discount_price: 0};
+    } else {
+      return amountDetails?.price?.find(item => item?.type === period);
+    }
+  };
+
+  const cartAddAmount = (item, period) => {
+    const data = getAmount(item?.amount_details, period);
+    return data;
+  };
+
+  const renewalAddToCart = async(e) => {
+    e.preventDefault();
+    const cartItems = cartState?.filter(item => item?.product_type === "google workspace" ? !item : item);
+    console.log(cartAddAmount(activePlan, userDetails?.workspace?.payment_cycle)?.discount_price)
+    const newCart = [
+      ...cartItems,
+      {
+        payment_cycle: userDetails?.workspace?.payment_cycle,
+        price: cartAddAmount(activePlan, userDetails?.workspace?.payment_cycle)?.discount_price,
+        currency: defaultCurrencySlice,
+        product_name: activePlan?.plan_name,
+        product_type: "google workspace",
+        total_year: userDetails?.license_usage,
+        plan_name_id: activePlan?.id,
+        workspace_status: "active",
+        is_trial: true
+      }
+    ];
+    // console.log({newCart, item});
+    try {
+      await dispatch(addToCartThunk({
+        user_id: customerId,
+        products: newCart
+      })).unwrap();
+      dispatch(setCart(newCart));
+      navigate('/add-cart');
+    } catch (error) {
+      // console.log(error);
+      toast.error("Error renewing plan");
+      if(error?.error == "Request failed with status code 401") {
+        try {
+          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    }
   };
   
   const downloadInvoice = async() => {
@@ -348,7 +451,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div>
-      <main className="min-h-screen pb-5">
+      <main className="min-h-screen pb-1">
         <h2 className="text-sm sm:text-xl lg:text-4xl font-medium text-green-500">
           Welcome to your Dashboard
         </h2>
@@ -440,6 +543,18 @@ const Dashboard: React.FC = () => {
                                 return (
                                   <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={() => {navigate(list?.link, {state: subscription})}}>{list?.label}</li>
                                 )
+                              } else if(list?.label === "Renew Plan") {
+                                if(renewalStatus) {
+                                  return (
+                                    <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => renewalAddToCart(e)}>{list?.label}</li>
+                                  )
+                                }
+                              } else if(list?.label === "Update Plan") {
+                                if(userDetails?.workspace?.workspace_status !== "trial") {
+                                  return (
+                                    <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => renewalAddToCart(e)}>{list?.label}</li>
+                                  )
+                                }
                               } else {
                                 if(subscription?.product_type?.toLowerCase() === "google workspace") {
                                   return (
@@ -454,16 +569,16 @@ const Dashboard: React.FC = () => {
                                     <li
                                       key={idx}
                                       className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
-                                      onClick={() => {
-                                        setIsModalOpen(true);
-                                        setModalType(list?.label);
-                                        setSubscriptionId(detail?.id)
-                                        if(list?.label === "View Invoice") {
-                                          setInvoiceData(subscription);
-                                        } else {
-                                          setInvoiceData(null);
-                                        }
-                                      }}
+                                      // onClick={() => {
+                                      //   setIsModalOpen(true);
+                                      //   setModalType(list?.label);
+                                      //   setSubscriptionId(detail?.id)
+                                      //   if(list?.label === "View Invoice") {
+                                      //     setInvoiceData(subscription);
+                                      //   } else {
+                                      //     setInvoiceData(null);
+                                      //   }
+                                      // }}
                                     >{list?.label}</li>
                                   )
                                 }
@@ -618,10 +733,19 @@ const Dashboard: React.FC = () => {
                     transition
                     className="w-full max-w-[600px] max-h-[600px] overflow-auto rounded-xl bg-white py-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
                   >
-                    <div className="w-full flex justify-end mb-3 px-4">
+                    <div className="w-full flex justify-between mb-3 px-4">
                       <Download
                         className="h-5 text-[#12A833] cursor-pointer"
                         onClick={() => {downloadInvoice()}}
+                      />
+                      <X
+                        className="h-5 text-[#12A833] cursor-pointer"
+                        onClick={() => {
+                          setIsModalOpen(false);
+                          setModalType("");
+                          setInvoiceData(null);
+                          setBillingHistoryData(null);
+                        }}
                       />
                     </div>
                     <div

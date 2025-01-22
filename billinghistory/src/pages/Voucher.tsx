@@ -72,7 +72,8 @@ const VoucherCard: React.FC = () => {
       </div>
       <div className="flex justify-center items-center gap-5 flex-wrap">
         {
-          voucherList?.length > 0 && voucherList?.map((coupon, index) => (
+          voucherList?.length > 0
+          ? voucherList?.map((coupon, index) => (
             <div className="max-w-[400px] h-[200px] relative w-full items-center border border-black overflow-hidden" key={index}>
               <div className={`w-full h-full ${
                 coupon?.status === "used"
@@ -103,7 +104,11 @@ const VoucherCard: React.FC = () => {
                 }
               </div>
             </div>
-          ))
+          )) : (
+            <div className="">
+              Vouchers not available
+            </div>
+          )
         }
       </div>
       <VoucherModal isModalOpen={isModalOpen} closeModal={handleCloseModal} />

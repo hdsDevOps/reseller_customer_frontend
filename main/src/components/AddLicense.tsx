@@ -162,11 +162,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList,
   };
 
   useEffect(() => {
-    if(userDetails?.workspace?.workspace_status === "trial") {
-      setLicensePrice(0);
-    } else {
-      getCurrencyValue();
-    }
+    getCurrencyValue();
   }, [activeSubscriptionPlan, userDetails, defaultCurrencySlice]);
 
   useEffect(() => {
@@ -212,9 +208,13 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList,
   }, [paymentMethodsState]);
 
   useEffect(() => {
-    const sub_total = numUsers*licensePrice;
-    setSubtotal(sub_total);
-  }, [numUsers, licensePrice]);
+    if(userDetails?.workspace?.workspace_status === "trial") {
+      setSubtotal(0);
+    } else {
+      const sub_total = numUsers*licensePrice;
+      setSubtotal(sub_total);
+    }
+  }, [numUsers, licensePrice, userDetails]);
 
   useEffect(() => {
     const tax_amount = subtotal * taxRate;
@@ -545,7 +545,38 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList,
                     i
                   </span>
                 </div>
-                <span className="flex items-center font-semibold">{numUsers} <X className="text-black w-3 h-3" /> {currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{licensePrice?.toFixed(2)}</span>
+                <span className="flex items-center font-semibold">
+                  {
+                    userDetails?.workspace?.workspace_status === "trial"
+                    ? (
+                      <p className="flex items-center content-center">
+                        <p className="font-inter font-normal text-xs text-red-600 line-through text-nowrap flex items-center">
+                          <span className="font-inter font-normal text-xs text-red-600">{numUsers} x&nbsp;</span>
+                          {/* <span><RiCloseFill className="w-3 h-3 text-red-600" /></span> */}
+                          <span className="font-inter font-normal text-xs text-red-600">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}</span>
+                          <span className="font-inter font-normal text-xs text-red-600">{licensePrice?.toFixed(2)}</span>
+                        </p>
+                        {/* <p className="line-through inline-block">
+                          <span className="inline-block">{numUsers}</span>
+                          <span className="inline-block"><X className="text-black w-3 h-3" /></span>
+                          <span className="inline-block">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{licensePrice?.toFixed(2)}</span>
+                        </p> */}
+                        <span className="mx-1 inline-block pt-[2px]">=</span>
+                        <span className="inline-block pt-[2px]">0</span>
+                      </p>
+                    ) : (
+                      <p className="inline-block">
+                        <p className="inline-block">
+                          <span className="inline-block">{numUsers}</span>
+                          <X className="text-black w-3 h-3 inline-block" />
+                          <span className="inline-block">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{licensePrice?.toFixed(2)}</span>
+                        </p>
+                        <span className="mx-1 inline-block">=</span>
+                        <span className="inline-block">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{numUsers*licensePrice}</span>
+                      </p>
+                    )
+                  }
+                </span>
               </div>
               <p className="underline mb-4 font-semibold mt-2 cursor-pointer" onClick={() => {setVoucherInputOpen(true)}}>Enter voucher code</p>
 
@@ -660,116 +691,137 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList,
           </div>
         </div>
 
-        <div className="flex justify-between max-w-md w-full text-xs sm:text-sm md:text-md">
-          <button
-            className={`flex-1 py-2 px-1 text-center rounded-l-md ${activeMethod === "saved" ? "bg-white text-green-500 shadow-sm" : "bg-white text-gray-800"}`}
-            type="button"
-            onClick={() => setActiveMethod("saved")}
-          >
-            Saved Payment Method
-          </button>
-          <button
-            className={`flex-1 py-2 px-1 text-center rounded-r-md ${activeMethod === "other" ? "bg-white text-green-500 shadow-sm" : "bg-white text-gray-800"}`}
-            type="button"
-            onClick={() => setActiveMethod("other")}
-          >
-            Other Payment Methods
-          </button>
-        </div>
+        {
+          userDetails?.workspace?.workspace_status === "trial"
+          ? (<></>) : (
+            <div className="flex justify-between max-w-md w-full text-xs sm:text-sm md:text-md">
+              <button
+                className={`flex-1 py-2 px-1 text-center rounded-l-md ${activeMethod === "saved" ? "bg-white text-green-500 shadow-sm" : "bg-white text-gray-800"}`}
+                type="button"
+                onClick={() => setActiveMethod("saved")}
+              >
+                Saved Payment Method
+              </button>
+              <button
+                className={`flex-1 py-2 px-1 text-center rounded-r-md ${activeMethod === "other" ? "bg-white text-green-500 shadow-sm" : "bg-white text-gray-800"}`}
+                type="button"
+                onClick={() => setActiveMethod("other")}
+              >
+                Other Payment Methods
+              </button>
+            </div>
+          )
+        }
   
-        <div className="rounded-b-lg rounded-tr-lg border p-3">
-          {activeMethod === "saved" && (
-            <div className="border-2 border-green-500 p-4 rounded-lg my-4">
-              {
-                saveCardsState?.length > 0 ? saveCardsState?.map((card, index) => (
-                  <div className="flex justify-between items-center mb-2" key={index}>
-                    <div className="flex items-center">
-                      <input
-                        type="radio"
-                        id="saved-method"
-                        checked={activeMethod === "saved" && selectedCard === card?.uuid}
-                        onChange={() => handlePaymentMethodChange2(card?.uuid)}
-                        className="mr-2 radio radio-xs radio-success"
-                        aria-labelledby="saved-method-label"
-                        defaultChecked
-                      />
-                      <label id="saved-method-label" className="flex items-center">
-                        <img
-                          src="/images/stripe.webp"
-                          alt="Stripe"
-                          className="w-14 h-8 mr-6"
-                        />
-                        <div className="flex flex-col">
-                          <small className="text-xs font-bold text-gray-700">{hideCardNumber(card?.card_id)}</small>
-                          <small className="text-[10px] text-gray-300">Expiry: {card?.expiry_month}/{card?.expiry_year}</small>
-                          <small className="text-[10px] flex items-center gap-1 text-gray-300">
-                            {/* <MdOutlineMail /> billing@acme.corp */}
-                            {card?.name}
-                          </small>
+        {
+          userDetails?.workspace?.workspace_status === "trial"
+          ? (
+            <></>
+          ) : (
+            <div className="rounded-b-lg rounded-tr-lg border p-3">
+              {activeMethod === "saved" && (
+                <div className="border-2 border-green-500 p-4 rounded-lg my-4">
+                  {
+                    saveCardsState?.length > 0 ? saveCardsState?.map((card, index) => (
+                      <div className="flex justify-between items-center mb-2" key={index}>
+                        <div className="flex items-center">
+                          <input
+                            type="radio"
+                            id="saved-method"
+                            checked={activeMethod === "saved" && selectedCard === card?.uuid}
+                            onChange={() => handlePaymentMethodChange2(card?.uuid)}
+                            className="mr-2 radio radio-xs radio-success"
+                            aria-labelledby="saved-method-label"
+                            defaultChecked
+                          />
+                          <label id="saved-method-label" className="flex items-center">
+                            <img
+                              src="/images/stripe.webp"
+                              alt="Stripe"
+                              className="w-14 h-8 mr-6"
+                            />
+                            <div className="flex flex-col">
+                              <small className="text-xs font-bold text-gray-700">{hideCardNumber(card?.card_id)}</small>
+                              <small className="text-[10px] text-gray-300">Expiry: {card?.expiry_month}/{card?.expiry_year}</small>
+                              <small className="text-[10px] flex items-center gap-1 text-gray-300">
+                                {/* <MdOutlineMail /> billing@acme.corp */}
+                                {card?.name}
+                              </small>
+                            </div>
+                          </label>
                         </div>
-                      </label>
-                    </div>
-                    {
-                      card?.is_default && (
-                        <button className="bg-green-500 text-white text-xs rounded-3xl px-4 py-1 mx-auto block">
-                          Default
-                        </button>
-                      )
-                    }
-                    <RiDeleteBin6Line onClick={() => {deleteCard(card?.uuid)}} className="text-red-500 text-lg cursor-pointer" />
-                  </div>
-                )) : (
-                  <p className="text-center">No saved cards</p>
-                )
-              }
+                        {
+                          card?.is_default && (
+                            <button className="bg-green-500 text-white text-xs rounded-3xl px-4 py-1 mx-auto block">
+                              Default
+                            </button>
+                          )
+                        }
+                        <RiDeleteBin6Line onClick={() => {deleteCard(card?.uuid)}} className="text-red-500 text-lg cursor-pointer" />
+                      </div>
+                    )) : (
+                      <p className="text-center">No saved cards</p>
+                    )
+                  }
+                </div>
+              )}
+      
+              {activeMethod === "other" && (
+                <div>
+                  {
+                    paymentMethodsState?.length > 0 && paymentMethodsState?.map((method, index) => (
+                      <div className="flex items-center justify-between mb-2" key={index}>
+                        <div className="flex items-center">
+                          <input
+                            type="radio"
+                            id={method?.id}
+                            name="payment-method"
+                            checked={selectedPaymentMethod === method?.method_name} // Check if method is 'stripe'
+                            onClick={() => {
+                              setSelectedPaymentMethod(method?.method_name);
+                              console.log(method?.method_name);
+                            }}
+                            className="mr-2 radio radio-xs radio-success"
+                            title={method?.method_name}
+                          />
+                          <label htmlFor={method?.id} className="mr-2 capitalize">
+                            {method?.method_name}
+                          </label>
+                        </div>
+                        <div>
+                          <img
+                            src={method?.method_image}
+                            alt={method?.method_name}
+                            className="w-14 h-8 border-2 border-gray-200 shadow-sm p-1 rounded-md"
+                          />
+                        </div>
+                      </div>
+                    ))
+                  }
+                </div>
+              )}
+      
+              {activeMethod === "saved" && (
+                <p className="text-green-500 text-sm text-left mt-4 cursor-pointer" onClick={() => {setActiveMethod("other")}}>
+                  Use another payment method
+                </p>
+              )}
             </div>
-          )}
-  
-          {activeMethod === "other" && (
-            <div>
-              {
-                paymentMethodsState?.length > 0 && paymentMethodsState?.map((method, index) => (
-                  <div className="flex items-center justify-between mb-2" key={index}>
-                    <div className="flex items-center">
-                      <input
-                        type="radio"
-                        id={method?.id}
-                        name="payment-method"
-                        checked={selectedPaymentMethod === method?.method_name} // Check if method is 'stripe'
-                        onClick={() => {
-                          setSelectedPaymentMethod(method?.method_name);
-                          console.log(method?.method_name);
-                        }}
-                        className="mr-2 radio radio-xs radio-success"
-                        title={method?.method_name}
-                      />
-                      <label htmlFor={method?.id} className="mr-2 capitalize">
-                        {method?.method_name}
-                      </label>
-                    </div>
-                    <div>
-                      <img
-                        src={method?.method_image}
-                        alt={method?.method_name}
-                        className="w-14 h-8 border-2 border-gray-200 shadow-sm p-1 rounded-md"
-                      />
-                    </div>
-                  </div>
-                ))
-              }
-            </div>
-          )}
-  
-          {activeMethod === "saved" && (
-            <p className="text-green-500 text-sm text-left mt-4 cursor-pointer" onClick={() => {setActiveMethod("other")}}>
-              Use another payment method
-            </p>
-          )}
-        </div>
+          )
+        }
 
         <div className="flex justify-start gap-4 mt-4">
           {
-            selectedPaymentMethod?.toLowerCase() === "stripe"
+            userDetails?.workspace?.workspace_status === "trial"
+            ? (
+              <button
+                className="bg-green-500 text-white py-2 px-4 rounded"
+                type="button"
+                onClick={() => {changeLicenseUsage()}}
+              >
+                Submit
+              </button>
+            ) : selectedPaymentMethod?.toLowerCase() === "stripe"
             ? (
               <button
                 className="bg-green-500 text-white py-2 px-4 rounded"

@@ -36,9 +36,7 @@ const DomainList: React.FC = () => {
   };
 
   const handleDomainClick = (domain) => {
-    if(domainResult?.availablity_status === "true") {
-      navigate('/selected-domain', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, selectedDomain: domain, type: 'new'}});
-    }
+    navigate('/selected-domain', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, selectedDomain: domain, type: 'new'}});
   };
 
 
@@ -92,7 +90,10 @@ const DomainList: React.FC = () => {
           ? (
             <p className={`self-start text-sm text-[#12A833]`}>This domain name is available.</p>
           ) : (
-            <p className={`self-start text-sm text-red-600`}>This domain name is already in use. If you own this domain and would like to use Google Workspace, please follow the steps <span className="text-[#12A833]">here</span>.</p>
+            <>
+              <p className={`self-start text-sm text-red-600`}>This domain name is already in use. If you own this domain and would like to use Google Workspace, please follow the steps <span className="text-[#12A833] cursor-pointer" onClick={() => window.open("https://support.google.com/a/answer/80610")}>here</span>.</p>
+              <p className={`self-start text-sm text-[#12A83291] underline cursor-pointer`}>Do you want to transfer your domain?</p>
+            </>
           )
         }
 
@@ -101,7 +102,7 @@ const DomainList: React.FC = () => {
 
           <div className="bg-white border border-gray-300 rounded-lg overflow-x-auto">
             <table className="w-full table-auto font-semibold">
-              <thead className="bg-[#12a83291] text-white text-left">
+              <thead className="bg-[#12A83291] text-white text-left">
                 <tr>
                   <th className="py-2 px-4">Available Domain</th>
                   <th className="py-2 px-4">Price</th>

@@ -1,18 +1,42 @@
 import { ArrowLeft, ChevronRight } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useAppDispatch } from 'store/hooks';
-import { plansAndPricesListThunk } from 'store/user.thunk';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { getDomainsListThunk, plansAndPricesListThunk } from 'store/user.thunk';
 
 function ViewPaymentDetails() {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
 
+  const { userDetails, customerId } = useAppSelector(state => state.auth);
+  console.log("userDetails...", userDetails);
+
   const locationData = location.state?.payment_details;
   const [plan, setPlan] = useState<object|null>(null);
   console.log("plan...", plan);
   const [data, setData] = useState({});
+  console.log("data...", data);
+  const [primaryDomain, setPrimaryDomain] = useState<object|null>(null);
+  console.log("primary domain...", primaryDomain);
+
+  const getPrimaryDomain = async() => {
+    try {
+      const result = await dispatch(getDomainsListThunk({customer_id: customerId})).unwrap();
+      const findPrimary = result?.data?.find(item => item?.domain_type === "primary");
+      if(findPrimary) {
+        setPrimaryDomain(findPrimary);
+      } else {
+        setPrimaryDomain(null);
+      }
+    } catch (error) {
+      setPrimaryDomain(null);
+    }
+  };
+
+  useEffect(() => {
+    getPrimaryDomain();
+  }, [customerId]);
   useEffect(() => {
     if(locationData.length > 0) {
       setData(locationData[locationData.length - 1]);
@@ -129,7 +153,7 @@ function ViewPaymentDetails() {
             <input
               type='text'
               className='w-full py-2 px-3 border border-[#E4E4E4] bg-white rounded-lg font-jakarta-plus font-normal text-base text-gray-800 mt-1'
-              value={plan?.plan_name}
+              value={data?.plan_id?.plan_name || 'N/A'}
               disabled
             />
           </div>
@@ -139,7 +163,7 @@ function ViewPaymentDetails() {
             <input
               type='text'
               className='w-full py-2 px-3 border border-[#E4E4E4] bg-white rounded-lg font-jakarta-plus font-normal text-base text-gray-800 mt-1'
-              value={data?.domain}
+              value={data?.plan_id ? primaryDomain?.domain_name : data?.domain}
               disabled
             />
           </div>
@@ -169,7 +193,7 @@ function ViewPaymentDetails() {
             <input
               type='text'
               className='w-full py-2 px-3 border border-[#E4E4E4] bg-white rounded-lg font-jakarta-plus font-normal text-base text-gray-800 mt-1'
-              value={data?.country}
+              value={userDetails?.country}
               disabled
             />
           </div>

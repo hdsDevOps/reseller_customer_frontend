@@ -5,7 +5,7 @@ import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { addToCartThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import { setCart } from "store/authSlice";
 
 const flagList = [
@@ -21,22 +21,35 @@ const flagList = [
 const PlanCard: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { customerId, cartState, defaultCurrencySlice } = useAppSelector(state => state.auth);
+  const { customerId, cartState, defaultCurrencySlice, userDetails } = useAppSelector(state => state.auth);
   const [isYearly, setIsYearly] = useState(false);
   const [renewalDate, setRenewalDate] = useState(format(new Date(), "dd-MM-yyyy"));
   // console.log("renewal date...", renewalDate);
   // console.log("cartState...", cartState);
+  console.log("userDetails...", userDetails);
 
   const toggleBilling = () => setIsYearly(!isYearly);
   const subscription_status = false;
   const [selectedCheckbox, setSelectedCheckbox] = useState<number | null>(null);
   console.log("check...", selectedCheckbox);
+  const [currentPlan, setCurrentPlan] = useState<object|null>(null);
+  console.log("currentPlan...", currentPlan);
 
   const [currencyLogo, setCurrencyLogo] = useState("$");
   // console.log("currency logo...", currencyLogo);
 
   const [plansList, setPlansList] = useState([]);
-  // console.log("plans list...", plansList);
+  console.log("plans list...", plansList);
+  const [renewalStatus, setRenewalStatus] = useState(false);
+
+  useEffect(() => {
+    const current = plansList?.find(item => item?.id === userDetails?.workspace?.plan_name_id);
+    if(current){
+      setCurrentPlan(current);
+    } else {
+      setCurrentPlan(null);
+    }
+  }, [plansList, userDetails]);
 
   const getPlansAndPricesList = async() => {
     try {
@@ -58,6 +71,31 @@ const PlanCard: React.FC = () => {
   useEffect(() => {
     getPlansAndPricesList();
   }, []);
+
+  const renewalDateTime = (datee) => {
+    const miliseconds = parseInt(datee?._seconds) * 1000 + parseInt(datee?._nanoseconds) / 1e6;
+
+    const date = new Date(miliseconds);
+    // const date = new Date();
+    const today = new Date();
+    console.log({date, today})
+
+    if(date < today) {
+      setRenewalStatus(true);
+    } else {
+      setRenewalStatus(false);
+    }
+  };
+
+  useEffect(() => {
+    renewalDateTime(userDetails?.workspace?.next_payment);
+  }, [userDetails?.workspace?.next_payment]);
+
+  useEffect(() => {
+    if(userDetails?.workspace?.workspace_status === "trial") {
+      navigate('/');
+    };
+  }, [userDetails]);
 
   useEffect(() => {
     const today = new Date();
@@ -82,7 +120,7 @@ const PlanCard: React.FC = () => {
 
   const discountPercentage = (price, discountedPrice) => {
     return (((parseInt(price) - parseInt(discountedPrice)) / parseInt(price)) * 100).toFixed(0);
-  }
+  };
 
   useEffect(() => {
     setCurrencyLogo(
@@ -93,7 +131,7 @@ const PlanCard: React.FC = () => {
   const cartAddAmount = (item, period) => {
     const data = getAmount(item?.amount_details, period);
     return data;
-  }
+  };
 
   const handleAddToCart = async(e, item) => {
     e.preventDefault();
@@ -102,7 +140,7 @@ const PlanCard: React.FC = () => {
       ...cartItems,
       {
         payment_cycle: isYearly ? "Yearly" : selectedCheckbox === null ? "Yearly Subscription with monthly billing" : "Monthly",
-        price: cartAddAmount(item, isYearly ? "Yearly" : selectedCheckbox === null ? "Yearly Subscription with monthly billing" : "Monthly")?.discount_price,
+        price: parseFloat(cartAddAmount(item, isYearly ? "Yearly" : selectedCheckbox === null ? "Yearly Subscription with monthly billing" : "Monthly")?.discount_price) - parseFloat(cartAddAmount(currentPlan, userDetails?.workspace?.payment_cycle)?.discount_price),
         currency: defaultCurrencySlice,
         product_name: item?.plan_name,
         product_type: "google workspace",
@@ -131,7 +169,7 @@ const PlanCard: React.FC = () => {
         }
       }
     }
-  }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center mb-5">
@@ -152,12 +190,26 @@ const PlanCard: React.FC = () => {
           plansList.length > 0 ? (
             <div className="flex items-center gap-2 mt-2">
               <p className="text-lg sm:text-xl font-medium">Monthly</p>
-              <input
-                type="checkbox"
-                className="toggle border-2 border-green-500 bg-green-500 [--tglbg:white] hover:bg-green-700"
-                checked={isYearly}
-                onChange={toggleBilling}
-              />
+              <label className="relative cursor-pointer flex items-center">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={isYearly}
+                  onChange={toggleBilling}
+                />
+                <div
+                  className={`w-14 sm:h-8 h-7 rounded-full ${
+                    isYearly ? "bg-green-500" : "bg-gray-300"
+                  } flex items-center transition-all`}
+                  // onClick={toggleBilling} // Ensures the toggle works even when clicking the container
+                >
+                  <div
+                    className={`sm:w-6 w-5 sm:h-6 h-5 bg-white rounded-full shadow-md transform transition-all ${
+                      isYearly ? "sm:translate-x-7 translate-x-8" : "translate-x-1"
+                    }`}
+                  ></div>
+                </div>
+              </label>
               <p className="text-lg sm:text-xl font-medium">Yearly</p>
             </div>
           ) : ""

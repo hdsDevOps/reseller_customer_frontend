@@ -411,6 +411,24 @@ const BillingHistory: React.FC = () => {
         </div>
       </div>
 
+      <div className="flex justify-start items-center mt-12 relative bottom-2 right-0">
+        <div className="flex items-center gap-1">
+          <select
+            onChange={e => {
+              setItemsPerPage(parseInt(e.target.value));
+            }}
+            value={itemsPerPage}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={15}>15</option>
+            <option value={20} selected>20</option>
+            <option value={50}>50</option>
+          </select>
+          <label>items</label>
+        </div>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="min-w-[1360px] w-full" ref={pdfRef}>
           <thead>
@@ -505,8 +523,8 @@ const BillingHistory: React.FC = () => {
         </table>
       </div>
 
-      <div className="flex justify-between items-center mt-12 relative bottom-2 right-0">
-        <div className="flex items-center gap-1">
+      <div className="flex justify-end items-center mt-12 relative bottom-2 right-0">
+        {/* <div className="flex items-center gap-1">
           <select
             onChange={e => {
               setItemsPerPage(parseInt(e.target.value));
@@ -520,7 +538,7 @@ const BillingHistory: React.FC = () => {
             <option value={50}>50</option>
           </select>
           <label>items</label>
-        </div>
+        </div> */}
         <div className="flex">
           <button
             onClick={() => {

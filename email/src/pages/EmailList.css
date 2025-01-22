@@ -1,0 +1,28 @@
+.email-search {
+  /* flex sm:justify-end justify-center */
+  display: flex;
+  justify-content: end;
+}
+
+.email-header {
+  /* flex items-start justify-start gap-8 sm:gap-0 flex-col */
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 16px 8px;
+  align-items: start;
+  gap: 30px;
+}
+
+@media screen and (max-width: 1024px) {
+  .email-header {
+    flex-direction: column;
+    justify-content: start;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .email-search {
+    justify-content: center;
+  }
+}

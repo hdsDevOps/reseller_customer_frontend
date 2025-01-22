@@ -310,10 +310,10 @@ const BusinessInfo: React.FC = () => {
       >
         <div className="pb-4 self-start">
           <h1 className="text-3xl font-semibold xsm-max:text-[16px]">
-            Enter your business information
+            Add more information
           </h1>
           <p className="xsm-max:text-sm">
-          Enter your business information to register your domain
+            Enter your information to register your domain
           </p>
         </div>
 

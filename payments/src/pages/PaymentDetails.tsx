@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import PaymentModal from "../components/PaymentModal";
 import DateSearch from "../components/DateSearch";
-import { cancelSubscriptionThunk, changeAutoRenewThunk, getBillingHistoryThunk, getDomainsListThunk, getPaymentMethodsThunk, getPaymentSubscriptionsListThunk, makeDefaultPaymentMethodThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
+import { addToCartThunk, cancelSubscriptionThunk, changeAutoRenewThunk, getBillingHistoryThunk, getDomainsListThunk, getPaymentMethodsThunk, getPaymentSubscriptionsListThunk, makeDefaultPaymentMethodThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { DateRangePicker } from "rsuite";
@@ -13,7 +13,7 @@ import { Download, X } from 'lucide-react';
 import html2canvas from 'html2canvas-pro';
 import jsPDF from "jspdf";
 import { toast } from "react-toastify";
-import { setCurrentPageNumberSlice, setItemsPerPageSlice, setPaymentDetailsFilterSlice } from "store/authSlice";
+import { setCart, setCurrentPageNumberSlice, setItemsPerPageSlice, setPaymentDetailsFilterSlice } from "store/authSlice";
 
 interface RangeType<T> {
   label: string;
@@ -78,13 +78,13 @@ const inititalCancel = {
   reason: ""
 };
 
-// const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899";
-const logo = "";
+const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899";
+// const logo = "";
 
 const PaymentDetails: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { customerId, paymentDetailsFilterSlice, itemsPerPageSlice, currentPageNumber } = useAppSelector(state => state.auth);
+  const { customerId, paymentDetailsFilterSlice, itemsPerPageSlice, currentPageNumber, userDetails, defaultCurrencySlice, cartState } = useAppSelector(state => state.auth);
 
   const initialFilter = {
     customer_id: customerId,
@@ -152,6 +152,106 @@ const PaymentDetails: React.FC = () => {
   console.log("billingHistoryList...", billingHistoryList);
   const [billingHistoryData, setBillingHistoryData] = useState<object|null>(null);
   console.log("billingHistoryData...", billingHistoryData);
+  const [renewalStatus, setRenewalStatus] = useState(false);
+
+  const [activePlan, setActivePlan] = useState<object|null>(null);
+
+  const renewalDate = (datee) => {
+    const miliseconds = parseInt(datee?._seconds) * 1000 + parseInt(datee?._nanoseconds) / 1e6;
+
+    const date = new Date(miliseconds);
+    // const date = new Date();
+    const today = new Date();
+    console.log({date, today})
+
+    if(date < today) {
+      setRenewalStatus(true);
+    } else {
+      setRenewalStatus(false);
+    }
+  };
+
+  useEffect(() => {
+    renewalDate(userDetails?.workspace?.next_payment);
+  }, [userDetails?.workspace?.next_payment]);
+
+  const getPlanNameById = async() => {
+    try {
+      const result = await dispatch(plansAndPricesListThunk({
+        subscription_id: userDetails?.workspace?.plan_name_id
+      })).unwrap();
+      setActivePlan(result?.data[0]);
+    } catch (error) {
+      // console.log(error);
+      setActivePlan(null);
+      if(error?.error == "Request failed with status code 401") {
+        try {
+          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    getPlanNameById();
+  }, [userDetails]);
+
+  const getAmount = (amount, period) => {
+    const amountDetails =  amount?.find(item => item?.currency_code === defaultCurrencySlice);
+    if(amountDetails === undefined) {
+      return {type: '', price: 0, discount_price: 0};
+    } else {
+      return amountDetails?.price?.find(item => item?.type === period);
+    }
+  };
+
+  const cartAddAmount = (item, period) => {
+    const data = getAmount(item?.amount_details, period);
+    return data;
+  };
+
+  const renewalAddToCart = async(e) => {
+    e.preventDefault();
+    const cartItems = cartState?.filter(item => item?.product_type === "google workspace" ? !item : item);
+    console.log(cartAddAmount(activePlan, userDetails?.workspace?.payment_cycle)?.discount_price)
+    const newCart = [
+      ...cartItems,
+      {
+        payment_cycle: userDetails?.workspace?.payment_cycle,
+        price: cartAddAmount(activePlan, userDetails?.workspace?.payment_cycle)?.discount_price,
+        currency: defaultCurrencySlice,
+        product_name: activePlan?.plan_name,
+        product_type: "google workspace",
+        total_year: userDetails?.license_usage,
+        plan_name_id: activePlan?.id,
+        workspace_status: "active",
+        is_trial: true
+      }
+    ];
+    // console.log({newCart, item});
+    try {
+      await dispatch(addToCartThunk({
+        user_id: customerId,
+        products: newCart
+      })).unwrap();
+      dispatch(setCart(newCart));
+      navigate('/add-cart');
+    } catch (error) {
+      // console.log(error);
+      toast.error("Error renewing plan");
+      if(error?.error == "Request failed with status code 401") {
+        try {
+          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    }
+  };
 
   const getBillingHistoryList = async() => {
     try {
@@ -555,6 +655,24 @@ const PaymentDetails: React.FC = () => {
         </div> */}
       </div>
 
+      <div className="flex justify-start items-center mt-12 relative bottom-2 right-0">
+        <div className="flex items-center gap-1">
+          <select
+            onChange={e => {
+              setItemsPerPage(parseInt(e.target.value));
+            }}
+            value={itemsPerPage}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={15}>15</option>
+            <option value={20} selected>20</option>
+            <option value={50}>50</option>
+          </select>
+          <label>items</label>
+        </div>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="min-w-full">
           <thead>
@@ -624,14 +742,19 @@ const PaymentDetails: React.FC = () => {
                         {detail?.payment_method ? (
                           <>
                             <img
+                              src={paymentMethods?.find(item => item?.method_name?.toLowerCase() === detail?.payment_method?.toLowerCase())?.method_image}
+                              alt={billingHistoryData?.payment_method}
+                              className="w-10 object-contain"
+                            />
+                            {/* <img
                               src="/images/visa.png"
                               alt="Visa"
                               className="h-4 mr-1"
-                            />
-                            <span className="text-[0.75rem] text-gray-600 font-semibold text-nowrap">
+                            /> */}
+                            {/* <span className="text-[0.75rem] text-gray-600 font-semibold text-nowrap">
                               {detail?.payment_method}
-                              {/* {maskeCardNumber(1212312312312312)} */}
-                            </span>
+                              {maskeCardNumber(1212312312312312)}
+                            </span> */}
                           </>
                         ) : (
                           <span className="text-gray-800 font-bold text-3xl text-center">
@@ -640,12 +763,12 @@ const PaymentDetails: React.FC = () => {
                         )}
                       </span>
                     </td>
-                    <td className="px-2 pb-10 pt-3 flex items-center justify-center">
+                    <td className="px-2 pb-10 pt-3 flex items-center content-center justify-center">
                       <button
-                        className="w-6 h-6 rounded-full border-2 border-green-500 flex justify-center items-center my-auto"
+                        className="w-6 h-6 rounded-full border-2 border-green-500 flex justify-center  items-center content-center my-auto"
                         onClick={() => {toggleList(index)}}
                       >
-                        <p className="mb-2">...</p>
+                        <p className="mb-2 items-center content-center">...</p>
                       </button>
                     </td>
                   </tr>
@@ -664,6 +787,22 @@ const PaymentDetails: React.FC = () => {
                                   return (
                                     <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={() => {navigate(list?.link, {state: detail})}}>{list?.label}</li>
                                   )
+                                } else if(list?.label === "Renew Plan") {
+                                  if(detail?.product_type?.toLowerCase() === "google workspace") {
+                                    if(renewalStatus) {
+                                      return (
+                                        <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => {renewalAddToCart(e)}}>{list?.label}</li>
+                                      )
+                                    }
+                                  }
+                                } else if(list?.label === "Update Plan") {
+                                  if(detail?.product_type?.toLowerCase() === "google workspace") {
+                                    if(userDetails?.workspace?.workspace_status !== "trial") {
+                                      return (
+                                        <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => renewalAddToCart(e)}>{list?.label}</li>
+                                      )
+                                    }
+                                  }
                                 } else {
                                   if(detail?.product_type?.toLowerCase() === "google workspace") {
                                     return (
@@ -678,12 +817,12 @@ const PaymentDetails: React.FC = () => {
                                       <li
                                         key={idx}
                                         className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
-                                        onClick={() => {
-                                          setIsModalOpen(true);
-                                          setModalType(list?.label);
-                                          setSubscriptionId(detail?.id);
-                                          setInvoiceData({});
-                                        }}
+                                        // onClick={() => {
+                                        //   setIsModalOpen(true);
+                                        //   setModalType(list?.label);
+                                        //   setSubscriptionId(detail?.id);
+                                        //   setInvoiceData({});
+                                        // }}
                                       >{list?.label}</li>
                                     )
                                   } else if(detail?.product_type?.toLowerCase() === "domain")  {
@@ -691,12 +830,12 @@ const PaymentDetails: React.FC = () => {
                                       <li
                                         key={idx}
                                         className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
-                                        onClick={() => {
-                                          setIsModalOpen(true);
-                                          setModalType("Cancel Domain");
-                                          setSubscriptionId(detail?.id);
-                                          setInvoiceData({});
-                                        }}
+                                        // onClick={() => {
+                                        //   setIsModalOpen(true);
+                                        //   setModalType("Cancel Domain");
+                                        //   setSubscriptionId(detail?.id);
+                                        //   setInvoiceData({});
+                                        // }}
                                       >Cancel Domain</li>
                                     )
                                   }
@@ -706,12 +845,12 @@ const PaymentDetails: React.FC = () => {
                                       <li
                                         key={idx}
                                         className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
-                                        onClick={() => {
-                                          setIsModalOpen(true);
-                                          setModalType(list?.label);
-                                          setSubscriptionId(detail?.id);
-                                          setInvoiceData({});
-                                        }}
+                                        // onClick={() => {
+                                        //   setIsModalOpen(true);
+                                        //   setModalType(list?.label);
+                                        //   setSubscriptionId(detail?.id);
+                                        //   setInvoiceData({});
+                                        // }}
                                       >{list?.label}</li>
                                     )
                                   } else if(detail?.product_type?.toLowerCase() === "domain") {
@@ -719,12 +858,12 @@ const PaymentDetails: React.FC = () => {
                                       <li
                                         key={idx}
                                         className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
-                                        onClick={() => {
-                                          setIsModalOpen(true);
-                                          setModalType("Transfer Domain");
-                                          setSubscriptionId(detail?.id);
-                                          setInvoiceData({});
-                                        }}
+                                        // onClick={() => {
+                                        //   setIsModalOpen(true);
+                                        //   setModalType("Transfer Domain");
+                                        //   setSubscriptionId(detail?.id);
+                                        //   setInvoiceData({});
+                                        // }}
                                       >Transfer Domain</li>
                                     )
                                   }
@@ -770,8 +909,8 @@ const PaymentDetails: React.FC = () => {
 
       
 
-      <div className="flex justify-between items-center mt-12 relative bottom-2 right-0">
-        <div className="flex items-center gap-1">
+      <div className="flex justify-end items-center mt-12 relative bottom-2 right-0">
+        {/* <div className="flex items-center gap-1">
           <select
             onChange={e => {
               setItemsPerPage(parseInt(e.target.value));
@@ -785,7 +924,7 @@ const PaymentDetails: React.FC = () => {
             <option value={50}>50</option>
           </select>
           <label>items</label>
-        </div>
+        </div> */}
         <div className="flex">
           <button
             onClick={() => {

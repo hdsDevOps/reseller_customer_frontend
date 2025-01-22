@@ -245,10 +245,6 @@ const DomainSummary = ({state, plan}:any) => {
                         )}
                       </div>
                     </div>
-                    <p className="text-[12px] w-[93%] text-gray-600">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                      eiusmod tempor. sit amet, consectetur.
-                    </p>
                   </div>
                 )) : (
                   <p className="font-inter font-normal text-black text-base text-center">No Vouchers...</p>
@@ -380,7 +376,7 @@ const DomainSummary = ({state, plan}:any) => {
                   {
                     voucherHover && (
                       <div onMouseOver={() => setVoucherHover(true)} onMouseLeave={() => {setVoucherHover(false)}} className="absolute flex flex-col ml-10">
-                        <p className="font-inter font-medium text-base text-white bg-[#12A833] p-2 rounded-[10px] -mt-[145px] w-full max-w-[200px] z-10">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam quis semper dolor. </p>
+                        <p className="font-inter font-medium text-base text-white bg-[#12A833] p-2 rounded-[10px] -mt-[145px] w-full max-w-[200px] z-10">These offer a percentage or fixed amount off the total purchase price.</p>
                         <div className="w-7 h-7 bg-[#12A833] rotate-45 -mt-4 mx-auto"></div>
                       </div>
                     )
@@ -412,12 +408,12 @@ const DomainSummary = ({state, plan}:any) => {
           <div className="w-[100%] flex items-center justify-center text-center mt-3">
             <p className="w-[65%] text-gray-400 text-[15px]">
               By purchasing, you accept the{" "}
-              <span className="text-green-500" onClick={() => {
+              <span className="text-green-500 cursor-pointer" onClick={() => {
                 setIsLegalModalOpen(true);
                 setLegalModalType("agreement");
               }}>Customer Agreement</span>{" "}
               and acknowledge reading the{" "}
-              <span className="text-green-500" onClick={() => {
+              <span className="text-green-500 cursor-pointer" onClick={() => {
                 setIsLegalModalOpen(true);
                 setLegalModalType("privacy");
               }}>Privacy Policy.</span>{" "}

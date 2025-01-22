@@ -315,6 +315,9 @@ function Review() {
 
   const addSubscriptionForWorkspace = async(item, result2) => {
     try {
+      const planData = await dispatch(plansAndPricesListThunk({
+        subscription_id: item?.plan_name_id
+      })).unwrap();
       const result = await dispatch(addSubscriptionThunk({
         product_type: "google workspace",
         payment_cycle: item?.payment_cycle,
@@ -344,7 +347,7 @@ function Review() {
             ? "0000000000000000"
             : "0000000000000000"
           }`,
-          plan_id: item?.plan_name_id,
+          plan_id: planData?.data[0],
           domain: "",
           phone: userData?.phone_no,
           email: userData?.email,
@@ -628,7 +631,7 @@ function Review() {
         }`,
         product_type: product_type,
         description: product_type?.toLowerCase() === "google workspace"
-        ? "purchase google workspace"
+        ? `purchase google workspace ${item?.product_type}`
         : product_type?.toLowerCase() === "domain"
         ? "purchase domain"
         : "",

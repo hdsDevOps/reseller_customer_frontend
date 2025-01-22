@@ -38,9 +38,9 @@ import AI from "./AI";
 const AuthApp: React.FC = () => {
   return (
     <div className="w-full min-h-screen bg-white relative">
-      {/* <ToastContainer /> */}
+      <ToastContainer />
       <Suspense fallback={<div>Loading...</div>}>
-        <div className="fixed top-0 left-0 right-0 w-full z-50 bg-white">
+        <div className="fixed top-0 left-0 right-0 w-full z-40 bg-white">
           <Header />
         </div>
         

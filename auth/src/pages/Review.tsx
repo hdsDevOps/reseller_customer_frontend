@@ -9,7 +9,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { BiSolidEditAlt } from "react-icons/bi";
 import { TbInfoTriangleFilled } from "react-icons/tb";
-import { addEmailsWithoutLoginThunk, addNewDomainWithoutLoginThunk, addSubscriptionWithoutLoginThunk, getPaymetnMethodsThunk, paystackPayThunk, stripePayThunk, udpateBusinessDataThunk } from "store/user.thunk";
+import { getPaymetnMethodsThunk, paystackPayThunk, plansAndPricesListThunk, stripePayThunk, udpateBusinessDataThunk } from "store/user.thunk";
 import { format } from "date-fns";
 import { currencyList } from "../components/CurrencyList";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
@@ -45,6 +45,19 @@ const Review = () => {
   const [addressDetails, setAddressDetails] = useState(location.state.formData);
   // console.log("addressDetails...", addressDetails);
 
+  const [planDate, setPlanDate] = useState(format(new Date(), "MMMM dd"));
+
+  useEffect(() => {
+    const today = new Date();
+    // console.log("today before...", today);
+    const trialPeriod = Number(data?.plan?.trial_period);
+    
+    today.setDate(today?.getDate() + trialPeriod);
+    // console.log("today after...", today);
+    
+    setPlanDate(format(today, "MMMM dd"));
+  }, [data?.period]);
+
   useEffect(() => {
     setData({
       ...data,
@@ -59,8 +72,8 @@ const Review = () => {
     business_name: data?.formData?.business_name,
     business_state: data?.formData?.business_state,
     business_city: data?.formData?.business_city,
-    business_zip_code: data?.formData?.business_zip_code,
-    region: data?.formData?.region
+    zipcode: data?.formData?.zipcode,
+    country: data?.formData?.country
   };
   
   const [isChecked, setIsChecked] = useState(false);
@@ -97,7 +110,7 @@ const Review = () => {
     { label: 'First Name', name: 'first_name', placeholder: 'Enter your First Name', type: 'text', },
     { label: 'Last Name', name: 'last_name', placeholder: 'Enter your Last Name', type: 'text', },
     { label: 'Address', name: 'address', placeholder: 'Enter your Address', type: 'text', },
-    { label: 'Business Zip code', name: 'business_zip_code', placeholder: 'Enter your Zip Code', type: 'number', },
+    { label: 'Zip code', name: 'zipcode', placeholder: 'Enter your Zip Code', type: 'number', },
     { label: 'State', name: 'business_state', placeholder: 'Select your State', type: 'drowpdown', },
     { label: 'City*', name: 'business_city', placeholder: 'Select your City', type: 'drowpdown', },
   ];
@@ -119,6 +132,25 @@ const Review = () => {
   const [planExpiryDate, setPlanExpiryDate] = useState("");
 
   const [processingModalOpen, setProcessingModalOpen] = useState(false);
+
+  const [allDataFilled, setAllDataFilled] = useState(false);
+  console.log("allDataFilled....", allDataFilled);
+
+  useEffect(() => {
+    if(
+      data?.formData?.business_name !== "" && data?.formData?.business_name?.trim() !== "" && data?.formData?.business_name !== null && data?.formData?.business_name !== undefined &&
+      data?.formData?.first_name !== "" && data?.formData?.first_name?.trim() !== "" && data?.formData?.first_name !== null && data?.formData?.first_name !== undefined &&
+      data?.formData?.last_name !== "" && data?.formData?.last_name?.trim() !== "" && data?.formData?.last_name !== null && data?.formData?.last_name?.trim() !== undefined &&
+      data?.formData?.address !== "" && data?.formData?.address?.trim() !== "" && data?.formData?.address !== null && data?.formData?.address?.trim() !== undefined &&
+      data?.formData?.zipcode !== "" && data?.formData?.zipcode?.trim() !== "" && data?.formData?.zipcode !== null && data?.formData?.zipcode?.trim() !== undefined &&
+      data?.formData?.business_state !== "" && data?.formData?.business_state?.trim() !== "" && data?.formData?.business_state !== null && data?.formData?.business_state?.trim() !== undefined &&
+      data?.formData?.business_city !== "" && data?.formData?.business_city?.trim() !== "" && data?.formData?.business_city !== null && data?.formData?.business_city?.trim() !== undefined
+    ) {
+      setAllDataFilled(true);
+    } else {
+      setAllDataFilled(false);
+    }
+  }, [data?.formData?.business_name, data?.formData?.first_name, data?.formData?.last_name, data?.formData?.address,data?.formData?.zipcode, data?.formData?.business_state, data?.formData?.business_city]);
     
   useEffect(() => {
     const dayToday = new Date();
@@ -160,10 +192,10 @@ const Review = () => {
 
   useEffect(() => {
     if(countries?.length > 0) {
-      const countryData = countries?.find(item => item?.name === data?.formData?.region);
+      const countryData = countries?.find(item => item?.name === data?.formData?.country);
       setCountry(countryData);
     };
-  }, [countries, data?.formData?.region]);
+  }, [countries, data?.formData?.country]);
 
   useEffect(() => {
     if(states?.length > 0) {
@@ -364,9 +396,7 @@ const Review = () => {
       const result = await dispatch(stripePayThunk(body)).unwrap();
       console.log("result...", result);
       if(result?.message === "Payment successful") {
-        setTimeout(() => {
-          navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: result?.charge, currency: defaultCurrencySlice, date: new Date() }});
-        }, 3000);
+        navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: result?.charge, currency: defaultCurrencySlice, date: new Date() }});
       } else {
         toast.error("Error on payment method");
       }
@@ -423,9 +453,7 @@ const Review = () => {
     if (responseData.status) {
       setProcessingModalOpen(true);
       // console.log(reference);
-      setTimeout(() => {
-        navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: reference, currency: defaultCurrencySlice, date: new Date() }});
-      }, 3000);
+      navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: reference, currency: defaultCurrencySlice, date: new Date() }});
     } else {
       toast.error("Error on payment method");
     }
@@ -441,133 +469,6 @@ const Review = () => {
     text: 'Agree and continue',
     onSuccess: (reference) => handlePaystackSuccessAction(reference),
     onClose: handlePaystackCloseAction,
-  };
-
-  const handleSubmit2 = async(e) => {
-    e.preventDefault();
-    if(paymentMethod === "") {
-      toast.warning("Please select a payment method");
-    } else {
-      try {
-        await dispatch(udpateBusinessDataThunk({
-          user_id: data?.customer_id,
-          first_name: data?.formData?.first_name,
-          last_name: data?.formData?.last_name,
-          email: data?.formData?.email,
-          phone_no: data?.formData?.phone_no,
-          address: data?.formData?.address,
-          state: '',
-          city: '',
-          country: data?.formData?.region,
-          password: '',
-          business_name: data?.formData?.business_name,
-          business_state: data?.formData?.business_state,
-          business_city: data?.formData?.business_city,
-          business_zip_code: data?.formData?.business_zip_code,
-          token: data?.token
-        })).unwrap();
-        await dispatch(addSubscriptionWithoutLoginThunk({
-          product_type: "domain",
-          payment_cycle: "Yearly",
-          customer_id: data?.customer_id,
-          description: "domain purchase",
-          domain: [data?.selectedDomain?.domain],
-          last_payment: todayDate,
-          next_payment: domainExpiryDate,
-          payment_method: "visa",
-          subscription_status: "auto renewal",
-          plan_name_id: "",
-          payment_details: [{
-            first_name: data?.formData?.first_name,
-            last_name: data?.formData?.last_name,
-            card_number: '123456789098',
-            billing_detail_id: '',
-          }],
-          plan_name: "",
-          workspace_status: "",
-          is_trial: false,
-          license_usage: data?.license_usage,
-          token: data?.token
-        })).unwrap();
-        await dispatch(addSubscriptionWithoutLoginThunk({
-          product_type: "google workspace",
-          payment_cycle: data?.period,
-          customer_id: data?.customer_id,
-          description: "google workspace purchase",
-          domain: [data?.selectedDomain?.domain],
-          last_payment: todayDate,
-          next_payment: planExpiryDate,
-          payment_method: "visa",
-          subscription_status: "auto renewal",
-          plan_name_id: data?.plan?.id,
-          payment_details: [{
-            first_name: data?.formData?.first_name,
-            last_name: data?.formData?.last_name,
-            card_number: '123456789098',
-            billing_detail_id: '',
-          }],
-          plan_name: data?.plan?.plan_name,
-          workspace_status: "trial",
-          is_trial: false,
-          license_usage: data?.license_usage,
-          token: data?.token
-        })).unwrap();
-        const domainData = await dispatch(addNewDomainWithoutLoginThunk({
-          customer_id: data?.customer_id,
-          domain_name: data?.selectedDomain?.domain,
-          domain_type: "primary",
-          subscription_id: "0",
-          business_name: data?.formData?.business_name,
-          business_email: data?.formData?.email,
-          license_usage: data?.license_usage,
-          plan: "0",
-          payment_method: "visa",
-          domain_status: true,
-          billing_period: "Yearly",
-          renew_status: "auto renewal",
-          subscription_status: "Auto-renwal",
-          token: data?.token
-        })).unwrap();
-        await dispatch(addEmailsWithoutLoginThunk({
-          user_id: data?.customer_id,
-          domain_id: domainData?.domain_id,
-          emails: [
-            {
-              first_name: data?.formData?.first_name,
-              last_name: data?.formData?.last_name,
-              email: `${data?.emailData?.username}`,
-              password: data?.emailData?.password,
-            }
-          ],
-          token: data.token
-        })).unwrap();
-        // await dispatch(setUserAuthTokenToLSThunk({token: state.token})).unwrap();
-        // await dispatch(setUserIdToLSThunk(state.customer_id)).unwrap();
-        // navigate('/dashboard', {state: {from: 'otp'}});
-      } catch (error) {
-        toast.error("Error purchasing");
-        console.log(error)
-      }
-    }
-    // finally {
-    //   try {
-    //     await dispatch(getUserAuthTokenFromLSThunk()).unwrap();
-    //     await dispatch(getUserIdFromLSThunk()).unwrap();
-    //     navigate('/dashboard', {state: {from: 'otp'}})
-    //   } catch (error) {
-    //     console.log("Error on token")
-    //   }
-    // }
-  }
-  const handleSubmit = async(e) => {
-    e.preventDefault();
-    if(paymentMethod === "") {
-      toast.warning("Please select a payment method");
-    } else {
-      toast.success("OK");
-      // window.location.href="http://localhost:3000/download-invoice";
-      // navigate('/download-invoice', {state: {...data, payment_method: paymentMethod}});
-    }
   };
 
   return (
@@ -601,10 +502,10 @@ const Review = () => {
                   {/* <h4 className="font-inter font-normal text-xl text-black">{item?.product_name}</h4> */}
                 </div>
                 <p>Your first {data?.plan?.trial_period} days are at no charge ( limited to 10 users). You can <span className='text-[#12A833]'>cancel at any time</span>.</p>
-                <p>Recurs at the end of every month.</p>
+                <p>Recurs {data?.period?.toLowerCase() === "yearly" ? "yearly" : "monthly"} from {planDate}</p>
               </div>
               <div className='w-[140px] max-[768px]:w-full flex flex-col items-end text-end ml-auto'>
-                <p className='font-inter font-normal text-xl text-black'>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{getPriceAmount(data?.plan?.amount_details, data?.period)}&nbsp;{data?.period === "Yearly" ? "yearly" : "monthly"}</p>
+                <p className='font-inter font-normal text-xl text-black'>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{(parseFloat(getPriceAmount(data?.plan?.amount_details, data?.period))*data?.license_usage)?.toFixed(2)}&nbsp;{data?.period === "Yearly" ? "yearly" : "monthly"}</p>
                 <p className='font-inter font-medium text-base text-black'>+applicable tax</p>
               </div>
             </div>
@@ -983,36 +884,48 @@ const Review = () => {
         {/* Submit Button */}
         <div className='flex justify-between w-full'>
           {
-            paymentMethod?.toLowerCase() === "stripe"
-            ? (
-              <button className="w-[30%] px-2 py-2 mb-5 ml-5 font-medium text-white bg-green-500 rounded-[10px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 mx-auto">
-                <StripeCheckout
-                  name='Hordanso'
-                  description="Purchasing google workspace and domain"
-                  image="https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899"
-                  ComponentClass="div"
-                  panelLabel="Submit"
-                  // amount={data?.finalTotalPrice * 100}
-                  // currency={defaultCurrencySlice}
-                  stripeKey="pk_test_51HCGY4HJst0MFfZtYup1hAW3VcsAmcJJ4lwg9fDjPLvStToUiLixgF679sFDyWfVH1awUIU3UGOd2TyAYDUkJrPF002WD2USoG"
-                  email={data?.formData?.email}
-                  // billingAddress
-                  token={makePayment}
-                  allowRememberMe
-                >Agree and continue</StripeCheckout>
-              </button>
-            ) : paymentMethod?.toLowerCase() === "paystack"
-            ? (
+            allDataFilled
+            ? paymentMethod?.toLowerCase() === "stripe"
+              ? (
+                <button type="button" className="w-[30%] px-2 py-2 mb-5 ml-5 font-medium text-white bg-green-500 rounded-[10px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 mx-auto">
+                  <StripeCheckout
+                    name='Hordanso'
+                    description="Purchasing google workspace and domain"
+                    image="https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899"
+                    ComponentClass="div"
+                    panelLabel="Submit"
+                    // amount={data?.finalTotalPrice * 100}
+                    // currency={defaultCurrencySlice}
+                    stripeKey="pk_test_51HCGY4HJst0MFfZtYup1hAW3VcsAmcJJ4lwg9fDjPLvStToUiLixgF679sFDyWfVH1awUIU3UGOd2TyAYDUkJrPF002WD2USoG"
+                    email={data?.formData?.email}
+                    // billingAddress
+                    token={makePayment}
+                    allowRememberMe
+                  >Agree and continue</StripeCheckout>
+                </button>
+              ) : paymentMethod?.toLowerCase() === "paystack"
+              ? (
+                <button
+                  type="button"
+                  className="w-[30%] px-2 py-2 mb-5 ml-5 font-medium text-white bg-green-500 rounded-[10px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 mx-auto"
+                  // onClick={() => {() => initializePayment(handleSuccess, handleClose)}}
+                >
+                  <PaystackButton {...componentProps} />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="w-[30%] px-2 py-2 mb-5 ml-5 font-medium text-white bg-green-500 rounded-[10px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 mx-auto"
+                  onClick={() => {toast.warning("Please select a payment method")}}
+                >
+                  Agree and continue
+                </button>
+              )
+            : (
               <button
+                type="button"
                 className="w-[30%] px-2 py-2 mb-5 ml-5 font-medium text-white bg-green-500 rounded-[10px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 mx-auto"
-                // onClick={() => {() => initializePayment(handleSuccess, handleClose)}}
-              >
-                <PaystackButton {...componentProps} />
-              </button>
-            ) : (
-              <button
-                className="w-[30%] px-2 py-2 mb-5 ml-5 font-medium text-white bg-green-500 rounded-[10px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 mx-auto"
-                onClick={() => {toast.warning("Please select a payment method")}}
+                onClick={() => {toast.warning("Please fill all the inputs")}}
               >
                 Agree and continue
               </button>
@@ -1155,13 +1068,13 @@ const Review = () => {
           <Dialog
             open={processingModalOpen}
             as="div"
-            className="relative z-10 focus:outline-none"
+            className="relative z-50 focus:outline-none"
             onClose={() => {
               setProcessingModalOpen(true);
             }}
             // static
           >
-            <div className="fixed inset-0 bg-black bg-opacity-50 z-10 w-screen overflow-y-auto">
+            <div className="fixed inset-0 top-0 bottom-0 left-0 right-0  bg-white z-50 w-screen overflow-y-auto">
               <div className="flex min-h-full items-center justify-center py-4">
                 <DialogPanel
                   transition

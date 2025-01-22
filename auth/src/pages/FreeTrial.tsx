@@ -103,7 +103,7 @@ const FreeTrial: React.FC = () => {
               <p className="text-xl xsm-max:text-sm">Starting {expiryDate}</p>
               <p className="text-xl xsm-max:text-sm">
                 {currencyList.find(item => item.name === defaultCurrencySlice)?.logo}
-                {amount}
+                {amount*location.state.license_usage}
                   {
                     location.state.period === "Yearly" ? "/year" : "/month"
                   }
@@ -122,15 +122,15 @@ const FreeTrial: React.FC = () => {
         <p className="text-xs text-gray-500 mb-4">
           By clicking <span className="text-black">Start Free Trial</span> 
             you agree to the{" "}
-            <a href="#" className="text-green-600">
+            <a href="#" className="text-green-600 cursor-pointer">
               Google Workspace Agreement, Google Workspace purchase Agreement
             </a>{" "}
             and{" "}
-            <a href="#" className="text-green-600">
+            <a href="#" className="text-green-600 cursor-pointer">
               Supplemental Terms
             </a>{" "}
             and{" "}
-            <a href="#" className="text-green-600">
+            <a href="#" className="text-green-600 cursor-pointer">
               Conditions for Google Workspace Free Trial Agreement.
             </a>.
         </p>
