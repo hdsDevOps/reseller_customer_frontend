@@ -114,7 +114,7 @@ export default function Footer() {
             <div className="flex flex-col gap-10">
               <div className="text-[#BDBDBD] text-base font-medium flex flex-col gap-1" dangerouslySetInnerHTML={{__html: footer?.contact_us_section_data?.value}}>
               </div>
-              <div className="flex gap-1">
+              {/* <div className="flex gap-1">
                 {
                   footer?.social_section_data?.length > 0 && footer?.social_section_data?.map((data, index) => (
                     <a className={`w-10 h-10 rounded-full flex items-center justify-center ${socialIcons.find(item => item.name === data?.name)?.color}`} href={data?.value} target="_blank" key={index}>
@@ -122,7 +122,7 @@ export default function Footer() {
                     </a>
                   ))
                 }
-              </div>
+              </div> */}
             </div>
           </div>
           <div className="flex flex-col gap-2 col-span-4 sm:col-span-2 lg:col-span-1">
