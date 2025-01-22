@@ -11,18 +11,22 @@ const AboutUs = ({aboutUs, id}:any) => {
   // console.log("aboutUs...", aboutUs);
   return (
     <section className="max-w-screen-2xl mx-auto bg-top bg-cover" style={{ backgroundImage: `url(${Base_URL}/images/AboutUsSpiral.png)` }} id={id}>
-      <div className="w-full relative my-2">
+      <div className={`w-full relative my-2 ${aboutUs?.heading_section?.image ? "" : "sm:h-[200px] h-[100px]"}`}>
         <div className="bg-[#12A8334F] absolute inset-0 text-white flex flex-col gap-2 justify-center items-center">
-          <h4 className="font-extrabold text-4xl">
+          <h4 className="font-extrabold sm:text-4xl text-xl">
             {aboutUs?.heading_section?.heading}
           </h4>
-          <h2 className="font-extrabold text-5xl">About Us</h2>
+          <h2 className="font-extrabold sm:text-5xl text-2xl">About Us</h2>
         </div>
-        <img
-          src={aboutUs?.heading_section?.image}
-          alt="AboutUsHeroimage"
-          className="w-full max-h-[300px] object-cover"
-        />
+        {
+          aboutUs?.heading_section?.image && (
+            <img
+              src={aboutUs?.heading_section?.image}
+              alt="AboutUsHeroimage"
+              className="w-full sm:max-h-[300px] max-h-[200px] object-cover"
+            />
+          )
+        }
       </div>
       <div className="w-full bg-cover bg-center"
       >

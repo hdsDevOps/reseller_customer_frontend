@@ -9,7 +9,7 @@ import axios from "axios";
 import { hereMapSearchThunk, udpateBusinessDataThunk } from "store/user.thunk";
 import { toast } from "react-toastify";
 
-//user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, business_zip_code
+//user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, zipcode
 
 const BusinessInfo: React.FC = () => {
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ const BusinessInfo: React.FC = () => {
 
   const [formData, setFormData] = useState(location.state.formData);
   console.log("form data...", formData);
-  const region = location.state.formData.region;
+  const region = location.state.formData.country;
   
   const [isNumberValid, setIsNumberValid] = useState(false);
   console.log({isNumberValid});
@@ -47,6 +47,7 @@ const BusinessInfo: React.FC = () => {
   const [states, setStates] = useState([]);
   const [cities, setCitites] = useState([]);
   const [country, setCountry] = useState({});
+  console.log("country...", country);
   const [state, setState] = useState({});
   const [city, setCity] = useState({});
   // console.log({countries, states, cities});
@@ -173,8 +174,8 @@ const BusinessInfo: React.FC = () => {
         setCityName("");
         setFormData({
           ...formData,
-          business_state: findState?.name,
-          business_city: ''
+          state: findState?.name,
+          city: ''
         });
       }
     }
@@ -184,12 +185,12 @@ const BusinessInfo: React.FC = () => {
     if(addressObject !== null) {
       if(cities?.length > 0) {
         const findCity = cities?.find(city => city?.name?.toLowerCase()?.includes(addressObject?.address?.city?.toLowerCase()));
-        console.log("findState...", findCity);
+        console.log("findCity...", findCity);
         setCity(findCity);
         setCityName("");
         setFormData({
           ...formData,
-          business_city: findCity?.name
+          city: findCity?.name
         });
       }
     }
@@ -252,14 +253,14 @@ const BusinessInfo: React.FC = () => {
           email: location.state.formData.email,
           phone_no: formData?.phone_no,
           address: formData?.address,
-          state: formData?.business_state,
-          city: formData?.business_city,
+          state: formData?.state,
+          city: formData?.city,
           country: region,
           password: '',
           business_name: formData?.business_name,
           business_state: '',
           business_city: '',
-          business_zip_code: formData?.business_zip_code,
+          zipcode: formData?.zipcode,
           token: location.state.token
         })).unwrap();
         // console.log("result...", result);
@@ -283,9 +284,9 @@ const BusinessInfo: React.FC = () => {
     if(
       formData?.business_name === "" || formData?.business_name?.trim() === "" ||
       formData?.address === "" || formData?.address?.trim() === "" ||
-      formData?.business_city?.trim() === "" ||
-      formData?.business_state?.trim() === "" ||
-      formData?.business_zip_code === "" || formData?.business_zip_code?.trim() === "" ||
+      formData?.city?.trim() === "" ||
+      formData?.state?.trim() === "" ||
+      formData?.zipcode === "" || formData?.zipcode?.trim() === "" ||
       formData?.phone_no === "" || formData?.phone_no?.trim() === ""
     ) {
       setIsSubmitDisabled(true)
@@ -366,7 +367,7 @@ const BusinessInfo: React.FC = () => {
                         setFormData({
                           ...formData,
                           address: addressItem?.address?.label,
-                          business_zip_code: addressItem?.address?.postalCode,
+                          zipcode: addressItem?.address?.postalCode,
                         });
                         setAddressObject(addressItem);
                         setAddress("");
@@ -382,16 +383,16 @@ const BusinessInfo: React.FC = () => {
 
         <div className="relative w-full mb-2" ref={stateRef}>
           <input
-            name="business_state"
+            name="state"
             type="text"
             placeholder="State"
-            value={formData?.business_state || stateName}
+            value={formData?.state || stateName}
             required={states?.length > 0 ? true : false}
             onChange={(e) => {
               setFormData({
                 ...formData,
-                business_state: '',
-                business_city: '',
+                state: '',
+                city: '',
               })
               setStateName(e.target.value);
               setCityName('');
@@ -402,7 +403,7 @@ const BusinessInfo: React.FC = () => {
             onFocus={() => {setStateDropdownOpen(true)}}
           />
           <label
-            htmlFor="business_state"
+            htmlFor="state"
             className="absolute bg-white -top-3 left-3 text-gray-500 transition-all duration-300 ease-in-out origin-top-left peer-placeholder-shown:text-gray-400 peer-focus:text-blue-600 peer-focus:text-sm"
           >
             State
@@ -418,8 +419,8 @@ const BusinessInfo: React.FC = () => {
                       onClick={() => {
                         setFormData({
                           ...formData,
-                          business_state: state?.name,
-                          business_city: ''
+                          state: state?.name,
+                          city: ''
                         });
                         setStateName('');
                         setCityName('');
@@ -437,14 +438,14 @@ const BusinessInfo: React.FC = () => {
 
         <div className="relative w-full mb-2" ref={cityRef}>
           <input
-            name="business_city"
+            name="city"
             type="text"
             placeholder="City"
-            value={formData?.business_city || cityName}
+            value={formData?.city || cityName}
             onChange={(e) => {
               setFormData({
                 ...formData,
-                business_city: '',
+                city: '',
               })
               setCityName(e.target.value);
               setCity({});
@@ -453,7 +454,7 @@ const BusinessInfo: React.FC = () => {
             onFocus={() => setCityDropdownOpen(true)}
           />
           <label
-            htmlFor="business_city"
+            htmlFor="city"
             className="absolute bg-white -top-3 left-3 text-gray-500 transition-all duration-300 ease-in-out origin-top-left peer-placeholder-shown:text-gray-400 peer-focus:text-blue-600 peer-focus:text-sm"
           >
             City*
@@ -469,7 +470,7 @@ const BusinessInfo: React.FC = () => {
                       onClick={() => {
                         setFormData({
                           ...formData,
-                          business_city: city?.name,
+                          city: city?.name,
                         });
                         setCityName('');
                         setCity(city);
@@ -485,15 +486,15 @@ const BusinessInfo: React.FC = () => {
 
         <div className="relative w-full mb-2">
           <input
-            name="business_zip_code"
+            name="zipcode"
             type="number"
             placeholder="Zip Code"
-            value={formData?.business_zip_code}
+            value={formData?.zipcode}
             onChange={handleChange}
             className="peer form-input"
           />
           <label
-            htmlFor="business_zip_code"
+            htmlFor="zipcode"
             className="absolute bg-white -top-3 left-3 text-gray-500 transition-all duration-300 ease-in-out origin-top-left peer-placeholder-shown:text-gray-400 peer-focus:text-blue-600 peer-focus:text-sm"
           >
             Zip Code

@@ -4,7 +4,7 @@ import { PiEyeClosedBold } from "react-icons/pi";
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { removeUserAuthTokenFromLSThunk, udpateProfileDataThunk } from 'store/user.thunk';
+import { removeUserAuthTokenFromLSThunk, udpateProfileDataThunk, hereMapSearchThunk } from 'store/user.thunk';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { setUserDetails } from 'store/authSlice';
 import PhoneInput from "react-phone-input-2";

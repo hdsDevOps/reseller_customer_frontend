@@ -15,13 +15,14 @@ const PlanCard: React.FC = ({plans, handleLeftPlan, handleRightPlan, plansLength
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
   const [isYearly, setIsYearly] = useState(false);
-  const [checkbox, setCheckbox] = useState(false);
+  const [checkbox, setCheckbox] = useState<null|string>(null);
+  console.log("checkbox...", checkbox);
   const [currentPlans, setCurrentPlans] = useState([]);
   // console.log("plans...", currentPlans);
   const [initialIndex, setInitialIndex] = useState(0);
   const toggleBilling = () => {
     setIsYearly(!isYearly);
-    setCheckbox(false);
+    setCheckbox(null);
   };
   const [isHovering, setIsHovering] = useState<Number|null>(null);
 
@@ -149,9 +150,9 @@ const PlanCard: React.FC = ({plans, handleLeftPlan, handleRightPlan, plansLength
                           isYearly ? "" : (
                             <input
                               type="checkbox"
-                              className="checkbox checkbox-sm border-2 border-black [--chkbg:theme(colors.white)] rounded-[3px] mt-1 mr-2"
-                              checked={checkbox}
-                              onClick={() => {setCheckbox(prev => !prev)}}
+                              className="checkbox checkbox-sm border-2 border-black rounded-[3px] mt-1 mr-2"
+                              checked={checkbox === plan?.id}
+                              onChange={() => {setCheckbox(prev => prev === plan?.id ? null : plan?.id)}}
                             />
                           )
                         }
@@ -160,8 +161,8 @@ const PlanCard: React.FC = ({plans, handleLeftPlan, handleRightPlan, plansLength
                           className="text-gray-700"
                         >
                           {isYearly
-                            ? `${getParticularAmount(plan?.amount_details, "Yearly")?.discount_price} per user / month`
-                            : `Or ${getParticularAmount(plan?.amount_details, "Monthly")?.discount_price} per user / month when billed monthly (without yearly commitment)`}
+                            ? `${currencyList.find(item => item.name === defaultCurrencySlice)?.logo}${getParticularAmount(plan?.amount_details, "Yearly")?.discount_price} per user / month`
+                            : `Or ${currencyList.find(item => item.name === defaultCurrencySlice)?.logo}${getParticularAmount(plan?.amount_details, "Monthly")?.discount_price} per user / month when billed monthly (without yearly commitment)`}
                         </label>
                       </div>
 
@@ -171,6 +172,7 @@ const PlanCard: React.FC = ({plans, handleLeftPlan, handleRightPlan, plansLength
                           className="bg-green-100 text-black py-1 px-2 sm:py-1 sm:px-4 rounded-lg mb-2 sm:mb-0 font-semibold text-[10px] sm:text-[12px]"
                           onMouseEnter={() => {setIsHovering(index)}}
                           onMouseLeave={() => {setIsHovering(null)}}
+                          onClick={() => {navigate('/ai')}}
                         >
                           Gemini add-on available
                         </button>
