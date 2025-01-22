@@ -164,8 +164,8 @@ export const resetPasswordThunk = createAsyncThunk(
 
 export const resgiterCustomerThunk = createAsyncThunk(
   "users/resgiterCustomer",
-  async ({ email, password, business_phone_number, first_name, last_name, business_name, region, street_name, state, city, zipcode }: any) => {
-    return await userApis.resgiterCustomerApi( email, password, business_phone_number, first_name, last_name, business_name, region, street_name, state, city, zipcode  );
+  async ({ email, password, phone_no, first_name, last_name, business_name, country, address, state, city, zipcode }: any) => {
+    return await userApis.resgiterCustomerApi( email, password, phone_no, first_name, last_name, business_name, country, address, state, city, zipcode  );
   }
 );
 

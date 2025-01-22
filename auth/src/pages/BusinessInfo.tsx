@@ -252,13 +252,13 @@ const BusinessInfo: React.FC = () => {
           email: location.state.formData.email,
           phone_no: formData?.phone_no,
           address: formData?.address,
-          state: '',
-          city: '',
+          state: formData?.business_state,
+          city: formData?.business_city,
           country: region,
           password: '',
           business_name: formData?.business_name,
-          business_state: formData?.business_state,
-          business_city: formData?.business_city,
+          business_state: '',
+          business_city: '',
           business_zip_code: formData?.business_zip_code,
           token: location.state.token
         })).unwrap();

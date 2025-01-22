@@ -103,18 +103,18 @@ async function resetPasswordApi(
 async function resgiterCustomerApi(
   email: string,
   password: string,
-  business_phone_number: string,
+  phone_no: string,
   first_name: string,
   last_name: string,
   business_name: string,
-  region: string,
-  street_name: string,
+  country: string,
+  address: string,
   state: string,
   city: string,
   zipcode: string,
 ): Promise<any> {
   try {
-    const result = await postApiCall(endPoints.resgiterCustomer, { email, password, business_phone_number, first_name, last_name, business_name, region, street_name, state, city, zipcode });
+    const result = await postApiCall(endPoints.resgiterCustomer, { email, password, phone_no, first_name, last_name, business_name, country, address, state, city, zipcode });
     return result;
   } catch (error: any) {
     throw error;

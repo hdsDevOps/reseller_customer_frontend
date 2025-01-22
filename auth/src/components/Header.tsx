@@ -74,14 +74,21 @@ export default function Header() {
     }
   };
 
+  const handleScrollTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+
 
   return (
-    <nav className="w-full flex items-center py-2 px-10 relative" id="home">
+    <nav className="w-full flex items-center py-2 px-10 relative bg-white" id="home">
       <button
         type="button"
         onClick={() => {
           location.pathname.toLowerCase().includes('/home')
-          ? handleScroll('home')
+          ? handleScrollTop()
           : navigate('/home');
         }}
       >
@@ -104,7 +111,7 @@ export default function Header() {
       </div>
       {
         width < 1024 ?
-        <div className={isNavOpen ? 'block absolute left-0 right-0 top-[80px]' : 'hidden'}>
+        <div className={isNavOpen ? 'block absolute left-0 right-0 top-[60px]' : 'hidden'}>
           <CustomerNavbar header={header} width={width} closeNav={toggleNavOpen} navOpen={isNavOpen} />
         </div>
         : null

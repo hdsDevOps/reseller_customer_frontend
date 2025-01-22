@@ -21,12 +21,12 @@ import { ChevronDown } from "lucide-react";
 const initialCustomer = {
   email: "",
   password: "",
-  business_phone_number: "",
+  phone_no: "",
   first_name: "",
   last_name: "",
   business_name: "",
-  region: "",
-  street_name: "",
+  country: "",
+  address: "",
   zipcode: ""
 };
 
@@ -59,7 +59,7 @@ const RegisterPage: React.FC = () => {
   const [hereDropdownOpen, setHereDropdownOpen] = useState(false);
   const hereRef = useRef(null);
   const [hereData, setHereData] = useState<object|null>(null);
-  // console.log({address: customer?.street_name, hereData, hereAddress});
+  // console.log({address: customer?.address, hereData, hereAddress});
 
   useEffect(() => {
     const getIpData = async() => {
@@ -73,7 +73,7 @@ const RegisterPage: React.FC = () => {
           setCountry(findCountry);
           setCustomer({
             ...customer,
-            region: findCountry?.name
+            country: findCountry?.name
           });
         }
       }
@@ -86,15 +86,15 @@ const RegisterPage: React.FC = () => {
     if(hereData !== null) {
       setCustomer({
         ...customer,
-        street_name: hereData?.title
+        address: hereData?.title
       });
     } else {
       setCustomer({
         ...customer,
-        street_name: "",
-        region: '',
+        address: "",
+        country: '',
         zipcode: '',
-        business_phone_number: ''
+        phone_no: ''
       });
     }
   }, [hereData]);
@@ -133,8 +133,8 @@ const RegisterPage: React.FC = () => {
         setCountry(findCountry);
         setCustomer({
           ...customer,
-          region: findCountry?.name,
-          street_name: hereData?.title,
+          country: findCountry?.name,
+          address: hereData?.title,
           zipcode: hereData?.address?.postalCode
         });
       }
@@ -200,11 +200,11 @@ const RegisterPage: React.FC = () => {
     {name: 'first_name', label: "First name", type: "text", required: false, placeholder: "Enter First name", },
     {name: 'last_name', label: "Last name", type: "text", required: false, placeholder: "Enter Last name", },
     {name: 'business_name', label: "Business Name", type: "text", required: false, placeholder: "Enter Business Name", },
-    {name: 'street_name', label: "Street address", type: "text", required: false, placeholder: "Search Street address", },
-    {name: 'region', label: "Region/Country", type: "dropdown", required: false, placeholder: "Select your Region", },
+    {name: 'address', label: "Street address", type: "text", required: false, placeholder: "Search Street address", },
+    {name: 'country', label: "Region/Country", type: "dropdown", required: false, placeholder: "Select your Region", },
     {name: 'zipcode', label: "Zip code", type: "number", required: false, placeholder: "Enter Zip code", },
     {name: 'email', label: "Email address", type: "email", required: false, placeholder: "Enter Email address", },
-    {name: 'business_phone_number', label: "Business phone number", type: "text", required: false, placeholder: "Enter Business phone number", },
+    {name: 'phone_no', label: "Business phone number", type: "text", required: false, placeholder: "Enter Business phone number", },
     {name: 'password', label: "Password", type: "password", required: false, placeholder: "Enter Password", },
     {name: 'c_password', label: "Confirm Password", type: "password", required: false, placeholder: "Enter Confirm Password", },
   ];
@@ -226,7 +226,7 @@ const RegisterPage: React.FC = () => {
   };
 
   const handlePhoneChange = (value: string) => {
-    setCustomer((prevData) => ({ ...prevData, business_phone_number: value }));
+    setCustomer((prevData) => ({ ...prevData, phone_no: value }));
   };
   
   const validateForm = () => {
@@ -256,12 +256,12 @@ const RegisterPage: React.FC = () => {
             const result = await dispatch(resgiterCustomerThunk({
               email: customer?.email,
               password: customer?.password,
-              business_phone_number: customer?.business_phone_number,
+              phone_no: customer?.phone_no,
               first_name: customer?.first_name,
               last_name: customer?.last_name,
               business_name: customer?.business_name,
-              region: customer?.region,
-              street_name: customer?.street_name,
+              country: customer?.country,
+              address: customer?.address,
               state: "",
               city: "",
               zipcode: customer?.zipcode
@@ -400,7 +400,7 @@ const RegisterPage: React.FC = () => {
                     </div>
                   )
                 } else if(head.type === "dropdown") {
-                  if(head.name === "region") {
+                  if(head.name === "country") {
                     return (
                       <div
                         key={index}
@@ -412,13 +412,13 @@ const RegisterPage: React.FC = () => {
                         >{head.label}</label>
                         <input
                           type="text"
-                          name="region"
+                          name="country"
                           required
                           className='border border-[#E4E4E4] rounded-[10px] h-[54px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
                           onChange={e => {
                             setCustomer({
                               ...customer,
-                              region: ''
+                              country: ''
                             });
                             setCountryName(e.target.value);
                           }}
@@ -438,7 +438,7 @@ const RegisterPage: React.FC = () => {
                                     onClick={() => {
                                       setCustomer({
                                         ...customer,
-                                        region: country?.name,
+                                        country: country?.name,
                                       });
                                       setCountryName("");
                                       setCountryDropdownOpen(false);
@@ -453,12 +453,12 @@ const RegisterPage: React.FC = () => {
                       </div>
                     )
                   }
-                } else if(head.name === "business_phone_number") {
+                } else if(head.name === "phone_no") {
                   return (
                     <div className="relative !w-full mb-2 pl-[6px] pr-2 !pb-[2px] !pt-[6px] sm:col-span-1 col-span-2 mt-2">
                       <PhoneInput
                         country={country?.iso2?.toLowerCase() || "us"}
-                        value={customer?.business_phone_number}
+                        value={customer?.phone_no}
                         onChange={(inputPhone, countryData, event, formattedValue) => {
                           handlePhoneChange(inputPhone);
                           if(countryData?.format?.length === formattedValue.length) {
@@ -477,12 +477,12 @@ const RegisterPage: React.FC = () => {
                         containerClass="relative !outline-none !w-full !border !border-[#E4E4E4] !rounded-[10px]"
                       />
                       <label
-                        htmlFor="business_phone_number"
+                        htmlFor="phone_no"
                         className="absolute bg-white -top-3 left-3 text-gray-500 transition-all duration-300 ease-in-out origin-top-left peer-placeholder-shown:text-gray-400 peer-focus:text-blue-600 peer-focus:text-sm"
                       >{head?.label}</label>
                     </div>
                   )
-                } else if(head.name === "street_name") {
+                } else if(head.name === "address") {
                   return (
                     <div
                       key={index}

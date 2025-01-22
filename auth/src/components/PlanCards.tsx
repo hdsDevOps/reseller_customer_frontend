@@ -5,11 +5,12 @@ import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { currencyList } from "./CurrencyList";
 import { useAppSelector } from "store/hooks";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const PlanCard: React.FC = ({plans}:any) => {
+const PlanCard: React.FC = ({plans, handleLeftPlan, handleRightPlan, plansLength}:any) => {
   const navigate = useNavigate();
   const location = useLocation();
-  console.log(location.state);
+  // console.log(location.state);
   
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
@@ -74,9 +75,32 @@ const PlanCard: React.FC = ({plans}:any) => {
       </div>
 
       {/* <div className="flex min-sm:flex-row  items-end justify-center gap-2 w-full max-sm:flex-col max-sm:items-center   mt-6"> */}
-      <div className="flex flex-col xl:flex-row lg:flex-row  lg:items-stretch justify-center gap-2 w-full sm:flex-col sm:items-center mt-6 bg-white">
+      <div className="flex flex-col xl:flex-row lg:flex-row  lg:items-stretch justify-center gap-2 w-full sm:flex-col sm:items-center mt-6 bg-white relative">
       {/* <div className="grid   md:grid-cols-3  grid-cols-1 w-full    mt-6"> */}
-      
+        {
+          plansLength > 3 && (
+            <button
+              type="button"
+              className="absolute left-0 top-[300px] transform -translate-y-1/2 p-1 rounded-full z-50"
+              onClick={() => {handleLeftPlan()}}
+            >
+              <ChevronLeft className="w-10 h-10 text-white bg-black bg-opacity-50 rounded-full" />
+            </button>
+          )
+        }
+        
+        {
+          plansLength > 3 && (
+            <button
+              type="button"
+              className="absolute right-0 top-[300px] transform -translate-y-1/2 p-1 rounded-full z-50"
+              onClick={() => {handleRightPlan()}}
+            >
+              <ChevronRight className="w-10 h-10 text-white bg-black bg-opacity-50 rounded-full" />
+            </button>
+          )
+        }
+        
         {
           currentPlans?.length > 0 && currentPlans?.map((plan, index) => {
             return (
@@ -127,7 +151,7 @@ const PlanCard: React.FC = ({plans}:any) => {
                               type="checkbox"
                               className="checkbox checkbox-sm border-2 border-black [--chkbg:theme(colors.white)] rounded-[3px] mt-1 mr-2"
                               checked={checkbox}
-                              onClick={() => {setCheckbox(!checkbox)}}
+                              onClick={() => {setCheckbox(prev => !prev)}}
                             />
                           )
                         }

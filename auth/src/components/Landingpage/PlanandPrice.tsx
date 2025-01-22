@@ -25,6 +25,58 @@ const PlanandPrice = ({id}:any) => {
   const [plans, setPlans] = useState([]);
   // console.log("plans...", plans);
 
+  const [plansLength, setPlansLength] = useState(0);
+  console.log("plansLength...", plansLength);
+  const [activePlans, setActivePlans] = useState([]);
+  console.log("activePlans...", activePlans);
+  const [activePlanIndex, setActivePlanIndex] = useState(0);
+  console.log("activePlanIndex...", activePlanIndex);
+
+  useEffect(() => {
+    if(plans?.length > 0) {
+      const plansList = plans?.filter((_, index) => index < 3);
+      setActivePlans(plansList);
+      setActivePlanIndex(0);
+      setPlansLength(plans?.length);
+    };
+  }, [plans]);
+
+  const handleLeftPlan = () => {
+    // console.log("left");
+    if(activePlanIndex === 0) {
+      setActivePlanIndex(plansLength-1);
+    } else {
+      setActivePlanIndex(prev => prev-1);
+    }
+  };
+
+  const handleRightPlan = () => {
+    if(activePlanIndex === plansLength -1) {
+      setActivePlanIndex(0);
+    } else {
+      setActivePlanIndex(prev => prev+1);
+    }
+  };
+
+  useEffect(() => {
+    if(plansLength - activePlanIndex >= 3) {
+      setActivePlans(plans?.filter((_,index) => index >= activePlanIndex && index < activePlanIndex+3));
+    } else if(plansLength - activePlanIndex < 3) {
+      const diff = plansLength - activePlanIndex;
+      console.log("diff...", diff);
+      if(diff === 2) {
+        const customPlans = plans?.filter((_,index) => index >= activePlanIndex);
+        customPlans?.push(plans[0]);
+        setActivePlans(customPlans);
+      } else if(diff === 1) {
+        const customPlans = [plans[activePlanIndex]];
+        console.log([plans[activePlanIndex]])
+        customPlans?.push(plans[0], plans[1]);
+        setActivePlans(customPlans);
+      }
+    }
+  }, [plans, plansLength, activePlanIndex]);
+
   const getPlansList = async() => {
     try {
       const result = await dispatch(plansAndPricesListThunk({subscription_id: ""})).unwrap();
@@ -54,7 +106,8 @@ const PlanandPrice = ({id}:any) => {
     } catch (error) {
       toast.error("Error finding domain");
     }
-  }
+  };
+
   return (
     <section className="w-full ms:px-16 px-4 max-w-screen-2xl mx-auto" id={id}>
       <form onSubmit={handleDomainSearch} className="py-[4.175rem] flex flex-col md:flex-row justify-center gap-4 items-center mx-auto">
@@ -73,13 +126,13 @@ const PlanandPrice = ({id}:any) => {
         </div>
         <button className="px-4 py-6 text-lg font-semibold text-white rounded-md bg-greenbase" type="submit">Search Domain</button>
       </form>
-      <PlanCard plans={plans} />
+      <PlanCard plans={activePlans} handleLeftPlan={() => handleLeftPlan()} handleRightPlan={() => handleRightPlan()} plansLength={plansLength} />
       <div className="flex flex-col items-center justify-center mx-auto mt-10">
         <p className="mb-2 text-xl font-medium text-greenbase">Compare plans in details</p>
         <FaArrowDownLong fill="#12A833"/>
       </div>
       
-      <ProductivityAndCollaboration plans={plans} />
+      <ProductivityAndCollaboration plans={activePlans} />
     </section>
   );
 };

@@ -47,7 +47,7 @@ const Subscribe: React.FC = () => {
   } , []);
   const [formData, setFormData] = useState({
     business_name: "",
-    region: "",
+    country: "",
     first_name: "",
     last_name: "",
     email: "",
@@ -109,7 +109,7 @@ const Subscribe: React.FC = () => {
       if(foundIpCountry) {
         setFormData({
           ...formData,
-          region: foundIpCountry?.name,
+          country: foundIpCountry?.name,
         });
         setCountry(foundIpCountry);
       }
@@ -141,7 +141,7 @@ const Subscribe: React.FC = () => {
 
   const handleNext = () => {
     setIsLoading(true);
-    if (step === 1 && formData.business_name && formData.region) {
+    if (step === 1 && formData.business_name && formData.country) {
       setStep(2);
       setIsLoading(false);
     } else if (step === 2) {
@@ -164,7 +164,7 @@ const Subscribe: React.FC = () => {
     if(step === 1) {
       if(
         formData?.business_name === "" || formData?.business_name?.trim() === "" ||
-        formData?.region === "" || formData?.region?.trim() === ""
+        formData?.country === "" || formData?.country?.trim() === ""
       ){
         setIsNextDisabled(true);
       } else {
@@ -192,12 +192,12 @@ const Subscribe: React.FC = () => {
         const result = await dispatch(resgiterCustomerThunk({
           email: formData?.email,
           password: '',
-          business_phone_number: '',
+          phone_no: '',
           first_name: formData?.first_name,
           last_name: formData?.last_name,
           business_name: formData?.business_name,
-          region: formData?.region,
-          street_name: '',
+          country: formData?.country,
+          address: '',
           state: '',
           city: '',
           zipcode: ''
@@ -259,15 +259,15 @@ const Subscribe: React.FC = () => {
               <input
                 type="text"
                 placeholder="Enter region name"
-                value={countryName || formData.region}
+                value={countryName || formData.country}
                 onChange={e => {
                   setCountryName(e.target.value);
                   setFormData({
                     ...formData,
-                    region: ''
+                    country: ''
                   });
                 }}
-                name="region"
+                name="country"
                 className="border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-4 relative focus:outline-none w-full"
                 onFocus={() => {setCountryDropdownOpen(true)}}
               />
@@ -282,7 +282,7 @@ const Subscribe: React.FC = () => {
                           onClick={() => {
                             setFormData({
                               ...formData,
-                              region: country?.name,
+                              country: country?.name,
                             });
                             setCountryName("");
                             setCountry(country);

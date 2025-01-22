@@ -33,14 +33,14 @@ const ProductivityAndCollaboration = ({plans}:any) => {
     return (
         <section className="min-w-full my-5 bg-white">
             <div className="w-full relative">
-                <div className="w-full grid grid-cols-12 sticky top-0 bg-white z-10">
-                    <div className="md:col-span-6 col-span-12"></div>
+                <div className="w-full grid grid-cols-12 sticky top-20 bg-white z-10">
+                    <div className="medium:col-span-6 col-span-12"></div>
                     {
                         plans?.length > 0 && plans?.map((plan, index) => {
                             if(index < 3) {
-                                console.log(plan?.sticker_text, index)
+                                // console.log(plan?.sticker_text, index)
                                 return (
-                                    <div className="md:col-span-2 col-span-4 flex flex-col justify-center items-center border-l border-[#8C8C8C] pb-2" key={index}>
+                                    <div className="medium:col-span-2 col-span-4 flex flex-col justify-center items-center border-l border-[#8C8C8C] pb-2" key={index}>
                                         <p className={`font-inter font-normal md:text-xs text-[10px] text-[#12A833] ${plan?.sticker_exists ? "bg-[#12A8331A]" : "bg-transparent"} w-full text-center h-10 items-center pt-[13px]`}>{plan?.sticker_exists ? plan?.sticker_text : ""}</p>
                                         <p className="font-inter font-normal sm:text-lg text-xs text-black">{plan?.plan_name}</p>
                                         <button type="button" onClick={() => {navigate('/subscribe', { state: {plan, period: 'Yearly'} })}} className="font-inter font-semibold sm:text-base text-xs text-[#F0F0F3] bg-[#12A833] sm:px-3 px-2 sm:py-2 py-[2px] sm:rounded-[10px] rounded-[4px] max-w-[126px] mt-1">Start a trial</button>
@@ -58,7 +58,7 @@ const ProductivityAndCollaboration = ({plans}:any) => {
                         if(item.image !== "") {
                             return(
                                 <div className="w-full grid grid-cols-12" key={index}>
-                                    <div className="md:col-span-6 col-span-12 py-3 border-t last:border-b border-[#8C8C8C] gap-4 flex items-center">
+                                    <div className="medium:col-span-6 col-span-12 py-3 border-t last:border-b border-[#8C8C8C] gap-4 flex items-center">
                                         <img
                                             src={item.image}
                                             alt={item.name}
@@ -71,7 +71,7 @@ const ProductivityAndCollaboration = ({plans}:any) => {
                                             if(index2 < 3) {
                                                 return (
                                                     <div
-                                                        className="md:col-span-2 col-span-4 py-3 border border-[#8C8C8C] w-full text-center font-inter font-normal text-base text-[#12A833]"
+                                                        className="medium:col-span-2 col-span-4 py-3 border border-[#8C8C8C] w-full text-center font-inter font-normal text-base text-[#12A833]"
                                                         key={index2}
                                                     >
                                                         {
@@ -87,7 +87,7 @@ const ProductivityAndCollaboration = ({plans}:any) => {
                         } else if(item.name === "meet_video_conferencing" || item.name === "meeting_lenght") {
                             return(
                                 <div className="w-full grid grid-cols-12" key={index}>
-                                    <div className="md:col-span-6 col-span-12 py-3 border-t last:border-b border-[#8C8C8C] pl-5 flex items-center">
+                                    <div className="medium:col-span-6 col-span-12 py-3 border-t last:border-b border-[#8C8C8C] pl-5 flex items-center">
                                         <div className="pl-[27px] ml-1" dangerouslySetInnerHTML={{__html: item.label}}></div>
                                     </div>
                                     {
@@ -95,7 +95,7 @@ const ProductivityAndCollaboration = ({plans}:any) => {
                                             if(index2 < 3) {
                                                 return (
                                                     <div
-                                                        className="md:col-span-2 col-span-4 py-3 border border-[#8C8C8C] w-full text-center font-inter font-normal text-base text-[#12A833]"
+                                                        className="medium:col-span-2 col-span-4 py-3 border border-[#8C8C8C] w-full text-center font-inter font-normal text-base text-[#12A833]"
                                                         key={index2}
                                                     >
                                                         {plan?.services[item.name]}
@@ -109,7 +109,7 @@ const ProductivityAndCollaboration = ({plans}:any) => {
                         } else {
                             return(
                                 <div className="w-full grid grid-cols-12" key={index}>
-                                    <div className="md:col-span-6 col-span-12 py-3 border-t last:border-b border-[#8C8C8C] pl-5 flex items-center">
+                                    <div className="medium:col-span-6 col-span-12 py-3 border-t last:border-b border-[#8C8C8C] pl-5 flex items-center">
                                         <div className="pl-[27px] ml-1" dangerouslySetInnerHTML={{__html: item.label}}></div>
                                     </div>
                                     {
@@ -117,7 +117,7 @@ const ProductivityAndCollaboration = ({plans}:any) => {
                                             if(index2 < 3) {
                                                 return (
                                                     <div
-                                                        className="md:col-span-2 col-span-4 py-3 border border-[#8C8C8C] w-full"
+                                                        className="medium:col-span-2 col-span-4 py-3 border border-[#8C8C8C] w-full"
                                                         key={index2}
                                                     >
                                                         {

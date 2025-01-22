@@ -84,7 +84,7 @@ const HeroSection = ({id}:any) => {
 
   const getAmountByCurrency = (array) => {
     const amount = array?.find((item) => item?.currency_code === defaultCurrencySlice);
-    console.log(amount);
+    // console.log(amount);
     return amount;
   };
 
@@ -184,11 +184,11 @@ const HeroSection = ({id}:any) => {
             {
               banner?.map((item, index) => (
                 <div
-                  className={`md:h-[620px] h-[650px] w-full grid grid-cols-5 relative`}
+                  className={`banner-item w-full grid grid-cols-5 relative`}
                   style={{backgroundImage: `url('${item?.background_image}')`, backgroundSize: 'cover', backgroundPosition: 'center'}}
                   key={index}
                 >
-                  <div className="lg:col-span-3 col-span-5">
+                  <div className="col-span-5">
                     <div className="grid grid-cols-3 h-full">
                       <div className="sm:col-span-2 col-span-3 text-white bg-[#454545] bg-opacity-20 relative h-full">
                         <div className="backdrop-blur-xl h-full lg:block hidden"></div>
@@ -207,7 +207,7 @@ const HeroSection = ({id}:any) => {
                             }
                           </p>
 
-                          <div className="sm:mt-[80px] mt-[40px] flex gap-[10px] sm:h-[50px] h-[30px]">
+                          <div className="sm:mt-[80px] mt-[40px] flex gap-[10px] sm:h-[50px] h-[30px] w-full max-w-[500px]">
                             {
                               googleImages.map((google, index) => (
                                 <img
@@ -238,7 +238,9 @@ const HeroSection = ({id}:any) => {
                   </div>
                   {
                     item?.show_promotion_status && (
-                      <div className="promotion-div border border-black" dangerouslySetInnerHTML={{__html: activePromotion?.html_template}}></div>
+                      <div className="promotion-div">
+                        <div className="promotion-div-data" dangerouslySetInnerHTML={{__html: activePromotion?.html_template}}></div>
+                      </div>
                     )
                   }
                 </div>

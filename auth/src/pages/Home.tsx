@@ -10,10 +10,13 @@ import FrequentlyAskedQuestions from "../components/Landingpage/FrequentlyaskedQ
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "store/hooks";
 import { getLandingPageThunk } from "store/user.thunk";
+import { ArrowBigUp } from "lucide-react";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
+  const [isVisible, setIsVisible] = useState(false);
 
   const [homeData, setHomeData] = useState({});
   // console.log("homeData...", homeData);
@@ -31,6 +34,28 @@ const Home: React.FC = () => {
   useEffect(() => {
     getLandingPageData();
   }, []);
+
+  useEffect(() => {
+    const toggleVisibility = () => {
+      if (window.scrollY > 300) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+
+    window.addEventListener("scroll", toggleVisibility);
+    return () => window.removeEventListener("scroll", toggleVisibility);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+
   return (
     <section className="w-full">
       <HeroSection id="banner" />
@@ -43,6 +68,14 @@ const Home: React.FC = () => {
         <FrequentlyAskedQuestions />
       </div>
       <ContactUs contact={homeData?.contact_us} id="contact_us" />
+      {isVisible && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-4 right-4 p-1 bg-green-100 text-white rounded-full shadow-lg hover:bg-green-200 transition-all duration-300 z-50"
+        >
+          <ArrowBigUp className="text-[#12A833] w-10 h-10" />
+        </button>
+      )}
     </section>
   );
 };

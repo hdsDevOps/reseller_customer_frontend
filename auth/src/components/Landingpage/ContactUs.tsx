@@ -81,28 +81,28 @@ const ContactUs = ({contact, id}:any) => {
         </p>
       </div>
       <div className="flex gap-8 justify-center flex-col lg:flex-row">
-        <form className="grid grid-rows-6 grid-cols-2 gap-y-2 gap-x-6" onSubmit={handleFormSubmit}>
-          <div className="row-span-1 col-span-1">
+        <form className="grid grid-cols-2 gap-y-2 gap-x-6" onSubmit={handleFormSubmit}>
+          <div className="md:col-span-1 col-span-2">
             <p className="font-normal text-base">
               First Name<span className="text-[#ff0000]">*</span>
             </p>
             <input type="text" className="w-full  p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" required name="first_name" onChange={handleChangeFormData} value={formData?.first_name} />
           </div>
-          <div className="row-span-1 col-span-1">
+          <div className="md:col-span-1 col-span-2">
             <p className="font-normal text-base">
               Last Name<span className="text-[#ff0000]">*</span>
             </p>
             <input type="text" className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" required name="last_name" onChange={handleChangeFormData} value={formData?.last_name} />
           </div>
 
-          <div className="row-span-1 col-span-2">
+          <div className="col-span-2">
             <p className="font-normal text-base">
               Email Address<span className="text-[#ff0000]">*</span>
             </p>
             <input type="email" className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" required name="email" onChange={handleChangeFormData} value={formData?.email} />
           </div>
 
-          <div className="row-span-1 col-span-1">
+          <div className="md:col-span-1 col-span-2">
             <p className="font-normal text-base">
               Phone Number<span className="text-[#ff0000]">*</span>
             </p>
@@ -127,14 +127,14 @@ const ContactUs = ({contact, id}:any) => {
               containerClass="relative !outline-none !w-full !border !border-[#E4E4E4] !rounded-[10px] !bg-[#E7E8F4]"
             />
           </div>
-          <div className="row-span-1 col-span-1">
+          <div className="md:col-span-1 col-span-2">
             <p className="font-normal text-base">
               Subject<span className="text-[#ff0000]">*</span>
             </p>
             <input type="text" className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" required name="subject" onChange={handleChangeFormData} value={formData?.subject} />
           </div>
 
-          <div className="row-span-2 col-span-2">
+          <div className="col-span-2">
             <p className="font-normal text-base">
               Please tell us how we can help
               <span className="text-[#ff0000]">*</span>
@@ -158,7 +158,7 @@ const ContactUs = ({contact, id}:any) => {
             <MdMailOutline size={28} />
             <div>
               <p className="text-greenbase font-bold text-base">EMAIL US</p>
-              <p className="font-bold text-base underline !pb-2">
+              <p className="font-bold text-base underline !pb-2 break-all">
                 {contact?.email}
               </p>
             </div>
