@@ -445,6 +445,7 @@ const Dashboard: React.FC = () => {
         }
       }
     } finally {
+      getSubscriptionList();
       setIsModalOpen(false);
       setModalType("");
       setSubscriptionId("");
@@ -597,7 +598,7 @@ const Dashboard: React.FC = () => {
                                 return (
                                   <li
                                     key={idx}
-                                    className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
+                                    className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
                                     onClick={() => {
                                       setIsModalOpen(true);
                                       setModalType(list?.label);
