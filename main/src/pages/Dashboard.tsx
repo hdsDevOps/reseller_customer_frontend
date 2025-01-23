@@ -593,6 +593,23 @@ const Dashboard: React.FC = () => {
                                     >{list?.label}</li>
                                   )
                                 }
+                              } else if(list?.label === "Turn off auto-renew") {
+                                return (
+                                  <li
+                                    key={idx}
+                                    className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
+                                    onClick={() => {
+                                      setIsModalOpen(true);
+                                      setModalType(list?.label);
+                                      setSubscriptionId(subscription?.id)
+                                      if(list?.label === "Turn off auto-renew") {
+                                        setInvoiceData(subscription);
+                                      } else {
+                                        setInvoiceData(null);
+                                      }
+                                    }}
+                                  >{list?.label}</li>
+                                )
                               } else {
                                 return (
                                   <li
