@@ -186,8 +186,10 @@ const OTP: React.FC = () => {
           // toast.error()
           if(error?.message === "Request failed with status code 400") {
             toast.error("Please enter the correct OTP");
+            setLoading(false);
           } else {
             toast.error("OTP error");
+            setLoading(false);
           }
         } finally {
           // Set loading state to false after request completes
@@ -204,6 +206,7 @@ const OTP: React.FC = () => {
           navigate("/resetpassword", {state: {email: email}});
         } catch (error) {
           toast.error("Please enter a valid otp");
+          setLoading(false);
         }
       } else if (mode === "signup") {
         setLoading(true);
@@ -232,11 +235,13 @@ const OTP: React.FC = () => {
           }
         } catch (error) {
           toast.error("Please enter a valid otp");
+          setLoading(false);
         }
       }
     } else {
       // not entered 6 otps
       toast.warning("Please enter the OTP");
+      setLoading(false);
     }
   };
 

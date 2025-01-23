@@ -222,10 +222,10 @@ const Subscribe: React.FC = () => {
       {step === 1 && (
         <div className="text-center mt-10">
           <h1 className="text-3xl font-bold">Let's Begin</h1>
-          <p className="mt-2 text-gray-600">
+          {/* <p className="mt-2 text-gray-600">
             Lorem, ipsum dolor sit amet consectetur adipisicing elit. Asperiores,
             accusamus!
-          </p>
+          </p> */}
         </div>
       )}
 
