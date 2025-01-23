@@ -339,18 +339,30 @@ const DomainList: React.FC = () => {
                                     {
                                       showList === domain?.id && (
                                         <div
-                                          className='absolute right-0 rounded-3xl bg-white border-2 w-[214px]'
+                                          className='absolute right-0 rounded-lg py-2 bg-white border-2 w-[214px]'
                                           ref={listRef}
                                         >
-                                          <ul className='text-left w-full h-fit p-2 pl-6'>
+                                          <ul className='text-left w-full h-fit'>
                                             {
-                                              showListTable.map((list, idx) => (
-                                                <li
-                                                  className='font-roboto font-medium text-[14px] text-[#222222] p-1 cursor-pointer'
-                                                  key={idx}
-                                                  onClick={(e) => {onClickTableList(e, list.label, domain?.id)}}
-                                                >{list.label}</li>
-                                              ))
+                                              showListTable.map((list, idx) => {
+                                                if(list?.label === "Cancel Domain" || list?.label === "Transfer Domain") {
+                                                  return (
+                                                    <li
+                                                      className='font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50'
+                                                      key={idx}
+                                                      // onClick={(e) => {onClickTableList(e, list.label, domain?.id)}}
+                                                    >{list.label}</li>
+                                                  )
+                                                } else {
+                                                  return (
+                                                    <li
+                                                      className='font-roboto font-medium text-[14px] text-[#222222] p-1 cursor-pointer'
+                                                      key={idx}
+                                                      onClick={(e) => {onClickTableList(e, list.label, domain?.id)}}
+                                                    >{list.label}</li>
+                                                  )
+                                                }
+                                              })
                                             }
                                           </ul>
                                         </div>

@@ -502,16 +502,19 @@ const Dashboard: React.FC = () => {
                   <td className="px-2 pb-10 pt-3 text-center">{formatDate(subscription?.last_payment?._seconds, subscription?.last_payment?._nanoseconds)}</td>
                   <td className="px-2 pb-10 pt-3 text-center">{formatDate(subscription?.next_payment?._seconds, subscription?.next_payment?._nanoseconds)}</td>
                   <td className="px-2 pb-10 pt-3 text-center">
-                    <button className={` border-2 px-2 py-1 rounded hover:text-white
-                      ${
-                        subscription?.subscription_status === "auto renewal" ?
-                        "text-green-500 border-green-500  hover:bg-green-500" : "text-red-500 border-red-500  hover:bg-red-500"
-                      }
-                    `}>{
-                      subscription?.subscription_status === "auto renewal" ?
-                      "Auto Renew" : subscription?.subscription_status === "Expired" ? "Expired" :
-                      subscription?.subscription_status === "Cancelled" ? "Cancelled" : subscription?.subscription_status
-                    }</button>
+                    <button
+                      className={`w-[80px] h-[30px] rounded hover:text-white capitalize ${
+                        subscription?.subscription_status === "Cancelled"
+                        ? "text-red-700 border-2 border-red-500 hover:bg-red-500"
+                        : subscription?.subscription_status === "Expired"
+                        ? "bg-gray-300 text-gray-700 border-2 border-gray-500 hover:bg-gray-700"
+                        : subscription?.subscription_status === "Cancel Requested"
+                        ? "text-yellow-600 border-2 border-yellow-600 hover:bg-gray-300"
+                        : subscription?.subscription_status?.toLowerCase() === "manual"
+                        ? "text-yellow-600 border-2 border-yellow-600 hover:bg-gray-300"
+                        : "text-green-500 border-2 border-green-500 hover:bg-green-500"
+                      }`}
+                    >{subscription?.subscription_status}</button>
                   </td>
                   <td className="px-2 pb-10 pt-3 items-center align-middle flex justify-center content-center">
                     <div className="inline-block">
