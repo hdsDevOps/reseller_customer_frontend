@@ -162,10 +162,10 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
         return true;
       })
     }
-  }
+  };
 
   const handleEmailSubmit = async(e) => {
-    // e.preventDeault();
+    e.preventDefault();
     // console.log({
     //   user_id: customerId,
     //   domain_id: data?.id,

@@ -80,6 +80,8 @@ const inititalCancel = {
 
 const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899";
 // const logo = "";
+const stripeImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/stripe.png?alt=media&token=23bd6672-665c-4dfb-9d75-155abd49dc58";
+const paystackImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/paystack.png?alt=media&token=8faf3870-4256-4810-9844-5fd3c147d7a3";
 
 const PaymentDetails: React.FC = () => {
   const navigate = useNavigate();
@@ -742,19 +744,19 @@ const PaymentDetails: React.FC = () => {
                         {detail?.payment_method ? (
                           <>
                             <img
-                              src={paymentMethods?.find(item => item?.method_name?.toLowerCase() === detail?.payment_method?.toLowerCase())?.method_image}
-                              alt={billingHistoryData?.payment_method}
-                              className="w-10 object-contain"
+                              src={
+                                detail?.payment_method?.toLowerCase() === "stripe"
+                                ? stripeImage
+                                : detail?.payment_method?.toLowerCase() === "paystack"
+                                ? paystackImage
+                                : ""
+                              }
+                              alt={detail?.payment_method}
+                              className="h-6 object-contain"
                             />
-                            {/* <img
-                              src="/images/visa.png"
-                              alt="Visa"
-                              className="h-4 mr-1"
-                            /> */}
-                            {/* <span className="text-[0.75rem] text-gray-600 font-semibold text-nowrap">
-                              {detail?.payment_method}
-                              {maskeCardNumber(1212312312312312)}
-                            </span> */}
+                            {"..."}{
+                              Number(detail?.payment_details[detail?.payment_details?.length - 1]?.card_number) % 10000
+                            }
                           </>
                         ) : (
                           <span className="text-gray-800 font-bold text-3xl text-center">
@@ -816,7 +818,7 @@ const PaymentDetails: React.FC = () => {
                                     return (
                                       <li
                                         key={idx}
-                                        className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
+                                        className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
                                         // onClick={() => {
                                         //   setIsModalOpen(true);
                                         //   setModalType(list?.label);
@@ -829,7 +831,7 @@ const PaymentDetails: React.FC = () => {
                                     return (
                                       <li
                                         key={idx}
-                                        className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
+                                        className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
                                         // onClick={() => {
                                         //   setIsModalOpen(true);
                                         //   setModalType("Cancel Domain");
@@ -844,7 +846,7 @@ const PaymentDetails: React.FC = () => {
                                     return (
                                       <li
                                         key={idx}
-                                        className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
+                                        className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
                                         // onClick={() => {
                                         //   setIsModalOpen(true);
                                         //   setModalType(list?.label);
@@ -857,7 +859,7 @@ const PaymentDetails: React.FC = () => {
                                     return (
                                       <li
                                         key={idx}
-                                        className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
+                                        className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
                                         // onClick={() => {
                                         //   setIsModalOpen(true);
                                         //   setModalType("Transfer Domain");
@@ -1064,12 +1066,20 @@ const PaymentDetails: React.FC = () => {
               <div className="flex min-h-full items-center justify-center py-4">
                 <DialogPanel
                   transition
-                  className="w-full max-w-[600px] max-h-[600px] overflow-auto rounded-xl bg-white py-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+                  className="w-full max-w-[600px] max-h-[600px] overflow-auto bg-white py-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
                 >
-                  <div className="w-full flex justify-end mb-3 px-4">
+                  <div className="w-full flex justify-between mb-3 px-4">
                     <Download
                       className="h-5 text-[#12A833] cursor-pointer"
                       onClick={() => {downloadInvoice()}}
+                    />
+                    <X
+                      className="h-5 text-[#12A833] cursor-pointer"
+                      onClick={() => {
+                        setIsModalOpen(false);
+                        setModalType("");
+                        setInvoiceData({});
+                      }}
                     />
                   </div>
                   <div

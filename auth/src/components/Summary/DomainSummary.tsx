@@ -9,7 +9,7 @@ import { RiCloseFill } from "react-icons/ri";
 import { IoMdClose } from "react-icons/io";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { addEmailsWithoutLoginThunk, addNewDomainWithoutLoginThunk, addSubscriptionWithoutLoginThunk, getPromotionListThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, udpateBusinessDataThunk } from "store/user.thunk";
+import { getPromotionListThunk } from "store/user.thunk";
 import { format } from "date-fns";
 import { currencyList } from "../CurrencyList";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";

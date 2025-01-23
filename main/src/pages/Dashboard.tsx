@@ -20,6 +20,8 @@ const inititalCancel = {
 
 const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899";
 // const logo = "";
+const stripeImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/stripe.png?alt=media&token=23bd6672-665c-4dfb-9d75-155abd49dc58";
+const paystackImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/paystack.png?alt=media&token=8faf3870-4256-4810-9844-5fd3c147d7a3";
 
 const Dashboard: React.FC = () => {
   const location = useLocation();
@@ -49,7 +51,7 @@ const Dashboard: React.FC = () => {
   const [subscriptionsList, setSubscriptionList] = useState([]);
   // console.log("subscriptionsList...", subscriptionsList);
   const [subscription, setSubscription] = useState<object | null>(null);
-  // console.log("subscription...", subscription);
+  console.log("subscription...", subscription);
   // console.log("user details...", userDetails);
 
   const [selectedDomain, setSelectedDomain] = useState({});
@@ -82,7 +84,7 @@ const Dashboard: React.FC = () => {
   // console.log("invoiceData...", invoiceData);
   const pdfRef = useRef(null);
   const [paymentMethods, setPaymentMethods] = useState([]);
-  // console.log("paymentMethods...", paymentMethods);
+  console.log("paymentMethods...", paymentMethods);
   const [subscriptionId, setSubscriptionId] = useState("");
   
   const [processingModalOpen, setProcessingModalOpen] = useState(false);
@@ -510,17 +512,26 @@ const Dashboard: React.FC = () => {
                       subscription?.subscription_status === "Cancelled" ? "Cancelled" : subscription?.subscription_status
                     }</button>
                   </td>
-                  <td className="px-2 pb-10 pt-3 items-center flex justify-center my-auto">
-                    <span className="flex items-center">
+                  <td className="px-2 pb-10 pt-3 items-center align-middle flex justify-center content-center">
+                    <div className="inline-block">
                       <img
-                        src="/images/visa.png"
-                        alt="Visa"
-                        className="h-4 mr-1"
+                        src={
+                          subscription?.payment_method?.toLowerCase() === "stripe"
+                          ? stripeImage
+                          : subscription?.payment_method?.toLowerCase() === "paystack"
+                          ? paystackImage
+                          : ""
+                        }
+                        alt="subscription?.payment_method"
+                        className="h-6 mr-1 inline-block"
                       />
-                      <span className="text-[0.75rem] text-gray-600 font-semibold">
-                        ...2354
-                      </span>
-                    </span>
+                      <p className="text-[0.75rem] text-gray-600 font-semibold inline-block">
+                      {/* % 10000 */}
+                        {"..."}{
+                          Number(subscription?.payment_details[subscription?.payment_details?.length - 1]?.card_number) % 10000
+                        }
+                      </p>
+                    </div>
                   </td>
                   <td className="px-2 pb-10 pt-3 text-right">
                     <button className="w-6 h-6 rounded-full border-2 border-green-500 flex justify-center items-center" type="button" onClick={() => setShowList(!showList)}>
@@ -568,7 +579,7 @@ const Dashboard: React.FC = () => {
                                   return (
                                     <li
                                       key={idx}
-                                      className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
+                                      className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
                                       // onClick={() => {
                                       //   setIsModalOpen(true);
                                       //   setModalType(list?.label);
@@ -731,7 +742,7 @@ const Dashboard: React.FC = () => {
                 <div className="flex min-h-full items-center justify-center py-4">
                   <DialogPanel
                     transition
-                    className="w-full max-w-[600px] max-h-[600px] overflow-auto rounded-xl bg-white py-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+                    className="w-full max-w-[600px] max-h-[600px] overflow-auto bg-white py-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
                   >
                     <div className="w-full flex justify-between mb-3 px-4">
                       <Download

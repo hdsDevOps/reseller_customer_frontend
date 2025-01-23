@@ -135,11 +135,11 @@ function ViewPaymentDetails() {
               value={maskeCardNumber(data?.card_number)}
               disabled
             />
-            <img
+            {/* <img
               src={'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/visa.png?alt=media&token=793767a0-a14e-4f5a-a6e4-fc490119413a'}
               alt={'visa'}
               className='w-10 absolute right-4 mt-9'
-            />
+            /> */}
           </div>
         </div>
       </div>

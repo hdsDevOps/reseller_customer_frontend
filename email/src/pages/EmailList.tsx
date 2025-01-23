@@ -104,6 +104,7 @@ const EmailList: React.FC = () => {
   const [todayDate, setTodayDate] = useState("");
   const [domainExpiryDate, setDomainExpiryDate] = useState("");
   const [planExpiryDate, setPlanExpiryDate] = useState("");
+  const [emailClicked, setEmailClicked] = useState(false);
 
   const dateFormat = (date) => {
     const miliseconds = parseInt(date?._seconds) * 1000 + parseInt(date?._nanoseconds) / 1e6;
@@ -457,14 +458,25 @@ const EmailList: React.FC = () => {
   };
 
   const handleEmailDataChange = (index, field, value) => {
-    setNewEmails((prev) => {
-      const array = [...prev];
-      array[index] = {
-        ...array[index],
-        [field]: value
-      }
-      return array;
-    })
+    if(field === "email") {
+      setNewEmails((prev) => {
+        const array = [...prev];
+        array[index] = {
+          ...array[index],
+          email: value+`@${data?.domain_name}`
+        }
+        return array;
+      })
+    } else {
+      setNewEmails((prev) => {
+        const array = [...prev];
+        array[index] = {
+          ...array[index],
+          [field]: value
+        }
+        return array;
+      })
+    }
   };
 
   const handleDeleteEmail = (index) => {
@@ -477,35 +489,62 @@ const EmailList: React.FC = () => {
     }
   };
 
-  const handleEmailSubmit = async(e) => {
-    // e.preventDeault();
-    console.log({
-      user_id: customerId,
-      domain_id: selectedDomain?.id,
-      emails: newEmails
-    })
-    try {
-      const result = await dispatch(addEmailsThunk({
-        user_id: customerId,
-        domain_id: selectedDomain?.id,
-        emails: newEmails
-      })).unwrap();
-      toast.success(result?.message);
-    } catch (error) {
-      toast.error("Error adding email");
-      if(error?.message == "Authentication token is required") {
-        try {
-          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
-          navigate('/login');
-        } catch (error) {
-          //
+  const validateEmailData = () => {
+    if(newEmails?.length > 0) {
+      return newEmails?.every(item => {
+        if(
+          !item?.first_name?.trim() ||
+          !item?.last_name?.trim() ||
+          !item?.email?.trim() ||
+          !item?.password?.trim()
+        ) {
+          return false;
         }
+        const emailBeforeAt = item?.email.split('@')[0].trim();
+
+        if(!emailBeforeAt) {
+          return false;
+        }
+        return true;
+      })
+    }
+  }
+
+  const handleEmailSubmit = async(e) => {
+    e.preventDefault();
+    // console.log({
+    //   user_id: customerId,
+    //   domain_id: selectedDomain?.id,
+    //   emails: newEmails
+    // })
+    setEmailClicked(true);
+    if(!validateEmailData()) {
+      toast.warning("Please fill all the fields");
+      setEmailClicked(false);
+    } else {
+      try {
+        const result = await dispatch(addEmailsThunk({
+          user_id: customerId,
+          domain_id: selectedDomain?.id,
+          emails: newEmails
+        })).unwrap();
+        toast.success(result?.message);
+      } catch (error) {
+        toast.error("Error adding email");
+        if(error?.message == "Authentication token is required") {
+          try {
+            const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+            navigate('/login');
+          } catch (error) {
+            //
+          }
+        }
+      } finally {
+        getDomainsList();
+        setIsModalOpen(false);
+        setNewEmails([]);
+        setNewEmailsCount(0);
       }
-    } finally {
-      getDomainsList();
-      setIsModalOpen(false);
-      setNewEmails([]);
-      setNewEmailsCount(0);
     }
   };
 

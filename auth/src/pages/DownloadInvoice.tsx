@@ -315,7 +315,7 @@ const DownloadInvoice: React.FC = () => {
             : ""
           }`,
           product_type: "google workspace",
-          description: `google workspace purchase ${data?.plan?.plan_name}`,
+          description: `google workspace purchase ${data?.plan?.plan_name} ${data?.license_usage}`,
           domain: data?.selectedDomain?.domain,
           payment_method: data?.payment_method,
           payment_status: "Success",

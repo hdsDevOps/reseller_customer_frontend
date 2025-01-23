@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa6";
 import { AiOutlineCheck } from "react-icons/ai";
 import { MdOutlineAddShoppingCart } from "react-icons/md";
-import { removeUserAuthTokenFromLSThunk, getCartThunk, addToCartThunk } from "store/user.thunk";
+import { removeUserAuthTokenFromLSThunk, getCartThunk, addToCartThunk, getDomainsListThunk } from "store/user.thunk";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { currencyList } from "../components/CurrencyList";
 
@@ -27,6 +27,9 @@ const SelectedDomain: React.FC = () => {
   const [cart, setCart] = useState([]);
   console.log("cart...", cart);
 
+  const [domainsList, setDomainsList] = useState([]);
+  console.log("domains list...", domainsList);
+
   const getCart = async() => {
     try {
       const result = await dispatch(getCartThunk({ user_id: customerId })).unwrap();
@@ -46,7 +49,20 @@ const SelectedDomain: React.FC = () => {
 
   useEffect(() => {
     getCart();
-  }, []);
+  }, [customerId]);
+
+  const getDomainsList = async() => {
+    try {
+      const result = await dispatch(getDomainsListThunk({customer_id: customerId})).unwrap();
+      setDomainsList(result?.data);
+    } catch (error) {
+      setDomainsList([]);
+    }
+  };
+
+  useEffect(() => {
+    getDomainsList();
+  }, [customerId]);
 
   useEffect(() => {
     setDomain(location.state.domain);
@@ -55,13 +71,16 @@ const SelectedDomain: React.FC = () => {
   const addToCart = async(e) => {
     e.preventDefault();
     try {
-      const newCart = cart;
+      const newCart = cart?.filter(item => item?.product_type === "domain" ? !item : item);
       const addCart = {
         product_name: location.state.domain.domain,
         product_type: "domain",
         price: location.state.domain.price[defaultCurrencySlice],
         payment_cycle: "Yearly",
-        total_year: "1"
+        total_year: 1,
+        currency: defaultCurrencySlice,
+        is_trail: false,
+        workspace_status: domainsList?.find(item => item?.domain_name === location.state.domain.domain) ? "old" : "new"
       }
       newCart.push(addCart)
       const result = await dispatch(addToCartThunk({

@@ -322,7 +322,7 @@ function Review() {
         product_type: "google workspace",
         payment_cycle: item?.payment_cycle,
         customer_id: customerId,
-        description: "google workspace purchase",
+        description: `purchase google workspace ${item?.product_type} ${item?.total_year}`,
         domain: [domainsState?.find(item => item?.domain_type === "primary")?.domain_name],
         last_payment: todayDate,
         next_payment: planExpiryDate,
@@ -631,7 +631,7 @@ function Review() {
         }`,
         product_type: product_type,
         description: product_type?.toLowerCase() === "google workspace"
-        ? `purchase google workspace ${item?.product_type}`
+        ? `purchase google workspace ${item?.product_type} ${item?.total_year}`
         : product_type?.toLowerCase() === "domain"
         ? "purchase domain"
         : "",
@@ -660,6 +660,8 @@ function Review() {
       userData?.business_state !== "" && userData?.business_state?.trim() !== "" && userData?.business_state !== null && userData?.business_state !== undefined &&
       userData?.business_city !== "" && userData?.business_city?.trim() !== "" && userData?.business_city !== undefined && userData?.business_city !== null
     ) {
+      const productNameTotal = await cart.filter(item => item.product_name).map(item => item.product_name);
+      const productNameJoined = await productNameTotal.join(" and ")
       const body = {
         token,
         product: {
@@ -668,11 +670,11 @@ function Review() {
           // price: 10,
           productBy: "test",
           currency: defaultCurrencySlice,
-          description: 'purchasing google workspace and domain',
+          description: `purchasing ${productNameJoined}`,
           domain: {
-            domain_name: cart?.find(item => item?.product_type?.toLowerCase() === "domain")?.product_name,
-            type: "new",
-            year: 1
+            domain_name: cart?.find(item => item?.product_type?.toLowerCase() === "domain")?.product_name || "",
+            type: cart?.find(item => item?.product_type?.toLowerCase() === "domain")?.workspace_status || "",
+            year: cart?.find(item => item?.product_type?.toLowerCase() === "domain")?.total_year || ""
           },
           workspace: {
             plan: usedPlan,
@@ -682,7 +684,7 @@ function Review() {
           },
           customer_id: customerId,
           email: userData?.email,
-          voucher_id: appliedVoucher === null ? "" : appliedVoucher?.id
+          voucher: appliedVoucher === null ? "" : appliedVoucher?.id
         }
       };
       const headers={
