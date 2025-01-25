@@ -585,12 +585,12 @@ async function udpateProfileDataApi(
   business_name:string,
   business_state:string,
   business_city:string,
-  business_zip_code:string,
+  zipcode:string,
   staff_id:string,
   is_staff:Boolean,
 ): Promise<any> {
   try {
-    const result = await postApiCall(endPoints.udpateProfileData, { user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, business_zip_code, staff_id, is_staff });
+    const result = await postApiCall(endPoints.udpateProfileData, { user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, zipcode, staff_id, is_staff });
     return result;
   } catch (error: any) {
     throw error;

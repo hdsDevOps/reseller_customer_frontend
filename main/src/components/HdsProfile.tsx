@@ -339,6 +339,19 @@ const HdsProfile = () => {
                     className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 left-2"
                 >City</label>
             </div>
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative">
+                <label
+                    htmlFor="Zip code"
+                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 left-2"
+                >Zip code</label>
+                <input
+                    type="text"
+                    id="Zip code"
+                    className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
+                    value={userDetails?.zipcode}
+                    disabled
+                />
+            </div>
         </div>
         <h2 className='text-lg font-bold text-[#14213D] mt-6'>Business information</h2>
         <div className='grid grid-cols-2 gap-3 mt-4'>
@@ -374,23 +387,12 @@ const HdsProfile = () => {
                     id="Mumbai"
                     className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
                     value={userDetails?.business_city}
+                    disabled
                 />
                 <label
                     htmlFor="Mumbai"
                     className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 left-2"
                 >Business City*</label>
-            </div>
-            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative">
-                <label
-                    htmlFor="Zip code"
-                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 left-2"
-                >Zip code</label>
-                <input
-                    type="text"
-                    id="Zip code"
-                    className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                    value={userDetails?.business_zip_code}
-                />
             </div>
         </div>
         <Dialog

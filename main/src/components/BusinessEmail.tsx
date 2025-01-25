@@ -95,6 +95,9 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
     try {
       const result = await dispatch(changeEmailStatusThunk({ domain_id: domainId, email: email, status: !status })).unwrap();
       // console.log("result...", result);
+      setTimeout(() => {
+        toast.success("User status changed successfully");
+      }, 1000);
     } catch (error) {
       toast.error("Error updating email status");
       if(error?.message == "Authentication token is required") {
@@ -177,6 +180,17 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
     }
   };
 
+  const validateEmailPasswordLength = () => {
+    if(newEmails?.length > 0) {
+      return newEmails?.every(item => {
+        if(item?.password?.length < 8) {
+          return false;
+        }
+        return true;
+      })
+    }
+  };
+
   const handleEmailSubmit = async(e) => {
     e.preventDefault();
     // console.log({
@@ -187,6 +201,9 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
     setEmailClicked(true);
     if(!validateEmailData()) {
       toast.warning("Please fill all the fields");
+      setEmailClicked(false);
+    } else if(!validateEmailPasswordLength()) {
+      toast.warning("Minimum password lenght is 8");
       setEmailClicked(false);
     } else {
       try {
@@ -314,40 +331,47 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
 
   const handleResetUserPasswordSubmit = async(e) => {
     e.preventDefault();
-    try {
-      if(password !== confirmPassword) {
-        toast.warning("Password and Confirm Password do not match");
-      } else if(password.length < 8 || confirmPassword.length < 8) {
-        toast.warning("Please enter a password with a minimum of lenght 8");
-      } else {
-        const result = await dispatch(resetEmailPasswordThunk({
-          domain_id: data?.id,
-          rec_id: selectedEmail?.email,
-          password: password
-        })).unwrap();
-        // console.log("result...", result);
-        toast.success(result?.message);
+    if(
+      password !== "" && password?.trim() !== "" &&
+      confirmPassword !== "" && confirmPassword?.trim() !== ""
+    ) {
+      try {
+        if(password !== confirmPassword) {
+          toast.warning("Password and Confirm Password do not match");
+        } else if(password.length < 8 || confirmPassword.length < 8) {
+          toast.warning("Please enter a password with a minimum of lenght 8");
+        } else {
+          const result = await dispatch(resetEmailPasswordThunk({
+            domain_id: data?.id,
+            rec_id: selectedEmail?.email,
+            password: password
+          })).unwrap();
+          // console.log("result...", result);
+          toast.success(result?.message);
+          setIsResetUserPasswordModalOpen(false);
+          setSelectedEmail({});
+          setPassword("");
+          setConfirmPassword("");
+        }
+      } catch (error) {
+        toast.error("Error updating user password");
         setIsResetUserPasswordModalOpen(false);
         setSelectedEmail({});
         setPassword("");
         setConfirmPassword("");
-      }
-    } catch (error) {
-      toast.error("Error updating user password");
-      setIsResetUserPasswordModalOpen(false);
-      setSelectedEmail({});
-      setPassword("");
-      setConfirmPassword("");
-      if(error?.message == "Authentication token is required") {
-        try {
-          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
-          navigate('/login');
-        } catch (error) {
-          //
+        if(error?.message == "Authentication token is required") {
+          try {
+            const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+            navigate('/login');
+          } catch (error) {
+            //
+          }
         }
+      } finally {
+        getDomainsList();
       }
-    } finally {
-      getDomainsList();
+    } else {
+      toast.warning("Input fields cannot be empty");
     }
   };
   

@@ -1,0 +1,42 @@
+.license-usage {
+  /* absolute bg-white w-[220px] top-5 left-1/2 rounded-md  */
+  position: absolute;
+  background-color: white;
+  width: 250px;
+  top: 40px;
+  left: 60%;
+  border-radius: 5px;
+}
+
+.tax-hover {
+  position: absolute;
+  background-color: white;
+  width: 200px;
+  border-radius: 5px;
+  top: 25px;
+}
+
+@media screen and (max-width: 450px) {
+  .license-usage {
+    left: 30%;
+  }
+}
+
+@media screen and (max-width: 370px) {
+  .license-usage {
+    left: 30%;
+    top: 50px;
+  }
+}
+
+@media screen and (max-width: 350px) {
+  .license-usage {
+    left: 10%;
+  }
+}
+
+@media screen and (max-width: 330px) {
+  .license-usage {
+    top: 60px;
+  }
+}

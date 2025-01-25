@@ -402,8 +402,8 @@ export const getProfileDataThunk = createAsyncThunk(
 
 export const udpateProfileDataThunk = createAsyncThunk(
   "users/udpateProfileData",
-  async ({ user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, business_zip_code, staff_id, is_staff }: any) => {
-    return await userApis.udpateProfileDataApi( user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, business_zip_code, staff_id, is_staff );
+  async ({ user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, zipcode, staff_id, is_staff }: any) => {
+    return await userApis.udpateProfileDataApi( user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, zipcode, staff_id, is_staff );
   }
 );
 

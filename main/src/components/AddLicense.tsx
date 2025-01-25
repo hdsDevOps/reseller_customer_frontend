@@ -13,6 +13,7 @@ import StripeCheckout from "react-stripe-checkout";
 import { PaystackButton } from "react-paystack";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { format } from "date-fns";
+import './licenseUsage.css';
 
 interface EmailModalProps {
   isOpen: boolean;
@@ -56,6 +57,8 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList,
   const [todayDate, setTodayDate] = useState("");
   const [domainExpiryDate, setDomainExpiryDate] = useState("");
   const [planExpiryDate, setPlanExpiryDate] = useState("");
+  const [licenseHover, setLicenseHover] = useState(false);
+  const [taxHover, setTaxHover] = useState(false);
 
   const dateFormat = (date) => {
     const miliseconds = parseInt(date?._seconds) * 1000 + parseInt(date?._nanoseconds) / 1e6;
@@ -538,13 +541,20 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList,
           <>
             <div className="border-y border-gray-300 py-2 my-6">
               <div className="flex justify-between items-center mt-2">
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 relative">
                   <p>
                     {numUsers + parseInt(userDetails?.license_usage)} users, Year subscription (price adjusted to current cycle)
                   </p>
-                  <span className="border-2 border-green-500 rounded-full h-5 w-5 flex items-center justify-center text-green-500 font-bold mr-1">
+                  <span className="border-2 border-green-500 rounded-full h-5 w-5 flex items-center justify-center text-green-500 font-bold mr-1 cursor-pointer" onMouseOver={() => {setLicenseHover(true)}} onMouseLeave={() => {setLicenseHover(false)}}>
                     i
                   </span>
+                  {
+                    licenseHover && (
+                      <div className="license-usage">
+                        <p className="bg-[#12A83330] px-4 py-3 w-full font-inter font-medium text-[10px] text-black rounded-md">The price shown is prorated according to the time left in your current billing cycle.</p>
+                      </div>
+                    )
+                  }
                 </div>
                 <span className="flex items-center font-semibold">
                   {
@@ -644,11 +654,18 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList,
                 <span>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{subtotal?.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <div className="flex items-center">
+                <div className="flex items-center relative">
                   Tax (8.25%)
-                  <span className="border-2 border-green-500 rounded-full h-5 w-5 flex items-center justify-center text-green-500 font-bold ml-1">
+                  <span className="border-2 border-green-500 rounded-full h-5 w-5 flex items-center justify-center text-green-500 font-bold mx-1 cursor-pointer" onMouseOver={() => {setTaxHover(true)}} onMouseLeave={() => {setTaxHover(false)}}>
                     i
                   </span>
+                  {
+                    taxHover && (
+                      <div className="tax-hover">
+                        <p className="bg-[#12A83330] px-4 py-3 w-full font-inter font-medium text-[10px] text-black rounded-md">Sales tax is calculated according to your billing address.</p>
+                      </div>
+                    )
+                  }
                 </div>
                 <span className="gap-2">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{tax.toFixed(2)}</span>
               </div>

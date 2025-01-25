@@ -8,6 +8,7 @@ import { getDomainsListThunk, removeUserAuthTokenFromLSThunk,addEmailsThunk, cha
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import axios from 'axios';
+import './licenseUsage.css';
 
 import "../index.css";
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -400,7 +401,10 @@ const EmailList: React.FC = () => {
   const toggleStatus = async( domainId:string, email:string, status:Boolean ) => {
     try {
       const result = await dispatch(changeEmailStatusThunk({ domain_id: domainId, email: email, status: !status })).unwrap();
-      console.log("result...", result);
+      // console.log("result...", result);
+      setTimeout(() => {
+        toast.success("User status changed successfully");
+      }, 1000);
     } catch (error) {
       toast.error("Error updating email status");
       if(error?.message == "Authentication token is required") {
@@ -422,6 +426,9 @@ const EmailList: React.FC = () => {
   const [newEmails, setNewEmails] = useState([]);
   // console.log("newEmails...", newEmails);
   const [newEmailsCount, setNewEmailsCount] = useState(0);
+  const [licenseHover, setLicenseHover] = useState(false);
+  const [taxHover, setTaxHover] = useState(false);
+  const licenseRef = useRef(null);
 
   const basicInformationTable = [
     { name: 'first_name', label: 'First Name', placholder: 'Enter your first name', type: 'text'},
@@ -448,6 +455,19 @@ const EmailList: React.FC = () => {
       document.removeEventListener('mousedown', handleClickOutsideOfModal);
     };
   }, []);
+  
+  const handleClickOutsideOfLicense = e => {
+    if(licenseRef.current && !licenseRef.current.contains(e.target)) {
+      setIsLicenseModalOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutsideOfLicense);
+    return() => {
+      document.removeEventListener('mousedown', handleClickOutsideOfLicense);
+    };
+  }, []);
 
   const [passwordVisible, setPasswordVisible ] = useState([]);
 
@@ -463,7 +483,7 @@ const EmailList: React.FC = () => {
         const array = [...prev];
         array[index] = {
           ...array[index],
-          email: value+`@${data?.domain_name}`
+          email: value+`@${selectedDomain?.domain_name}`
         }
         return array;
       })
@@ -518,7 +538,18 @@ const EmailList: React.FC = () => {
         return true;
       })
     }
-  }
+  };
+
+  const validateEmailPasswordLength = () => {
+    if(newEmails?.length > 0) {
+      return newEmails?.every(item => {
+        if(item?.password?.length < 8) {
+          return false;
+        }
+        return true;
+      })
+    }
+  };
 
   const handleEmailSubmit = async(e) => {
     e.preventDefault();
@@ -530,6 +561,9 @@ const EmailList: React.FC = () => {
     setEmailClicked(true);
     if(!validateEmailData()) {
       toast.warning("Please fill all the fields");
+      setEmailClicked(false);
+    } else if(!validateEmailPasswordLength()) {
+      toast.warning("Minimum password lenght is 8");
       setEmailClicked(false);
     } else {
       try {
@@ -646,40 +680,47 @@ const EmailList: React.FC = () => {
 
   const handleResetUserPasswordSubmit = async(e) => {
     e.preventDefault();
-    try {
-      if(password !== confirmPassword) {
-        toast.warning("Password and Confirm Password do not match");
-      } else if(password.length < 8 || confirmPassword.length < 8) {
-        toast.warning("Please enter a password with a minimum of lenght 8");
-      } else {
-        const result = await dispatch(resetEmailPasswordThunk({
-          domain_id: selectedDomain?.id,
-          rec_id: selectedEmail?.email,
-          password: password
-        })).unwrap();
-        // console.log("result...", result);
-        toast.success(result?.message);
+    if(
+      password !== "" && password?.trim() !== "" &&
+      confirmPassword !== "" && confirmPassword?.trim() !== ""
+    ) {
+      try {
+        if(password !== confirmPassword) {
+          toast.warning("Password and Confirm Password do not match");
+        } else if(password.length < 8 || confirmPassword.length < 8) {
+          toast.warning("Please enter a password with a minimum of lenght 8");
+        } else {
+          const result = await dispatch(resetEmailPasswordThunk({
+            domain_id: selectedDomain?.id,
+            rec_id: selectedEmail?.email,
+            password: password
+          })).unwrap();
+          // console.log("result...", result);
+          toast.success(result?.message);
+          setIsResetUserPasswordModalOpen(false);
+          setSelectedEmail({});
+          setPassword("");
+          setConfirmPassword("");
+        }
+      } catch (error) {
+        toast.error("Error updating user password");
         setIsResetUserPasswordModalOpen(false);
         setSelectedEmail({});
         setPassword("");
         setConfirmPassword("");
-      }
-    } catch (error) {
-      toast.error("Error updating user password");
-      setIsResetUserPasswordModalOpen(false);
-      setSelectedEmail({});
-      setPassword("");
-      setConfirmPassword("");
-      if(error?.message == "Authentication token is required") {
-        try {
-          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
-          navigate('/login');
-        } catch (error) {
-          //
+        if(error?.message == "Authentication token is required") {
+          try {
+            const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+            navigate('/login');
+          } catch (error) {
+            //
+          }
         }
+      } finally {
+        getDomainsList();
       }
-    } finally {
-      getDomainsList();
+    } else {
+      toast.warning("Input fields cannot be empty");
     }
   };
   
@@ -1117,9 +1158,9 @@ const EmailList: React.FC = () => {
                             <td className="p-2 text-gray-500 text-xs sm:text-sm md:text-md  font-semibold flex items-center content-center">
                               <p className="p-2 text-gray-600 font-semibold text-xs sm:text-sm md:text-md flex items-center">{row?.first_name}&nbsp;{row?.last_name}</p>
                               {row?.is_admin ? (
-                                <p className="p-2 text-gray-600 font-semibold text-xs sm:text-sm md:text-md flex items-center">
+                                <p className="px-2 -mt-[1px] text-gray-600 font-semibold text-xs sm:text-sm md:text-md flex items-center">
                                   <ChevronRight />
-                                  <span className="text-gray-600 font-semibold text-xs sm:text-sm md:text-md">Admin</span>
+                                  <span className="text-gray-600 font-semibold text-xs sm:text-sm md:text-md mt-[1px]">Admin</span>
                                 </p>
                               ) : ""}
                             </td>
@@ -1322,8 +1363,8 @@ const EmailList: React.FC = () => {
                                 type="text"
                                 placeholder="Enter email id"
                                 className="peer border-2 border-gray-200 rounded-xl p-[.63rem] bg-transparent w-full placeholder-transparent focus:border-blue-500 focus:outline-none"
-                                value={email?.email}
-                                onChange={(e) => {handleEmailDataChange(index, "email", e.target.value)} }
+                                value={email?.email.split('@')[0]}
+                                onChange={(e) => {handleEmailDataChange(index, "email", e.target.value.replace(/@/g, ''))} }
                               />
                               <label
                                 htmlFor="username"
@@ -1331,6 +1372,9 @@ const EmailList: React.FC = () => {
                               >
                                 Email
                               </label>
+                              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">
+                                @{selectedDomain?.domain_name}
+                              </span>
                             </div>
                             <div className="relative col-span-2">
                               <input
@@ -1409,7 +1453,7 @@ const EmailList: React.FC = () => {
         {
           isLicenseModalOpen && (
             <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-              <div className="bg-white p-6 rounded-lg shadow-md max-w-3xl w-full mx-2  max-h-[95vh] xl:max-h-full overflow-y-scroll">
+              <div className="bg-white p-6 rounded-lg shadow-md max-w-3xl w-full mx-2  max-h-[95vh] xl:max-h-full overflow-y-scroll" ref={licenseRef}>
                 <div className="flex items-center justify-between mb-4">
                   <h1 className="text-xl font-bold">Add User License</h1>
                   {/* <button className="flex items-center gap-1 text-green-500 border-2 border-green-500 hover:bg-green-500 hover:text-white transition duration-200 ease-in-out py-2 px-4 rounded-lg text-xs sm:text-sm">
@@ -1439,13 +1483,20 @@ const EmailList: React.FC = () => {
                   <>
                     <div className="border-y border-gray-300 py-2 my-6">
                       <div className="flex justify-between items-center mt-2">
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 relative">
                           <p>
                             {numUsers + parseInt(userDetails?.license_usage)} users, Year subscription (price adjusted to current cycle)
                           </p>
-                          <span className="border-2 border-green-500 rounded-full h-5 w-5 flex items-center justify-center text-green-500 font-bold mr-1">
+                          <span className="border-2 border-green-500 rounded-full h-5 w-5 flex items-center justify-center text-green-500 font-bold mr-1 cursor-pointer" onMouseOver={() => {setLicenseHover(true)}} onMouseLeave={() => {setLicenseHover(false)}}>
                             i
                           </span>
+                          {
+                            licenseHover && (
+                              <div className="license-usage">
+                                <p className="bg-[#12A83330] px-4 py-3 w-full font-inter font-medium text-[10px] text-black rounded-md">The price shown is prorated according to the time left in your current billing cycle.</p>
+                              </div>
+                            )
+                          }
                         </div>
                         <span className="flex items-center font-semibold">
                           {
@@ -1546,11 +1597,18 @@ const EmailList: React.FC = () => {
                         <span>{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{subtotal?.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <div className="flex items-center">
+                        <div className="flex items-center relative">
                           Tax (8.25%)
-                          <span className="border-2 border-green-500 rounded-full h-5 w-5 flex items-center justify-center text-green-500 font-bold ml-1">
+                          <span className="border-2 border-green-500 rounded-full h-5 w-5 flex items-center justify-center text-green-500 font-bold mx-1 cursor-pointer" onMouseOver={() => {setTaxHover(true)}} onMouseLeave={() => {setTaxHover(false)}}>
                             i
                           </span>
+                          {
+                            taxHover && (
+                              <div className="tax-hover">
+                                <p className="bg-[#12A83330] px-4 py-3 w-full font-inter font-medium text-[10px] text-black rounded-md">Sales tax is calculated according to your billing address.</p>
+                              </div>
+                            )
+                          }
                         </div>
                         <span className="gap-2">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{tax.toFixed(2)}</span>
                       </div>

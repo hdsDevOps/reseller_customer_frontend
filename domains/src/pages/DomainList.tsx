@@ -43,11 +43,13 @@ const DomainList: React.FC = () => {
   // console.log("emailList...", emailsList);
   const [licenseUsage, setLicenseUsage] = useState(0);
   const [domainId, setDomainId] = useState("");
+  const [domainName, setDomainName] = useState("");
   const [showList, setShowList] = useState("");
   const listRef = useRef(null);
   const modalRef = useRef(null);
   const [newEmails, setNewEmails] = useState([]);
   // console.log("newEmails...", newEmails);
+  const [emailClicked, setEmailClicked] = useState(false);
   const [newEmailsCount, setNewEmailsCount] = useState(0);
   // console.log(newEmailsCount);
   const [passwordVisible, setPasswordVisible ] = useState([]);
@@ -91,10 +93,12 @@ const DomainList: React.FC = () => {
       setIsActionModalOpen(true);
       setActionModalType("Cancel");
       setDomainId(id);
+      setDomainName("");
     } else if(label === "Transfer Domain") {
       setIsActionModalOpen(true);
       setActionModalType("Transfer");
       setDomainId(id);
+      setDomainName("");
     }
   };
 
@@ -117,7 +121,7 @@ const DomainList: React.FC = () => {
 
   useEffect(() => {
     getDomainsList();
-  }, []);
+  }, [customerId]);
 
   const toggleList = (domainId:string) => {
     setShowList((prev) => (prev === domainId ? "" : domainId));
@@ -139,6 +143,7 @@ const DomainList: React.FC = () => {
     if(modalRef.current && !modalRef.current.contains(e.target)) {
       setIsModalOpen(false);
       setDomainId("");
+      setDomainName("");
     }
   };
 
@@ -163,14 +168,35 @@ const DomainList: React.FC = () => {
   };
 
   const handleEmailDataChange = (index, field, value) => {
-    setNewEmails((prev) => {
-      const array = [...prev];
-      array[index] = {
-        ...array[index],
-        [field]: value
-      }
-      return array;
-    })
+    if(field === "email") {
+      setNewEmails((prev) => {
+        const array = [...prev];
+        array[index] = {
+          ...array[index],
+          email: value+`@${domainName}`
+        }
+        return array;
+      })
+    } else if(field === "first_name" || field === "last_name") {
+      const filteredValue = value.replace(/[^a-zA-Z\s]/g, "");
+      setNewEmails((prev) => {
+        const array = [...prev];
+        array[index] = {
+          ...array[index],
+          [field]: filteredValue
+        }
+        return array;
+      })
+    } else {
+      setNewEmails((prev) => {
+        const array = [...prev];
+        array[index] = {
+          ...array[index],
+          [field]: value
+        }
+        return array;
+      })
+    }
   };
 
   const handleDeleteEmail = (index) => {
@@ -183,38 +209,74 @@ const DomainList: React.FC = () => {
     }
   };
 
-  const handleEmailSubmit = async(e) => {
-    // e.preventDeault();
-    console.log({
-      user_id: customerId,
-      domain_id: domainId,
-      emails: newEmails
-    })
-    try {
-      const result = await dispatch(addEmailsThunk({
-        user_id: customerId,
-        domain_id: domainId,
-        emails: newEmails
-      })).unwrap();
-      toast.success(result?.message);
-    } catch (error) {
-      toast.error("Error adding email");
-      if(error?.message == "Authentication token is required") {
-        try {
-          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
-          navigate('/login');
-        } catch (error) {
-          //
+  const validateEmailData = () => {
+    if(newEmails?.length > 0) {
+      return newEmails?.every(item => {
+        if(
+          !item?.first_name?.trim() ||
+          !item?.last_name?.trim() ||
+          !item?.email?.trim() ||
+          !item?.password?.trim()
+        ) {
+          return false;
         }
+        const emailBeforeAt = item?.email.split('@')[0].trim();
+
+        if(!emailBeforeAt) {
+          return false;
+        }
+        return true;
+      })
+    }
+  };
+
+  const validateEmailPasswordLength = () => {
+    if(newEmails?.length > 0) {
+      return newEmails?.every(item => {
+        if(item?.password?.length < 8) {
+          return false;
+        }
+        return true;
+      })
+    }
+  };
+
+  const handleEmailSubmit = async(e) => {
+    setEmailClicked(true);
+    if(!validateEmailData()) {
+      toast.warning("Please fill all the fields");
+      setEmailClicked(false);
+    } else if(!validateEmailPasswordLength()) {
+      toast.warning("Minimum password lenght is 8");
+      setEmailClicked(false);
+    } else {
+      try {
+        const result = await dispatch(addEmailsThunk({
+          user_id: customerId,
+          domain_id: domainId,
+          emails: newEmails
+        })).unwrap();
+        toast.success(result?.message);
+      } catch (error) {
+        toast.error("Error adding email");
+        if(error?.message == "Authentication token is required") {
+          try {
+            const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+            navigate('/login');
+          } catch (error) {
+            //
+          }
+        }
+      } finally {
+        getDomainsList();
+        setIsModalOpen(false);
+        setDomainId("");
+        setDomainName("");
+        setNewEmails([]);
+        setNewEmailsCount(0);
+        setLicenseUsage(0);
+        setPasswordVisible([]);
       }
-    } finally {
-      getDomainsList();
-      setIsModalOpen(false);
-      setDomainId("");
-      setNewEmails([]);
-      setNewEmailsCount(0);
-      setLicenseUsage(0);
-      setPasswordVisible([]);
     }
   };
 
@@ -244,6 +306,7 @@ const DomainList: React.FC = () => {
       setIsActionModalOpen(false);
     } finally {
       setDomainId("");
+      setDomainName("");
       getDomainsList();
     }
   }
@@ -289,6 +352,7 @@ const DomainList: React.FC = () => {
                             );
                             setLicenseUsage(userDetails?.license_usage);
                             setDomainId(domain?.id);
+                            setDomainName(domain?.domain_name);
                             setEmailsList(domain?.emails ? domain?.emails : []);
                           }}
                         >
@@ -474,8 +538,8 @@ const DomainList: React.FC = () => {
                               type="text"
                               placeholder="Enter email id"
                               className="peer border-2 border-gray-200 rounded-xl p-[.63rem] bg-transparent w-full placeholder-transparent focus:border-blue-500 focus:outline-none"
-                              value={email?.email}
-                              onChange={(e) => {handleEmailDataChange(index, "email", e.target.value)} }
+                              value={email?.email.split('@')[0]}
+                              onChange={(e) => {handleEmailDataChange(index, "email", e.target.value.replace(/@/g, ''))} }
                             />
                             <label
                               htmlFor="username"
@@ -483,6 +547,9 @@ const DomainList: React.FC = () => {
                             >
                               Email
                             </label>
+                              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">
+                                @{domainName}
+                              </span>
                           </div>
                           <div className="relative col-span-2">
                             <input
@@ -546,6 +613,7 @@ const DomainList: React.FC = () => {
                   onClick={() => {
                     setIsModalOpen(false);
                     setDomainId("");
+                    setDomainName("");
                     setNewEmails([]);
                     setPasswordVisible([]);
                     setNewEmailsCount(0);
@@ -581,6 +649,7 @@ const DomainList: React.FC = () => {
                 onClick={() => {
                   setIsActionModalOpen(false);
                   setDomainId("");
+                  setDomainName("");
                 }}
               >Cancel</button>
             </div>

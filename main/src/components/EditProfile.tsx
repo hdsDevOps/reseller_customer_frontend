@@ -33,6 +33,15 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
       [e.target.name]: e.target.value,
     });
   };
+  
+  const handleChangeName = (e) => {
+    const value = e.target.value;
+    const filteredValue = value.replace(/[^a-zA-Z\s]/g, "");
+    setData({
+      ...data,
+      [e.target.name]: filteredValue,
+    });
+  };
 
   const [phoneNumber,setPhoneNumber] = useState();
   const [phoneCode,setPhoneCode] = useState('+1');
@@ -358,7 +367,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
       data?.business_name === "" || data?.business_name?.trim() === "" ||
       data?.business_state === "" || data?.business_state?.trim() === "" ||
       data?.business_city === "" || data?.business_city?.trim() === "" ||
-      data?.business_zip_code === "" || data?.business_zip_code?.trim() === ""
+      data?.zipcode === "" || data?.zipcode?.trim() === ""
     ) {
       return false;
     }
@@ -370,34 +379,41 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
     if(isNumberValid) {
       try {
         if(confirmPassword !== "") {
-          if(data?.password !== confirmPassword) {
-            toast.warning("Password and Confirm Password do not mathc");
-          } else {
-            if(validateForm()) {
-              const result = await dispatch(udpateProfileDataThunk({
-                user_id: customerId,
-                first_name: data?.first_name,
-                last_name: data?.last_name,
-                email: data?.email,
-                phone_no: data?.phone_no,
-                address: data?.address,
-                state: data?.state,
-                city: data?.city,
-                country: data?.country,
-                password: data?.password,
-                business_name: data?.business_name,
-                business_state: data?.business_state,
-                business_city: data?.business_city,
-                business_zip_code: data?.business_zip_code,
-                staff_id: staffId,
-                is_staff: staffStatus
-              })).unwrap();
-              toast.success(result?.message);
-              handleCloseShowModal();
-              await dispatch(setUserDetails(data));
+          if(
+            data?.password !== "" && data?.password?.trim() !== "" &&
+            confirmPassword !== "" && confirmPassword?.trim() !== ""
+          ) {
+            if(data?.password !== confirmPassword) {
+              toast.warning("Password and Confirm Password do not match");
             } else {
-              toast.warning("Input fields cannot be empty");
+              if(validateForm()) {
+                const result = await dispatch(udpateProfileDataThunk({
+                  user_id: customerId,
+                  first_name: data?.first_name,
+                  last_name: data?.last_name,
+                  email: data?.email,
+                  phone_no: data?.phone_no,
+                  address: data?.address,
+                  state: data?.state,
+                  city: data?.city,
+                  country: data?.country,
+                  password: data?.password,
+                  business_name: data?.business_name,
+                  business_state: data?.business_state,
+                  business_city: data?.business_city,
+                  zipcode: data?.zipcode,
+                  staff_id: staffId,
+                  is_staff: staffStatus
+                })).unwrap();
+                toast.success(result?.message);
+                handleCloseShowModal();
+                await dispatch(setUserDetails(data));
+              } else {
+                toast.warning("Input fields cannot be empty");
+              }
             }
+          } else {
+            toast.warning("Password cannot be blank");
           }
         } else {
           if(validateForm()) {
@@ -414,7 +430,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
               business_name: data?.business_name,
               business_state: data?.business_state,
               business_city: data?.business_city,
-              business_zip_code: data?.business_zip_code,
+              zipcode: data?.zipcode,
               staff_id: staffId,
               is_staff: staffStatus
             })).unwrap();
@@ -464,18 +480,18 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
                 <input
                     type="text"
                     className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                    value={data?.first_name || "John"}
+                    value={data?.first_name}
                     name='first_name'
-                    onChange={handleChangeData}
+                    onChange={handleChangeName}
                 />
             </div>
             <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
                 <input
                     type="text"
                     className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                    value={data?.last_name || "Doe"}
+                    value={data?.last_name}
                     name='last_name'
-                    onChange={handleChangeData}
+                    onChange={handleChangeName}
                 />
                 <label
                     htmlFor="last_name"
@@ -685,11 +701,25 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
                 }
             </div>
             <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
+              <label
+                htmlFor="zipcode"
+                className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+              >Zip code</label>
+              <input
+                type="number"
+                className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
+                value={data?.zipcode}
+                name='zipcode'
+                onChange={handleChangeData}
+              />
+            </div>
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
                 <input
                     type={showPassword ? "text" : "password"}
                     className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
                     name='password'
                     onChange={handleChangeData}
+                    minLength={8}
                 />
                 <label
                     htmlFor="password"
@@ -713,6 +743,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
                     className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
                     name='confirm_password'
                     onChange={e => {setConfirmPassword(e.target.value)}}
+                    minLength={8}
                 />
                 <label
                     htmlFor="confirm_password"
@@ -842,19 +873,6 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
                   )
                 }
             </div>
-            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                  <label
-                      htmlFor="business_zip_code"
-                      className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                  >Zip code</label>
-                  <input
-                      type="text"
-                      className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                      value={data?.business_zip_code}
-                      name='business_zip_code'
-                      onChange={handleChangeData}
-                  />
-              </div>
           </div>
           <div className='flex items-center justify-between mt-3 px-6'>
             <button
