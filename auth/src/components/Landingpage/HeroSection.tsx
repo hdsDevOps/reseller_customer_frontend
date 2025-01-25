@@ -195,8 +195,8 @@ const HeroSection = ({id}:any) => {
                         <div className="absolute top-0 md:py-[40px] py-3 md:px-[70px] px-3">
                           <h3 className="font-inter font-extrabold sm:text-[40px] text-[30px] text-white">{item?.title}</h3>
                           {/* <p className="!font-inter !font-normal !text-lg !text-white py-2" dangerouslySetInnerHTML={{__html: item?.description}}></p> */}
-                          <p className="!font-inter !font-normal !text-lg !text-white py-2 text-left inline-block items-start">
-                            <p className="inline-block" dangerouslySetInnerHTML={{__html: item?.description}}></p>
+                          <p className="!font-inter !font-normal !text-lg !text-white py-2 text-left inline-block items-start w-full break-words">
+                            <p className="inline-block  w-full break-words" dangerouslySetInnerHTML={{__html: item?.description}}></p>
                             {
                               item?.show_video_status && (
                                 <LuTvMinimalPlay className="text-[#12A833] w-6 h-6 ml-2 inline-block cursor-pointer" onClick={() => {

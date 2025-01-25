@@ -663,6 +663,43 @@ function Review() {
       console.log("result2...", subResult);
       if(subResult) {
         await addBillingHistory(item, result, paymentMethod, "domain", subResult?.subscription_id);
+        const domainData = await dispatch(addNewDomainThunk({
+          customer_id: data?.customer_id,
+          domain_name: item?.product_name,
+          domain_type: cart?.find((item) => item?.product_type === "google workspace") ? cart?.find((item) => item?.product_type === "google workspace")?.workspace_status === "trial" ? "primary" : "secondary" : "secondary",
+          subscription_id: "0",
+          business_name: userData?.business_name,
+          business_email: userData?.email,
+          license_usage: cart?.find((item) => item?.product_type === "google workspace") ? cart?.find((item) => item?.product_type === "google workspace")?.total_year : userData?.license_usage ? userData?.license_usage : 0,
+          plan: "0",
+          payment_method: "Stripe",
+          domain_status: true,
+          billing_period: "Yearly",
+          renew_status: "auto renewal",
+          subscription_status: "auto renewal"
+        })).unwrap();
+        cart?.find((item) => item?.product_type === "google workspace")
+        ? cart?.find((item) => item?.product_type === "google workspace")?.workspace_status === "trial"
+          ? await dispatch(addEmailsThunk({
+            user_id: customerId,
+            domain_id: domainData?.domain_id,
+            emails: [
+              {
+                first_name: userData?.first_name,
+                last_name: userData?.last_name,
+                email: cart?.find((item) => item?.product_type === "google workspace")?.emails?.username,
+                password: cart?.find((item) => item?.product_type === "google workspace")?.emails?.password,
+              }
+            ]
+          })).unwrap()
+          : ""
+        : "";
+        cart?.find((item) => item?.product_type === "google workspace")
+        ? cart?.find((item) => item?.product_type === "google workspace")?.workspace_status === "trial"
+          ? await dispatch(makeEmailAdminThunk({domain_id: domainData?.domain_id, rec_id: cart?.find((item) => item?.product_type === "google workspace")?.emails?.username})).unwrap()
+          : ""
+        : "";
+        await getDomains();
       }
     } catch (error) {
       console.log(error);
@@ -973,6 +1010,7 @@ function Review() {
                   const role = await dispatch(addSettingThunk({user_type: "Super Admin", user_id: customerId, permissions: superAdminPermissions})).unwrap();
                   // settingId
                   await dispatch(addStaffThunk({user_id: customerId, first_name: userData?.first_name, last_name: userData?.last_name, email: userData?.email, phone_no: userData?.phone_no, user_type_id: role?.settingId}));
+                  
                 }
               } else if(item?.product_type?.toLowerCase() === "domain") {
                 const domainSubscription = await addSubscriptionForDomain(item, result?.charge);
@@ -1027,6 +1065,7 @@ function Review() {
                   ? await dispatch(makeEmailAdminThunk({domain_id: domainData?.domain_id, rec_id: cart?.find((item) => item?.product_type === "google workspace")?.emails?.username})).unwrap()
                   : ""
                 : "";
+                await getDomains();
               }
             })
             await updateCart();

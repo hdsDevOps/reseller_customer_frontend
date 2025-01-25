@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "store/hooks";
 import { HiOutlineEye } from "react-icons/hi";
 import { RiCloseFill, RiEyeCloseLine } from "react-icons/ri";
-import { getRoleIdFromLSThunk, getStaffIdFromLSThunk, getStaffStatusFromLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, makeUserLoginThunk, setRoleIdToLSThunk, setStaffIdToLSThunk, setStaffStatusToLSThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk } from "store/user.thunk";
+import { getLandingPageThunk, getRoleIdFromLSThunk, getStaffIdFromLSThunk, getStaffStatusFromLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, makeUserLoginThunk, setRoleIdToLSThunk, setStaffIdToLSThunk, setStaffStatusToLSThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk } from "store/user.thunk";
 import { useForm, SubmitHandler } from "react-hook-form";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -28,6 +28,21 @@ const Login: React.FC = () => {
   const [userDetails, setUserDetails] = useState<IFormInput>(initialUserDetails);
   // console.log("userDetails...", userDetails);
   const [termsModalOpen, setTermsModalOpen] = useState(false);
+
+  const [termsAndConditions, setTermsAndConditions] = useState("");
+
+  const getTermsAndConditions = async() => {
+    try {
+      const result = await dispatch(getLandingPageThunk()).unwrap();
+      setTermsAndConditions(result?.data?.terms_conditions?.content);
+    } catch (error) {
+      setTermsAndConditions("");
+    }
+  };
+
+  useEffect(() => {
+    getTermsAndConditions();
+  }, []);
 
   const updateUserDetails = e => {
     setUserDetails({
@@ -224,8 +239,12 @@ const Login: React.FC = () => {
                   ><RiCloseFill className="w-6 h-6" /></button>
                 </div>
               </div>
+
+              <div className="max-w-xl w-full p-2 max-h-[400px] overflow-y-auto">
+                <div dangerouslySetInnerHTML={{__html: termsAndConditions}}></div>
+              </div>
               
-              <div className="max-w-xl w-full p-2">
+              {/* <div className="max-w-xl w-full p-2">
                 
                 <p
                   className="h-[500px] overflow-scroll overflow-x-hidden font-inter text-[14px] pr-1"
@@ -341,7 +360,7 @@ const Login: React.FC = () => {
 
                   If you have any questions about these Terms, please contact us at [Your Contact Information].
                 </p>
-              </div>
+              </div> */}
             </DialogPanel>
           </div>
         </div>

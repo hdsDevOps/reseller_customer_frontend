@@ -14,11 +14,7 @@ const initialFooter = {
     value: ''
   },
   marketing_section_data: [],
-  newsletter_section_data: {
-    name: '',
-    type: '',
-    value: ''
-  },
+  newsletter_section_data: [],
   social_section_data: [],
   website_section_data: [],
 }
@@ -75,7 +71,7 @@ export default function Footer() {
               {
                 footer?.marketing_section_data?.length > 0 && footer?.marketing_section_data?.map((data, index) => (
                   <li className="flex flex-col gap-2" key={index}>
-                    <a href={data?.value} target="_blank">{data?.name}</a>
+                    <a href={data?.value} target="_blank" className="break-words w-52">{data?.name}</a>
                     <hr className="w-52 bg-[#808080] h-[0.15rem] rounded-md"></hr>
                   </li>
                 ))
@@ -95,7 +91,7 @@ export default function Footer() {
               {
                 footer?.website_section_data?.length > 0 && footer?.website_section_data?.map((data, index) => (
                   <li className="flex flex-col gap-2" key={index}>
-                    <a href={data?.value} target='_blank'>{data?.name}</a>
+                    <a href={data?.value} target='_blank' className="break-words w-52">{data?.name}</a>
                     <hr className="w-52 bg-[#808080] h-[0.15rem] rounded-md"></hr>
                   </li>
                 ))
@@ -125,7 +121,7 @@ export default function Footer() {
               </div> */}
             </div>
           </div>
-          <div className="flex flex-col gap-2 col-span-4 sm:col-span-2 lg:col-span-1">
+          <div className="flex flex-col gap-2 col-span-4 sm:col-span-2 lg:col-span-1  ">
             <div className="flex flex-col gap-2">
               <p className="text-white font-semibold">OUR NEWSLETTER</p>
               <progress
@@ -134,19 +130,16 @@ export default function Footer() {
                 max="100"
               ></progress>
             </div>
-            <div className="flex flex-col gap-4">
-              {/* <p className="text-[#BDBDBD]">Search for: </p> */}
-              {/* <div className="w-full border-yellow-300 h-14 rounded-full bg-[#BDBDBD] flex items-center px-1.5 py-2 relative">
-                <input
-                  className="w-full bg-[#F0F0F3] h-12 rounded-full p-2 text-md"
-                  placeholder="Search"
-                ></input>
-                <button className="bg-[#12a833] px-3 rounded-full py-2.5 text-white font-semibold text-lg absolute right-1.5">
-                  Search
-                </button>
-              </div> */}
-              <p className="flex text-left font-medium text-lg text-[#BDBDBD]">{footer?.newsletter_section_data?.value}</p>
-            </div>
+            <ul className="text-[#BDBDBD] text-base font-medium flex flex-col gap-2">
+              {
+                footer?.newsletter_section_data?.length > 0 && footer?.newsletter_section_data?.map((data, index) => (
+                  <li className="flex flex-col gap-2" key={index}>
+                    <a href={data?.value} target='_blank' className="break-words w-52">{data?.name}</a>
+                    <hr className="w-52 bg-[#808080] h-[0.15rem] rounded-md"></hr>
+                  </li>
+                ))
+              }
+            </ul>
           </div>
         </div>
         <div className="text-center  w-100% ">

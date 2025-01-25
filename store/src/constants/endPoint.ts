@@ -100,6 +100,7 @@ export const endPoints = {
 
     // here platform
     hereMapSearch: 'customerservices/user/api/v1/get_address',
+
 };
 
 export const resellerEndPoints = {

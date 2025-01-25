@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
+import { useAppDispatch } from "store/hooks";
+import { getLandingPageThunk } from "store/user.thunk";
 
 interface TermsAndConditionsProps {
   isOpen: boolean;
@@ -10,13 +12,29 @@ const TermsAndConditions: React.FC<TermsAndConditionsProps> = ({
   isOpen,
   onClose,
 }) => {
+  const dispatch = useAppDispatch();
+  const [termsAndConditions, setTermsAndConditions] = useState("");
+
+  const getTermsAndConditions = async() => {
+    try {
+      const result = await dispatch(getLandingPageThunk()).unwrap();
+      setTermsAndConditions(result?.data?.terms_conditions?.content);
+    } catch (error) {
+      setTermsAndConditions("");
+    }
+  };
+
+  useEffect(() => {
+    getTermsAndConditions();
+  }, []);
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
       <div className="bg-white rounded-lg shadow-lg max-w-xl w-full p-2">
         <div className="flex justify-between items-center pb-3">
-          <h1 className="h1-text">Terms of Services</h1>
+          <h1 className="h1-text">Terms and Conditions</h1>
           <button onClick={onClose} className="text-black">
             <img
               src={'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/close.png?alt=media&token=3fac7102-9ead-4bfa-a6f0-2c84d72260c6'}
@@ -25,7 +43,10 @@ const TermsAndConditions: React.FC<TermsAndConditionsProps> = ({
             />
           </button>
         </div>
-        <p
+        <div className="h-[500px] overflow-scroll overflow-x-hidden font-inter text-[14px] pr-1">
+          <div dangerouslySetInnerHTML={{__html: termsAndConditions}}></div>
+        </div>
+        {/* <p
           className="h-[500px] overflow-scroll overflow-x-hidden font-inter text-[14px] pr-1"
         >
         &nbsp;1. Introduction
@@ -138,7 +159,7 @@ const TermsAndConditions: React.FC<TermsAndConditionsProps> = ({
         <br />
 
         If you have any questions about these Terms, please contact us at [Your Contact Information].
-        </p>
+        </p> */}
       </div>
     </div>
   );

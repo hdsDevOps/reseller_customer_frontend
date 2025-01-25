@@ -19,6 +19,9 @@ import { DateRangePicker } from "rsuite";
 import "rsuite/dist/rsuite.min.css";
 import { setCurrentPageNumberSlice, setBillingHistoryFilterSlice, setItemsPerPageSlice } from "store/authSlice";
 
+const stripeImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/stripe.png?alt=media&token=23bd6672-665c-4dfb-9d75-155abd49dc58";
+const paystackImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/paystack.png?alt=media&token=8faf3870-4256-4810-9844-5fd3c147d7a3";
+
 interface RangeType<T> {
   label: string;
   value: [T, T] | ((value: T[]) => [T, T]);
@@ -487,7 +490,31 @@ const BillingHistory: React.FC = () => {
                           {detail.paymentMethod}
                         </span>
                       </span> */}
-                      {detail?.payment_method}
+                      {/* {detail?.payment_method} */}
+                      <span className="flex items-center justify-center">
+                        {detail?.payment_method ? (
+                          <>
+                            <img
+                              src={
+                                detail?.payment_method?.toLowerCase() === "stripe"
+                                ? stripeImage
+                                : detail?.payment_method?.toLowerCase() === "paystack"
+                                ? paystackImage
+                                : ""
+                              }
+                              alt={detail?.payment_method}
+                              className="h-6 object-contain"
+                            />
+                            {"..."}{
+                              detail?.payment_details?.transaction_data?.payment_method_details?.card?.last4 || "0000"
+                            }
+                          </>
+                        ) : (
+                          <span className="text-gray-800 font-bold text-3xl text-center">
+                            -
+                          </span>
+                        )}
+                      </span>
                     </td>
                     <td className="px-2 pb-10 pt-3 text-center">
                       <button className="bg-green-500 text-white hover:bg-opacity-95 w-[80px] h-[30px] rounded">

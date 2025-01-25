@@ -9,7 +9,7 @@ import TermsAndConditions from "./Terms";
 import CheckBox from "../utils/inputs/checkbox";
 import { Link } from "react-router-dom";
 import { useAppDispatch } from "store/hooks";
-import { hereMapSearchThunk, resgiterCustomerThunk } from "store/user.thunk";
+import { getLandingPageThunk, hereMapSearchThunk, resgiterCustomerThunk } from "store/user.thunk";
 import { HiOutlineEye } from "react-icons/hi";
 import axios from "axios";
 import { toast } from "react-toastify";
