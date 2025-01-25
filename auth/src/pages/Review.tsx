@@ -41,6 +41,7 @@ const Review = () => {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentMethods, setPaymentMethods] = useState([]);
   console.log("payment methods...", paymentMethods);
+  const [paymentMethodHover, setPaymentMethodHover] = useState(false);
 
   const [addressDetails, setAddressDetails] = useState(location.state.formData);
   // console.log("addressDetails...", addressDetails);
@@ -228,6 +229,7 @@ const Review = () => {
   // console.log("primaryContact...", primaryContact);
   
   const [domainPrice, setDomainPrice] = useState(0);
+  const [primaryContactHover, setPrimaryContactHover] = useState(false);
 
   useEffect(() => {
     setDomainPrice(data?.selectedDomain?.price[defaultCurrencySlice]);
@@ -736,9 +738,16 @@ const Review = () => {
                 }
 
                 <div className="flex flex-col items-start justify-start w-full gap-2 mb-4">
-                  <h1 className="font-inter font-semibold text-sm flex flex-row items-center justify-center mr-2">
+                  <h1 className="font-inter font-semibold text-sm flex flex-row items-center justify-center mr-2 relative">
                     Primary Contact
-                    <GoInfo className="ml-2 w-4 h-4" />
+                    <GoInfo className="ml-2 w-4 h-4" onMouseOver={() => {setPrimaryContactHover(true)}} onMouseLeave={() => {setPrimaryContactHover(false)}}  />
+                    {
+                      primaryContactHover && (
+                        <div className="absolute bg-white w-[220px] top-5 left-[13px] rounded-md">
+                          <p className="bg-[#12A83330] px-4 py-3 w-full font-inter font-medium text-[10px] text-black rounded-md">This is your legal address of your organization or home</p>
+                        </div>
+                      )
+                    }
                     <BiSolidEditAlt
                       className="ml-2 w-4 h-4"
                       onClick={() => {
@@ -760,7 +769,17 @@ const Review = () => {
           </div>
           
           <div className="w-full relative">
-            <h2 className="mb-4 text-lg font-bold">Payment method</h2>
+            <div className="flex items-center mb-4 relative">
+              <h2 className="text-lg font-bold">Payment method</h2>
+              <GoInfo className="ml-2 w-4 h-4" onMouseOver={() => {setPaymentMethodHover(true)}} onMouseLeave={() => {setPaymentMethodHover(false)}}  />
+              {
+                paymentMethodHover && (
+                  <div className="absolute bg-white w-[270px] top-7 left-7 rounded-md">
+                    <p className="bg-[#12A83330] px-4 py-3 w-full font-inter font-medium text-[10px] text-black rounded-md">Available payment methods are determined by country and the type of payment selected in ‘How you pay’</p>
+                  </div>
+                )
+              }
+            </div>
             {/* Payment Options */}
             <div className="space-y-4">
               {

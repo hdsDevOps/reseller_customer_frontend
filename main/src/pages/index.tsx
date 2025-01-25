@@ -16,12 +16,30 @@ import { useAppDispatch, useAppSelector } from "store/hooks";
 import { getProfileDataThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
 import Footer from "../components/Footer";
 import Dashboard from "./Dashboard";
+import ChooseYourPlan from "../components/planFlow/ChooseYourPlan";
+import BusinessInfo from "../components/planFlow/BusinessInfo";
+import Subscribe from "../components/planFlow/Subscribe";
+import ChooseDomain from "../components/planFlow/ChooseDomain";
+import DomainList from "../components/planFlow/DomainList";
+import SelectedDomainDetails from "../components/planFlow/SelectedDomainDetails";
+import HowToSignInToDomain from "../components/planFlow/HowToSignInToDomain";
+import TrialSummary from "../components/planFlow/TrialSummary";
+import GeminiSummary from "../components/planFlow/GeminiSummary";
 
 const routes = [
   { path: "/", element: <Dashboard /> },
   { path: "/dashboard", element: <Dashboard /> },
   { path: "/upgrade-plan/*", element: <PlanCard /> },
   { path: "/profile", element: <HdsProfile /> },
+  { path: "/choose-your-plan", element: <ChooseYourPlan /> },
+  { path: "/business-information", element: <BusinessInfo /> },
+  { path: "/subscribe-plan", element: <Subscribe /> },
+  { path: "/choose-your-domain", element: <ChooseDomain /> },
+  { path: "/choose-from-list", element: <DomainList /> },
+  { path: "/selected-domain-details", element: <SelectedDomainDetails /> },
+  { path: "/how-you-will-sign-in-to-domain", element: <HowToSignInToDomain /> },
+  { path: "/free-trial-page", element: <TrialSummary /> },
+  { path: "/gemini-summary", element: <GeminiSummary /> },
 ];
 
 const MainApp: React.FC = () => {

@@ -140,7 +140,7 @@ const PlanCard: React.FC = () => {
       ...cartItems,
       {
         payment_cycle: isYearly ? "Yearly" : selectedCheckbox === null ? "Yearly Subscription with monthly billing" : "Monthly",
-        price: parseFloat(cartAddAmount(item, isYearly ? "Yearly" : selectedCheckbox === null ? "Yearly Subscription with monthly billing" : "Monthly")?.discount_price) - parseFloat(cartAddAmount(currentPlan, userDetails?.workspace?.payment_cycle)?.discount_price),
+        price: item?.amount_details,
         currency: defaultCurrencySlice,
         product_name: item?.plan_name,
         product_type: "google workspace",

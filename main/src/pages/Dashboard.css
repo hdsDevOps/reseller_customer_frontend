@@ -1,0 +1,32 @@
+.warning-box{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.common-warning {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  border-radius: 6px;
+  align-items: center;
+  height: 111px;
+  padding: 0 16px;
+}
+
+.expire-warning {
+  background-color: #FBC2C2;
+}
+
+.expired-warning {
+  background-color: #E3E3E3;
+}
+
+@media screen and (max-width: 540px) {
+  .common-warning {
+    flex-direction: column;
+    padding: 10px 16px;
+  }
+}

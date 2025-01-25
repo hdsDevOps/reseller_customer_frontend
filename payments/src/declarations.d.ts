@@ -102,4 +102,9 @@ declare module 'store/user.thunk' {
   export const paystackPayThunk;
   export const getBillingHistoryThunk;
   export const getBillingHistoryThunk;
+  export const addSettingThunk;
+  export const addStaffThunk;
+  export const addEmailsThunk;
+  export const makeEmailAdminThunk;
+  export const addNewDomainThunk;
 }

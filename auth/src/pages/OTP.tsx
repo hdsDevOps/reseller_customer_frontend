@@ -31,10 +31,12 @@ const OTP: React.FC = () => {
 
   useEffect(() => {
     if(location.state) {
-      if(location.state?.email) {
+      if(location.state?.from === "forgot") {
         toast.success("OTP for resetting your password has been sent.");
-      } else if(location?.state?.customerId) {
+      } else if(location?.state?.from === "otp") {
         toast.success("OTP for log in to your account has been sent.");
+      } else if(location?.state?.from === "registration") {
+        toast.success("OTP for verify your account has been sent.");
       } else {
         console.log("ok")
       }
@@ -185,9 +187,11 @@ const OTP: React.FC = () => {
           console.error("Login error:", error);
           // toast.error()
           if(error?.message === "Request failed with status code 400") {
+            
             toast.error("Please enter the correct OTP");
             setLoading(false);
           } else {
+            
             toast.error("OTP error");
             setLoading(false);
           }
@@ -205,6 +209,7 @@ const OTP: React.FC = () => {
           console.log("result...", result);
           navigate("/resetpassword", {state: {email: email}});
         } catch (error) {
+          
           toast.error("Please enter a valid otp");
           setLoading(false);
         }
@@ -234,12 +239,14 @@ const OTP: React.FC = () => {
             }
           }
         } catch (error) {
+          
           toast.error("Please enter a valid otp");
           setLoading(false);
         }
       }
     } else {
       // not entered 6 otps
+      
       toast.warning("Please enter the OTP");
       setLoading(false);
     }
@@ -250,16 +257,19 @@ const OTP: React.FC = () => {
       try {
         const result = await dispatch(resendLoginOtpThunk({customer_id: customerId})).unwrap();
         console.log("result...", result);
+        
         toast.success("Please check your email for OTP.");
         setTimeLeft(120);
       } catch (error) {
         console.log(error)
+        
         toast.error("Error resending otp");
       }
     } else if(mode === "forgotpassword") {
       try {
         const result = await dispatch(resendForgetPasswordOtpThunk({email: email})).unwrap();
         console.log("result...", result);
+        
         toast.success("Please check your email for OTP.");
         setTimeLeft(120);
       } catch (error) {
@@ -269,12 +279,15 @@ const OTP: React.FC = () => {
       try {
         const result = await dispatch(resendRegisterOtpThunk({customer_id: customerId})).unwrap();
         console.log("result...", result);
+        
         toast.success("Please check your email for OTP.");
         setTimeLeft(120);
       } catch (error) {
+        
         toast.error("Error resending otp");
       }
     } else {
+      
       toast.error("Error");
     }
   }

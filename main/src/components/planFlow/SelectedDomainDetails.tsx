@@ -2,10 +2,10 @@ import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { IoChevronBackSharp } from "react-icons/io5";
 import { AiOutlineCheck } from "react-icons/ai";
-import { currencyList } from "../components/CurrencyList";
+import { currencyList } from "../CurrencyList";
 import { useAppSelector } from "store/hooks";
 
-const SelectedDomain: React.FC = () => {
+const SelectedDomainDetails: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -22,7 +22,7 @@ const SelectedDomain: React.FC = () => {
     <div className="relative flex flex-col items-center justify-center w-full h-full gap-6 p-4">
       <p
         className="absolute flex items-center gap-1 text-green-600 cursor-pointer left-4 top-2"
-        onClick={() => navigate('/adddomain', {state: location.state})}
+        onClick={() => navigate('/choose-from-list', {state: {...location.state, selectedDomain: location.state.preSelectedDomain}})}
       >
         <IoChevronBackSharp /> Back to previous page
       </p>
@@ -58,24 +58,16 @@ const SelectedDomain: React.FC = () => {
         <button
           className="self-start px-4 py-2 mt-4 text-white bg-green-600 rounded-lg"
           // onClick={() => navigate('/signin-domain', { state: { selectedDomain: domain } })}
-          onClick={()=> {
-            location.state.from === "business_info"
-            ? navigate("/signin-domain", {state: location.state})
-            : navigate("/plans", {state: { ...location.state }})
-          }}
+          onClick={()=> {navigate("/how-you-will-sign-in-to-domain", {state: { ...location.state }})}}
         >
           Next
         </button>
         <p className="self-start mt-1 text-xl font-bold text-green-600 cursor-pointer hover:underline"><a
-          onClick={()=> {
-            location.state.from === "business_info"
-            ? navigate('/adddomain', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from}})
-            : navigate("/adddomain")
-          }}
+          onClick={()=> {navigate('/choose-your-domain', {state: {license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period}})}}
         >Want to use a domain I already own</a></p>
       </div>
     </div>
   );
 };
 
-export default SelectedDomain;
+export default SelectedDomainDetails;

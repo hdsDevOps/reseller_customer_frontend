@@ -124,7 +124,7 @@ const DownloadInvoice: React.FC = () => {
   };
 
   useEffect(() => {
-    const saveAllData = async() => {
+    const saveAllData = async(e) => {
       try {
         await dispatch(udpateBusinessDataThunk({
           user_id: data?.customer_id,
@@ -334,6 +334,9 @@ const DownloadInvoice: React.FC = () => {
         setDisabled(false);
       } catch (error) {
         console.log("error");
+        if(error?.message === "Error adding customer subscription"){
+          handleGoToDashboard(e);
+        }
       }
     };
 
@@ -351,6 +354,7 @@ const DownloadInvoice: React.FC = () => {
       await dispatch(setUserIdToLSThunk(data?.customer_id)).unwrap();
       navigate('/dashboard', {state: {from: 'otp'}});
     } catch (error) {
+              
       toast.error("Error purchasing");
       console.log(error)
     } finally {

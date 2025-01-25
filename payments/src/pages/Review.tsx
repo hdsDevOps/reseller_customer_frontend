@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { BiSolidEditAlt } from 'react-icons/bi';
 import { GoInfo } from 'react-icons/go'
 import { IoIosArrowBack, IoIosArrowDown } from 'react-icons/io'
@@ -6,7 +6,7 @@ import { TbInfoTriangleFilled } from "react-icons/tb";
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { format } from "date-fns";
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { addBillingHistoryThunk, addNewDomainThunk, addSubscriptionThunk, addToCartThunk, getDomainsListThunk, getPaymentMethodsThunk, getProfileDataThunk, makeDefaultPaymentMethodThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk, stripePayThunk, udpateProfileDataThunk, useVoucherThunk } from 'store/user.thunk';
+import { addBillingHistoryThunk, addEmailsThunk, addNewDomainThunk, addSettingThunk, addStaffThunk, addSubscriptionThunk, addToCartThunk, getDomainsListThunk, getPaymentMethodsThunk, getProfileDataThunk, makeDefaultPaymentMethodThunk, makeEmailAdminThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk, stripePayThunk, udpateProfileDataThunk, useVoucherThunk } from 'store/user.thunk';
 import { setCart, setDomains, setUserDetails, staffStatus, staffId, domainsState } from 'store/authSlice';
 import { toast } from 'react-toastify';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
@@ -15,18 +15,62 @@ import useData from 'rsuite/esm/InputPicker/hooks/useData';
 import { currencyList } from '../components/CurrencyList';
 import StripeCheckout from "react-stripe-checkout";
 import { PaystackButton } from "react-paystack";
+import axios from 'axios';
 
 const initialCartPrice = {
   total_year: 0,
   price: 0
-}
+};
+
+const superAdminPermissions = [
+  {
+      "name": "Dashboard",
+      "value": true
+  },
+  {
+      "name": "Profile",
+      "value": true
+  },
+  {
+      "name": "Domain",
+      "value": true
+  },
+  {
+      "name": "Payment Subscription",
+      "value": true
+  },
+  {
+      "name": "Email",
+      "value": true
+  },
+  {
+      "name": "Payment Method",
+      "value": true
+  },
+  {
+      "name": "Vouhcers",
+      "value": true
+  },
+  {
+      "name": "My Staff",
+      "value": true
+  },
+  {
+      "name": "Billing History",
+      "value": true
+  },
+  {
+      "name": "Settings",
+      "value": true
+  }
+];
 
 function Review() {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
   const { customerId, domainsState, userDetails, defaultCurrencySlice } = useAppSelector(state => state.auth);
-  // console.log("domainsState...", domainsState);
+  console.log("domainsState...", domainsState);
   const [isChecked, setIsChecked] = useState(false);
   const [userData, setUserData] = useState(userDetails);
   console.log("userDetails...", userData);
@@ -36,13 +80,16 @@ function Review() {
     setUserData(userDetails);
   }, [userDetails]);
 
+  console.log("location.state...", location.state);
+
   const cart = location.state?.cart;
   // console.log("cart...", cart);
   const appliedVoucher = location.state.voucher_code;
   console.log("appliedVoucher...", appliedVoucher);
+  const [paymentMethodId, setPaymentMethodId] = useState("");
 
   const initialData = {
-    customer_id: userDetails?.customer_id,
+    customer_id: customerId,
     domain_name: location.state[0]?.product_name || "Domain",
     domain_type: "secondary",
     subscription_id: "",
@@ -63,12 +110,28 @@ function Review() {
   const initialPrimaryContact = {
     first_name: userData?.first_name,
     last_name: userData?.last_name
-  }
+  };
+  
+  const countryRef = useRef(null);
+  const stateRef = useRef(null);
+  const cityRef = useRef(null);
+  const [countryName, setCountryName] = useState("");
+  const [stateName, setStateName] = useState("");
+  const [cityName, setCityName] = useState("");
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [cities, setCitites] = useState([]);
+  const [country, setCountry] = useState({});
+  const [state, setState] = useState({});
+  const [city, setCity] = useState({});
 
   const [primaryContact, setPrimaryContact] = useState(initialPrimaryContact);
+  console.log("primaryContact...", primaryContact);
+  const [primaryContactHover, setPrimaryContactHover] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [usedPlan, setUsedPlan] = useState<object|null>(null);
+  console.log("usedPlan...", usedPlan);
   const [processingModalOpen, setProcessingModalOpen] = useState(false);
   
   const [todayDate, setTodayDate] = useState("");
@@ -90,9 +153,171 @@ function Review() {
   const [taxedPrice, setTaxedPrice] = useState(0.00);
   const [discountedPrice, setDiscountedPrice] = useState(0.00);
   const [preDiscountedPrice, setPreDiscountedPrice] = useState(0.00);
+  const [paymentMethodHover, setPaymentMethodHover] = useState(false);
 
   const [primaryDomain, setPrimaryDomain] = useState<object|null>(null);
   console.log("primaryDomain...", primaryDomain);
+  
+  const getProfileData = async() => {
+    try {
+      const result = await dispatch(getProfileDataThunk({user_id: customerId, staff_id: staffId, is_staff: staffStatus})).unwrap();
+      console.log("result...", result);
+      await dispatch(setUserDetails(result?.customerData));
+    } catch (error) {
+      //
+    }
+  };
+
+  const updateProfileData = async() => {
+    try {
+      const result = await dispatch(udpateProfileDataThunk({
+        user_id: customerId,
+        first_name: userData?.first_name,
+        last_name: userData?.last_name,
+        email: userDetails?.email,
+        phone_no: userDetails?.phone_no,
+        address: userData?.address,
+        state: userDetails?.state,
+        city: userDetails?.city,
+        country: userDetails?.country,
+        password: '',
+        business_name: userData?.business_name,
+        business_state: userData?.business_state,
+        business_city: userData?.business_city,
+        zipcode: userData?.zipcode,
+        staff_id: staffId,
+        is_staff: staffStatus
+      })).unwrap();
+      // console.log("result...", result);
+      await getProfileData();
+      // toast.success("Business Information updated successfully");
+      // navigate("/choose-your-domain", {state: { ...location.state}})
+    } catch (error) {
+      // toast.error("Error updating Business Information");
+    }
+  }
+
+  useEffect(() => {
+    if(countries?.length > 0 && userDetails?.country) {
+      const findCountry = countries?.find(item => item?.name === userDetails?.country);
+      if(findCountry) {
+        setCountry(findCountry);
+      }
+    }
+  }, [countries, userDetails?.country]);
+
+  useEffect(() => {
+    if(states?.length > 0 && userDetails?.business_state) {
+      const findState = states?.find(item => item?.name === userData?.business_state);
+      if(findState){
+        setCountry(findState);
+      }
+    }
+  }, [states, userDetails?.business_state]);
+
+  useEffect(() => {
+    if(countries?.length > 0 && userDetails?.business_city) {
+      const findCity = countries?.find(item => item?.name === userData?.business_city);
+      if(findCity) {
+        setCountry(findCity);
+      }
+    }
+  }, [countries, userDetails?.business_city]);
+  
+  const handleClickOutsideState = (event: MouseEvent) => {
+    if(stateRef.current && !stateRef.current.contains(event.target as Node)) {
+      setStateDropdownOpen(false);
+    }
+  };
+  const handleClickOutsideCity = (event: MouseEvent) => {
+    if(cityRef.current && !cityRef.current.contains(event.target as Node)) {
+      setCityDropdownOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutsideState);
+    document.addEventListener('mousedown', handleClickOutsideCity);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutsideState);
+      document.removeEventListener('mousedown', handleClickOutsideCity);
+    };
+  }, []);
+
+  useEffect(() => {
+    if(states.length > 0 && stateName !== "") {
+      setStateDropdownOpen(true);
+    }
+  }, [states, stateName]);
+
+  useEffect(() => {
+    if(cities.length > 0 && cityName !== "") {
+      setCityDropdownOpen(true);
+    }
+  }, [cities, cityName]);
+
+  useEffect(() => {
+    var config = {
+      method: 'get',
+      url: 'https://api.countrystatecity.in/v1/countries',
+      headers: {
+        'X-CSCAPI-KEY': 'Nk5BN011UlE5QXZ6eXc1c05Id3VsSmVwMlhIWWNwYm41S1NRTmJHMA=='
+      }
+    };
+    axios(config)
+      .then(res => {
+        setCountries(res.data);
+        // console.log(res.data);
+      })
+      .catch(err => {
+        setCountries([]);
+        console.log("error...", err);
+      })
+  }, []);
+  
+  useEffect(() => {
+    if(country?.iso2 !== undefined) {
+      var config = {
+        method: 'get',
+        url: `https://api.countrystatecity.in/v1/countries/${country?.iso2}/states`,
+        headers: {
+          'X-CSCAPI-KEY': 'Nk5BN011UlE5QXZ6eXc1c05Id3VsSmVwMlhIWWNwYm41S1NRTmJHMA=='
+        }
+      };
+      axios(config)
+      .then(res => {
+        setStates(res.data);
+      })
+      .catch(err => {
+        setStates([]);
+        console.log("error...", err);
+      })
+    } else {
+      setStates([]);
+    }
+  }, [country]);
+  
+  useEffect(() => {
+    if(country?.iso2 !== undefined && state?.iso2 !== undefined) {
+      var config = {
+        method: 'get',
+        url: `https://api.countrystatecity.in/v1/countries/${country?.iso2}/states/${state?.iso2}/cities`,
+        headers: {
+          'X-CSCAPI-KEY': 'Nk5BN011UlE5QXZ6eXc1c05Id3VsSmVwMlhIWWNwYm41S1NRTmJHMA=='
+        }
+      };
+      axios(config)
+      .then(res => {
+        setCitites(res.data);
+      })
+      .catch(err => {
+        setCitites([]);
+        console.log("error...", err);
+      })
+    } else {
+      setCitites([]);
+    }
+  }, [country, state]);
 
   useEffect(() => {
     setPrimaryDomain(domainsState?.find(item => item?.domain_type === "primary"));
@@ -121,8 +346,10 @@ function Review() {
   useEffect(() => {
     if(cart?.length > 0) {
       const total = cartPrice?.reduce((totalCart, item) => {
-        const amountt = parseFloat(item?.price) * parseInt(item?.total_year);
-        return totalCart + amountt;
+        let amount = parseFloat(item?.price) * parseInt(item?.total_year);
+    
+        console.log(`${item?.product_type}...`, totalCart + amount);
+        return totalCart + amount;
       }, 0);
       console.log("cartTotal...", total);
       setTotalPrice(parseFloat(total.toFixed(2)));
@@ -144,6 +371,8 @@ function Review() {
   const getPlan = async() => {
     if(userDetails?.workspace?.workspace_status === "trial") {
       setWorkspacePrice(0);
+      const result = await dispatch(plansAndPricesListThunk({subscription_id: userDetails?.plan_name_id})).unwrap();
+      setUsedPlan(result?.data[0]);
     } else {
       const workspaceCart = cart?.find(item => item?.product_type === "google workspace");
       if(workspaceCart) {
@@ -158,14 +387,19 @@ function Review() {
           setWorkspacePrice(0);
         }
       } else {
-        setWorkspacePrice(0);
+        const result = await dispatch(plansAndPricesListThunk({subscription_id: userDetails?.plan_name_id})).unwrap();
+        setUsedPlan(result?.data[0]);
+        const amountArray = result?.data[0]?.amount_details;
+        const priceArray = amountArray?.find(amount => amount?.currency_code === defaultCurrencySlice)?.price;
+        const finalArray = priceArray?.find(price => price?.type?.toLowerCase() === workspaceCart?.payment_cycle?.toLowerCase());
+        setWorkspacePrice(finalArray?.discount_price);
       }
     }
   };
 
   useEffect(() => {
     getPlan();
-  }, [cart, defaultCurrencySlice]);
+  }, [cart, defaultCurrencySlice, userDetails]);
 
   const getDomainPrice = () => {
     return 953.72;
@@ -175,9 +409,13 @@ function Review() {
     if(cart?.length > 0) {
       const priceList = cart.map((item) => {
         if(item?.product_type === "google workspace"){
-          return {total_year: item?.total_year, price: workspacePrice};
+          if(item?.workspace_status === "trial") {
+            return {total_year: item?.total_year, price: 0};
+          } else {
+            return {total_year: item?.total_year, price: workspacePrice};
+          }
         } else if(item?.product_type?.toLowerCase() === "domain") {
-          return {total_year: item?.total_year, price: 953.72};
+          return {total_year: item?.total_year, price: item?.price[defaultCurrencySlice]};
         }
       });
 
@@ -189,7 +427,7 @@ function Review() {
 
   useEffect(() => {
     calculateCartAmount(cart);
-  }, [cart, workspacePrice]);
+  }, [cart, workspacePrice, defaultCurrencySlice]);
 
   useEffect(() =>{
     setData({
@@ -292,7 +530,7 @@ function Review() {
     { label: 'First Name', name: 'first_name', placeholder: 'Enter your First Name', type: 'text', },
     { label: 'Last Name', name: 'last_name', placeholder: 'Enter your Last Name', type: 'text', },
     { label: 'Address', name: 'address', placeholder: 'Enter your Address', type: 'text', },
-    { label: 'Business Zip code', name: 'business_zip_code', placeholder: 'Enter your Zip Code', type: 'number', },
+    { label: 'Business Zip code', name: 'zipcode', placeholder: 'Enter your Zip Code', type: 'number', },
     { label: 'Business State', name: 'business_state', placeholder: 'Select your State', type: 'drowpdown', },
     { label: 'Business City*', name: 'business_city', placeholder: 'Select your City', type: 'drowpdown', },
   ];
@@ -318,12 +556,14 @@ function Review() {
       const planData = await dispatch(plansAndPricesListThunk({
         subscription_id: item?.plan_name_id
       })).unwrap();
-      const result = await dispatch(addSubscriptionThunk({
+      const subResult = await dispatch(addSubscriptionThunk({
         product_type: "google workspace",
         payment_cycle: item?.payment_cycle,
         customer_id: customerId,
         description: `purchase google workspace ${item?.product_type} ${item?.total_year}`,
-        domain: [domainsState?.find(item => item?.domain_type === "primary")?.domain_name],
+        domain: [
+          domainsState?.find(item => item?.domain_type === "primary")?.domain_name || cart?.find(item => item?.product_type === "domain") ? cart?.find(item => item?.product_type === "domain")?.product_name : ""
+        ],
         last_payment: todayDate,
         next_payment: planExpiryDate,
         payment_method: paymentMethod,
@@ -355,11 +595,14 @@ function Review() {
           due_date: planExpiryDate,
         }],
         plan_name: usedPlan?.plan_name,
-        workspace_status: "active",
+        workspace_status: item?.wokrspace_status === "trial" ? "trial" : "active",
         is_trial: false,
         license_usage: item?.total_year
       })).unwrap();
-      console.log("result1...", result);
+      console.log("result1...", subResult);
+      if(subResult) {
+        await addBillingHistory(item, result2, paymentMethod, "google workspace", subResult?.subscription_id);
+      }
     } catch (error) {
       console.log(error);
       if(error?.error == "Request failed with status code 401") {
@@ -384,7 +627,7 @@ function Review() {
       next_payment: domainExpiryDate,
       payment_method: paymentMethod,
       subscription_status: "auto renewal",
-      plan_name_id: "0",
+      plan_name_id: "",
       payment_details: [{
         type: `card`,
         card_type: `${
@@ -403,21 +646,24 @@ function Review() {
           ? "0000000000000000"
           : "0000000000000000"
         }`,
-        plan_id: '0',
+        plan_id: '',
         domain: item?.product_name,
         phone: userData?.phone_no,
         email: userData?.email,
         country: userData?.region,
         due_date: domainExpiryDate,
       }],
-      plan_name: "0",
-      workspace_status: userData?.workspace?.workspace_status,
+      plan_name: "",
+      workspace_status: userData?.workspace ? userData?.workspace?.workspace_status : "trial",
       is_trial: false,
-      license_usage: userData?.license_usage
+      license_usage: userData?.license_usage || cart?.find(item => item?.product_type === "google workspace")?.total_year
     };
     try {
-      const result = await dispatch(addSubscriptionThunk(data)).unwrap();
-      console.log("result2...", result);
+      const subResult = await dispatch(addSubscriptionThunk(data)).unwrap();
+      console.log("result2...", subResult);
+      if(subResult) {
+        await addBillingHistory(item, result, paymentMethod, "domain", subResult?.subscription_id);
+      }
     } catch (error) {
       console.log(error);
       if(error?.error == "Request failed with status code 401") {
@@ -610,7 +856,7 @@ function Review() {
   //   }
   // };
 
-  const addBillingHistory = async(item, paymentResult, madePaymentMethod, product_type) => {
+  const addBillingHistory = async(item, paymentResult, madePaymentMethod, product_type, subscriptionId) => {
     try {
       await dispatch(addBillingHistoryThunk({
         user_id: customerId,
@@ -631,19 +877,22 @@ function Review() {
         }`,
         product_type: product_type,
         description: product_type?.toLowerCase() === "google workspace"
-        ? `purchase google workspace ${item?.product_type} ${item?.total_year}`
+        ? `purchase google workspace ${item?.product_name} ${item?.total_year}`
         : product_type?.toLowerCase() === "domain"
         ? "purchase domain"
         : "",
         domain: product_type?.toLowerCase() === "google workspace"
-        ? domainsState?.find(item2 => item2?.domain_type === "primary")?.domain_name
+        ? item?.workspace_status === "trial"
+          ? cart?.find(item2 => item2?.product_type === "domain")?.product_name || ""
+          : domainsState?.find(item2 => item2?.domain_type === "primary")?.domain_name || ""
         : product_type?.toLowerCase() === "domain"
         ? item?.product_name
         : "",
         payment_method: madePaymentMethod,
         payment_status: "Success",
         amount: `${currencyList?.find(item2 => item2?.name === defaultCurrencySlice)?.logo}${finalTotalPrice}`,
-        transaction_data: paymentResult
+        transaction_data: paymentResult,
+        subscription_id: subscriptionId
       }));
     } catch (error) {
       console.log("error");
@@ -677,10 +926,10 @@ function Review() {
             year: cart?.find(item => item?.product_type?.toLowerCase() === "domain")?.total_year || ""
           },
           workspace: {
-            plan: usedPlan,
+            plan: usedPlan || "",
             license_usage: cart?.find((item) => item?.product_type === "google workspace")?.total_year,
             plan_period: cart?.find((item) => item?.product_type === "google workspace")?.payment_cycle,
-            trial_plan: "no"
+            trial_plan: cart?.find((item) => item?.product_type === "google workspace")?.workspace_status === "trial" ? "yes" : "no"
           },
           customer_id: customerId,
           email: userData?.email,
@@ -697,13 +946,87 @@ function Review() {
         if(result?.message === "Payment successful") {
           setTimeout(async() => {
             // navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: result?.charge}});
-            cart?.map((item) => {
+            await updateProfileData();
+            cart?.map(async(item) => {
               if(item?.product_type?.toLowerCase() === "google workspace") {
-                addSubscriptionForWorkspace(item, result?.charge);
-                addBillingHistory(item, result?.charge, "Stripe", "google workspace");
+                const workspaceSubscription = await addSubscriptionForWorkspace(item, result?.charge);
+                console.log(workspaceSubscription);
+                // await addBillingHistory(item, result?.charge, "Stripe", "google workspace", workspaceSubscription?.subscription_id);
+                // await dispatch(addBillingHistoryThunk({
+                //   user_id: customerId,
+                //   transaction_id: result?.charge?.balance_transaction,
+                //   date: todayDate,
+                //   invoice: result?.charge?.payment_method_details?.card?.network_transaction_id,
+                //   product_type: "google workspace",
+                //   description: `purchase google workspace ${item?.product_name} ${item?.total_year}`,
+                //   domain: item?.workspace_status === "trial"
+                //   ? cart?.find(item2 => item2?.product_type === "domain")?.product_name || ""
+                //   : domainsState?.find(item2 => item2?.domain_type === "primary")?.domain_name || "",
+                //   payment_method: "Stripe",
+                //   payment_status: "Success",
+                //   amount: `${currencyList?.find(item2 => item2?.name === defaultCurrencySlice)?.logo}${finalTotalPrice}`,
+                //   transaction_data: result?.charge,
+                //   subscription_id: domainSubscription?.subscription_id
+                // }));
+                if(item?.workspace_status === "trial") {
+                  await dispatch(makeDefaultPaymentMethodThunk({user_id: customerId, payment_method_id: paymentMethodId}));
+                  const role = await dispatch(addSettingThunk({user_type: "Super Admin", user_id: customerId, permissions: superAdminPermissions})).unwrap();
+                  // settingId
+                  await dispatch(addStaffThunk({user_id: customerId, first_name: userData?.first_name, last_name: userData?.last_name, email: userData?.email, phone_no: userData?.phone_no, user_type_id: role?.settingId}));
+                }
               } else if(item?.product_type?.toLowerCase() === "domain") {
-                addSubscriptionForDomain(item, result?.charge);
-                addBillingHistory(item, result?.charge, "Stripe", "domain");
+                const domainSubscription = await addSubscriptionForDomain(item, result?.charge);
+                // await addBillingHistory(item, result?.charge, "Stripe", "domain", domainSubscription?.subscription_id);
+                // await dispatch(addBillingHistoryThunk({
+                //   user_id: customerId,
+                //   transaction_id: result?.charge?.balance_transaction,
+                //   date: todayDate,
+                //   invoice: result?.charge?.payment_method_details?.card?.network_transaction_id,
+                //   product_type: "domain",
+                //   description: `purchase domain ${item?.product_name}`,
+                //   domain: item?.product_name,
+                //   payment_method: "Stripe",
+                //   payment_status: "Success",
+                //   amount: `${currencyList?.find(item2 => item2?.name === defaultCurrencySlice)?.logo}${finalTotalPrice}`,
+                //   transaction_data: result?.charge,
+                //   subscription_id: domainSubscription?.subscription_id
+                // }));
+                const domainData = await dispatch(addNewDomainThunk({
+                  customer_id: data?.customer_id,
+                  domain_name: item?.product_name,
+                  domain_type: cart?.find((item) => item?.product_type === "google workspace") ? cart?.find((item) => item?.product_type === "google workspace")?.workspace_status === "trial" ? "primary" : "secondary" : "secondary",
+                  subscription_id: "0",
+                  business_name: userData?.business_name,
+                  business_email: userData?.email,
+                  license_usage: cart?.find((item) => item?.product_type === "google workspace") ? cart?.find((item) => item?.product_type === "google workspace")?.total_year : userData?.license_usage ? userData?.license_usage : 0,
+                  plan: "0",
+                  payment_method: "Stripe",
+                  domain_status: true,
+                  billing_period: "Yearly",
+                  renew_status: "auto renewal",
+                  subscription_status: "auto renewal"
+                })).unwrap();
+                cart?.find((item) => item?.product_type === "google workspace")
+                ? cart?.find((item) => item?.product_type === "google workspace")?.workspace_status === "trial"
+                  ? await dispatch(addEmailsThunk({
+                    user_id: customerId,
+                    domain_id: domainData?.domain_id,
+                    emails: [
+                      {
+                        first_name: userData?.first_name,
+                        last_name: userData?.last_name,
+                        email: cart?.find((item) => item?.product_type === "google workspace")?.emails?.username,
+                        password: cart?.find((item) => item?.product_type === "google workspace")?.emails?.password,
+                      }
+                    ]
+                  })).unwrap()
+                  : ""
+                : "";
+                cart?.find((item) => item?.product_type === "google workspace")
+                ? cart?.find((item) => item?.product_type === "google workspace")?.workspace_status === "trial"
+                  ? await dispatch(makeEmailAdminThunk({domain_id: domainData?.domain_id, rec_id: cart?.find((item) => item?.product_type === "google workspace")?.emails?.username})).unwrap()
+                  : ""
+                : "";
               }
             })
             await updateCart();
@@ -736,7 +1059,7 @@ function Review() {
     lastName: userData?.last_name,
     channels: ['card']
   };
-
+  
   
   const body = {
     reference: (new Date()).getTime().toString(),
@@ -747,17 +1070,17 @@ function Review() {
     firstName: userData?.first_name,
     lastName: userData?.last_name,
     name: `${userData?.first_name} ${userData?.last_name}`,
-    description: 'purchasing google workspace and domain',
+    description: `purchasing ${cart?.filter(item => item.product_name)?.map(item => item.product_name)?.join(" and ")}`,
     domain: {
-      domain_name: primaryDomain?.domain_name,
-      type: "new",
-      year: 1
+      domain_name: cart?.find(item => item?.product_type?.toLowerCase() === "domain")?.product_name || "",
+      type: cart?.find(item => item?.product_type?.toLowerCase() === "domain")?.workspace_status || "",
+      year: cart?.find(item => item?.product_type?.toLowerCase() === "domain")?.total_year || ""
     },
     workspace: {
-      plan: usedPlan,
+      plan: usedPlan || "",
       license_usage: cart?.find((item) => item?.product_type === "google workspace")?.total_year,
       plan_period: cart?.find((item) => item?.product_type === "google workspace")?.payment_cycle,
-      trial_plan: "no"
+      trial_plan: cart?.find((item) => item?.product_type === "google workspace")?.workspace_status === "trial" ? "yes" : "no"
     },
     customer_id: customerId,
     voucher_id: appliedVoucher === null ? "" : appliedVoucher?.id
@@ -784,14 +1107,15 @@ function Review() {
         setProcessingModalOpen(true);
         // console.log(reference);
         setTimeout(async() => {
+          await updateProfileData();
           // navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: reference}});
           cart?.map(async(item) => {
             if(item?.product_type?.toLowerCase() === "google workspace") {
               await addSubscriptionForWorkspace(item, result?.charge);
-              await addBillingHistory(item, result?.charge, "Stripe", "google workspace");
+              // await addBillingHistory(item, result?.charge, "Stripe", "google workspace");
             } else if(item?.product_type?.toLowerCase() === "domain") {
               await addSubscriptionForDomain(item, result?.charge);
-              await addBillingHistory(item, result?.charge, "Stripe", "domain");
+              // await addBillingHistory(item, result?.charge, "Stripe", "domain");
             }
           })
           // setIsLicenseModalOpen(false);
@@ -854,11 +1178,12 @@ function Review() {
                   </div>
                   <div className='w-[140px] max-[768px]:w-full flex flex-col items-end text-end'>
                     <p className='font-inter font-normal text-xl text-black'>
-                      {currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}
                       {
                         item?.product_type === "google workspace"
-                        ? workspacePrice
-                        : item?.price
+                        ? `${item?.total_year} x ${currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}${workspacePrice}`
+                        : item?.product_type === "domain"
+                          ?`${item?.total_year} x ${currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}${item?.price[defaultCurrencySlice]}`
+                        : `${item?.total_year} x ${currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}${item?.price}`
                       }
                     </p>
                     <p className='font-inter font-medium text-base text-black'>+applicable tax</p>
@@ -934,45 +1259,117 @@ function Review() {
                 </h1>
 
                 {
-                  bottomForm.map((form, index) => {
-                    if(form.name === "state") {
+                  bottomForm?.map((form, index) => {
+                    if(form.name === "business_state") {
                       return (
-                        <div className='relative w-full flex flex-col h-[58px]' key={index}>
-                          <label className='absolute -mt-[10px] ml-4 font-inter font-normal text-sm text-[#8A8A8A] bg-white'>{form.label}</label>
-                          <select
-                            name={form?.name}
-                            className='border border-[#E4E4E4] px-3 py-1 w-full rounded-[10px] font-inter font-normal text-base text-[#1E1E1E] h-[45px]'
+                        <div
+                          className='flex flex-col mb-2 w-full mx-auto relative'
+                          ref={stateRef}
+                        >
+                          <label
+                            className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
+                          >Business State</label>
+                          <input
+                            type="text"
+                            name="business_state"
+                            required
+                            className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
                             onChange={(e) => {
                               setUserData({
                                 ...userData,
-                                [e.target.name]: e.target.value
-                              })
+                                business_state: '',
+                                business_city: '',
+                              });
+                              setStateName(e.target.value);
+                              setCityName('');
+                              setState({});
+                              setCity({});
                             }}
-                            value={userData[form.name]}
-                            required
-                          >
-                            <option value="West Bengal" selected>West Bengal</option>
-                          </select>
+                            value={userData?.business_state || stateName}
+                            onFocus={() => {setStateDropdownOpen(true)}}
+                            placeholder="Search your business state"
+                            // cypress-name={item.name+"_input"}
+                          />
+                          {
+                            stateDropdownOpen && (
+                              <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md max-h-32 overflow-auto'>
+                                {
+                                  states?.filter(name => name?.name.toLowerCase().includes(stateName.toLowerCase())).map((state, idx) => (
+                                    <p
+                                      key={idx}
+                                      className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                                      dropdown-name="country-dropdown"
+                                      onClick={() => {
+                                        setUserData({
+                                          ...userData,
+                                          business_state: state?.name,
+                                          business_city: ''
+                                        });
+                                        setStateName("");
+                                        setCityName("");
+                                        setState(state);
+                                        setCity({});
+                                        setStateDropdownOpen(false);
+                                      }}
+                                    >{state?.name}</p>
+                                  ))
+                                }
+                              </div>
+                            )
+                          }
                         </div>
                       )
-                    } else if(form.name === "city") {
+                    } else if(form.name === "business_city") {
                       return (
-                        <div className='relative w-full flex flex-col h-[58px]' key={index}>
-                          <label className='absolute -mt-[10px] ml-4 font-inter font-normal text-sm text-[#8A8A8A] bg-white'>{form.label}</label>
-                          <select
-                            name={form?.name}
-                            className='border border-[#E4E4E4] px-3 py-1 w-full rounded-[10px] font-inter font-normal text-base text-[#1E1E1E] h-[45px]'
+                        <div
+                          className='flex flex-col mb-2 w-full mx-auto relative'
+                          ref={cityRef}
+                        >
+                          <label
+                            className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
+                          >Business City</label>
+                          <input
+                            type="text"
+                            name="business_city"
+                            required
+                            className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
                             onChange={(e) => {
                               setUserData({
                                 ...userData,
-                                [e.target.name]: e.target.value
-                              })
+                                business_city: '',
+                              });
+                              setCityName(e.target.value);
+                              setCity({});
                             }}
-                            value={userData[form.name]}
-                            required
-                          >
-                            <option value="Kolkata" selected>Kolkata</option>
-                          </select>
+                            value={userData?.business_city || cityName}
+                            onFocus={() => {setCityDropdownOpen(true)}}
+                            placeholder="Search your business city"
+                            // cypress-name={item.name+"_input"}
+                          />
+                          {
+                            cityDropdownOpen && (
+                              <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md max-h-32 overflow-auto'>
+                                {
+                                  cities?.filter(name => name?.name.toLowerCase().includes(cityName.toLowerCase())).map((city, idx) => (
+                                    <p
+                                      key={idx}
+                                      className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                                      dropdown-name="country-dropdown"
+                                      onClick={() => {
+                                        setUserData({
+                                          ...userData,
+                                          business_city: city?.name
+                                        });
+                                        setCityName("");
+                                        setCity(city);
+                                        setCityDropdownOpen(false);
+                                      }}
+                                    >{city?.name}</p>
+                                  ))
+                                }
+                              </div>
+                            )
+                          }
                         </div>
                       )
                     } else {
@@ -1000,9 +1397,16 @@ function Review() {
                 }
 
                 <div className="flex flex-col items-start justify-start w-full gap-2 mb-4">
-                  <h1 className="font-inter font-semibold text-sm flex flex-row items-center justify-center mr-2">
+                  <h1 className="font-inter font-semibold text-sm flex flex-row items-center justify-center mr-2 relative">
                     Primary Contact
-                    <GoInfo className="ml-2 w-4 h-4" />
+                    <GoInfo className="ml-2 w-4 h-4" onMouseOver={() => {setPrimaryContactHover(true)}} onMouseLeave={() => {setPrimaryContactHover(false)}} />
+                    {
+                      primaryContactHover && (
+                        <div className="absolute bg-white w-[220px] top-5 left-[13px] rounded-md">
+                          <p className="bg-[#12A83330] px-4 py-3 w-full font-inter font-medium text-[10px] text-black rounded-md">This is your legal address of your organization or home</p>
+                        </div>
+                      )
+                    }
                     <BiSolidEditAlt
                       className="ml-2 w-4 h-4"
                       onClick={() => {
@@ -1024,7 +1428,17 @@ function Review() {
           </div>
           
           <div className="w-full relative">
-            <h2 className="mb-4 text-lg font-bold">Payment method</h2>
+            <div className="flex items-center mb-4 relative">
+              <h2 className="text-lg font-bold">Payment method</h2>
+              <GoInfo className="ml-2 w-4 h-4" onMouseOver={() => {setPaymentMethodHover(true)}} onMouseLeave={() => {setPaymentMethodHover(false)}}  />
+              {
+                paymentMethodHover && (
+                  <div className="absolute bg-white w-[270px] top-7 left-7 rounded-md">
+                    <p className="bg-[#12A83330] px-4 py-3 w-full font-inter font-medium text-[10px] text-black rounded-md">Available payment methods are determined by country and the type of payment selected in ‘How you pay’</p>
+                  </div>
+                )
+              }
+            </div>
             {/* Payment Options */}
             <div className="space-y-4">
               {
@@ -1036,7 +1450,10 @@ function Review() {
                         name="option"
                         value={method?.method_name}
                         checked={paymentMethod === method?.method_name}
-                        onChange={() => setPaymentMethod(method?.method_name)}
+                        onChange={() => {
+                          setPaymentMethod(method?.method_name);
+                          setPaymentMethodId(method?.id);
+                        }}
                         className="hidden"
                       />
                       <div

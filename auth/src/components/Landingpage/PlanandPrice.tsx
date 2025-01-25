@@ -119,6 +119,7 @@ const PlanandPrice = ({id}:any) => {
       console.log("result...", result);
       navigate('/domainlist', {state: {selectedDomain: domain, result: result, from: 'home', type: 'new'}});
     } catch (error) {
+      
       toast.error("Error finding domain");
     }
   };

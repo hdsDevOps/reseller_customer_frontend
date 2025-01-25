@@ -17,8 +17,9 @@ const ForgotPassword: React.FC = () => {
     setLoading(true);
     try {
       const result = await dispatch(forgetPasswordThunk({email: email})).unwrap();
-      navigate("/otp?mode=forgotpassword", {state: {email}});
+      navigate("/otp?mode=forgotpassword", {state: {email, from: 'forgot'}});
     } catch (error) {
+              
       toast.error("Please enter a valid email");
       setLoading(false);
     }

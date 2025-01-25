@@ -107,6 +107,8 @@ declare module 'store/user.thunk' {
   export const getRoleIdFromLSThunk;
   export const getSettingsListThunk;
   export const getBillingHistoryThunk;
+  export const verifyReCaptchaThunk;
+  export const addSettingThunk;
 }
 
 declare module 'store/authSlice' {
@@ -128,4 +130,11 @@ declare module 'store/authSlice' {
   export const setMetaDataSlice;
   export const setDefaultCurrencySlice;
   export const setNotificationsListSlice: (payload: any) => PayloadAction<any>;
+}
+
+declare module 'store/reseller.thunk' {
+  import { createAsyncThunk } from "@reduxjs/toolkit";
+
+  export const checkDomainThunk;
+  export const domainAvailabilityThunk;
 }

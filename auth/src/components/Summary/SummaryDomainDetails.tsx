@@ -48,7 +48,7 @@ const SummaryDomainDetails = ({state, handleContactModalOpen, handleBusinessModa
             {currencyList.find(item => item.name === defaultCurrencySlice)?.logo}
             {amount}{" "}
             {
-              state.period === "Yearly" ? "user/year" : "user/month"
+              state.period === "Yearly" ? "per user/year" : "per user/month"
             }
           </p>
           <p className="text-gray-500">

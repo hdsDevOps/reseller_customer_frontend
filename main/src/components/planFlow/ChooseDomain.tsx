@@ -7,7 +7,7 @@ import { useAppDispatch } from "store/hooks";
 import { toast } from "react-toastify";
 import { checkDomainThunk, domainAvailabilityThunk } from "store/reseller.thunk";
 
-const DomainDetails: React.FC = () => {
+const ChooseDomain: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
@@ -44,13 +44,9 @@ const DomainDetails: React.FC = () => {
         const result = await dispatch(domainAvailabilityThunk( `${domainName}${domainExtension}`)).unwrap();
         console.log("result...", result);
         if(result?.availablity_status === "false") {
-          if(location.state.from === "business_info") {
-            navigate('/domainlist', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, selectedDomain: {domain: domainName, domain_extension: domainExtension}, result: result, type: 'new'}});
-          }
+          navigate('/choose-from-list', {state: { ...location.state, selectedDomain: {domain: domainName, domain_extension: domainExtension}, result: result, type: 'new'}});
         } else{
-          if(location.state.from === "business_info") {
-            navigate('/domainlist', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, selectedDomain: {domain: domainName, domain_extension: domainExtension}, result: result, type: 'new_error'}});
-          }
+          navigate('/choose-from-list', {state: {...location.state, selectedDomain: {domain: domainName, domain_extension: domainExtension}, result: result, type: 'new_error'}});
         }
       } catch (error) {
         
@@ -87,15 +83,15 @@ const DomainDetails: React.FC = () => {
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center w-full h-full gap-6 p-4">
+    <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative">
       <p
         className="absolute flex items-center gap-1 text-green-600 cursor-pointer left-4 top-2"
-        onClick={() => navigate('/businessinfo', {state: location.state})}
+        onClick={() => navigate('/business-information', {state: location.state})}
       >
         <IoChevronBackSharp /> Back to previous page
       </p>
 
-      <div className="flex flex-col items-center justify-center w-full gap-6 p-7">
+      <div className="flex flex-col items-center justify-center w-full gap-6 min-[450px]:p-7">
         <div className="pb-4 text-center">
           <h1 className="text-3xl font-semibold xsm-max:text-[16px]">
             Next, We'll Setup Your Domain
@@ -108,9 +104,9 @@ const DomainDetails: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex w-full max-w-5xl gap-12 xsm-max:flex-col">
+        <div className="flex w-full max-w-5xl gap-12 xl:flex-row flex-col">
           {/* Form for Creating a New Domain */}
-          <div className="flex flex-col flex-1 bg-white border border-gray-200 rounded-xl">
+          <div className="flex flex-col flex-1 bg-white border border-gray-200 rounded-xl w-full max-w-[450px] mx-auto">
             <div className="p-3 bg-gray-100 rounded-t-md">
               <h2 className="text-xl font-semibold xsm-max:text-sm">Create a New Domain</h2>
             </div>
@@ -152,7 +148,7 @@ const DomainDetails: React.FC = () => {
           </div>
 
           {/* Form for Using an Existing Domain */}
-          <div className="flex flex-col flex-1 bg-white border border-gray-200 rounded-xl">
+          <div className="flex flex-col flex-1 bg-white border border-gray-200 rounded-xl w-full max-w-[450px] mx-auto">
             <div className="p-3 bg-gray-100 rounded-t-md">
               <h2 className="text-xl font-semibold xsm-max:text-sm">Use a Domain You Own</h2>
             </div>
@@ -175,7 +171,7 @@ const DomainDetails: React.FC = () => {
               <button
                 type="button"
                 className="px-4 py-2 text-white transition duration-200 ease-in-out bg-green-600 rounded-md hover:bg-green-700"
-                onClick={handleExistingDomainSubmit}
+                // onClick={handleExistingDomainSubmit}
               >
                 Next
               </button>
@@ -193,4 +189,4 @@ const DomainDetails: React.FC = () => {
   );
 };
 
-export default DomainDetails;
+export default ChooseDomain;

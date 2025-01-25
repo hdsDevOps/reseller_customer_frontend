@@ -54,6 +54,49 @@ const initialRolePermissions = [
   }
 ];
 
+const superRolePermissions = [
+  {
+      "name": "Dashboard",
+      "value": true
+  },
+  {
+      "name": "Profile",
+      "value": true
+  },
+  {
+      "name": "Domain",
+      "value": true
+  },
+  {
+      "name": "Payment Subscription",
+      "value": true
+  },
+  {
+      "name": "Email",
+      "value": true
+  },
+  {
+      "name": "Payment Method",
+      "value": true
+  },
+  {
+      "name": "Vouhcers",
+      "value": true
+  },
+  {
+      "name": "My Staff",
+      "value": true
+  },
+  {
+      "name": "Billing History",
+      "value": true
+  },
+  {
+      "name": "Settings",
+      "value": true
+  }
+];
+
 const flagList = [
   {flag: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/european-flag.png?alt=media&token=bb4a2892-0544-4e13-81a6-88c3477a2a64', name: 'EUR', logo: '€',},
   {flag: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/australia-flag.png?alt=media&token=5a2db638-131e-49c7-be83-d0c84db8d440', name: 'AUD', logo: 'A$',},
@@ -74,14 +117,14 @@ const DropdownMenu = () => {
   const [currencyModal, setCurrencyModal] = useState(false);
   
   const [rolePermissions, setRolePermissions] = useState(initialRolePermissions);
-  // console.log("rolePermissions...", rolePermissions);
+  console.log("rolePermissions header...", rolePermissions);
 
   const getRolePermission = async() => {
     try {
       const result = await dispatch(getSettingsListThunk({user_type: "", user_id: customerId})).unwrap();
       const rolePermissionsObject = await result?.settings?.find(item => item?.id === roleId);
       // console.log("rolePermissionsObject...", rolePermissionsObject);
-      setRolePermissions(rolePermissionsObject?.permissions);
+      setRolePermissions(rolePermissionsObject?.permissions || superRolePermissions);
     } catch (error) {
       setRolePermissions(initialRolePermissions);
     }
@@ -114,6 +157,7 @@ const DropdownMenu = () => {
 
   const checkPermission = () => {
     if(rolePermission?.length > 0) {
+      console.log("Check permission",rolePermission?.find(item => item?.name === "Profile")?.value)
       return rolePermission?.find(item => item?.name === "Profile")?.value;
     } else {
       return false;
@@ -135,11 +179,23 @@ const DropdownMenu = () => {
       </button>
       {isOpen && (
         <ul className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-md p-2">
-          <li className="flex items-center space-x-2 p-2">
+          <li className="flex items-center space-x-2 p-2 cursor-default">
             <span className="w-8 h-8 rounded-full bg-[#FF7272] text-white flex items-center justify-center text-xs font-bold">
-              {getInitials(userDetails?.first_name || "J")}{getInitials(userDetails?.last_name || "D")}
+              {
+                userDetails?.profile_image
+                ? (
+                  <img
+                    src={userDetails?.profile_image}
+                    alt="Profile"
+                    className="w-4 h-4 rounded-full border-2 border-gray-300 object-cover cursor-pointer"
+                  />
+                ) : (
+                  <p className="font-medium">{getInitials(userDetails?.first_name || "J")}{getInitials(userDetails?.last_name || "D")}</p>
+                )
+              }
             </span>
             <div className="text-xs overflow-hidden whitespace-nowrap">
+              
               <p className="font-medium">{userDetails?.first_name} {userDetails?.last_name}</p>
               <p className="text-gray-500 text-[10px]">
                 {userDetails?.email}
@@ -147,13 +203,14 @@ const DropdownMenu = () => {
             </div>
           </li>
           <li className="border-t border-gray-200 my-1"></li>
-          {/* {
-            checkPermission() && ( */}
+          {
+            checkPermission() && (
               <li
                 onClick={() => {
                   navigate('/profile');
                   setIsOpen(false);
                 }}
+                className="cursor-pointer"
               >
                 <a
                   className="flex items-center space-x-2 p-2 hover:bg-gray-100 text-xs"
@@ -162,10 +219,10 @@ const DropdownMenu = () => {
                   <span>Profile Settings</span>
                 </a>
               </li>
-            {/* )
-          } */}
+            )
+          }
           
-          <li>
+          <li className="cursor-pointer">
             <a
               onClick={() => {setCurrencyModal(true)}}
               className="flex items-center space-x-2 p-2 hover:bg-gray-100 text-xs"

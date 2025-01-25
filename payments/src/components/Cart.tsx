@@ -46,7 +46,7 @@ const Cart = () => {
   const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
   const [isVoucherApplied, setIsVoucherApplied] = useState(false);
   const [cart, setCartItems] = useState([]);
-  // console.log("cart...", cart);
+  console.log("cart...", cart);
   const [vouchers, setVouchers] = useState([]);
   const [filterVouchers, setFilterVouchers] = useState([]);
   // console.log("vouchers..", vouchers);
@@ -61,7 +61,7 @@ const Cart = () => {
   const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
   const [legalModalType, setLegalModalType] = useState("");
   const [cartPrice, setCartPrice] = useState([initialCartPrice]);
-  // console.log("cartPrice...", cartPrice);
+  console.log("cartPrice...", cartPrice);
   const [workspacePrice, setWorkspacePrice] = useState(0);
   const [currentPlan, setCurrentPlan] = useState<object|null>(null);
   // console.log("currentPlan...", currentPlan);
@@ -152,9 +152,13 @@ const Cart = () => {
     if(cart?.length > 0) {
       const priceList = cart.map((item) => {
         if(item?.product_type === "google workspace"){
-          return {total_year: item?.total_year, price: workspacePrice};
+          if(item?.workspace_status === "trial") {
+            return {total_year: item?.total_year, price: 0};
+          } else {
+            return {total_year: item?.total_year, price: workspacePrice};
+          }
         } else if(item?.product_type?.toLowerCase() === "domain") {
-          return {total_year: item?.total_year, price: 953.72};
+          return {total_year: item?.total_year, price: item?.price[defaultCurrencySlice]};
         }
       });
 
@@ -166,7 +170,7 @@ const Cart = () => {
 
   useEffect(() => {
     calculateCartAmount(cart);
-  }, [cart, workspacePrice]);
+  }, [cart, workspacePrice, defaultCurrencySlice]);
 
   useEffect(() => {
     // const filterByCurrency = vouchers?.filter(v => v?.voucher?.voucher_code === defaultCurrencySlice);
@@ -177,10 +181,12 @@ const Cart = () => {
   useEffect(() => {
     if(cart?.length > 0) {
       const total = cartPrice?.reduce((totalCart, item) => {
-        const amountt = parseFloat(item?.price) * parseInt(item?.total_year);
-        return totalCart + amountt;
+        let amount = parseFloat(item?.price) * parseInt(item?.total_year);
+    
+        console.log(`${item?.product_type}...`, totalCart + amount);
+        return totalCart + amount;
       }, 0);
-      // console.log("cartTotal...", total);
+      console.log("cartTotal...", total);
       setTotalPrice(parseFloat(total.toFixed(2)));
       setTaxedPrice(parseFloat(((total * taxAmount) / 100).toFixed(2)));
       const discountedPercent = appliedVoucher === null
@@ -478,7 +484,7 @@ const Cart = () => {
                             className="max-w-full focus:outline-none border-0 h-full w-[40px] ml-1"
                               type="number"
                               onChange={e => {
-                                if(userDetails?.workspace?.workspace_status === "trial") {
+                                if(item?.workspace_status === "trial") {
                                   if(e.target.value < 0) {
                                     handleChangeCartValue(e, index, 0)
                                   } else if(e.target.value > 10) {
@@ -516,11 +522,41 @@ const Cart = () => {
                     <div className="cart-delete-flex">
                       <div className="flex flex-col justify-start
                      text-left">
-                        <span className="text-xl font-inter font-bold text-black text-end">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{
-                          item?.product_type === "google workspace"
-                          ? workspacePrice
-                          : item?.price
-                        }</span>
+                        <p className="text-xl font-inter font-bold text-black text-end flex flex-row">
+                          {
+                            item?.workspace_status === "trial"
+                            ? item?.product_type === "google workspace"
+                              ? (
+                                <>
+                                  <span className="line-through text-red-600">
+                                    {item?.total_year} x {currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{
+                                      item?.product_type === "google workspace"
+                                      ? workspacePrice
+                                      : item?.price[defaultCurrencySlice]
+                                    }
+                                  </span>
+                                  <span className="">{" "}{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}0</span>
+                                </>
+                              ) : (
+                                <>
+                                  {item?.total_year} x {currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{
+                                    item?.product_type === "google workspace"
+                                    ? workspacePrice
+                                    : item?.price[defaultCurrencySlice]
+                                  }
+                                </>
+                              )
+                            : (
+                              <>
+                                {item?.total_year} x {currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{
+                                  item?.product_type === "google workspace"
+                                  ? workspacePrice
+                                  : item?.price[defaultCurrencySlice]
+                                }
+                              </>
+                            )
+                          }
+                        </p>
                         <small className="font-inter font-medium text-[8px] text-gray-400 self-end max-w-[70px]">
                           <span className="capitalize">{item?.payment_cycle}</span> cycle
                         </small>
@@ -622,11 +658,39 @@ const Cart = () => {
                             </small>
                           </div>
                           <div className="text-xl font-normal text-black">
-                            <h2>{item?.total_year} X {currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{
-                              item?.product_type === "google workspace"
-                              ? workspacePrice
-                              : item?.price  
-                            }</h2>
+                              {
+                                item?.workspace_status === "trial"
+                                ? item?.product_type === "google workspace"
+                                  ? (
+                                    <h2 className="flex gap-1">
+                                      <span className="line-through text-red-600">
+                                        {item?.total_year} x {currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{
+                                          item?.product_type === "google workspace"
+                                          ? workspacePrice
+                                          : item?.price[defaultCurrencySlice]
+                                        }
+                                      </span>
+                                      <span>{" "}{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}0</span>
+                                    </h2>
+                                  ) : (
+                                    <h2>
+                                      {item?.total_year} x {currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{
+                                        item?.product_type === "google workspace"
+                                        ? workspacePrice
+                                        : item?.price[defaultCurrencySlice]
+                                      }
+                                    </h2>
+                                  )
+                                : (
+                                  <h2>
+                                    {item?.total_year} X {currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{
+                                      item?.product_type === "google workspace"
+                                      ? workspacePrice
+                                      : item?.price[defaultCurrencySlice]
+                                    }
+                                  </h2>
+                                )
+                              }
                           </div>
                         </div>
                       ))

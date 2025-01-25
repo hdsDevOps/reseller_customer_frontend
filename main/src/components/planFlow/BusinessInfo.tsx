@@ -4,12 +4,17 @@ import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { IoChevronBackSharp } from "react-icons/io5";
 import "./cumtel.css";
-import { useAppDispatch } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 import axios from "axios";
-import { hereMapSearchThunk, udpateBusinessDataThunk } from "store/user.thunk";
+import { getProfileDataThunk, hereMapSearchThunk, udpateProfileDataThunk } from "store/user.thunk";
 import { toast } from "react-toastify";
+import { setUserDetails } from "store/authSlice";
 
 //user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, zipcode
+
+const initialFormData = {
+  
+}
 
 const BusinessInfo: React.FC = () => {
   const navigate = useNavigate();
@@ -18,7 +23,11 @@ const BusinessInfo: React.FC = () => {
   const stateRef = useRef(null);
   const cityRef = useRef(null);
 
-  console.log("state....", location.state);
+  const { userDetails, customerId, staffId, staffStatus } = useAppSelector(state => state.auth);
+
+  // console.log("userDetails...", userDetails);
+
+  // console.log("state....", location.state);
 
   useEffect(() => {
     if(!location.state) {
@@ -26,12 +35,13 @@ const BusinessInfo: React.FC = () => {
     }
   }, [location.state]);
 
-  const [formData, setFormData] = useState(location.state.formData);
-  console.log("form data...", formData);
-  const region = location.state.formData.country;
+  const [formData, setFormData] = useState<object|null>(null);
+  // console.log("form data...", formData);
   
   const [isNumberValid, setIsNumberValid] = useState(false);
-  console.log({isNumberValid});
+  // console.log({isNumberValid});
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const [address, setAddress] = useState("");
   // console.log("address...", address);
@@ -47,16 +57,32 @@ const BusinessInfo: React.FC = () => {
   const [states, setStates] = useState([]);
   const [cities, setCitites] = useState([]);
   const [country, setCountry] = useState({});
-  console.log("country...", country);
+  // console.log("country...", country);
   const [state, setState] = useState({});
   const [city, setCity] = useState({});
   // console.log({countries, states, cities});
   // console.log({country, state, city});
 
   useEffect(() => {
-    const countryFind = countries?.find(item => item?.name === region);
+    if(userDetails !== null) {
+      setFormData({...userDetails});
+    }
+  }, [userDetails]);
+
+  useEffect(() => {
+    const countryFind = countries?.find(item => item?.name === userDetails?.country);
     setCountry(countryFind || {});
-  }, [countries, region])
+  }, [countries, userDetails]);
+
+  useEffect(() => {
+    const stateFind = states?.find(item => item?.name === userDetails?.state);
+    setState(stateFind || {});
+  }, [states, userDetails]);
+
+  useEffect(() => {
+    const cityFind = cities?.find(item => item?.name === userDetails?.city);
+    setCity(cityFind || {});
+  }, [cities, userDetails]);
 
   const [stateDropdownOpen, setStateDropdownOpen] = useState<Boolean>(false);
   const [cityDropdownOpen, setCityDropdownOpen] = useState<Boolean>(false);
@@ -82,13 +108,13 @@ const BusinessInfo: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if(states.length > 0 && stateName !== "") {
+    if(states?.length > 0 && stateName !== "") {
       setStateDropdownOpen(true);
     }
   }, [states, stateName]);
 
   useEffect(() => {
-    if(cities.length > 0 && cityName !== "") {
+    if(cities?.length > 0 && cityName !== "") {
       setCityDropdownOpen(true);
     }
   }, [cities, cityName]);
@@ -103,7 +129,7 @@ const BusinessInfo: React.FC = () => {
     };
     axios(config)
       .then(res => {
-        setCountries(res.data);
+        setCountries(res?.data);
         // console.log(res.data);
       })
       .catch(err => {
@@ -123,7 +149,7 @@ const BusinessInfo: React.FC = () => {
       };
       axios(config)
       .then(res => {
-        setStates(res.data);
+        setStates(res?.data);
       })
       .catch(err => {
         setStates([]);
@@ -145,7 +171,7 @@ const BusinessInfo: React.FC = () => {
       };
       axios(config)
       .then(res => {
-        setCitites(res.data);
+        setCitites(res?.data);
       })
       .catch(err => {
         setCitites([]);
@@ -204,7 +230,7 @@ const BusinessInfo: React.FC = () => {
     }
   }, [addressList, address]);
 
-  const findAddress = async() => {
+  const findAddress = async(address:string) => {
     try {
       const result = await dispatch(hereMapSearchThunk({address: address})).unwrap();
       // console.log("result...", result);
@@ -217,15 +243,19 @@ const BusinessInfo: React.FC = () => {
 
   useEffect(() => {
     if(address?.length > 0) {
-      findAddress();
+      findAddress(address);
+    } else {
+      if(userDetails?.address !== null || userDetails?.address !== undefined || userDetails?.address !== "") {
+        findAddress(userDetails?.address);
+      }
     }
-  }, [address]);
+  }, [userDetails?.address, address]);
 
   const removePrefix = (input:string, prefix:string) => {
-    if(input.startsWith(prefix)) {
-      return input.slice(prefix.length);
-    } else if(input.startsWith('0')) {
-      return input.slice(1);
+    if(input?.startsWith(prefix)) {
+      return input?.slice(prefix.length);
+    } else if(input?.startsWith('0')) {
+      return input?.slice(1);
     }
     return input;
   };
@@ -235,48 +265,56 @@ const BusinessInfo: React.FC = () => {
   };
 
   useEffect(() => {
-    if(location.state.formData.phone_no === formData.phone_no) {
+    if(userDetails?.phone_no === formData?.phone_no) {
       setIsNumberValid(true);
     }
-  }, [location.state]);
+  }, [userDetails]);
+  
+  const getProfileData = async() => {
+    try {
+      const result = await dispatch(getProfileDataThunk({user_id: customerId, staff_id: staffId, is_staff: staffStatus})).unwrap();
+      console.log("result...", result);
+      await dispatch(setUserDetails(result?.customerData));
+    } catch (error) {
+      //
+    }
+  };
 
   const handleSubmit = async(e) => {
     // Handle form submission or navigate to another route
     // navigate("/adddomain");
     e.preventDefault();
-    if(location.state.phone_no === formData?.phone_no || isNumberValid) {
+    setIsLoading(true);
+    if(userDetails?.phone_no === formData?.phone_no || isNumberValid) {
       try {
-        const result = await dispatch(udpateBusinessDataThunk({
-          user_id: location.state.customer_id,
-          first_name: location.state.formData.first_name,
-          last_name: location.state.formData.last_name,
-          email: location.state.formData.email,
+        const result = await dispatch(udpateProfileDataThunk({
+          user_id: customerId,
+          first_name: userDetails?.first_name,
+          last_name: userDetails?.last_name,
+          email: userDetails?.email,
           phone_no: formData?.phone_no,
           address: formData?.address,
           state: formData?.state,
           city: formData?.city,
-          country: region,
+          country: userDetails?.country,
           password: '',
           business_name: formData?.business_name,
-          business_state: '',
-          business_city: '',
+          business_state: userDetails?.business_state,
+          business_city: userDetails?.business_city,
           zipcode: formData?.zipcode,
-          token: location.state.token
+          staff_id: staffId,
+          is_staff: staffStatus
         })).unwrap();
         // console.log("result...", result);
-        
+        await getProfileData();
         toast.success("Business Information updated successfully");
-        if(location.state?.from === "home") {
-          navigate("/signin-domain", {state: { ...location.state, formData: formData, }});
-        } else {
-          navigate("/adddomain", {state: { ...location.state, formData: formData, from: 'business_info'}});
-        }
+        navigate("/choose-your-domain", {state: { ...location.state}})
       } catch (error) {
-        
+        setIsLoading(true);
         toast.error("Error updating Business Information");
       }
     } else {
-      
+      setIsLoading(true);
       toast.warning("Please enter a valid phone number");
     }
   };
@@ -536,14 +574,16 @@ const BusinessInfo: React.FC = () => {
         <div className="mt-6">
           <button
             type="submit"
-            disabled={isSubmitDisabled}
+            disabled={isLoading}
             className={`py-2 px-4 rounded-md text-white transition duration-200 ease-in-out ${
               isSubmitDisabled
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-green-600 hover:bg-green-700"
             }`}
           >
-            Submit
+            {
+              isLoading ? "Loading..." : "Submit"
+            }
           </button>
         </div>
       </form>

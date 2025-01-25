@@ -5,15 +5,19 @@ import "react-phone-input-2/lib/style.css";
 import { IoChevronBackSharp } from "react-icons/io5";
 import { TfiPlus, TfiMinus } from "react-icons/tfi";
 import "./cumtel.css"
-import { useAppDispatch } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { resgiterCustomerThunk } from "store/user.thunk";
+import { getProfileDataThunk, resgiterCustomerThunk, udpateProfileDataThunk } from "store/user.thunk";
+import { setUserDetails } from "store/authSlice";
 
 const Subscribe: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
+
+  const { userDetails, staffStatus, staffId, customerId } = useAppSelector(state => state.auth);
+  console.log("userDetails...", userDetails);
   
   useEffect(() => {
     const section = document.getElementById("top_subscribe");
@@ -22,7 +26,7 @@ const Subscribe: React.FC = () => {
     }
   })
 
-  console.log("state...", location.state);
+  // console.log("state...", location.state);
 
   useEffect(() => {
     if(!location.state) {
@@ -36,24 +40,17 @@ const Subscribe: React.FC = () => {
   const [ipCountry, setIpCountry] = useState("");
 
   useEffect(() => {
-    const getIpData = async() => {
-      const response = await fetch('https://geolocation-db.com/json/');
-      const data = await response.json();
-      console.log("first...", data);
-      setIpCountry(data?.country_name);
-    };
+    // const getIpData = async() => {
+    //   const response = await fetch('https://geolocation-db.com/json/');
+    //   const data = await response.json();
+    //   console.log("first...", data);
+    //   setIpCountry(data?.country_name);
+    // };
 
-    getIpData();
+    // getIpData();
   } , []);
-  const [formData, setFormData] = useState({
-    business_name: "",
-    country: "",
-    first_name: "",
-    last_name: "",
-    email: "",
-    phone_no: "",
-  });
-  // console.log("form data...", formData);
+  const [formData, setFormData] = useState<object|null>(null);
+  console.log("form data...", formData);
   const [count, setCount] = useState(1);
   const [countryDropdownOpen, setCountryDropdownOpen] = useState<Boolean>(false);
   const countryRef = useRef(null);
@@ -64,6 +61,12 @@ const Subscribe: React.FC = () => {
   // console.log("country...", country);
   const [isNumberValid, setIsNumberValid] = useState(false);
   console.log({isNumberValid});
+
+  useEffect(() => {
+    if(userDetails !== null) {
+      setFormData({...userDetails});
+    }
+  }, [userDetails?.business_name, userDetails?.country, userDetails?.first_name, userDetails?.last_name, userDetails?.email, userDetails?.phone_no]);
   
   const handleClickOutsideCountry = (event: MouseEvent) => {
     if(countryRef.current && !countryRef.current.contains(event.target as Node)) {
@@ -83,6 +86,12 @@ const Subscribe: React.FC = () => {
       setCountryDropdownOpen(true);
     }
   }, [countries, countryName]);
+  
+    useEffect(() => {
+      if(userDetails?.phone_no === formData?.phone_no) {
+        setIsNumberValid(true);
+      }
+    }, [userDetails, formData]);
 
   useEffect(() => {
     var config = {
@@ -95,7 +104,7 @@ const Subscribe: React.FC = () => {
     axios(config)
       .then(res => {
         setCountries(res.data);
-        // console.log(res.data);
+        console.log(res.data);
       })
       .catch(err => {
         setCountries([]);
@@ -103,18 +112,31 @@ const Subscribe: React.FC = () => {
       })
   }, []);
 
+  // useEffect(() => {
+  //   if(countries?.length > 0 && ipCountry !== "") {
+  //     const foundIpCountry = countries?.find((count) => count?.name?.toLowerCase() === ipCountry?.toLowerCase());
+  //     if(foundIpCountry) {
+  //       setFormData({
+  //         ...formData,
+  //         country: foundIpCountry?.name,
+  //       });
+  //       setCountry(foundIpCountry);
+  //     }
+  //   }
+  // }, [countries, ipCountry]);
+
   useEffect(() => {
-    if(countries?.length > 0 && ipCountry !== "") {
-      const foundIpCountry = countries?.find((count) => count?.name?.toLowerCase() === ipCountry?.toLowerCase());
+    if(countries?.length > 0 && formData?.country !== "") {
+      const foundIpCountry = countries?.find((count) => count?.name?.toLowerCase() === formData?.country?.toLowerCase());
       if(foundIpCountry) {
-        setFormData({
-          ...formData,
-          country: foundIpCountry?.name,
-        });
+        // setFormData({
+        //   ...formData,
+        //   country: foundIpCountry?.name,
+        // });
         setCountry(foundIpCountry);
       }
     }
-  }, [countries, ipCountry]);
+  }, [countries, formData !== null]);
 
   const handleChange = (e) => {
     setFormData({
@@ -150,7 +172,7 @@ const Subscribe: React.FC = () => {
 
   const handleNext = () => {
     setIsLoading(true);
-    if (step === 1 && formData.business_name && formData.country) {
+    if (step === 1 && formData?.business_name && formData?.country) {
       setStep(2);
       setIsLoading(false);
     } else if (step === 2) {
@@ -191,30 +213,58 @@ const Subscribe: React.FC = () => {
         setIsNextDisabled(false);
       }
     }
-  }, [step, formData])
+  }, [step, formData]);
+
+  const getProfileData = async() => {
+    try {
+      const result = await dispatch(getProfileDataThunk({user_id: customerId, staff_id: staffId, is_staff: staffStatus})).unwrap();
+      console.log("result...", result);
+      await dispatch(setUserDetails(result?.customerData));
+    } catch (error) {
+      //
+    }
+  };
 
   const handleSubscribeSubmit = async(e) => {
     e.preventDefault();
     setIsLoading(true);
     if(isNumberValid) {
       try {
-        const result = await dispatch(resgiterCustomerThunk({
-          email: formData?.email,
-          password: '',
-          phone_no: '',
+        const result = await dispatch(udpateProfileDataThunk({
+          user_id: customerId,
           first_name: formData?.first_name,
           last_name: formData?.last_name,
-          business_name: formData?.business_name,
+          email: userDetails?.email,
+          phone_no: formData?.phone_no,
+          address: userDetails?.address,
+          state: `${
+            formData?.country === userDetails?.country
+            ? userDetails?.state
+            : ""
+          }`,
+          city: `${
+            formData?.country === userDetails?.country
+            ? userDetails?.city
+            : ""
+          }`,
           country: formData?.country,
-          address: '',
-          state: '',
-          city: '',
-          zipcode: ''
+          password: '',
+          business_name: formData?.business_name,
+          business_state: userDetails?.business_state,
+          business_city: userDetails?.business_city,
+          zipcode: `${
+            formData?.country === userDetails?.country
+            ? userDetails?.zipcode
+            : ""
+          }`,
+          staff_id: staffId,
+          is_staff: staffStatus
         })).unwrap();
         console.log("result...", result);
-        navigate('/subscribeotp', { state: { ...location.state, formData: formData, customer_id: result?.customer_id, license_usage: count }});
+        await getProfileData();
+        navigate('/business-information', { state: { ...location.state, license_usage: count }});
       } catch (error) {
-        toast.error("Error registering");
+        toast.error("Error updating information");
         setIsLoading(false);
       }
     } else {
@@ -252,7 +302,7 @@ const Subscribe: React.FC = () => {
                 id="business_name"
                 type="text"
                 placeholder="Enter business name"
-                value={formData.business_name}
+                value={formData?.business_name}
                 onChange={handleChange}
                 name="business_name"
                 className="border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 relative focus:outline-none w-full"
@@ -268,7 +318,7 @@ const Subscribe: React.FC = () => {
               <input
                 type="text"
                 placeholder="Enter region name"
-                value={countryName || formData.country}
+                value={countryName || formData?.country}
                 onChange={e => {
                   setCountryName(e.target.value);
                   setFormData({
@@ -284,7 +334,7 @@ const Subscribe: React.FC = () => {
                 countryDropdownOpen && (
                   <div className="absolute mt-14 xl-custom:w-[28%] big:w-[27%] medium:w-[26%] md2:w-[26%] small-3:w-[94%] sm:w-[93%] small-2:w-[92%]  small-small:w-[90%] small:w-[88%] w-[85%] max-h-32 bg-[#E4E4E4] overflow-y-auto z-10 px-2 border border-[#8A8A8A1A] rounded-md">
                     {
-                      countries?.filter(name => name?.name.toLowerCase().includes(countryName.toLowerCase())).map((country, index) => (
+                      countries?.filter(name => name?.name?.toLowerCase().includes(countryName?.toLowerCase())).map((country, index) => (
                         <p
                           key={index}
                           className="py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer"
@@ -373,7 +423,7 @@ const Subscribe: React.FC = () => {
               name="first_name"
               type="text"
               placeholder="Robert"
-              value={formData.first_name}
+              value={formData?.first_name}
               onChange={handleChangeName}
               className="peer form-input"
             />
@@ -390,7 +440,7 @@ const Subscribe: React.FC = () => {
               name="last_name"
               type="text"
               placeholder="Clive"
-              value={formData.last_name}
+              value={formData?.last_name}
               onChange={handleChangeName}
               className="peer form-input"
             />
@@ -407,8 +457,9 @@ const Subscribe: React.FC = () => {
               name="email"
               type="email"
               placeholder="robertclive@gmail.com"
-              value={formData.email}
-              onChange={handleChange}
+              value={formData?.email}
+              // onChange={handleChange}
+              disabled
               className="peer form-input"
             />
             <label
@@ -422,12 +473,12 @@ const Subscribe: React.FC = () => {
           <div className="relative w-full mb-2">
             <div className="relatve"></div>
             <PhoneInput
-              country={country?.iso2.toLowerCase() || "us"}
-              value={formData.phone_no}
+              value={formData?.phone_no}
               onChange={(inputPhone, countryData, event, formattedValue) => {
                 handlePhoneChange(inputPhone);
-                if(countryData?.format?.length === formattedValue.length) {
+                if(countryData?.format?.length === formattedValue?.length) {
                   const newValue = removePrefix(inputPhone, countryData?.dialCode);
+                  console.log({inputPhone, countryData, formattedValue})
                   if (newValue.startsWith('0')) {
                     setIsNumberValid(false);
                   } else {

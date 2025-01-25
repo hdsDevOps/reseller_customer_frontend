@@ -223,7 +223,7 @@ const PaymentDetails: React.FC = () => {
       ...cartItems,
       {
         payment_cycle: userDetails?.workspace?.payment_cycle,
-        price: cartAddAmount(activePlan, userDetails?.workspace?.payment_cycle)?.discount_price,
+        price: activePlan?.amount_details,
         currency: defaultCurrencySlice,
         product_name: activePlan?.plan_name,
         product_type: "google workspace",

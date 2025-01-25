@@ -47,19 +47,26 @@ const ResetPassword: React.FC = () => {
   const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    if (password === confirmPassword) {
-      try {
-        const result = await dispatch(resetPasswordThunk({
-          email: email,
-          password: password
-        })).unwrap();
-        navigate("/successpassword", {state: "Password reset successfull"});
-      } catch (error) {
-        toast.error("Error updating password.")
+    if(
+      password !== "" && password?.trim() !== "" &&
+      confirmPassword !== "" && confirmPassword?.trim() !== ""
+    ) {
+      if (password === confirmPassword) {
+        try {
+          const result = await dispatch(resetPasswordThunk({
+            email: email,
+            password: password
+          })).unwrap();
+          navigate("/successpassword", {state: "Password reset successfull"});
+        } catch (error) {
+          toast.error("Error updating password.")
+        }
+      } else {
+        toast.warning("Password and Confirm Password do not match");
+        setLoading(false);
       }
     } else {
-      toast.warning("Password and Confirm Password do not match");
-      setLoading(false);
+      toast.warning("Please fill all the inputs");
     }
   };
 

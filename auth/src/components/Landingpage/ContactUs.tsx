@@ -31,6 +31,15 @@ const ContactUs = ({contact, id}:any) => {
       [e.target.name]: e.target.value,
     });
   };
+  
+  const handleChangeFormName = (e) => {
+    const value = e.target.value;
+    const filteredValue = value.replace(/[^a-zA-Z\s]/g, "");
+    setFormData({
+      ...formData,
+      [e.target.name]: filteredValue,
+    })
+  };
 
   const removePrefix = (input:string, prefix:string) => {
     if(input.startsWith(prefix)) {
@@ -58,15 +67,19 @@ const ContactUs = ({contact, id}:any) => {
           formData?.message !== "" && formData?.message?.trim() !== ""
         ) {
           const result = await dispatch(contactFormThunk(formData)).unwrap();
+          
           toast.success(result?.message);
           setFormData(initialForm);
         } else {
+          
           toast.warning("Inputs cannot be empty");
         }
       } else {
+        
         toast.warning("Please enter a valid phone number");
       }
     } catch (error) {
+      
       toast.error("Error submiting the form");
     }
   }
@@ -86,13 +99,13 @@ const ContactUs = ({contact, id}:any) => {
             <p className="font-normal text-base">
               First Name<span className="text-[#ff0000]">*</span>
             </p>
-            <input type="text" className="w-full  p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" required name="first_name" onChange={handleChangeFormData} value={formData?.first_name} />
+            <input type="text" className="w-full  p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" required name="first_name" onChange={handleChangeFormName} value={formData?.first_name} />
           </div>
           <div className="md:col-span-1 col-span-2">
             <p className="font-normal text-base">
               Last Name<span className="text-[#ff0000]">*</span>
             </p>
-            <input type="text" className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" required name="last_name" onChange={handleChangeFormData} value={formData?.last_name} />
+            <input type="text" className="w-full p-2 border !border-black/30 bg-[#E7E8F4] rounded resize-none" required name="last_name" onChange={handleChangeFormName} value={formData?.last_name} />
           </div>
 
           <div className="col-span-2">

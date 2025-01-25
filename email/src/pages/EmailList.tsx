@@ -432,7 +432,7 @@ const EmailList: React.FC = () => {
   const handleUpdateEmailData = e => {
     setSelectedEmail({
       ...selectedEmail,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value.replace(/[^a-zA-Z\s]/g, ""),
     });
   };
   
@@ -464,6 +464,16 @@ const EmailList: React.FC = () => {
         array[index] = {
           ...array[index],
           email: value+`@${data?.domain_name}`
+        }
+        return array;
+      })
+    } else if(field === "first_name" || field === "last_name") {
+      const filteredValue = value.replace(/[^a-zA-Z\s]/g, "");
+      setNewEmails((prev) => {
+        const array = [...prev];
+        array[index] = {
+          ...array[index],
+          [field]: filteredValue
         }
         return array;
       })
@@ -691,30 +701,37 @@ const EmailList: React.FC = () => {
 
   const handleRenameAccountSubmit = async(e) => {
     e.preventDefault();
-    try {
-      const result = await dispatch(updateEmailUserDataThunk({
-        domain_id: selectedDomain?.id,
-        uuid: selectedEmail?.uuid,
-        first_name: selectedEmail?.first_name,
-        last_name: selectedEmail?.last_name,
-      })).unwrap();
-      toast.success(result?.message);
-      setIsRenameUserAccountModalOpen(false);
-      setSelectedEmail({});
-    } catch (error) {
-      toast.error("Error udpating email");
-      setIsRenameUserAccountModalOpen(false);
-      setSelectedEmail({});
-      if(error?.message == "Authentication token is required") {
-        try {
-          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
-          navigate('/login');
-        } catch (error) {
-          //
+    if(
+      selectedEmail?.first_name !== "" && selectedEmail?.first_name?.trim() !== "" &&
+      selectedEmail?.last_name !== "" && selectedEmail?.last_name?.trim() !== "" 
+    ) {
+      try {
+        const result = await dispatch(updateEmailUserDataThunk({
+          domain_id: selectedDomain?.id,
+          uuid: selectedEmail?.uuid,
+          first_name: selectedEmail?.first_name,
+          last_name: selectedEmail?.last_name,
+        })).unwrap();
+        toast.success(result?.message);
+        setIsRenameUserAccountModalOpen(false);
+        setSelectedEmail({});
+      } catch (error) {
+        toast.error("Error udpating email");
+        setIsRenameUserAccountModalOpen(false);
+        setSelectedEmail({});
+        if(error?.message == "Authentication token is required") {
+          try {
+            const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+            navigate('/login');
+          } catch (error) {
+            //
+          }
         }
+      } finally {
+        getDomainsList();
       }
-    } finally {
-      getDomainsList();
+    } else {
+      toast.warning("Please fill all the fields");
     }
   };
   

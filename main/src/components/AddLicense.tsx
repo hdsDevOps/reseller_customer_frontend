@@ -19,9 +19,10 @@ interface EmailModalProps {
   onClose: () => void;
   getDomainsList: () => void;
   selectedDomain: object|null;
+  licenseRef: any;
 }
 
-const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList, selectedDomain }) => {
+const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList, selectedDomain, licenseRef }) => {
   const navigate = useNavigate();
   const { userDetails, customerId, token, saveCardsState, paymentMethodsState, defaultCurrencySlice } = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();
@@ -514,7 +515,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList,
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded-lg shadow-md max-w-3xl w-full mx-2  max-h-[95vh] xl:max-h-full overflow-y-scroll">
+      <div className="bg-white p-6 rounded-lg shadow-md max-w-3xl w-full mx-2  max-h-[95vh] xl:max-h-full overflow-y-scroll" ref={licenseRef}>
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-xl font-bold">Add User License</h1>
           {/* <button className="flex items-center gap-1 text-green-500 border-2 border-green-500 hover:bg-green-500 hover:text-white transition duration-200 ease-in-out py-2 px-4 rounded-lg text-xs sm:text-sm">

@@ -165,6 +165,7 @@ const DomainSummary = ({state, plan}:any) => {
       setSelectedVoucher({voucher: voucherFind});
       setShowVoucherInput(false);
     } else {
+      
       toast.error(`No voucher found with voucher code: ${voucherCode}`);
     }
   };

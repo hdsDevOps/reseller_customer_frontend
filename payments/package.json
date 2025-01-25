@@ -42,6 +42,7 @@
     "@syncfusion/ej2-react-buttons": "^27.1.51",
     "@syncfusion/ej2-react-calendars": "^27.1.52",
     "antd": "^5.21.3",
+    "axios": "^1.7.9",
     "date-fns": "^4.1.0",
     "html2canvas-pro": "^1.5.8",
     "jspdf": "^2.5.2",

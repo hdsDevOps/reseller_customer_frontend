@@ -75,7 +75,7 @@ const SelectedDomain: React.FC = () => {
       const addCart = {
         product_name: location.state.domain.domain,
         product_type: "domain",
-        price: location.state.domain.price[defaultCurrencySlice],
+        price: location.state.domain.price,
         payment_cycle: "Yearly",
         total_year: 1,
         currency: defaultCurrencySlice,

@@ -12,11 +12,19 @@ import jsPDF from "jspdf";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { currencyList } from "../components/CurrencyList";
 import { setCart } from "store/authSlice";
+import './Dashboard.css';
 
 const inititalCancel = {
   number: 0,
   reason: ""
 };
+
+const initialExpiryData = {
+  plan_name: "",
+  is_trial: "",
+  days: 0,
+  date: format(new Date(), "dd-MM-yyyy"),
+}
 
 const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899";
 // const logo = "";
@@ -37,10 +45,12 @@ const Dashboard: React.FC = () => {
     }
     
     if(location.state?.from === "otp") {
+      
       toast.success(`Successfully logged`);
       // toast.success(`Successfully logged in ${Math.random() * 3}`);
       // console.log(`Successfully logged in ${Math.random() * 3}`)
     } else if(location.state?.from === "registration") {
+      
       toast.success("Successfully registered");
       // console.log("Resgisisin")
     } else {
@@ -98,6 +108,53 @@ const Dashboard: React.FC = () => {
   // console.log("billingHistoryData...", billingHistoryData);
   const [renewalStatus, setRenewalStatus] = useState(false);
   console.log("renewalStatus...", renewalStatus);
+
+  const [isExpirySectionOpen, setIsExpirySectionOpen] = useState(false);
+  const [expiryData, setExpiryData] = useState(initialExpiryData);
+  console.log("expiryData...", expiryData);
+
+  useEffect(() => {
+    const getExpiryDate = () => {
+      if(userDetails?.workspace) {
+        const miliseconds = parseInt(userDetails?.workspace?.next_payment?._seconds) * 1000 + parseInt(userDetails?.workspace?.next_payment?._nanoseconds) / 1e6;
+
+        const date = new Date(miliseconds);
+        // const date = new Date();
+        const today = new Date();
+
+        const timeDifference = Math.abs(date - today);
+        console.log("timeDifference...", timeDifference);
+        const days = Math.floor(timeDifference / (1000*60*60*24));
+        const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+        if(timeDifference < 0) {
+          setExpiryData({
+            ...expiryData,
+            days: -1,
+            date: format(new Date(), "dd-MM-yyyy")
+          })
+        } else {
+          if(days < 3) {
+            setExpiryData({
+              ...expiryData,
+              days: days,
+              date: format(date, "dd-MM-yyyy")
+            });
+            setIsExpirySectionOpen(true);
+          } else {
+            setExpiryData(initialExpiryData);
+            setIsExpirySectionOpen(false);
+          }
+        }
+      } else {
+        setExpiryData(initialExpiryData);
+        setIsExpirySectionOpen(false);
+      }
+    }
+
+    getExpiryDate();
+  }, [userDetails]);
 
   const getBillingHistoryList = async() => {
     try {
@@ -203,7 +260,7 @@ const Dashboard: React.FC = () => {
       ...cartItems,
       {
         payment_cycle: userDetails?.workspace?.payment_cycle,
-        price: cartAddAmount(activePlan, userDetails?.workspace?.payment_cycle)?.discount_price,
+        price: activePlan?.amount_details,
         currency: defaultCurrencySlice,
         product_name: activePlan?.plan_name,
         product_type: "google workspace",
@@ -223,6 +280,7 @@ const Dashboard: React.FC = () => {
       navigate('/add-cart');
     } catch (error) {
       // console.log(error);
+      
       toast.error("Error renewing plan");
       if(error?.error == "Request failed with status code 401") {
         try {
@@ -297,10 +355,12 @@ const Dashboard: React.FC = () => {
         payment_method_id: id
       })).unwrap();
       setTimeout(() => {
+        
         toast.success(result?.message);
       }, 1000);
     } catch (error) {
       if(error?.message == "Request failed with status code 401") {
+        
         toast.error("Error making default payment method");
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -327,6 +387,7 @@ const Dashboard: React.FC = () => {
       // console.log("result...", result);
     } catch (error) {
       if(error?.message == "Request failed with status code 401") {
+        
         toast.error("Error making default payment method");
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -411,7 +472,11 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     if(subscriptionsList?.length > 0) {
       const data = subscriptionsList?.find(item => item?.product_type === "google workspace");
-      setSubscription(data);
+      if(data) {
+        setSubscription(data);
+      } else {
+        setSubscription(null);
+      }
     } else {
       setSubscription(null);
     }
@@ -427,16 +492,41 @@ const Dashboard: React.FC = () => {
     return formattedDate;
   };
 
+  const formatExpiryDate = (seconds, nanoseconds) => {
+    const miliseconds = parseInt(seconds) * 1000 + parseInt(nanoseconds) / 1e6;
+
+    const date = new Date(miliseconds);
+    // const date = new Date();
+    const today = new Date();
+
+    const timeDifference = today - date;
+    const days = timeDifference / (1000 * 60 * 60 *24);
+    if(today > date) {
+      return {expired: true, days: parseInt(days)};
+    } else {
+      return {expired: false, days: 0};
+    }
+  };
+
+  console.log("user details", userDetails)
+
+  useEffect(() => {
+    if(userDetails?.workspace) {
+      console.log("format expiry...",formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds));
+    }
+  }, [userDetails])  
+
   const changeAutoRenewStatus = async(e) => {
     e.preventDefault();
     try {
       const result = await dispatch(changeAutoRenewThunk({subscription_id: subscriptionId, status: "manual", product_type: "google workspace"})).unwrap();
       // console.log("result....", result);
+      
       toast.success("Auto Renew Status updated");
     } catch (error) {
       if(error?.message == "Request failed with status code 401") {
-      toast.error("Auto Renew Status updation failed");
-      toast.error("Error making default payment method");
+        
+        toast.error("Auto Renew Status updation failed");
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');
@@ -454,220 +544,286 @@ const Dashboard: React.FC = () => {
 
   return (
     <div>
+      {
+        isExpirySectionOpen && (
+          <div className="warning-box">
+            <div className={`${
+              expiryData?.days < 0
+              ? "expired-warning"
+              : expiryData?.days >= 0 && expiryData?.days < 3
+              ? "expire-warning"
+              : ""
+            } common-warning`}>
+              <p className="font-inter font-normal text-lg text-black">Your {userDetails?.workspace?.wokrspace_status === "trial" ? "free trial" : "plan"} {expiryData?.days >= 0 ? "will be expired" : "has been expired"} {expiryData?.days > 0 ? `in ${expiryData?.days} days ` : expiryData?.days === 0 ? "today" : ""}{expiryData?.days !== 0 ? `on ${expiryData?.date}` : ""}.</p>
+              <button
+                type="button"
+                className={`px-6 py-2 ${
+                  expiryData?.days < 0
+                  ? "text-[#12A833]"
+                  : expiryData?.days >= 0 && expiryData?.days < 3
+                  ? "text-[#FF0000]"
+                  : ""
+                } border border-[#E02424] font-inter font-semibold text-sm rounded-[40px]`}
+              >{
+                expiryData?.days < 0
+                ? "Renew Plan"
+                : expiryData?.days >= 0 && expiryData?.days < 3
+                ? "Pay now"
+                : ""
+              }</button>
+            </div>
+            <button
+              type="button"
+              onClick={() => {setIsExpirySectionOpen(false)}}
+              className="w-4 h-4 text-[#919191] hover:text-slate-300"
+            ><X /></button>
+          </div>
+        )
+      }
       <main className="min-h-screen pb-1">
         <h2 className="text-sm sm:text-xl lg:text-4xl font-medium text-green-500">
           Welcome to your Dashboard
         </h2>
 
         <div className="overflow-x-auto mt-6">
-          { subscription !== null && (
-            <table className="min-w-full  rounded-t-md border-b border-gray-300">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
-                    Product Type
-                  </th>
-                  <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
-                    Payment Cycle
-                  </th>
-                  <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
-                    Description
-                  </th>
-                  <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
-                    Domain
-                  </th>
-                  <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
-                    Last Payment
-                  </th>
-                  <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
-                    Next Payment
-                  </th>
-                  <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
-                    Billing Status
-                  </th>
-                  <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
-                    Payment Method
-                  </th>
-                  <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="text-xs text-gray-400 relative">
-                  <td className="px-2 pb-10 pt-3">Google workspace</td>
-                  <td className="px-2 pb-10 pt-3 text-center">{subscription?.payment_cycle}</td>
-                  <td className="px-2 pb-10 pt-3 text-center">{subscription?.description}</td>
-                  <td className="px-2 pb-10 pt-3 text-center">{subscription?.domain[0]}</td>
-                  <td className="px-2 pb-10 pt-3 text-center">{formatDate(subscription?.last_payment?._seconds, subscription?.last_payment?._nanoseconds)}</td>
-                  <td className="px-2 pb-10 pt-3 text-center">{formatDate(subscription?.next_payment?._seconds, subscription?.next_payment?._nanoseconds)}</td>
-                  <td className="px-2 pb-10 pt-3 text-center">
-                    <button
-                      className={`w-[80px] h-[30px] rounded hover:text-white capitalize ${
-                        subscription?.subscription_status === "Cancelled"
-                        ? "text-red-700 border-2 border-red-500 hover:bg-red-500"
-                        : subscription?.subscription_status === "Expired"
-                        ? "bg-gray-300 text-gray-700 border-2 border-gray-500 hover:bg-gray-700"
-                        : subscription?.subscription_status === "Cancel Requested"
-                        ? "text-yellow-600 border-2 border-yellow-600 hover:bg-gray-300"
-                        : subscription?.subscription_status?.toLowerCase() === "manual"
-                        ? "text-yellow-600 border-2 border-yellow-600 hover:bg-gray-300"
-                        : "text-green-500 border-2 border-green-500 hover:bg-green-500"
-                      }`}
-                    >{subscription?.subscription_status}</button>
-                  </td>
-                  <td className="px-2 pb-10 pt-3 items-center align-middle flex justify-center content-center">
-                    <div className="inline-block">
-                      <img
-                        src={
-                          subscription?.payment_method?.toLowerCase() === "stripe"
-                          ? stripeImage
-                          : subscription?.payment_method?.toLowerCase() === "paystack"
-                          ? paystackImage
-                          : ""
-                        }
-                        alt="subscription?.payment_method"
-                        className="h-6 mr-1 inline-block"
-                      />
-                      <p className="text-[0.75rem] text-gray-600 font-semibold inline-block">
-                      {/* % 10000 */}
-                        {"..."}{
-                          Number(subscription?.payment_details[subscription?.payment_details?.length - 1]?.card_number) % 10000
-                        }
-                      </p>
-                    </div>
-                  </td>
-                  <td className="px-2 pb-10 pt-3 text-right">
-                    <button className="w-6 h-6 rounded-full border-2 border-green-500 flex justify-center items-center" type="button" onClick={() => setShowList(!showList)}>
-                      <p className="mb-2">...</p>
-                    </button>
-                  </td>
-                </tr>
-                {
-                  showList && (
-                    <div
-                      className="p-2 w-80 max-w-[12rem] absolute right-1 -mt-10 z-10"
-                      onClick={(e) => {e.stopPropagation()}}
-                      ref={listRef}
-                    >
-                      <ul className="bg-gray-100 rounded-xl shadow-md space-y-2 flex-grow flex-col items-start justify-center p-1">
-                        {
-                          showListTable.map((list, idx) => {
-                            if(list?.type === "link") {
-                              if(list?.label === "View payment details") {
-                                return (
-                                  <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={() => {navigate(list?.link, {state: subscription})}}>{list?.label}</li>
-                                )
-                              } else if(list?.label === "Renew Plan") {
-                                if(renewalStatus) {
-                                  return (
-                                    <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => renewalAddToCart(e)}>{list?.label}</li>
-                                  )
-                                }
-                              } else if(list?.label === "Update Plan") {
-                                if(userDetails?.workspace?.workspace_status !== "trial") {
-                                  return (
-                                    <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => renewalAddToCart(e)}>{list?.label}</li>
-                                  )
-                                }
-                              } else {
-                                if(subscription?.product_type?.toLowerCase() === "google workspace") {
+          {
+            subscription !== null ? (
+              <table className="min-w-full  rounded-t-md border-b border-gray-300">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
+                      Product Type
+                    </th>
+                    <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
+                      Payment Cycle
+                    </th>
+                    <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
+                      Description
+                    </th>
+                    <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
+                      Domain
+                    </th>
+                    <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
+                      Last Payment
+                    </th>
+                    <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
+                      Next Payment
+                    </th>
+                    <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
+                      Billing Status
+                    </th>
+                    <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
+                      Payment Method
+                    </th>
+                    <th className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="text-xs text-gray-400 relative">
+                    <td className="px-2 pb-10 pt-3">Google workspace</td>
+                    <td className="px-2 pb-10 pt-3 text-center">{subscription?.payment_cycle}</td>
+                    <td className="px-2 pb-10 pt-3 text-center">{subscription?.description}</td>
+                    <td className="px-2 pb-10 pt-3 text-center">{subscription?.domain[0]}</td>
+                    <td className="px-2 pb-10 pt-3 text-center">{formatDate(subscription?.last_payment?._seconds, subscription?.last_payment?._nanoseconds)}</td>
+                    <td className="px-2 pb-10 pt-3 text-center">{formatDate(subscription?.next_payment?._seconds, subscription?.next_payment?._nanoseconds)}</td>
+                    <td className="px-2 pb-10 pt-3 text-center">
+                      <button
+                        className={`w-[80px] h-[30px] rounded hover:text-white capitalize ${
+                          userDetails?.workspace?.workspace_status === "trial"
+                          ? "text-green-500 border-2 border-green-500 hover:bg-green-500"
+                          : formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.expired
+                          ? "bg-gray-300 text-gray-700 border-2 border-gray-500 hover:bg-gray-700"
+                          : subscription?.subscription_status === "Cancelled"
+                          ? "text-red-700 border-2 border-red-500 hover:bg-red-500"
+                          : subscription?.subscription_status === "Expired"
+                          ? "bg-gray-300 text-gray-700 border-2 border-gray-500 hover:bg-gray-700"
+                          : subscription?.subscription_status === "Cancel Requested"
+                          ? "text-yellow-600 border-2 border-yellow-600 hover:bg-gray-300"
+                          : subscription?.subscription_status?.toLowerCase() === "manual"
+                          ? "text-yellow-600 border-2 border-yellow-600 hover:bg-gray-300"
+                          : "text-green-500 border-2 border-green-500 hover:bg-green-500"
+                        }`}
+                      >{
+                        userDetails?.workspace?.workspace_status === "trial"
+                        ? "Trial Period"
+                        : formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.expired
+                        ? formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days === 0
+                          ? "Expired today"
+                          :  formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days === 1
+                          ? "1 day due"
+                          : formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days < 10
+                          ? `${formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days} days due`
+                          :  "Expired"
+                        : subscription?.subscription_status
+                      }</button>
+                    </td>
+                    <td className="px-2 pb-10 pt-3 items-center align-middle flex justify-center content-center">
+                      <div className="inline-block">
+                        <img
+                          src={
+                            subscription?.payment_method?.toLowerCase() === "stripe"
+                            ? stripeImage
+                            : subscription?.payment_method?.toLowerCase() === "paystack"
+                            ? paystackImage
+                            : ""
+                          }
+                          alt="subscription?.payment_method"
+                          className="h-6 mr-1 inline-block"
+                        />
+                        <p className="text-[0.75rem] text-gray-600 font-semibold inline-block">
+                        {/* % 10000 */}
+                          {"..."}{
+                            Number(subscription?.payment_details[subscription?.payment_details?.length - 1]?.card_number) % 10000
+                          }
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-2 pb-10 pt-3 text-right">
+                      <button className="w-6 h-6 rounded-full border-2 border-green-500 flex justify-center items-center" type="button" onClick={() => setShowList(!showList)}>
+                        <p className="mb-2">...</p>
+                      </button>
+                    </td>
+                  </tr>
+                  {
+                    showList && (
+                      <div
+                        className="p-2 w-80 max-w-[12rem] absolute right-1 -mt-10 z-50"
+                        onClick={(e) => {e.stopPropagation()}}
+                        ref={listRef}
+                      >
+                        <ul className="bg-gray-100 rounded-xl shadow-md space-y-2 flex-grow flex-col items-start justify-center p-1">
+                          {
+                            showListTable.map((list, idx) => {
+                              if(list?.type === "link") {
+                                if(list?.label === "View payment details") {
                                   return (
                                     <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={() => {navigate(list?.link, {state: subscription})}}>{list?.label}</li>
                                   )
+                                } else if(list?.label === "Renew Plan") {
+                                  if(renewalStatus) {
+                                    return (
+                                      <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => renewalAddToCart(e)}>{list?.label}</li>
+                                    )
+                                  }
+                                } else if(list?.label === "Update Plan") {
+                                  if(userDetails?.workspace?.workspace_status !== "trial") {
+                                    return (
+                                      <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => renewalAddToCart(e)}>{list?.label}</li>
+                                    )
+                                  }
+                                } else {
+                                  if(subscription?.product_type?.toLowerCase() === "google workspace") {
+                                    return (
+                                      <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={() => {navigate(list?.link, {state: subscription})}}>{list?.label}</li>
+                                    )
+                                  }
                                 }
-                              }
-                            } else if(list?.type === "modal") {
-                              if(list?.label === "Cancel Subscription" || list?.label === "Transfer Subscription") {
-                                if(subscription?.product_type?.toLowerCase() === "google workspace") {
+                              } else if(list?.type === "modal") {
+                                if(list?.label === "Cancel Subscription" || list?.label === "Transfer Subscription") {
+                                  if(subscription?.product_type?.toLowerCase() === "google workspace") {
+                                    return (
+                                      <li
+                                        key={idx}
+                                        className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
+                                        // onClick={() => {
+                                        //   setIsModalOpen(true);
+                                        //   setModalType(list?.label);
+                                        //   setSubscriptionId(detail?.id)
+                                        //   if(list?.label === "View Invoice") {
+                                        //     setInvoiceData(subscription);
+                                        //   } else {
+                                        //     setInvoiceData(null);
+                                        //   }
+                                        // }}
+                                      >{list?.label}</li>
+                                    )
+                                  }
+                                } else if(list?.label === "Turn off auto-renew") {
                                   return (
                                     <li
                                       key={idx}
-                                      className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
-                                      // onClick={() => {
-                                      //   setIsModalOpen(true);
-                                      //   setModalType(list?.label);
-                                      //   setSubscriptionId(detail?.id)
-                                      //   if(list?.label === "View Invoice") {
-                                      //     setInvoiceData(subscription);
-                                      //   } else {
-                                      //     setInvoiceData(null);
-                                      //   }
-                                      // }}
+                                      className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
+                                      onClick={() => {
+                                        setIsModalOpen(true);
+                                        setModalType(list?.label);
+                                        setSubscriptionId(subscription?.id)
+                                        if(list?.label === "Turn off auto-renew") {
+                                          setInvoiceData(subscription);
+                                        } else {
+                                          setInvoiceData(null);
+                                        }
+                                      }}
+                                    >{list?.label}</li>
+                                  )
+                                } else {
+                                  return (
+                                    <li
+                                      key={idx}
+                                      className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
+                                      onClick={() => {
+                                        setIsModalOpen(true);
+                                        setModalType(list?.label);
+                                        if(list?.label === "View Invoice") {
+                                          setInvoiceData(subscription);
+                                        } else {
+                                          setInvoiceData(null);
+                                        }
+                                      }}
                                     >{list?.label}</li>
                                   )
                                 }
-                              } else if(list?.label === "Turn off auto-renew") {
-                                return (
-                                  <li
-                                    key={idx}
-                                    className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
-                                    onClick={() => {
-                                      setIsModalOpen(true);
-                                      setModalType(list?.label);
-                                      setSubscriptionId(subscription?.id)
-                                      if(list?.label === "Turn off auto-renew") {
-                                        setInvoiceData(subscription);
-                                      } else {
-                                        setInvoiceData(null);
-                                      }
-                                    }}
-                                  >{list?.label}</li>
-                                )
                               } else {
                                 return (
-                                  <li
-                                    key={idx}
-                                    className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
-                                    onClick={() => {
-                                      setIsModalOpen(true);
-                                      setModalType(list?.label);
-                                      if(list?.label === "View Invoice") {
-                                        setInvoiceData(subscription);
-                                      } else {
-                                        setInvoiceData(null);
-                                      }
-                                    }}
-                                  >{list?.label}</li>
+                                  <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer">{list?.label}</li>
                                 )
                               }
-                            } else {
-                              return (
-                                <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer">{list?.label}</li>
-                              )
-                            }
-                          })
-                        }
-                      </ul>
-                    </div>
-                  )
-                }
-              </tbody>
-            </table>
-          )}
+                            })
+                          }
+                        </ul>
+                      </div>
+                    )
+                  }
+                </tbody>
+              </table>
+            ) : (
+              <div className="my-[10px] w-full bg-[#F8F7F7] rounded-[10px] drop-shadow-custom py-2 pb-4 px-4 flex flex-col">
+                <h3 className="font-inter font-medium small:text-[28px] text-xl text-black text-nowrap">Add Subscription</h3>
+                <p className="font-inter font-normal small:text-base text-sm text-black w-full pt-1 pb-3 border-b-2 border-black drop-shadow-custom">It seems you don’t have subscriptions</p>
+                <button
+                  type="button"
+                  className="max-w-[220px] bg-[#12A833] rounded-[10px] font-plus-jakarta-sans font-bold small:text-base text-sm text-white gap-1 items-center flex justify-center small:px-4 px-1 py-2 mt-3 mb-2"
+                  onClick={() => {navigate('/choose-your-plan')}}
+                >
+                  <Plus />
+                  <span>Add Subscription</span>
+                </button>
+              </div>
+            )
+          }
         </div>
         {
-          activeStatus ? (
-            <React.Fragment>
+          activeStatus
+          ? (
+            <div>
               <div className="">
                 <BusinessEmail data={selectedDomain} getDomainsList={getDomainsList} />
               </div>
               <SubscriptionModal isOpen={isSubscriptionModalOpen} onClose={() => setSubscriptionModalOpen(false)} />
-            </React.Fragment>
-          ) : (
-            <div className="my-[10px] w-full bg-[#F8F7F7] rounded-[10px] drop-shadow-custom py-2 pb-4 px-4 flex flex-col">
-              <h3 className="font-inter font-medium small:text-[28px] text-xl text-black text-nowrap">Add Subscription</h3>
-              <p className="font-inter font-normal small:text-base text-sm text-black w-full pt-1 pb-3 border-b-2 border-black drop-shadow-custom">It seems you don’t have subscriptions</p>
-              <button
-                type="button"
-                className="max-w-[220px] bg-[#12A833] rounded-[10px] font-plus-jakarta-sans font-bold small:text-base text-sm text-white gap-1 items-center flex justify-center small:px-4 px-1 py-2 mt-3 mb-2"
-                onClick={() => {navigate('/upgrade-plan')}}
-              >
-                <Plus />
-                <span>Add Subscription</span>
-              </button>
             </div>
           )
+          : userDetails?.workspace
+          ? (
+            <div className="relative pointer-events-none">
+              <div className="pointer-events-none">
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 font-inter font-semibold text-[40px] text-[#E02424] z-20">Expired !!!</div>
+                <div className="absolute bg-gray-400 bg-opacity-50 z-10 top-0 left-0 bottom-0 right-0 backdrop-blur-sm"></div>
+                <BusinessEmail data={selectedDomain} getDomainsList={getDomainsList} />
+              </div>
+              <SubscriptionModal isOpen={isSubscriptionModalOpen} onClose={() => setSubscriptionModalOpen(false)} />
+            </div>
+          ) : (<></>)
         }
 
         {

@@ -85,8 +85,10 @@ const Login: React.FC = () => {
       console.error("Login error:", error);
       setLoading(false);
       if(error?.message === "Request failed with status code 500") {
+        
         toast.error("Please enter correct email or password");
       } else {
+        
         toast.error("Error logging in");
       }
     }

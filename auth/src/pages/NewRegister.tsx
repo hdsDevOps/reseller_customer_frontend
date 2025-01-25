@@ -215,6 +215,15 @@ const RegisterPage: React.FC = () => {
       [e.target.name]: e.target.value,
     });
   };
+  
+  const updateCustomerName = (e) => {
+    const value = e.target.value;
+    const filteredValue = value.replace(/[^a-zA-Z\s]/g, "");
+    setCustomer({
+      ...customer,
+      [e.target.name]: filteredValue,
+    })
+  };
 
   const removePrefix = (input:string, prefix:string) => {
     if(input.startsWith(prefix)) {
@@ -244,9 +253,11 @@ const RegisterPage: React.FC = () => {
     // return;
     setLoading(true);
     if (customer.password !== confirmPassword) {
+      
       toast.warning("Passwords do not match");
       setLoading(false);
     } else if (!termsAccepted) {
+      
       toast.warning("You must accept the terms and conditions");
       setLoading(false);
     } else {
@@ -267,16 +278,19 @@ const RegisterPage: React.FC = () => {
               zipcode: customer?.zipcode
             })).unwrap();
             console.log("result...", result);
-            navigate("/otp?mode=signup", { state: {customer_id: result?.customer_id} })
+            navigate("/otp?mode=signup", { state: {customer_id: result?.customer_id, from: "registration"} })
           } catch (error) {
+            
             toast.error("Error registering customer");
             setLoading(false);
           }
         } else {
+          
           toast.warning("Please fill out all the fields");
           setLoading(false);
         }
       } else {
+        
         toast.warning("Please enter a valid phone number");
         setLoading(false);
       }
@@ -525,6 +539,26 @@ const RegisterPage: React.FC = () => {
                           </div>
                         )
                       }
+                    </div>
+                  )
+                } else if(head.name === "first_name" || head.name === "last_name") {
+                  return (
+                    <div
+                      key={index}
+                      className='flex flex-col px-2 mb-2  sm:col-span-1 col-span-2'
+                    >
+                      <label
+                        className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
+                      >{head.label}</label>
+                      <input
+                        type={head.type}
+                        name={head.name}
+                        required={head.required}
+                        className='border border-[#E4E4E4] rounded-[10px] h-[54px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                        onChange={updateCustomerName}
+                        placeholder={head?.placeholder}
+                        value={customer[head.name]}
+                      />
                     </div>
                   )
                 } else {

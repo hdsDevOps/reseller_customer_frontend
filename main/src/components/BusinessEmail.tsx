@@ -29,6 +29,9 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
     position: 'absolute', // Specify the initial position
   });
 
+  const licenseRef = useRef(null);
+  console.log(licenseRef, "licemse ewgv")
+
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
@@ -71,7 +74,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
   const handleUpdateEmailData = e => {
     setSelectedEmail({
       ...selectedEmail,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value.replace(/[^a-zA-Z\s]/g, ""),
     });
   };
   
@@ -118,6 +121,16 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
         array[index] = {
           ...array[index],
           email: value+`@${data?.domain_name}`
+        }
+        return array;
+      })
+    } else if(field === "first_name" || field === "last_name") {
+      const filteredValue = value.replace(/[^a-zA-Z\s]/g, "");
+      setNewEmails((prev) => {
+        const array = [...prev];
+        array[index] = {
+          ...array[index],
+          [field]: filteredValue
         }
         return array;
       })
@@ -237,6 +250,19 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
     }
   };
   
+  const handleClickOutsideLicenseRef = (event: MouseEvent) => {
+    if(licenseRef.current && !licenseRef.current.contains(event.target as Node)) {
+      setisLicenseModalOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutsideLicenseRef);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutsideLicenseRef);
+    };
+  }, []);
+  
   const handleClickOutsideRemoveEmail = (event: MouseEvent) => {
     if(removeEmailRef.current && !removeEmailRef.current.contains(event.target as Node)) {
       setIsRemoveUserModalOpen(false);
@@ -343,30 +369,37 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
 
   const handleRenameAccountSubmit = async(e) => {
     e.preventDefault();
-    try {
-      const result = await dispatch(updateEmailUserDataThunk({
-        domain_id: data?.id,
-        uuid: selectedEmail?.uuid,
-        first_name: selectedEmail?.first_name,
-        last_name: selectedEmail?.last_name,
-      })).unwrap();
-      toast.success(result?.message);
-      setIsRenameUserAccountModalOpen(false);
-      setSelectedEmail({});
-    } catch (error) {
-      toast.error("Error udpating email");
-      setIsRenameUserAccountModalOpen(false);
-      setSelectedEmail({});
-      if(error?.message == "Authentication token is required") {
-        try {
-          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
-          navigate('/login');
-        } catch (error) {
-          //
+    if(
+      selectedEmail?.first_name !== "" && selectedEmail?.first_name?.trim() !== "" &&
+      selectedEmail?.last_name !== "" && selectedEmail?.last_name?.trim() !== "" 
+    ) {
+      try {
+        const result = await dispatch(updateEmailUserDataThunk({
+          domain_id: data?.id,
+          uuid: selectedEmail?.uuid,
+          first_name: selectedEmail?.first_name,
+          last_name: selectedEmail?.last_name,
+        })).unwrap();
+        toast.success(result?.message);
+        setIsRenameUserAccountModalOpen(false);
+        setSelectedEmail({});
+      } catch (error) {
+        toast.error("Error udpating email");
+        setIsRenameUserAccountModalOpen(false);
+        setSelectedEmail({});
+        if(error?.message == "Authentication token is required") {
+          try {
+            const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+            navigate('/login');
+          } catch (error) {
+            //
+          }
         }
+      } finally {
+        getDomainsList();
       }
-    } finally {
-      getDomainsList();
+    } else {
+      toast.warning("Please fill all the fields");
     }
   };
   
@@ -788,6 +821,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
           onClose={() => setisLicenseModalOpen(false)}
           getDomainsList={() => getDomainsList()}
           selectedDomain={data}
+          licenseRef={licenseRef}
         />
         {
           isRemoveUserModalOpen && (

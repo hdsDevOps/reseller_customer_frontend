@@ -3,11 +3,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { IoChevronBackSharp } from "react-icons/io5";
 import { FaCrown } from "react-icons/fa";
 import { format } from "date-fns";
-import { currencyList } from "../components/CurrencyList";
+import { currencyList } from "../CurrencyList";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { plansAndPricesListThunk } from "store/user.thunk";
 
-const FreeTrial: React.FC = () => {
+const TrialSummary: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
@@ -16,7 +16,7 @@ const FreeTrial: React.FC = () => {
   // const plan = location.state.plan;
   const [plan, setPlan] = useState(location.state.plan);
   // console.log("plan...", plan?.amount_details);
-  const { defaultCurrencySlice } = useAppSelector(state => state.auth);
+  const { defaultCurrencySlice, userDetails } = useAppSelector(state => state.auth);
 
   const [today, setToday] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
@@ -62,7 +62,7 @@ const FreeTrial: React.FC = () => {
     <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative">
     <p
       className="flex items-center gap-1 text-green-600 cursor-pointer absolute left-4 top-2"
-      onClick={() => navigate('/signin-domain', {state: location.state})}
+      onClick={() => navigate('/how-you-will-sign-in-to-domain', {state: location.state})}
     >
       <IoChevronBackSharp /> Back to previous page
     </p>
@@ -120,7 +120,7 @@ const FreeTrial: React.FC = () => {
         </ul>
 
         <p className="text-xs text-gray-500 mb-4">
-          By clicking <span className="text-black">Start Free Trial</span>{" "}
+          By clicking <span className="text-black">Start Free Trial</span> 
             you agree to the{" "}
             <a href="#" className="text-green-600 cursor-pointer">
               Google Workspace Agreement, Google Workspace purchase Agreement
@@ -135,7 +135,7 @@ const FreeTrial: React.FC = () => {
             </a>.
         </p>
 
-        <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg" onClick={()=>navigate('/gemini-add', { state: { ...location.state, plan: plan, } })}>
+        <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg" onClick={()=>navigate('/gemini-summary', { state: { ...location.state, plan: plan, } })}>
           Start Free Trial
         </button>
       </div>
@@ -143,4 +143,4 @@ const FreeTrial: React.FC = () => {
   );
 };
 
-export default FreeTrial;
+export default TrialSummary;
