@@ -38,13 +38,13 @@ import AI from "./AI";
 const AuthApp: React.FC = () => {
   return (
     <div className="w-full min-h-screen bg-white relative">
-      <ToastContainer />
       <Suspense fallback={<div>Loading...</div>}>
         <div className="fixed top-0 left-0 right-0 w-full z-40 bg-white">
           <Header />
         </div>
         
         <main className="flex items-center justify-center max-w-full lg:mt-[80px] mt-[60px]">
+          <ToastContainer />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />

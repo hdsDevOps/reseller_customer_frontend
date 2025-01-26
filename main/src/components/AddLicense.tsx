@@ -396,6 +396,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList,
           ? paymentResult?.reference
           : ""
         }`,
+        customer_name: `${userDetails?.first_name} ${userDetails?.last_name}`,
         product_type: "user license",
         description: "purchase user license",
         domain: selectedDomain?.domain_name,

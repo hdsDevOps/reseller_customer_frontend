@@ -42,6 +42,30 @@ const EmailList: React.FC = () => {
   console.log("user details...", userDetails);
   // console.log("save Cards State...", saveCardsState);
   // console.log("paymentMethodsState...", paymentMethodsState);
+
+  useEffect(() => {
+    if(userDetails?.workspace?.workspace_status === "trial") {
+      const miliseconds = parseInt(userDetails?.workspace?.next_payment?._seconds) * 1000 + parseInt(userDetails?.workspace?.next_payment?._nanoseconds) / 1e6;
+      const foundDate =  new Date(miliseconds);
+      const today = new Date(Date.now());
+      if(foundDate > today) {
+        //
+      } else {
+        navigate('/');
+      }
+    } else if(userDetails?.workspace?.workspace_status === "active") {
+      const miliseconds = parseInt(userDetails?.workspace?.next_payment?._seconds) * 1000 + parseInt(userDetails?.workspace?.next_payment?._nanoseconds) / 1e6;
+      const foundDate =  new Date(miliseconds);
+      const today = new Date(Date.now());
+      if(foundDate > today) {
+        //
+      } else {
+        navigate('/');
+      }
+    } else {
+      navigate('/');
+    }
+  }, [userDetails]);
   
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState<boolean>(false);
@@ -93,7 +117,7 @@ const EmailList: React.FC = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>("");
   const [selectedCard, setSelectedCard] = useState<string | null>("");
   const [activeSubscriptionPlan, setActiveSubscriptionPlan] = useState({});
-  // console.log(activeSubscriptionPlan);
+  // console.log("activeSubscriptionPlan...",activeSubscriptionPlan);
   // console.log(userDetails);
   const [licensePrice, setLicensePrice] = useState(0);
   // console.log(licensePrice);
@@ -907,6 +931,7 @@ const EmailList: React.FC = () => {
           ? paymentResult?.reference
           : ""
         }`,
+        customer_name: `${userDetails?.first_name} ${userDetails?.last_name}`,
         product_type: "user license",
         description: "purchase user license",
         domain: selectedDomain?.domain_name,
@@ -1101,14 +1126,26 @@ const EmailList: React.FC = () => {
                         </p>
 
                         <p className="text-sm md:text-md text-gray-600">
-                          <span className="inline-block items-center content-center">Google Workspace Starter</span>
-                          <Dot className="inline-block items-center content-center" />
-                          <span
-                            className="text-xs sm:text-sm text-green-500 cursor-pointer inline-block items-center content-center"
-                            onClick={() => navigate("/upgrade-plan")}
-                          >
-                            Update plan
-                          </span>
+                          <span className="inline-block items-center content-center">{activeSubscriptionPlan?.plan_name}</span>
+                          {
+                            userDetails?.workspace?.workspace_status !== "trial"
+                            ? (
+                              <>
+                                <Dot className="inline-block items-center content-center" />
+                                  <span
+                                    className="text-xs sm:text-sm text-green-500 cursor-pointer inline-block items-center content-center"
+                                    onClick={() => {
+                                      if(userDetails?.workspace?.workspace_status !== "trial") {
+                                        navigate("/upgrade-plan")
+                                      }
+                                    }}
+                                  >
+                                    Update plan
+                                  </span>
+                              </>
+                            ) : (<></>)
+                          }
+                          
                         </p>
                       </React.Fragment>
                     )

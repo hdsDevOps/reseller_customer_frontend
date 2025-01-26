@@ -9,7 +9,6 @@ import { ToastContainer } from "react-toastify";
 const HistoryApp: React.FC = () => {
   return (
     <div className="mb-5">
-      <ToastContainer />
       <Suspense fallback={<div>Loading...</div>}>
         <Routes>
           <Route path="/billing-history" element={<BillingHistory />} />

@@ -13,7 +13,6 @@ import ViewPaymentDetails from "./ViewPaymentDetails";
 const PaymentApp: React.FC = () => {
   return (
     <div className="mb-5">
-      <ToastContainer />
       <Suspense fallback={<div>Loading...</div>}>
         <Routes>
           <Route path="/payment-method" element={<PaymentMethod />} />

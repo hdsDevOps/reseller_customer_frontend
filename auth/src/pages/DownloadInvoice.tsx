@@ -196,7 +196,7 @@ const DownloadInvoice: React.FC = () => {
           product_type: "google workspace",
           payment_cycle: data?.period,
           customer_id: data?.customer_id,
-          description: "google workspace purchase",
+          description: `google workspace purchase ${data?.plan?.plan_name}`,
           domain: [data?.selectedDomain?.domain],
           last_payment: todayDate,
           next_payment: planExpiryDate,
@@ -288,6 +288,7 @@ const DownloadInvoice: React.FC = () => {
             ? data?.payment_result?.reference
             : ""
           }`,
+          customer_name: `${data?.formData?.first_name} ${data?.formData?.last_name}`,
           product_type: "domain",
           description: "domain purchase",
           domain: data?.selectedDomain?.domain,
@@ -319,6 +320,7 @@ const DownloadInvoice: React.FC = () => {
           domain: data?.selectedDomain?.domain,
           payment_method: data?.payment_method,
           payment_status: "Success",
+          customer_name: `${data?.formData?.first_name} ${data?.formData?.last_name}`,
           amount: `${currencyList?.find(item => item?.name === data?.currency)?.logo}0`,
           transaction_data: data?.payment_result,
           subscription_id: workspaceSubscription?.subscription_id

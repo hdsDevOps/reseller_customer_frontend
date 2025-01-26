@@ -51,6 +51,7 @@ const DomainList: React.FC = () => {
   // console.log("newEmails...", newEmails);
   const [emailClicked, setEmailClicked] = useState(false);
   const [newEmailsCount, setNewEmailsCount] = useState(0);
+  const [addEmailDisabled, setAddEmailDisabled] = useState(true);
   // console.log(newEmailsCount);
   const [passwordVisible, setPasswordVisible ] = useState([]);
   const togglePasswordVisibilty = (index) => {
@@ -153,6 +154,30 @@ const DomainList: React.FC = () => {
       document.removeEventListener('mousedown', handleClickOutsideOfModal);
     };
   }, []);
+
+  useEffect(() => {
+    if(userDetails?.workspace?.workspace_status === "trial") {
+      const miliseconds = parseInt(userDetails?.workspace?._seconds) * 1000 + parseInt(userDetails?.workspace?._nanoseconds) / 1e6;
+      const foundDate =  new Date(miliseconds);
+      const today = new Date(Date.now());
+      if(foundDate > today) {
+        setAddEmailDisabled(false);
+      } else {
+        setAddEmailDisabled(true);
+      }
+    } else if(userDetails?.workspace?.workspace_status === "active") {
+      const miliseconds = parseInt(userDetails?.workspace?._seconds) * 1000 + parseInt(userDetails?.workspace?._nanoseconds) / 1e6;
+      const foundDate =  new Date(miliseconds);
+      const today = new Date(Date.now());
+      if(foundDate > today) {
+        setAddEmailDisabled(false);
+      } else {
+        setAddEmailDisabled(true);
+      }
+    } else {
+      setAddEmailDisabled(true);
+    }
+  }, [userDetails]);
 
   const handleOpenActionModal = (event: React.MouseEvent, domain: string) => {
     const rect = event.currentTarget.getBoundingClientRect(); // Get button position
@@ -355,6 +380,7 @@ const DomainList: React.FC = () => {
                             setDomainName(domain?.domain_name);
                             setEmailsList(domain?.emails ? domain?.emails : []);
                           }}
+                          disabled={addEmailDisabled}
                         >
                           Add Emails
                         </button>

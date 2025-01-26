@@ -59,7 +59,7 @@
     "react-router-dom": "^6.24.0",
     "react-stripe-checkout": "^2.6.3",
     "react-switch": "^7.0.0",
-    "react-toastify": "^11.0.2",
+    "react-toastify": "^11.0.3",
     "react-world-flags": "^1.6.0"
   }
 }

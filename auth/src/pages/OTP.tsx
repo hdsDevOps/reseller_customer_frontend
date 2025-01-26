@@ -138,7 +138,7 @@ const OTP: React.FC = () => {
                 await dispatch(setStaffIdToLSThunk(staffId)).unwrap();
                 await dispatch(setStaffStatusToLSThunk(location.state.is_staff)).unwrap();
                 await dispatch(setRoleIdToLSThunk(location.state?.role_id)).unwrap();
-                navigate('/dashboard', {state: {from: 'otp'}});
+                // navigate('/dashboard', {state: {from: 'otp'}});
               } catch (error) {
                 console.log("Error on token");
               } finally {
@@ -164,7 +164,7 @@ const OTP: React.FC = () => {
               try {
                 await dispatch(setUserAuthTokenToLSThunk({token: result?.token})).unwrap();
                 await dispatch(setUserIdToLSThunk(customerId)).unwrap();
-                navigate('/dashboard', {state: {from: 'otp'}});
+                // navigate('/dashboard', {state: {from: 'otp'}});
                 await dispatch(setStaffIdToLSThunk(staffId)).unwrap();
                 await dispatch(setStaffStatusToLSThunk(location.state.is_staff)).unwrap();
               } catch (error) {
@@ -225,7 +225,7 @@ const OTP: React.FC = () => {
             try {
               await dispatch(setUserAuthTokenToLSThunk({token: result?.token})).unwrap();
               await dispatch(setUserIdToLSThunk(customerId)).unwrap();
-              navigate('/dashboard', {state: {from: 'registration'}});
+              // navigate('/dashboard', {state: {from: 'registration'}});
             } catch (error) {
               console.log("Error on token");
             } finally {

@@ -7,7 +7,6 @@ import { ToastContainer } from "react-toastify";
 const EmailApp: React.FC = () => {
   return (
     <div className="mb-5">
-      <ToastContainer />
       <Routes>
         <Route path="/email" element={<EmailList />} />
       </Routes>

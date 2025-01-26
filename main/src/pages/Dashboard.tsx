@@ -4,14 +4,14 @@ import SubscriptionModal from "../components/SubscriptionModal";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { addToCartThunk, cancelSubscriptionThunk, changeAutoRenewThunk, getBillingHistoryThunk, getDomainsListThunk, getPaymentMethodsThunk, getPaymentSubscriptionsListThunk, makeDefaultPaymentMethodThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
+import { addToCartThunk, cancelSubscriptionThunk, changeAutoRenewThunk, getBillingHistoryThunk, getDomainsListThunk, getPaymentMethodsThunk, getPaymentSubscriptionsListThunk, getStaffIdFromLSThunk, getStaffStatusFromLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, makeDefaultPaymentMethodThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
 import { Download, Plus, X } from "lucide-react";
 import { format } from "date-fns";
 import html2canvas from 'html2canvas-pro';
 import jsPDF from "jspdf";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { currencyList } from "../components/CurrencyList";
-import { setCart } from "store/authSlice";
+import { setCart, setCustomerId, setStaffId, setStaffStatus, setTokenDetails } from "store/authSlice";
 import './Dashboard.css';
 
 const inititalCancel = {
@@ -34,34 +34,32 @@ const paystackImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gwork
 const Dashboard: React.FC = () => {
   const location = useLocation();
   const dispatch = useAppDispatch();
-  const { customerId, userDetails, cartState, defaultCurrencySlice } = useAppSelector(state => state.auth);
+  const { customerId, userDetails, cartState, defaultCurrencySlice,token } = useAppSelector(state => state.auth);
   const navigate = useNavigate();
   // console.log("state...", location.state);
   const isInitialRender = useRef(true);
   useEffect(() => {
-    if (isInitialRender.current) {
-      isInitialRender.current = false;
-      return;
-    }
+    // if (isInitialRender.current) {
+    //   isInitialRender.current = false;
+    //   return;
+    // }
     
-    if(location.state?.from === "otp") {
+    if(location.state) {
+      if(location.state?.from === "otp") {
       
-      toast.success(`Successfully logged`);
-      // toast.success(`Successfully logged in ${Math.random() * 3}`);
-      // console.log(`Successfully logged in ${Math.random() * 3}`)
-    } else if(location.state?.from === "registration") {
-      
-      toast.success("Successfully registered");
-      // console.log("Resgisisin")
-    } else {
-      //
+        toast.success(`Successfully logged`, {autoClose: 4000});
+        // toast.success(`Successfully logged in ${Math.random() * 3}`);
+        // console.log(`Successfully logged in ${Math.random() * 3}`)
+      } else if(location.state?.from === "registration") {
+        toast.success("Successfully registered", {autoClose: 4000});
+      }
     }
   }, [location.state]);
   const [isSubscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
   const [subscriptionsList, setSubscriptionList] = useState([]);
   // console.log("subscriptionsList...", subscriptionsList);
   const [subscription, setSubscription] = useState<object | null>(null);
-  console.log("subscription...", subscription);
+  // console.log("subscription...", subscription);
   // console.log("user details...", userDetails);
 
   const [selectedDomain, setSelectedDomain] = useState({});
@@ -94,24 +92,24 @@ const Dashboard: React.FC = () => {
   // console.log("invoiceData...", invoiceData);
   const pdfRef = useRef(null);
   const [paymentMethods, setPaymentMethods] = useState([]);
-  console.log("paymentMethods...", paymentMethods);
+  // console.log("paymentMethods...", paymentMethods);
   const [subscriptionId, setSubscriptionId] = useState("");
   
   const [processingModalOpen, setProcessingModalOpen] = useState(false);
 
   const [activePlan, setActivePlan] = useState<object|null>(null);
-  console.log("activePlan...", activePlan);
+  // console.log("activePlan...", activePlan);
 
   const [billingHistoryList, setBillingHistoryList] = useState([]);
   // console.log("billingHistoryList...", billingHistoryList);
   const [billingHistoryData, setBillingHistoryData] = useState<object|null>(null);
   // console.log("billingHistoryData...", billingHistoryData);
   const [renewalStatus, setRenewalStatus] = useState(false);
-  console.log("renewalStatus...", renewalStatus);
+  // console.log("renewalStatus...", renewalStatus);
 
   const [isExpirySectionOpen, setIsExpirySectionOpen] = useState(false);
   const [expiryData, setExpiryData] = useState(initialExpiryData);
-  console.log("expiryData...", expiryData);
+  // console.log("expiryData...", expiryData);
 
   useEffect(() => {
     const getExpiryDate = () => {
@@ -123,7 +121,7 @@ const Dashboard: React.FC = () => {
         const today = new Date();
 
         const timeDifference = Math.abs(date - today);
-        console.log("timeDifference...", timeDifference);
+        // console.log("timeDifference...", timeDifference);
         const days = Math.floor(timeDifference / (1000*60*60*24));
         const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
@@ -155,6 +153,26 @@ const Dashboard: React.FC = () => {
 
     getExpiryDate();
   }, [userDetails]);
+
+  useEffect(() => {
+    const getUserDetails = async () => {
+      try {
+        const tokenResult = await dispatch(getUserAuthTokenFromLSThunk()).unwrap();
+        await dispatch(setTokenDetails(tokenResult));
+        const customerIdResult = await dispatch(getUserIdFromLSThunk()).unwrap();
+        await dispatch(setCustomerId(customerIdResult));
+        const staffIdResult = await dispatch(getStaffIdFromLSThunk()).unwrap();
+        await dispatch(setStaffId(staffIdResult));
+        const staffStatusResult = await dispatch(getStaffStatusFromLSThunk()).unwrap();
+        await dispatch(setStaffStatus(staffStatusResult === "true" ? true : false));
+      } catch (error) {
+        // console.error("Error fetching token:", error);
+        navigate('/login');
+      }
+    };
+
+    getUserDetails();
+  }, [token, dispatch, navigate]);
 
   const getBillingHistoryList = async() => {
     try {
@@ -225,7 +243,7 @@ const Dashboard: React.FC = () => {
     const date = new Date(miliseconds);
     // const date = new Date();
     const today = new Date();
-    console.log({date, today})
+    // console.log({date, today})
 
     if(date < today) {
       setRenewalStatus(true);
@@ -255,7 +273,7 @@ const Dashboard: React.FC = () => {
   const renewalAddToCart = async(e) => {
     e.preventDefault();
     const cartItems = cartState?.filter(item => item?.product_type === "google workspace" ? !item : item);
-    console.log(cartAddAmount(activePlan, userDetails?.workspace?.payment_cycle)?.discount_price)
+    // console.log(cartAddAmount(activePlan, userDetails?.workspace?.payment_cycle)?.discount_price)
     const newCart = [
       ...cartItems,
       {
@@ -508,11 +526,11 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  console.log("user details", userDetails)
+  // console.log("user details", userDetails)
 
   useEffect(() => {
     if(userDetails?.workspace) {
-      console.log("format expiry...",formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds));
+      // console.log("format expiry...",formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds));
     }
   }, [userDetails])  
 

@@ -650,7 +650,7 @@ const MyStaff = () => {
                 <DialogTitle
                   as="h3"
                   className="text-[28px] font-semibold text-[#0D121F]"
-                >{isEdit ? 'Edit ' : 'Add '}User Type</DialogTitle>
+                >Delete Staff</DialogTitle>
                 <div className='btn-close-bg'>
                   <button
                     type='button'

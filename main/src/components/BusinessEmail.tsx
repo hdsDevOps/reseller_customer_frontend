@@ -7,7 +7,7 @@ import "../index.css";
 import { toast } from "react-toastify";
 import { ChevronRight, CirclePlus, Dot, Trash2, X } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { addEmailsThunk, changeEmailStatusThunk, deleteEmailThunk, makeEmailAdminThunk, removeUserAuthTokenFromLSThunk, resetEmailPasswordThunk, updateEmailUserDataThunk } from "store/user.thunk";
+import { addEmailsThunk, changeEmailStatusThunk, deleteEmailThunk, makeEmailAdminThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk, resetEmailPasswordThunk, updateEmailUserDataThunk } from "store/user.thunk";
 import { HiOutlineEye } from "react-icons/hi";
 import { RiEyeCloseLine } from "react-icons/ri";
 
@@ -70,6 +70,33 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
     { name: 'last_name', label: 'Last Name', placholder: 'Enter your last name', type: 'text'},
     { name: 'email', label: 'Email', placholder: 'Enter your email id', type: 'text'},
   ];
+  
+  const [activePlan, setActivePlan] = useState<object|null>(null);
+  // console.log("activePlan...", activePlan);
+  
+  const getPlanNameById = async() => {
+    try {
+      const result = await dispatch(plansAndPricesListThunk({
+        subscription_id: userDetails?.workspace?.plan_name_id
+      })).unwrap();
+      setActivePlan(result?.data[0]);
+    } catch (error) {
+      // console.log(error);
+      setActivePlan(null);
+      if(error?.error == "Request failed with status code 401") {
+        try {
+          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    getPlanNameById();
+  }, [userDetails]);
 
   const handleUpdateEmailData = e => {
     setSelectedEmail({
@@ -480,14 +507,25 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                     </span>
                   </p>
                   <p className="text-sm md:text-md text-gray-600">
-                    <span className="inline-block items-center content-center">Google Workspace Starter</span>
-                    <Dot className="inline-block items-center content-center" />
-                    <span
-                      className="text-xs sm:text-sm text-green-500 cursor-pointer inline-block items-center content-center"
-                      onClick={() => navigate("/upgrade-plan")}
-                    >
-                      Update plan
-                    </span>
+                    <span className="inline-block items-center content-center">{activePlan?.plan_name}</span>
+                    {
+                      userDetails?.workspace?.workspace_status !== "trial"
+                      ? (
+                        <>
+                          <Dot className="inline-block items-center content-center" />
+                            <span
+                              className="text-xs sm:text-sm text-green-500 cursor-pointer inline-block items-center content-center"
+                              onClick={() => {
+                                if(userDetails?.workspace?.workspace_status !== "trial") {
+                                  navigate("/upgrade-plan")
+                                }
+                              }}
+                            >
+                              Update plan
+                            </span>
+                        </>
+                      ) : (<></>)
+                    }
                   </p>
                 </div>
               </div>

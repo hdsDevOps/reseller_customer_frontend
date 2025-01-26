@@ -537,10 +537,11 @@ async function addBillingHistoryApi(
   payment_status: string,
   amount: string,
   transaction_data: object,
-  subscription_id:string
+  subscription_id:string,
+  customer_name:string
 ): Promise<any> {
   try {
-    const result = await postApiCall(endPoints.addBillingHistory, {  user_id, transaction_id, date, invoice, product_type, description, domain, payment_method, payment_status, amount, transaction_data,subscription_id });
+    const result = await postApiCall(endPoints.addBillingHistory, {  user_id, transaction_id, date, invoice, product_type, description, domain, payment_method, payment_status, amount, transaction_data,subscription_id, customer_name });
     return result;
   } catch (error: any) {
     throw error;

@@ -14,6 +14,7 @@ import "./index.css";
 import { HelmetProvider, Helmet } from 'react-helmet-async';
 import countryToCurrency, { Currencies, Countries } from "country-to-currency";
 import { currencyList } from "./components/CurrencyList";
+import { ToastContainer } from "react-toastify";
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();

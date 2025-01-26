@@ -474,6 +474,21 @@ function Review() {
   const today = new Date();
   const formattedDate = format(today, 'MMMM dd, yyyy');
   const formattedDate2 = format(today, 'MMMM dd');
+  const [formattedDate3, setFormattedDate3] = useState(format(today, 'MMMM dd'));
+
+  useEffect(() => {
+    const dateFromNow = new Date(today);
+    const paymentGoogle = cart?.find(item => item?.product_type === "google workspace");
+    if(paymentGoogle) {
+      if (paymentGoogle?.payment_cycle?.toLowerCase() === "yearly") {
+        dateFromNow.setFullYear(dateFromNow.getFullYear() + 1);
+        setFormattedDate3(format(dateFromNow, 'MMMM dd'));
+      } else {
+        dateFromNow.setDate(dateFromNow.getDate() + 30);
+        setFormattedDate3(format(dateFromNow, 'MMMM dd'));
+      }
+    }
+  })
   
   const formattedToday = format(today, 'yyyy-MM-dd');
   const yearFromToday = () => {
@@ -560,7 +575,7 @@ function Review() {
         product_type: "google workspace",
         payment_cycle: item?.payment_cycle,
         customer_id: customerId,
-        description: `purchase google workspace ${item?.product_type} ${item?.total_year}`,
+        description: `purchase google workspace ${item?.product_name} ${item?.total_year}`,
         domain: [
           domainsState?.find(item => item?.domain_type === "primary")?.domain_name || cart?.find(item => item?.product_type === "domain") ? cart?.find(item => item?.product_type === "domain")?.product_name : ""
         ],
@@ -912,6 +927,7 @@ function Review() {
           ? paymentResult?.reference
           : ""
         }`,
+        customer_name: `${userDetails?.first_name} ${userDetails?.last_name}`,
         product_type: product_type,
         description: product_type?.toLowerCase() === "google workspace"
         ? `purchase google workspace ${item?.product_name} ${item?.total_year}`
@@ -1212,8 +1228,18 @@ function Review() {
                       <h4 className="font-inter font-normal text-xl text-black">{item?.product_type}</h4>
                       {/* <h4 className="font-inter font-normal text-xl text-black">{item?.product_name}</h4> */}
                     </div>
-                    <p>Your annual plan will begin {formattedDate}. You can <span className='text-[#12A833]'>cancel at any time</span>.</p>
-                    <p>Charges today and recurs {item?.payment_cycle} on {formattedDate2}.</p>
+                    <p>Your {
+                      item?.payment_cycle?.toLowerCase() === "yearly"
+                      ? "annual plan"
+                      : item?.payment_cycle?.toLowerCase() === "monthly"
+                      ? "monthly plan"
+                      : "yearly plan with monthly billing"
+                    } will begin {formattedDate}. You can <span className='text-[#12A833]'>cancel at any time</span>.</p>
+                    <p>Charges today and recurs {
+                      item?.payment_cycle?.toLowerCase() === "yearly"
+                      ? `yearly on ${formattedDate2}`
+                      : `next month on ${formattedDate3}`
+                    } .</p>
                   </div>
                   <div className='w-[140px] max-[768px]:w-full flex flex-col items-end text-end'>
                     <p className='font-inter font-normal text-xl text-black'>

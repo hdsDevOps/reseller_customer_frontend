@@ -4,9 +4,9 @@ import { PiEyeClosedBold } from "react-icons/pi";
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { removeUserAuthTokenFromLSThunk, udpateProfileDataThunk, hereMapSearchThunk } from 'store/user.thunk';
+import { removeUserAuthTokenFromLSThunk, udpateProfileDataThunk, hereMapSearchThunk, getProfileDataThunk, getRoleIdFromLSThunk } from 'store/user.thunk';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { setUserDetails } from 'store/authSlice';
+import { setRoleIdSlice, setUserDetails } from 'store/authSlice';
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import axios from 'axios';
@@ -372,7 +372,26 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
       return false;
     }
     return true;
-  }
+  };
+
+  const getProfileData = async() => {
+    try {
+      const result = await dispatch(getProfileDataThunk({user_id: customerId, staff_id: staffId, is_staff: staffStatus})).unwrap();
+      // console.log("result...", result);
+      const roleData = await dispatch(getRoleIdFromLSThunk()).unwrap();
+      await dispatch(setUserDetails(result?.customerData));
+      await dispatch(setRoleIdSlice(roleData));
+    } catch (error) {
+      if(error?.message == "Request failed with status code 401") {
+        try {
+          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    }
+  };
 
   const handleSubmit = async(e) => {
     e.preventDefault();
@@ -453,6 +472,8 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
           //
           }
         }
+      } finally {
+        getProfileData();
       }
     } else {
       toast.warning("Please enter a valid phone number");

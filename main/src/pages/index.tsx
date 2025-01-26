@@ -45,9 +45,9 @@ const routes = [
 const MainApp: React.FC = () => {
   return (
   <div className="main-wrapper">
-    <ToastContainer />
     <Header />
     <div className="content-body relative min-h-screen pl-[5.2rem] lg:pl-[17rem] pt-[70px] pr-[0.8rem] pb-4">
+      <ToastContainer />
       <Routes>
         {routes.map((route, index) => (
           <Route key={index} path={route.path} element={route.element} />

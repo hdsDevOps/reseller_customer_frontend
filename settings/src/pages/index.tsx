@@ -8,7 +8,6 @@ import { ToastContainer } from "react-toastify";
 const DomainApp: React.FC = () => {
   return (
     <div className="mb-5">
-      <ToastContainer />
       <Routes>
         <Route path="/settings" element={<Settings />} />
         <Route path="/my-staff" element={<MyStaff />} />

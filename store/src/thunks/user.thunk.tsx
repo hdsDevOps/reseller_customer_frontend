@@ -381,8 +381,8 @@ export const getBillingHistoryThunk = createAsyncThunk(
 
 export const addBillingHistoryThunk = createAsyncThunk(
   "users/addBillingHistory",
-  async ({ user_id, transaction_id, date, invoice, product_type, description, domain, payment_method, payment_status, amount, transaction_data, subscription_id }: any) => {
-    return await userApis.addBillingHistoryApi( user_id, transaction_id, date, invoice, product_type, description, domain, payment_method, payment_status, amount, transaction_data, subscription_id );
+  async ({ user_id, transaction_id, date, invoice, product_type, description, domain, payment_method, payment_status, amount, transaction_data, subscription_id, customer_name }: any) => {
+    return await userApis.addBillingHistoryApi( user_id, transaction_id, date, invoice, product_type, description, domain, payment_method, payment_status, amount, transaction_data, subscription_id, customer_name );
   }
 );
 
