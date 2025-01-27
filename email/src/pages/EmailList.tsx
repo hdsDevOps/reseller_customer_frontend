@@ -37,11 +37,28 @@ const EmailList: React.FC = () => {
   const location = useLocation();
   const searchRef = useRef();
 
-  const { customerId, userDetails, saveCardsState, paymentMethodsState, token, defaultCurrencySlice } = useAppSelector(state => state.auth);
+  const { customerId, userDetails, saveCardsState, paymentMethodsState, token, defaultCurrencySlice, rolePermission } = useAppSelector(state => state.auth);
   // console.log("userId...", customerId);
   console.log("user details...", userDetails);
   // console.log("save Cards State...", saveCardsState);
   // console.log("paymentMethodsState...", paymentMethodsState);
+  
+  useEffect(() => {
+    const checkPermission = (label:String) => {
+      if(rolePermission?.length > 0) {
+        const permissionStatus = rolePermission?.find(item => item?.name === label)?.value;
+        if(permissionStatus) {
+          //
+        } else {
+          navigate('/');
+        }
+      } else {
+        navigate('/');
+      }
+    };
+
+    checkPermission("Email");
+  }, [rolePermission]);
 
   useEffect(() => {
     if(userDetails?.workspace?.workspace_status === "trial") {
@@ -636,7 +653,8 @@ const EmailList: React.FC = () => {
     e.preventDefault();
     try {
       const result = await dispatch(deleteEmailThunk({domain_id: selectedDomain?.id, uuid: selectedEmail?.uuid})).unwrap();
-      console.log("result...", result);
+      // console.log("result...", result);
+      toast.success(result?.message);
     } catch (error) {
       toast.error("Error removing email");
       if(error?.message == "Authentication token is required") {
@@ -1956,7 +1974,7 @@ const EmailList: React.FC = () => {
                     <input
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
-                      className="w-full h-10 border border-[#E4E4E4] rounded-[10px] px-3"
+                      className="w-full h-10 border border-[#E4E4E4] rounded-[10px] pl-3 pr-8"
                       onChange={e => {setPassword(e.target.value)}}
                       value={password}
                     />
@@ -1986,7 +2004,7 @@ const EmailList: React.FC = () => {
                     <input
                       type={showCPassword ? "text" : "password"}
                       placeholder="Enter your password"
-                      className="w-full h-10 border border-[#E4E4E4] rounded-[10px] px-3"
+                      className="w-full h-10 border border-[#E4E4E4] rounded-[10px] pl-3 pr-8"
                       onChange={e => {setConfirmPassword(e.target.value)}}
                       value={confirmPassword}
                     />

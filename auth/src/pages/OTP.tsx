@@ -9,7 +9,50 @@ import { LuMoveLeft } from "react-icons/lu";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { verifyLoginOtpThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, resendLoginOtpThunk, verifyForgetPasswordOtpThunk, resendForgetPasswordOtpThunk, resendRegisterOtpThunk, verifyRegisterOtpThunk, setStaffIdToLSThunk, getStaffIdFromLSThunk, verifyStaffLoginOtpThunk, setStaffStatusToLSThunk, getStaffStatusFromLSThunk, setRoleIdToLSThunk, getRoleIdFromLSThunk } from 'store/user.thunk';
+import { verifyLoginOtpThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, resendLoginOtpThunk, verifyForgetPasswordOtpThunk, resendForgetPasswordOtpThunk, resendRegisterOtpThunk, verifyRegisterOtpThunk, setStaffIdToLSThunk, getStaffIdFromLSThunk, verifyStaffLoginOtpThunk, setStaffStatusToLSThunk, getStaffStatusFromLSThunk, setRoleIdToLSThunk, getRoleIdFromLSThunk, addSettingWithoutLoginThunk, addStaffWithoutLoginThunk } from 'store/user.thunk';
+
+const superAdminRolePermissions = [
+  {
+      name: "Dashboard",
+      value: true
+  },
+  {
+      name: "Profile",
+      value: true
+  },
+  {
+      name: "Domain",
+      value: true
+  },
+  {
+      name: "Payment Subscription",
+      value: true
+  },
+  {
+      name: "Email",
+      value: true
+  },
+  {
+      name: "Payment Method",
+      value: true
+  },
+  {
+      name: "Vouchers",
+      value: true
+  },
+  {
+      name: "My Staff",
+      value: true
+  },
+  {
+      name: "Billing History",
+      value: true
+  },
+  {
+      name: "Settings",
+      value: true
+  }
+];
 
 const OTP: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -135,9 +178,9 @@ const OTP: React.FC = () => {
               try {
                 await dispatch(setUserAuthTokenToLSThunk({token: result?.token})).unwrap();
                 await dispatch(setUserIdToLSThunk(customerId)).unwrap();
-                await dispatch(setStaffIdToLSThunk(staffId)).unwrap();
+                await dispatch(setStaffIdToLSThunk(staffId || "")).unwrap();
                 await dispatch(setStaffStatusToLSThunk(location.state.is_staff)).unwrap();
-                await dispatch(setRoleIdToLSThunk(location.state?.role_id)).unwrap();
+                await dispatch(setRoleIdToLSThunk(location.state?.role_id || "")).unwrap();
                 // navigate('/dashboard', {state: {from: 'otp'}});
               } catch (error) {
                 console.log("Error on token");
@@ -223,6 +266,10 @@ const OTP: React.FC = () => {
           console.log("result...", result);
           if(result?.status === 200) {
             try {
+              const role = await dispatch(addSettingWithoutLoginThunk({user_type: "Super Admin", user_id: location.state?.customer_id, permissions: superAdminRolePermissions, token: result?.token})).unwrap();
+              // settingId
+              await dispatch(addStaffWithoutLoginThunk({user_id: location.state?.customer_id, first_name: location.state?.data?.first_name, last_name: location.state?.data?.last_name, email: location.state?.data?.email, phone_no: location.state?.data?.phone_no, user_type_id: role?.settingId, token: result?.token}));
+
               await dispatch(setUserAuthTokenToLSThunk({token: result?.token})).unwrap();
               await dispatch(setUserIdToLSThunk(customerId)).unwrap();
               // navigate('/dashboard', {state: {from: 'registration'}});

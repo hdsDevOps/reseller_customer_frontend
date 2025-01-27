@@ -30,15 +30,31 @@ const DomainList: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   
-  const { customerId, userDetails } = useAppSelector(state => state.auth);
+  const { customerId, userDetails, rolePermission } = useAppSelector(state => state.auth);
   // console.log("userDetails....", userDetails);
+  useEffect(() => {
+    const checkPermission = (label:String) => {
+      if(rolePermission?.length > 0) {
+        const permissionStatus = rolePermission?.find(item => item?.name === label)?.value;
+        if(permissionStatus) {
+          //
+        } else {
+          navigate('/');
+        }
+      } else {
+        navigate('/');
+      }
+    };
+
+    checkPermission("Domain");
+  }, [rolePermission]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState<boolean>(false);
   const [actionModalType, setActionModalType] = useState<string>("Cancel");
   const [actionModalStyle, setActionModalStyle] = useState<React.CSSProperties | null>(null);
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [domainsList, setDomainsList] = useState([]);
-  console.log("domainsList...", domainsList);
+  // console.log("domainsList...", domainsList);
   const [emailsList, setEmailsList] = useState([intialEmail]);
   // console.log("emailList...", emailsList);
   const [licenseUsage, setLicenseUsage] = useState(0);

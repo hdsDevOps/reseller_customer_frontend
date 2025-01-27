@@ -74,9 +74,9 @@ const Login: React.FC = () => {
         try {
           await dispatch(setUserAuthTokenToLSThunk({token: result?.token})).unwrap();
           await dispatch(setUserIdToLSThunk(result?.customer_id)).unwrap();
-          await dispatch(setStaffIdToLSThunk(result?.staff_id)).unwrap();
+          await dispatch(setStaffIdToLSThunk(result?.staff_id || "")).unwrap();
           await dispatch(setStaffStatusToLSThunk(result?.is_staff)).unwrap();
-          await dispatch(setRoleIdToLSThunk(result?.role_id)).unwrap();
+          await dispatch(setRoleIdToLSThunk(result?.role_id || "")).unwrap();
           // navigate('/dashboard', {state: {from: 'otp'}});
         } catch (error) {
           console.log("Error on token");

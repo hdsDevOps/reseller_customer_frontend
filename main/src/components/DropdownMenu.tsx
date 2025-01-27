@@ -9,94 +9,6 @@ import { RiCloseFill } from "react-icons/ri";
 import { currencyList } from "./CurrencyList";
 import { getSettingsListThunk } from "store/user.thunk";
 
-
-
-const initialRolePermissions = [
-  {
-      "name": "Dashboard",
-      "value": false
-  },
-  {
-      "name": "Profile",
-      "value": false
-  },
-  {
-      "name": "Domain",
-      "value": false
-  },
-  {
-      "name": "Payment Subscription",
-      "value": false
-  },
-  {
-      "name": "Email",
-      "value": false
-  },
-  {
-      "name": "Payment Method",
-      "value": false
-  },
-  {
-      "name": "Vouhcers",
-      "value": false
-  },
-  {
-      "name": "My Staff",
-      "value": false
-  },
-  {
-      "name": "Billing History",
-      "value": false
-  },
-  {
-      "name": "Settings",
-      "value": false
-  }
-];
-
-const superRolePermissions = [
-  {
-      "name": "Dashboard",
-      "value": true
-  },
-  {
-      "name": "Profile",
-      "value": true
-  },
-  {
-      "name": "Domain",
-      "value": true
-  },
-  {
-      "name": "Payment Subscription",
-      "value": true
-  },
-  {
-      "name": "Email",
-      "value": true
-  },
-  {
-      "name": "Payment Method",
-      "value": true
-  },
-  {
-      "name": "Vouhcers",
-      "value": true
-  },
-  {
-      "name": "My Staff",
-      "value": true
-  },
-  {
-      "name": "Billing History",
-      "value": true
-  },
-  {
-      "name": "Settings",
-      "value": true
-  }
-];
-
 const flagList = [
   {flag: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/european-flag.png?alt=media&token=bb4a2892-0544-4e13-81a6-88c3477a2a64', name: 'EUR', logo: '€',},
   {flag: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/australia-flag.png?alt=media&token=5a2db638-131e-49c7-be83-d0c84db8d440', name: 'AUD', logo: 'A$',},
@@ -115,24 +27,15 @@ const DropdownMenu = () => {
   const [selectedCurrency, setSelectedCurrency] = useState(defaultCurrencySlice);
   // console.log("first...", defaultCurrencySlice);
   const [currencyModal, setCurrencyModal] = useState(false);
-  
-  const [rolePermissions, setRolePermissions] = useState(initialRolePermissions);
-  console.log("rolePermissions header...", rolePermissions);
 
-  const getRolePermission = async() => {
-    try {
-      const result = await dispatch(getSettingsListThunk({user_type: "", user_id: customerId})).unwrap();
-      const rolePermissionsObject = await result?.settings?.find(item => item?.id === roleId);
-      // console.log("rolePermissionsObject...", rolePermissionsObject);
-      setRolePermissions(rolePermissionsObject?.permissions || superRolePermissions);
-    } catch (error) {
-      setRolePermissions(initialRolePermissions);
+  const checkPermission = () => {
+    if(rolePermission?.length > 0) {
+      console.log(rolePermission?.find(item => item?.name === "Profile"))
+      return rolePermission?.find(item => item?.name === "Profile")?.value;
+    } else {
+      return false;
     }
   };
-
-  useEffect(() => {
-    getRolePermission();
-  }, [roleId, customerId]);
 
   useEffect(() => {
     setSelectedCurrency(defaultCurrencySlice);
@@ -154,16 +57,6 @@ const DropdownMenu = () => {
       //
     }
   };
-
-  const checkPermission = () => {
-    if(rolePermission?.length > 0) {
-      console.log("Check permission",rolePermission?.find(item => item?.name === "Profile")?.value)
-      return rolePermission?.find(item => item?.name === "Profile")?.value;
-    } else {
-      return false;
-    }
-  };
-
 
   return (
     <div className="relative">
@@ -203,8 +96,8 @@ const DropdownMenu = () => {
             </div>
           </li>
           <li className="border-t border-gray-200 my-1"></li>
-          {/* {
-            checkPermission() && ( */}
+          {
+            checkPermission() && (
               <li
                 onClick={() => {
                   navigate('/profile');
@@ -219,8 +112,8 @@ const DropdownMenu = () => {
                   <span>Profile Settings</span>
                 </a>
               </li>
-            {/* )
-          } */}
+            )
+          }
           
           <li className="cursor-pointer">
             <a

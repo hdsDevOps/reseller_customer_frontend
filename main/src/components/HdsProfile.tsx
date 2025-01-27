@@ -18,7 +18,7 @@ import { RiCameraFill } from 'react-icons/ri';
 const HdsProfile = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const { userDetails, customerId, staffId, staffStatus } = useAppSelector(state => state.auth);
+    const { userDetails, customerId, staffId, staffStatus,rolePermission } = useAppSelector(state => state.auth);
     const [showModal,setShowModal] = useState<boolean>(false);
     const [showEditModal,setEditShowModal] = useState<boolean>(false);
     const displayModal=()=>{
@@ -33,6 +33,23 @@ const HdsProfile = () => {
     const handleCloseShowModal=()=>{
         setEditShowModal(false)
     };
+    useEffect(() => {
+        const checkPermission = (label:String) => {
+            if(rolePermission?.length > 0) {
+                console.log(rolePermission?.find(item => item?.name === label))
+                const permissionStatus = rolePermission?.find(item => item?.name === label)?.value;
+                if(permissionStatus) {
+                //
+                } else {
+                navigate('/');
+                }
+            } else {
+                navigate('/');
+            }
+        };
+    
+        checkPermission("Profile");
+    }, [rolePermission]);
     const [imageModal, setImageModal] = useState(false);
     const [image, setImage] = useState(null);
     // console.log("image...", image);

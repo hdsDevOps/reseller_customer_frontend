@@ -48,7 +48,7 @@ const superAdminPermissions = [
       "value": true
   },
   {
-      "name": "Vouhcers",
+      "name": "Vouchers",
       "value": true
   },
   {
@@ -154,7 +154,8 @@ function Review() {
   const [discountedPrice, setDiscountedPrice] = useState(0.00);
   const [preDiscountedPrice, setPreDiscountedPrice] = useState(0.00);
   const [paymentMethodHover, setPaymentMethodHover] = useState(false);
-
+  const [nameAndAddressHover, setNameAndAddressHover] = useState(false);
+  
   const [primaryDomain, setPrimaryDomain] = useState<object|null>(null);
   console.log("primaryDomain...", primaryDomain);
   
@@ -1318,148 +1319,157 @@ function Review() {
 
                 <p className='font-inter font-normal text-xs text-[#12A833] py-3 border-b border-[#E4E4E4] w-full mb-2'>Add a GST identification number (GSTIN) (optional) </p>
 
-                <h1 className="font-inter font-medium text-[14px] text-black flex flex-row items-center justify-center mr-2">
+                <h1 className="font-inter font-semibold text-sm flex flex-row items-center justify-center mr-2 relative mb-3">
                   Name and address
-                  <GoInfo className="ml-2" />
+                  <GoInfo className="ml-2 w-4 h-4" onMouseOver={() => {setNameAndAddressHover(true)}} onMouseLeave={() => {setNameAndAddressHover(false)}} />
+                  {
+                    nameAndAddressHover && (
+                      <div className="absolute bg-white w-[220px] top-5 left-[13px] rounded-md z-10">
+                        <p className="bg-[#12A83330] px-4 py-3 w-full font-inter font-medium text-[10px] text-black rounded-md">This is the legal address of your organization or home</p>
+                      </div>
+                    )
+                  }
                 </h1>
 
-                {
-                  bottomForm?.map((form, index) => {
-                    if(form.name === "business_state") {
-                      return (
-                        <div
-                          className='flex flex-col mb-2 w-full mx-auto relative'
-                          ref={stateRef}
-                        >
-                          <label
-                            className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
-                          >Business State</label>
-                          <input
-                            type="text"
-                            name="business_state"
-                            required
-                            className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
-                            onChange={(e) => {
-                              setUserData({
-                                ...userData,
-                                business_state: '',
-                                business_city: '',
-                              });
-                              setStateName(e.target.value);
-                              setCityName('');
-                              setState({});
-                              setCity({});
-                            }}
-                            value={userData?.business_state || stateName}
-                            onFocus={() => {setStateDropdownOpen(true)}}
-                            placeholder="Search your business state"
-                            // cypress-name={item.name+"_input"}
-                          />
-                          {
-                            stateDropdownOpen && (
-                              <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md max-h-32 overflow-auto'>
-                                {
-                                  states?.filter(name => name?.name.toLowerCase().includes(stateName.toLowerCase())).map((state, idx) => (
-                                    <p
-                                      key={idx}
-                                      className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
-                                      dropdown-name="country-dropdown"
-                                      onClick={() => {
-                                        setUserData({
-                                          ...userData,
-                                          business_state: state?.name,
-                                          business_city: ''
-                                        });
-                                        setStateName("");
-                                        setCityName("");
-                                        setState(state);
-                                        setCity({});
-                                        setStateDropdownOpen(false);
-                                      }}
-                                    >{state?.name}</p>
-                                  ))
-                                }
-                              </div>
-                            )
-                          }
-                        </div>
-                      )
-                    } else if(form.name === "business_city") {
-                      return (
-                        <div
-                          className='flex flex-col mb-2 w-full mx-auto relative'
-                          ref={cityRef}
-                        >
-                          <label
-                            className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
-                          >Business City</label>
-                          <input
-                            type="text"
-                            name="business_city"
-                            required
-                            className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
-                            onChange={(e) => {
-                              setUserData({
-                                ...userData,
-                                business_city: '',
-                              });
-                              setCityName(e.target.value);
-                              setCity({});
-                            }}
-                            value={userData?.business_city || cityName}
-                            onFocus={() => {setCityDropdownOpen(true)}}
-                            placeholder="Search your business city"
-                            // cypress-name={item.name+"_input"}
-                          />
-                          {
-                            cityDropdownOpen && (
-                              <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md max-h-32 overflow-auto'>
-                                {
-                                  cities?.filter(name => name?.name.toLowerCase().includes(cityName.toLowerCase())).map((city, idx) => (
-                                    <p
-                                      key={idx}
-                                      className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
-                                      dropdown-name="country-dropdown"
-                                      onClick={() => {
-                                        setUserData({
-                                          ...userData,
-                                          business_city: city?.name
-                                        });
-                                        setCityName("");
-                                        setCity(city);
-                                        setCityDropdownOpen(false);
-                                      }}
-                                    >{city?.name}</p>
-                                  ))
-                                }
-                              </div>
-                            )
-                          }
-                        </div>
-                      )
-                    } else {
-                      return (
-                        <div className='relative w-full flex flex-col h-[58px]' key={index}>
-                          <label className='absolute -mt-[10px] ml-4 font-inter font-normal text-sm text-[#8A8A8A] bg-white'>{form.label}</label>
-                          <input
-                            type={form.type}
-                            name={form.name}
-                            placeholder={form.placeholder}
-                            className='border border-[#E4E4E4] px-3 py-1 w-full rounded-[10px] font-inter font-normal text-base text-[#1E1E1E] h-[45px]'
-                            onChange={(e) => {
-                              setUserData({
-                                ...userData,
-                                [e.target.name]: e.target.value
-                              })
-                            }}
-                            value={userData[form.name]}
-                            required
-                          />
-                        </div>
-                      )
-                    }
-                  })
-                }
+                <div className='w-full flex flex-col mt-2'>
+                  {
+                    bottomForm?.map((form, index) => {
+                      if(form.name === "business_state") {
+                        return (
+                          <div
+                            className='flex flex-col mb-2 w-full mx-auto relative'
+                            ref={stateRef}
+                          >
+                            <label
+                              className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
+                            >Business State</label>
+                            <input
+                              type="text"
+                              name="business_state"
+                              required
+                              className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                              onChange={(e) => {
+                                setUserData({
+                                  ...userData,
+                                  business_state: '',
+                                  business_city: '',
+                                });
+                                setStateName(e.target.value);
+                                setCityName('');
+                                setState({});
+                                setCity({});
+                              }}
+                              value={userData?.business_state || stateName}
+                              onFocus={() => {setStateDropdownOpen(true)}}
+                              placeholder="Search your business state"
+                              // cypress-name={item.name+"_input"}
+                            />
+                            {
+                              stateDropdownOpen && (
+                                <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md max-h-32 overflow-auto'>
+                                  {
+                                    states?.filter(name => name?.name.toLowerCase().includes(stateName.toLowerCase())).map((state, idx) => (
+                                      <p
+                                        key={idx}
+                                        className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                                        dropdown-name="country-dropdown"
+                                        onClick={() => {
+                                          setUserData({
+                                            ...userData,
+                                            business_state: state?.name,
+                                            business_city: ''
+                                          });
+                                          setStateName("");
+                                          setCityName("");
+                                          setState(state);
+                                          setCity({});
+                                          setStateDropdownOpen(false);
+                                        }}
+                                      >{state?.name}</p>
+                                    ))
+                                  }
+                                </div>
+                              )
+                            }
+                          </div>
+                        )
+                      } else if(form.name === "business_city") {
+                        return (
+                          <div
+                            className='flex flex-col mb-2 w-full mx-auto relative'
+                            ref={cityRef}
+                          >
+                            <label
+                              className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
+                            >Business City</label>
+                            <input
+                              type="text"
+                              name="business_city"
+                              required
+                              className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                              onChange={(e) => {
+                                setUserData({
+                                  ...userData,
+                                  business_city: '',
+                                });
+                                setCityName(e.target.value);
+                                setCity({});
+                              }}
+                              value={userData?.business_city || cityName}
+                              onFocus={() => {setCityDropdownOpen(true)}}
+                              placeholder="Search your business city"
+                              // cypress-name={item.name+"_input"}
+                            />
+                            {
+                              cityDropdownOpen && (
+                                <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md max-h-32 overflow-auto'>
+                                  {
+                                    cities?.filter(name => name?.name.toLowerCase().includes(cityName.toLowerCase())).map((city, idx) => (
+                                      <p
+                                        key={idx}
+                                        className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                                        dropdown-name="country-dropdown"
+                                        onClick={() => {
+                                          setUserData({
+                                            ...userData,
+                                            business_city: city?.name
+                                          });
+                                          setCityName("");
+                                          setCity(city);
+                                          setCityDropdownOpen(false);
+                                        }}
+                                      >{city?.name}</p>
+                                    ))
+                                  }
+                                </div>
+                              )
+                            }
+                          </div>
+                        )
+                      } else {
+                        return (
+                          <div className='relative w-full flex flex-col h-[58px]' key={index}>
+                            <label className='absolute -mt-[10px] ml-4 font-inter font-normal text-sm text-[#8A8A8A] bg-white'>{form.label}</label>
+                            <input
+                              type={form.type}
+                              name={form.name}
+                              placeholder={form.placeholder}
+                              className='border border-[#E4E4E4] px-3 py-1 w-full rounded-[10px] font-inter font-normal text-base text-[#1E1E1E] h-[45px]'
+                              onChange={(e) => {
+                                setUserData({
+                                  ...userData,
+                                  [e.target.name]: e.target.value
+                                })
+                              }}
+                              value={userData[form.name]}
+                              required
+                            />
+                          </div>
+                        )
+                      }
+                    })
+                  }
+                </div>
 
                 <div className="flex flex-col items-start justify-start w-full gap-2 mb-4">
                   <h1 className="font-inter font-semibold text-sm flex flex-row items-center justify-center mr-2 relative">

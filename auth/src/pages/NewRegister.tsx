@@ -170,7 +170,7 @@ const RegisterPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if(countries.length > 0 && countryName !== "") {
+    if(countries?.length > 0 && countryName !== "") {
       setCountryDropdownOpen(true);
     }
   }, [countries, countryName]);
@@ -278,7 +278,7 @@ const RegisterPage: React.FC = () => {
               zipcode: customer?.zipcode
             })).unwrap();
             console.log("result...", result);
-            navigate("/otp?mode=signup", { state: {customer_id: result?.customer_id, from: "registration"} })
+            navigate("/otp?mode=signup", { state: {customer_id: result?.customer_id, from: "registration", data: customer} });
           } catch (error) {
             
             toast.error("Error registering customer");

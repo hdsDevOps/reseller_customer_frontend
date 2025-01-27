@@ -14,44 +14,44 @@ import jsPDF from "jspdf";
 
 const superAdminPermissions = [
   {
-      "name": "Dashboard",
-      "value": true
+    name: "Dashboard",
+    value: true
   },
   {
-      "name": "Profile",
-      "value": true
+    name: "Profile",
+    value: true
   },
   {
-      "name": "Domain",
-      "value": true
+    name: "Domain",
+    value: true
   },
   {
-      "name": "Payment Subscription",
-      "value": true
+    name: "Payment Subscription",
+    value: true
   },
   {
-      "name": "Email",
-      "value": true
+    name: "Email",
+    value: true
   },
   {
-      "name": "Payment Method",
-      "value": true
+    name: "Payment Method",
+    value: true
   },
   {
-      "name": "Vouhcers",
-      "value": true
+    name: "Vouchers",
+    value: true
   },
   {
-      "name": "My Staff",
-      "value": true
+    name: "My Staff",
+    value: true
   },
   {
-      "name": "Billing History",
-      "value": true
+    name: "Billing History",
+    value: true
   },
   {
-      "name": "Settings",
-      "value": true
+    name: "Settings",
+    value: true
   }
 ];
 
@@ -332,7 +332,7 @@ const DownloadInvoice: React.FC = () => {
         await dispatch(makeDefaultPaymentMethodWithoutLoginThunk({user_id: data?.customer_id, payment_method_id: defaultPaymentId, token: data?.token}));
         const role = await dispatch(addSettingWithoutLoginThunk({user_type: "Super Admin", user_id: data?.customer_id, permissions: superAdminPermissions, token: data?.token})).unwrap();
         // settingId
-        await dispatch(addStaffWithoutLoginThunk({user_id: data?.customer_id, first_name: data?.formData?.first_name, last_name: data?.formData?.last_name, email: data?.formData?.email, phone_no: data?.formData?.phone_no, user_type_id: role?.settingId, token: data?.token}))
+        await dispatch(addStaffWithoutLoginThunk({user_id: data?.customer_id, first_name: data?.formData?.first_name, last_name: data?.formData?.last_name, email: data?.formData?.email, phone_no: data?.formData?.phone_no, user_type_id: role?.settingId, token: data?.token}));
         setDisabled(false);
       } catch (error) {
         console.log("error");

@@ -21,48 +21,46 @@ import { setRolePermissionsSlice, setTokenDetails } from "store/authSlice";
 import { getSettingsListThunk, removeUserAuthTokenFromLSThunk, removeUserIdFromLSThunk } from 'store/user.thunk';
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 
-
-
 const initialRolePermissions = [
   {
-      "name": "Dashboard",
-      "value": false
+      name: "Dashboard",
+      value: false
   },
   {
-      "name": "Profile",
-      "value": false
+      name: "Profile",
+      value: false
   },
   {
-      "name": "Domain",
-      "value": false
+      name: "Domain",
+      value: false
   },
   {
-      "name": "Payment Subscription",
-      "value": false
+      name: "Payment Subscription",
+      value: false
   },
   {
-      "name": "Email",
-      "value": false
+      name: "Email",
+      value: false
   },
   {
-      "name": "Payment Method",
-      "value": false
+      name: "Payment Method",
+      value: false
   },
   {
-      "name": "Vouhcers",
-      "value": false
+      name: "Vouchers",
+      value: false
   },
   {
-      "name": "My Staff",
-      "value": false
+      name: "My Staff",
+      value: false
   },
   {
-      "name": "Billing History",
-      "value": false
+      name: "Billing History",
+      value: false
   },
   {
-      "name": "Settings",
-      "value": false
+      name: "Settings",
+      value: false
   }
 ];
 
@@ -84,7 +82,7 @@ const links = [
   },
   {
     path: "/voucher",
-    label: "Voucher",
+    label: "Vouchers",
     icon: <Ticket className="w-5 h-5" />,
   },
   {
@@ -118,7 +116,7 @@ const Sidebar = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { userDetails, roleId, customerId, rolePermission } = useAppSelector(state => state.auth);
+  const { userDetails, roleId, customerId, rolePermission, isAdmin } = useAppSelector(state => state.auth);
   const [isOpen, setIsOpen] = useState(false);
   const [username] = useState("Robert Clive"); // Replace with actual username
   const [email] = useState("roberclive@domain.co.in"); // Replace with actual email
@@ -127,23 +125,8 @@ const Sidebar = () => {
   // console.log("user details...", userDetails);
   // console.log("role id...", roleId);
 
-  const [rolePermissions, setRolePermissions] = useState(initialRolePermissions);
-  // console.log("rolePermissions...", rolePermissions);
-
-  const getRolePermission = async() => {
-    try {
-      const result = await dispatch(getSettingsListThunk({user_type: "", user_id: customerId})).unwrap();
-      const rolePermissionsObject = await result?.settings?.find(item => item?.id === roleId);
-      // console.log("rolePermissionsObject...", rolePermissionsObject);
-      setRolePermissions(rolePermissionsObject?.permissions);
-    } catch (error) {
-      setRolePermissions(initialRolePermissions);
-    }
-  };
-
-  useEffect(() => {
-    getRolePermission();
-  }, [roleId, customerId]);
+  // const [rolePermissions, setRolePermissions] = useState(initialRolePermissions);
+  // console.log("rolePermissions...", rolePermission);
 
   const handleLogout = async () => {
     await dispatch(removeUserAuthTokenFromLSThunk());
@@ -173,7 +156,7 @@ const Sidebar = () => {
 
   return (
     <aside
-      className={`fixed h-full sm:max-h-screen top-3 left-0 transition-all duration-300 ease-in-out bg-[#F0F0F0] text-black shadow-md flex flex-col ${
+      className={`fixed h-full sm:max-h-screen ${isAdmin ? "top-[80px]" : "top-3"} left-0 transition-all duration-300 ease-in-out bg-[#F0F0F0] text-black shadow-md flex flex-col ${
         isOpen ? "max-w-64 sm-max:max-w-64" : "max-w-20"
       } lg:max-w-64 w-full z-20`}
     >
@@ -224,9 +207,9 @@ const Sidebar = () => {
         </div>
         <nav>
           <ul className="relative flex flex-col gap-2">
-            {links.map((link, index) => {
-              // console.log(checkPermission(label))
-              // if(rolePermission?.find(item => item?.name === link?.label)?.value) {
+            {links?.map((link, index) => {
+              // console.log(checkPermission(link?.label))
+              if(checkPermission(link?.label)) {
                 return(
                   <li key={index} className={getLinkClass(link?.path)}>
                     {location.pathname === link?.path && (
@@ -255,7 +238,7 @@ const Sidebar = () => {
                     </Link>
                   </li>
                 )
-              // }
+              }
             })}
           </ul>
         </nav>

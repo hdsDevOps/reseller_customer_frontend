@@ -14,6 +14,8 @@ import html2canvas from 'html2canvas-pro';
 import jsPDF from "jspdf";
 import { toast } from "react-toastify";
 import { setCart, setCurrentPageNumberSlice, setItemsPerPageSlice, setPaymentDetailsFilterSlice } from "store/authSlice";
+import './pagination.css';
+import ReactPaginate from "react-paginate";
 
 interface RangeType<T> {
   label: string;
@@ -86,7 +88,24 @@ const paystackImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gwork
 const PaymentDetails: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { customerId, paymentDetailsFilterSlice, itemsPerPageSlice, currentPageNumber, userDetails, defaultCurrencySlice, cartState } = useAppSelector(state => state.auth);
+  const { customerId, paymentDetailsFilterSlice, itemsPerPageSlice, currentPageNumber, userDetails, defaultCurrencySlice, cartState, rolePermission } = useAppSelector(state => state.auth);
+  
+  useEffect(() => {
+    const checkPermission = (label:String) => {
+      if(rolePermission?.length > 0) {
+        const permissionStatus = rolePermission?.find(item => item?.name === label)?.value;
+        if(permissionStatus) {
+          //
+        } else {
+          navigate('/');
+        }
+      } else {
+        navigate('/');
+      }
+    };
+
+    checkPermission("Payment Subscription");
+  }, [rolePermission]);
 
   const initialFilter = {
     customer_id: customerId,
@@ -907,73 +926,62 @@ const PaymentDetails: React.FC = () => {
             }
           </tbody>
         </table>
-      </div>
 
-      
-
-      <div className="flex justify-end items-center mt-12 relative bottom-2 right-0">
-        {/* <div className="flex items-center gap-1">
-          <select
-            onChange={e => {
-              setItemsPerPage(parseInt(e.target.value));
-            }}
-            value={itemsPerPage}
-          >
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={15}>15</option>
-            <option value={20} selected>20</option>
-            <option value={50}>50</option>
-          </select>
-          <label>items</label>
-        </div> */}
-        <div className="flex">
-          <button
-            onClick={() => {
-              setCurrentPage((prev) => Math.max(prev - 1, 0));
-            }}
-            disabled={currentPage === 0}
-            className={`px-3 py-1 text-sm ${
-              currentPage === 0
-                ? "bg-transparent text-gray-300"
-                : "bg-transparent hover:bg-green-500 hover:text-white"
-            } rounded-l transition`}
-          >
-            Prev
-          </button>
-
-          {/* Page numbers */}
-          {Array.from({ length: totalPages }, (_, index) => (
+        <ReactPaginate
+          breakLabel="..."
+          nextLabel={(
             <button
-              key={index}
               onClick={() => {
-                setCurrentPage(index);
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1));
               }}
-              className={`px-3 py-1 text-sm mx-1 rounded ${
-                currentPage === index
-                  ? "bg-green-500 text-white"
+              disabled={currentPage === totalPages - 1}
+              className={`px-3 py-1 text-sm ${
+                currentPage === totalPages - 1
+                  ? "bg-transparent text-gray-300"
                   : "bg-transparent text-black hover:bg-green-500 hover:text-white"
-              } transition`}
+              } rounded-r transition`}
             >
-              {index + 1}
+              Next
             </button>
-          ))}
+          )}
+          onPageChange={(event) => {
+            setCurrentPage(event.selected);
+            // console.log(event.selected);
+          }}
+          pageRangeDisplayed={2}
+          pageCount={totalPages}
+          previousLabel={(
+            <button
+              onClick={() => {
+                setCurrentPage((prev) => Math.max(prev - 1, 0));
+              }}
+              disabled={currentPage === 0}
+              className={`px-3 py-1 text-sm ${
+                currentPage === 0
+                  ? "bg-transparent text-gray-300"
+                  : "bg-transparent text-black hover:bg-green-500 hover:text-white"
+              } rounded-l transition`}
+            >
+              Prev
+            </button>
+          )}
 
-          <button
-            onClick={() => {
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1));
-            }}
-            disabled={currentPage === totalPages - 1}
-            className={`px-3 py-1 text-sm ${
-              currentPage === totalPages - 1
-                ? "bg-transparent text-gray-300"
-                : "bg-transparent hover:bg-green-500 hover:text-white"
-            } rounded-r transition`}
-          >
-            Next
-          </button>
-        </div>
+          containerClassName="flex justify-start"
+
+          renderOnZeroPageCount={null}
+          className="pagination-class-name"
+
+          pageClassName="pagination-li"
+          pageLinkClassName="pagination-li-a"
+
+          breakClassName="pagination-ellipsis"
+          breakLinkClassName="pagination-ellipsis-a"
+
+          activeClassName="pagination-active-li"
+          activeLinkClassName	="pagination-active-a"
+        />
       </div>
+      
       {
         isModalOpen && modalType === "Update payment method" ?
         (

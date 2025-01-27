@@ -42,11 +42,11 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList,
 
   const [activeMethod, setActiveMethod] = useState("saved");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>("");
-  console.log("selectedPaymentMethod...", selectedPaymentMethod);
+  // console.log("selectedPaymentMethod...", selectedPaymentMethod);
   const [selectedCard, setSelectedCard] = useState<string | null>("");
   const [activeSubscriptionPlan, setActiveSubscriptionPlan] = useState({});
   // console.log(activeSubscriptionPlan);
-  console.log(userDetails);
+  // console.log(userDetails);
   const [licensePrice, setLicensePrice] = useState(0);
   // console.log(licensePrice);
   // console.log({numUsers, licensePrice, subtotal, tax, total, preDiscountRate, preDiscountAmount, discountRate, discountAmount,});

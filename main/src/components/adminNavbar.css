@@ -1,0 +1,37 @@
+/* bg-[#12A83399] flex justify-between px-10 items-center h-full w-full */
+
+.admin-navbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0 70px;
+  align-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  background-color: #12A83399;
+  color: black;
+}
+
+@media screen and (max-width: 850px) {
+  .admin-navbar {
+    flex-direction: column;
+    padding: 4px 70px;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .admin-navbar {
+    padding: 4px 0;
+  }
+
+  .admin-navbar h6{
+    font-size: 18px;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  .admin-navbar h6{
+    font-size: 14px;
+  }
+}

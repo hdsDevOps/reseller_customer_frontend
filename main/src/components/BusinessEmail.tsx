@@ -19,7 +19,7 @@ const intialEmail = {
 }
 
 const EmailList: React.FC = ({data, getDomainsList}) => {
-  console.log("data...", data);
+  // console.log("data...", data);
   const { customerId, userDetails } = useAppSelector(state => state.auth);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLicenseModalOpen, setisLicenseModalOpen] = useState<boolean>(false);
@@ -30,7 +30,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
   });
 
   const licenseRef = useRef(null);
-  console.log(licenseRef, "licemse ewgv")
+  // console.log(licenseRef, "licemse ewgv");
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,7 +51,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
   const resetUserPasswordRef = useRef(null);
   const renameAccountRef = useRef(null);
   const [newEmails, setNewEmails] = useState([]);
-  console.log("newEmails...", newEmails);
+  // console.log("newEmails...", newEmails);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -277,7 +277,8 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
     e.preventDefault();
     try {
       const result = await dispatch(deleteEmailThunk({domain_id: data?.id, uuid: selectedEmail?.uuid})).unwrap();
-      console.log("result...", result);
+      // console.log("result...", result);
+      toast.success(result?.message);
     } catch (error) {
       toast.error("Error removing email");
       if(error?.message == "Authentication token is required") {
@@ -973,7 +974,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                     <input
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
-                      className="w-full h-10 border border-[#E4E4E4] rounded-[10px] px-3"
+                      className="w-full h-10 border border-[#E4E4E4] rounded-[10px] pl-3 pr-8"
                       onChange={e => {setPassword(e.target.value)}}
                       value={password}
                     />
@@ -1003,7 +1004,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                     <input
                       type={showCPassword ? "text" : "password"}
                       placeholder="Enter your password"
-                      className="w-full h-10 border border-[#E4E4E4] rounded-[10px] px-3"
+                      className="w-full h-10 border border-[#E4E4E4] rounded-[10px] pl-3 pr-8"
                       onChange={e => {setConfirmPassword(e.target.value)}}
                       value={confirmPassword}
                     />

@@ -78,13 +78,16 @@ function ViewPaymentDetails() {
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="self-start">
-        <Link to="/payment-subscription">
+        <button
+          type='button'
+          onClick={() => {navigate(-1)}}
+        >
           <h2 className="text-green-500 font-medium text-sm sm:text-md lg:text-2xl flex items-center mb-3">
             <ArrowLeft className="text-sm sm:text-md lg:text-2xl" /> View payment details
           </h2>
-        </Link>
+        </button>
         <div className="flex items-center gap-1 text-sm sm:text-md md:text-lg">
-          <Link to="/domain">Payment subscription</Link>
+          <button type='button'>Payment subscription</button>
           <ChevronRight />
           <p className="text-green-500">View payment details</p>
         </div>

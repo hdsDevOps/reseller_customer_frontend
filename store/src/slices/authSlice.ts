@@ -8,6 +8,54 @@ import {
 } from '../thunks/user.thunk';
 import { userLocalStorage } from '../localStorage/user.storage';
 
+const initialRolePermissions = [
+  {
+      name: "Dashboard",
+      value: false
+  },
+  {
+      name: "Profile",
+      value: false
+  },
+  {
+      name: "Domain",
+      value: false
+  },
+  {
+      name: "Payment Subscription",
+      value: false
+  },
+  {
+      name: "Email",
+      value: false
+  },
+  {
+      name: "Payment Method",
+      value: false
+  },
+  {
+      name: "Vouchers",
+      value: false
+  },
+  {
+      name: "My Staff",
+      value: false
+  },
+  {
+      name: "Billing History",
+      value: false
+  },
+  {
+      name: "Settings",
+      value: false
+  }
+];
+
+export interface Permission {
+  name: string,
+  value: Boolean
+}
+
 export interface UserDetailsState {
   userAuthStatus: 'AUTHORIZED' | 'UN_AUTHORIZED' | 'PENDING' | 'UPGRADE';
   userDetails: any;
@@ -29,11 +77,11 @@ export interface UserDetailsState {
   itemsPerPageSlice: Number;
   metaDataSlice: object|null;
   roleId: string;
-  rolePermission: [];
+  rolePermission: Permission[];
   notificationsList: [];
+  isAdmin: Boolean;
+  adminName: string;
 }
-
-
 
 const initialState: UserDetailsState = {
   userAuthStatus: 'PENDING',
@@ -56,8 +104,10 @@ const initialState: UserDetailsState = {
   itemsPerPageSlice: 20,
   metaDataSlice: null,
   roleId: "",
-  rolePermission: [],
+  rolePermission: [...initialRolePermissions],
   notificationsList: [],
+  isAdmin: false,
+  adminName: "",
 };
 
 const authSlice = createSlice({
@@ -127,6 +177,12 @@ const authSlice = createSlice({
     setNotificationsListSlice: (state, action: PayloadAction<any>) => {
       state.notificationsList = action.payload;
     },
+    setIsAdminSlice: (state, action: PayloadAction<any>) => {
+      state.isAdmin = action.payload;
+    },
+    setAdminNameSlice: (state, action: PayloadAction<any>) => {
+      state.adminName = action.payload;
+    },
     resetUserSlice: (state) => {
       state.userAuthStatus = 'PENDING';
       state.userDetails = {};
@@ -183,6 +239,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setTokenDetails, setUserDetails, setUserAuthStatus,  setResellerToken, resetUserSlice, setCart, setDomains, setSaveCards, setPaymentMethodsState, setDefaultCurrencySlice, setWorkSpaceFlowSlice, setCustomerId, setStaffId, setStaffStatus, setBillingHistoryFilterSlice, setPaymentDetailsFilterSlice, setCurrentPageNumberSlice, setItemsPerPageSlice, setMetaDataSlice, setRoleIdSlice, setNotificationsListSlice } = authSlice.actions;
+export const { setTokenDetails, setUserDetails, setUserAuthStatus,  setResellerToken, resetUserSlice, setCart, setDomains, setSaveCards, setPaymentMethodsState, setDefaultCurrencySlice, setWorkSpaceFlowSlice, setCustomerId, setStaffId, setStaffStatus, setBillingHistoryFilterSlice, setPaymentDetailsFilterSlice, setCurrentPageNumberSlice, setItemsPerPageSlice, setMetaDataSlice, setRoleIdSlice, setNotificationsListSlice, setIsAdminSlice, setAdminNameSlice, setRolePermissionsSlice } = authSlice.actions;
 
 export default authSlice.reducer;

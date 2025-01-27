@@ -25,6 +25,7 @@ import SelectedDomainDetails from "../components/planFlow/SelectedDomainDetails"
 import HowToSignInToDomain from "../components/planFlow/HowToSignInToDomain";
 import TrialSummary from "../components/planFlow/TrialSummary";
 import GeminiSummary from "../components/planFlow/GeminiSummary";
+import AdminHeader from "../components/AdminHeader";
 
 const routes = [
   { path: "/", element: <Dashboard /> },
@@ -43,10 +44,15 @@ const routes = [
 ];
 
 const MainApp: React.FC = () => {
+  const { isAdmin } = useAppSelector(state => state.auth);
+
   return (
   <div className="main-wrapper">
+    {
+      isAdmin && (<AdminHeader />)
+    }
     <Header />
-    <div className="content-body relative min-h-screen pl-[5.2rem] lg:pl-[17rem] pt-[70px] pr-[0.8rem] pb-4">
+    <div className={`content-body relative min-h-screen pl-[5.2rem] lg:pl-[17rem] ${isAdmin ? "pt-[150px]" : "pt-[80px]"} pr-[0.8rem] pb-4`}>
       <ToastContainer />
       <Routes>
         {routes.map((route, index) => (

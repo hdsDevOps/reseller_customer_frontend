@@ -130,6 +130,8 @@ declare module 'store/authSlice' {
   export const setMetaDataSlice;
   export const setDefaultCurrencySlice;
   export const setNotificationsListSlice: (payload: any) => PayloadAction<any>;
+  export const setAdminNameSlice;
+  export const setIsAdminSlice;
 }
 
 declare module 'store/reseller.thunk' {

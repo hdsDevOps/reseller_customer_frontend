@@ -12,10 +12,27 @@ import { getVouchersListThunk, removeUserAuthTokenFromLSThunk } from "store/user
 const VoucherCard: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { customerId } = useAppSelector(state => state.auth);
+  const { customerId,rolePermission } = useAppSelector(state => state.auth);
   const [isModalOpen, setModalOpen] = useState(false);
   const [voucherList, setVouhcerList] = useState([]);
   console.log("voucher list...", voucherList);
+  
+  useEffect(() => {
+    const checkPermission = (label:String) => {
+      if(rolePermission?.length > 0) {
+        const permissionStatus = rolePermission?.find(item => item?.name === label)?.value;
+        if(permissionStatus) {
+          //
+        } else {
+          navigate('/');
+        }
+      } else {
+        navigate('/');
+      }
+    };
+
+    checkPermission("Vouchers");
+  }, [rolePermission]);
 
   const getVouchersList = async() => {
     try {

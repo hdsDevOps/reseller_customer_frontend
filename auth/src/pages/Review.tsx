@@ -45,6 +45,7 @@ const Review = () => {
 
   const [addressDetails, setAddressDetails] = useState(location.state.formData);
   // console.log("addressDetails...", addressDetails);
+  const [nameAndAddressHover, setNameAndAddressHover] = useState(false);
 
   const [planDate, setPlanDate] = useState(format(new Date(), "MMMM dd"));
 
@@ -594,9 +595,16 @@ const Review = () => {
 
                 {/* CUSTOMER INFORMATION */}
 
-                <h1 className="font-inter font-medium text-[14px] text-black flex flex-row items-center justify-center mr-2">
+                <h1 className="font-inter font-semibold text-sm flex flex-row items-center justify-center mr-2 relative mb-3">
                   Name and address
-                  <GoInfo className="ml-2" />
+                  <GoInfo className="ml-2 w-4 h-4" onMouseOver={() => {setNameAndAddressHover(true)}} onMouseLeave={() => {setNameAndAddressHover(false)}} />
+                  {
+                    nameAndAddressHover && (
+                      <div className="absolute bg-white w-[220px] top-5 left-[13px] rounded-md z-10">
+                        <p className="bg-[#12A83330] px-4 py-3 w-full font-inter font-medium text-[10px] text-black rounded-md">This is the legal address of your organization or home</p>
+                      </div>
+                    )
+                  }
                 </h1>
 
                 {

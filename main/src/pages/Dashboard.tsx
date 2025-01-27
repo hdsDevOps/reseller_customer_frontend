@@ -34,7 +34,7 @@ const paystackImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gwork
 const Dashboard: React.FC = () => {
   const location = useLocation();
   const dispatch = useAppDispatch();
-  const { customerId, userDetails, cartState, defaultCurrencySlice,token } = useAppSelector(state => state.auth);
+  const { customerId, userDetails, cartState, defaultCurrencySlice,token, rolePermission } = useAppSelector(state => state.auth);
   const navigate = useNavigate();
   // console.log("state...", location.state);
   const isInitialRender = useRef(true);
@@ -55,6 +55,25 @@ const Dashboard: React.FC = () => {
       }
     }
   }, [location.state]);
+
+  useEffect(() => {
+    const checkPermission = (label:String) => {
+      if(rolePermission?.length > 0) {
+        console.log(rolePermission?.find(item => item?.name === label))
+        const permissionStatus = rolePermission?.find(item => item?.name === label)?.value;
+        if(permissionStatus) {
+          //
+        } else {
+          navigate('/');
+        }
+      } else {
+        navigate('/');
+      }
+    };
+
+    checkPermission("Dashboard");
+  }, [rolePermission]);
+  
   const [isSubscriptionModalOpen, setSubscriptionModalOpen] = useState(false);
   const [subscriptionsList, setSubscriptionList] = useState([]);
   // console.log("subscriptionsList...", subscriptionsList);
@@ -219,6 +238,19 @@ const Dashboard: React.FC = () => {
       setBillingHistoryData(null);
     }
   }, [billingHistoryList, invoiceData]);
+    
+  const handleClickOutsideListeRef = (event: MouseEvent) => {
+    if(listRef.current && !listRef.current.contains(event.target as Node)) {
+      setShowList(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutsideListeRef);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutsideListeRef);
+    };
+  }, []);
   
   const openProcessingModal = () => {
     setProcessingModalOpen(true);
@@ -298,7 +330,6 @@ const Dashboard: React.FC = () => {
       navigate('/add-cart');
     } catch (error) {
       // console.log(error);
-      
       toast.error("Error renewing plan");
       if(error?.error == "Request failed with status code 401") {
         try {
@@ -308,6 +339,8 @@ const Dashboard: React.FC = () => {
           //
         }
       }
+    } finally {
+      setShowList(false);
     }
   };
   
@@ -764,6 +797,7 @@ const Dashboard: React.FC = () => {
                                       key={idx}
                                       className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
                                       onClick={() => {
+                                        setShowList(false);
                                         setIsModalOpen(true);
                                         setModalType(list?.label);
                                         setSubscriptionId(subscription?.id)
@@ -781,6 +815,7 @@ const Dashboard: React.FC = () => {
                                       key={idx}
                                       className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
                                       onClick={() => {
+                                        setShowList(false);
                                         setIsModalOpen(true);
                                         setModalType(list?.label);
                                         if(list?.label === "View Invoice") {

@@ -7,8 +7,8 @@ import UserAuth from "./hoc/UserAuth.hoc";
 import MainApp from "./pages";
 import AuthApp from "auth/AuthApp";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { getCartThunk, getDomainsListThunk, getLandingPageThunk, getNotificationsListThunk, getPaymentMethodsThunk, getProfileDataThunk, getRoleIdFromLSThunk, getStaffIdFromLSThunk, getStaffStatusFromLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, removeUserAuthTokenFromLSThunk, savedCardsListThunk } from 'store/user.thunk';
-import { setCart, setCustomerId, setDefaultCurrencySlice, setDomains, setMetaDataSlice, setNotificationsListSlice, setPaymentMethodsState, setResellerToken, setRoleIdSlice, setSaveCards, setStaffId, setStaffStatus, setTokenDetails, setUserDetails } from 'store/authSlice';
+import { getCartThunk, getDomainsListThunk, getLandingPageThunk, getNotificationsListThunk, getPaymentMethodsThunk, getProfileDataThunk, getRoleIdFromLSThunk, getSettingsListThunk, getStaffIdFromLSThunk, getStaffStatusFromLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, removeUserAuthTokenFromLSThunk, savedCardsListThunk } from 'store/user.thunk';
+import { setCart, setCustomerId, setDefaultCurrencySlice, setDomains, setMetaDataSlice, setNotificationsListSlice, setPaymentMethodsState, setResellerToken, setRoleIdSlice, setRolePermissionsSlice, setSaveCards, setStaffId, setStaffStatus, setTokenDetails, setUserDetails } from 'store/authSlice';
 import "auth/AuthCss";
 import "./index.css";
 import { HelmetProvider, Helmet } from 'react-helmet-async';
@@ -16,10 +16,140 @@ import countryToCurrency, { Currencies, Countries } from "country-to-currency";
 import { currencyList } from "./components/CurrencyList";
 import { ToastContainer } from "react-toastify";
 
+const initialRolePermissions = [
+  {
+      name: "Dashboard",
+      value: false
+  },
+  {
+      name: "Profile",
+      value: false
+  },
+  {
+      name: "Domain",
+      value: false
+  },
+  {
+      name: "Payment Subscription",
+      value: false
+  },
+  {
+      name: "Email",
+      value: false
+  },
+  {
+      name: "Payment Method",
+      value: false
+  },
+  {
+      name: "Vouchers",
+      value: false
+  },
+  {
+      name: "My Staff",
+      value: false
+  },
+  {
+      name: "Billing History",
+      value: false
+  },
+  {
+      name: "Settings",
+      value: false
+  }
+];
+
+const superAdminRolePermissions = [
+  {
+      name: "Dashboard",
+      value: true
+  },
+  {
+      name: "Profile",
+      value: true
+  },
+  {
+      name: "Domain",
+      value: true
+  },
+  {
+      name: "Payment Subscription",
+      value: true
+  },
+  {
+      name: "Email",
+      value: true
+  },
+  {
+      name: "Payment Method",
+      value: true
+  },
+  {
+      name: "Vouchers",
+      value: true
+  },
+  {
+      name: "My Staff",
+      value: true
+  },
+  {
+      name: "Billing History",
+      value: true
+  },
+  {
+      name: "Settings",
+      value: true
+  }
+];
+
+const hordansoAdminRolePermissions = [
+  {
+      name: "Dashboard",
+      value: true
+  },
+  {
+      name: "Profile",
+      value: false
+  },
+  {
+      name: "Domain",
+      value: true
+  },
+  {
+      name: "Payment Subscription",
+      value: true
+  },
+  {
+      name: "Email",
+      value: true
+  },
+  {
+      name: "Payment Method",
+      value: false
+  },
+  {
+      name: "Vouchers",
+      value: true
+  },
+  {
+      name: "My Staff",
+      value: true
+  },
+  {
+      name: "Billing History",
+      value: false
+  },
+  {
+      name: "Settings",
+      value: false
+  }
+];
+
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { token, customerId, staffId, staffStatus, resellerToken, userDetails, metaDataSlice, defaultCurrencySlice, domainsState, notificationsList } = useAppSelector((state) => state.auth);
+  const { token, customerId, staffId, staffStatus, resellerToken, userDetails, metaDataSlice, defaultCurrencySlice, domainsState, notificationsList, roleId, rolePermission, isAdmin } = useAppSelector((state) => state.auth);
+  // console.log({rolePermission});
   // console.log("notificationsList...", notificationsList);
   // const token ="vvggg"
   // console.log(token, "...token");
@@ -45,6 +175,44 @@ const App: React.FC = () => {
 
     getNotificationsList();
   }, [customerId]);
+
+  // console.log({roleId, customerId});
+  
+  useEffect(() => {
+    const getRolePermission = async() => {
+      if(isAdmin) {
+        await dispatch(setRolePermissionsSlice(hordansoAdminRolePermissions));
+      } else {
+        try {
+          const result = await dispatch(getSettingsListThunk({user_type: "", user_id: customerId})).unwrap();
+          console.log("result...", result?.settings);
+          if(result) {
+            if(staffStatus) {
+              const permissions = result?.settings?.find(item => item?.id === roleId)?.permissions;
+              // console.log("premissions...", permissions);
+             if(permissions) {
+              await dispatch(setRolePermissionsSlice(permissions));
+             }
+            } else {
+              const permissions = result?.settings?.find(item => item?.user_type === "Super Admin")?.permissions;
+              // console.log("premissions...", permissions);
+              if(permissions) {
+                await dispatch(setRolePermissionsSlice(permissions));
+              }
+            }
+          } else {
+            // console.log("premissions...", initialRolePermissions);
+              await dispatch(setRolePermissionsSlice(initialRolePermissions));
+          }
+        } catch (error) {
+          // setRolePermissions(initialRolePermissions);
+          await dispatch(setRolePermissionsSlice(initialRolePermissions));
+        }
+      }
+    };
+    
+    getRolePermission();
+  }, [roleId, customerId, staffId, staffStatus, isAdmin]);
 
   useEffect(() => {
     const getIpData = async() => {

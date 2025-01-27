@@ -9,10 +9,27 @@ import { toast } from "react-toastify";
 const PaymentMethod = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { customerId }= useAppSelector(state => state.auth);
+  const { customerId, rolePermission }= useAppSelector(state => state.auth);
   
   const [paymentMethods, setPaymentMethods] = useState([]);
   // console.log("payment methods...", paymentMethods);
+  
+  useEffect(() => {
+    const checkPermission = (label:String) => {
+      if(rolePermission?.length > 0) {
+        const permissionStatus = rolePermission?.find(item => item?.name === label)?.value;
+        if(permissionStatus) {
+          //
+        } else {
+          navigate('/');
+        }
+      } else {
+        navigate('/');
+      }
+    };
+
+    checkPermission("Payment Method");
+  }, [rolePermission]);
 
   const getPaymentMethods = async() => {
     try {

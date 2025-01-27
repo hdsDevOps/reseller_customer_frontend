@@ -11,6 +11,7 @@ import { useReactToPrint } from 'react-to-print';
 import html2pdf from 'html2pdf.js'
 import BillingInvoice from "../components/BillingInvoice";
 import './invoice.css';
+import './pagination.css';
 import { getBillingHistoryThunk, getDomainsListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +19,7 @@ import { addDays, addMonths, endOfMonth, endOfWeek, format, startOfMonth, startO
 import { DateRangePicker } from "rsuite";
 import "rsuite/dist/rsuite.min.css";
 import { setCurrentPageNumberSlice, setBillingHistoryFilterSlice, setItemsPerPageSlice } from "store/authSlice";
+import ReactPaginate from "react-paginate";
 
 const stripeImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/stripe.png?alt=media&token=23bd6672-665c-4dfb-9d75-155abd49dc58";
 const paystackImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/paystack.png?alt=media&token=8faf3870-4256-4810-9844-5fd3c147d7a3";
@@ -83,7 +85,7 @@ const predefinedRanges: RangeType<Date>[] = [
 const BillingHistory: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { customerId, billingHistoryFilterSlice, currentPageNumber, itemsPerPageSlice } = useAppSelector(state => state.auth);
+  const { customerId, billingHistoryFilterSlice, currentPageNumber, itemsPerPageSlice, rolePermission } = useAppSelector(state => state.auth);
   const domainRef = useRef();
   const [isOpen, setIsOpen] = useState(false);
   const pdfRef = useRef<HTMLDivElement>(null);
@@ -94,6 +96,23 @@ const BillingHistory: React.FC = () => {
   const [selectedDomain, setSelectedDomain] = useState("");
   const [search, setSearch] = useState("");
   const [domainDropdownOpen, setDomainDropdownOpen] = useState(false);
+    
+  useEffect(() => {
+    const checkPermission = (label:String) => {
+      if(rolePermission?.length > 0) {
+        const permissionStatus = rolePermission?.find(item => item?.name === label)?.value;
+        if(permissionStatus) {
+          //
+        } else {
+          navigate('/');
+        }
+      } else {
+        navigate('/');
+      }
+    };
+
+    checkPermission("Billing History");
+  }, [rolePermission]);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -548,70 +567,60 @@ const BillingHistory: React.FC = () => {
             }
           </tbody>
         </table>
-      </div>
 
-      <div className="flex justify-end items-center mt-12 relative bottom-2 right-0">
-        {/* <div className="flex items-center gap-1">
-          <select
-            onChange={e => {
-              setItemsPerPage(parseInt(e.target.value));
-            }}
-            value={itemsPerPage}
-          >
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={15}>15</option>
-            <option value={20} selected>20</option>
-            <option value={50}>50</option>
-          </select>
-          <label>items</label>
-        </div> */}
-        <div className="flex">
-          <button
-            onClick={() => {
-              setCurrentPage((prev) => Math.max(prev - 1, 0));
-            }}
-            disabled={currentPage === 0}
-            className={`px-3 py-1 text-sm ${
-              currentPage === 0
-                ? "bg-transparent text-gray-300"
-                : "bg-transparent hover:bg-green-500 hover:text-white"
-            } rounded-l transition`}
-          >
-            Prev
-          </button>
-
-          {/* Page numbers */}
-          {Array.from({ length: totalPages }, (_, index) => (
+        <ReactPaginate
+          breakLabel="..."
+          nextLabel={(
             <button
-              key={index}
               onClick={() => {
-                setCurrentPage(index);
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1));
               }}
-              className={`px-3 py-1 text-sm mx-1 rounded ${
-                currentPage === index
-                  ? "bg-green-500 text-white"
+              disabled={currentPage === totalPages - 1}
+              className={`px-3 py-1 text-sm ${
+                currentPage === totalPages - 1
+                  ? "bg-transparent text-gray-300"
                   : "bg-transparent text-black hover:bg-green-500 hover:text-white"
-              } transition`}
+              } rounded-r transition`}
             >
-              {index + 1}
+              Next
             </button>
-          ))}
+          )}
+          onPageChange={(event) => {
+            setCurrentPage(event.selected);
+            // console.log(event.selected);
+          }}
+          pageRangeDisplayed={2}
+          pageCount={totalPages}
+          previousLabel={(
+            <button
+              onClick={() => {
+                setCurrentPage((prev) => Math.max(prev - 1, 0));
+              }}
+              disabled={currentPage === 0}
+              className={`px-3 py-1 text-sm ${
+                currentPage === 0
+                  ? "bg-transparent text-gray-300"
+                  : "bg-transparent text-black hover:bg-green-500 hover:text-white"
+              } rounded-l transition`}
+            >
+              Prev
+            </button>
+          )}
 
-          <button
-            onClick={() => {
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1));
-            }}
-            disabled={currentPage === totalPages - 1}
-            className={`px-3 py-1 text-sm ${
-              currentPage === totalPages - 1
-                ? "bg-transparent text-gray-300"
-                : "bg-transparent hover:bg-green-500 hover:text-white"
-            } rounded-r transition`}
-          >
-            Next
-          </button>
-        </div>
+          containerClassName="flex justify-start"
+
+          renderOnZeroPageCount={null}
+          className="pagination-class-name"
+
+          pageClassName="pagination-li"
+          pageLinkClassName="pagination-li-a"
+
+          breakClassName="pagination-ellipsis"
+          breakLinkClassName="pagination-ellipsis-a"
+
+          activeClassName="pagination-active-li"
+          activeLinkClassName	="pagination-active-a"
+        />
       </div>
     </div>
   );
