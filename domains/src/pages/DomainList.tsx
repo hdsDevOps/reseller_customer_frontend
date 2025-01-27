@@ -173,7 +173,7 @@ const DomainList: React.FC = () => {
 
   useEffect(() => {
     if(userDetails?.workspace?.workspace_status === "trial") {
-      const miliseconds = parseInt(userDetails?.workspace?._seconds) * 1000 + parseInt(userDetails?.workspace?._nanoseconds) / 1e6;
+      const miliseconds = parseInt(userDetails?.workspace?.next_payment?._seconds) * 1000 + parseInt(userDetails?.workspace?.next_payment?._nanoseconds) / 1e6;
       const foundDate =  new Date(miliseconds);
       const today = new Date(Date.now());
       if(foundDate > today) {
@@ -182,7 +182,7 @@ const DomainList: React.FC = () => {
         setAddEmailDisabled(true);
       }
     } else if(userDetails?.workspace?.workspace_status === "active") {
-      const miliseconds = parseInt(userDetails?.workspace?._seconds) * 1000 + parseInt(userDetails?.workspace?._nanoseconds) / 1e6;
+      const miliseconds = parseInt(userDetails?.workspace?.next_payment?._seconds) * 1000 + parseInt(userDetails?.workspace?.next_payment?._nanoseconds) / 1e6;
       const foundDate =  new Date(miliseconds);
       const today = new Date(Date.now());
       if(foundDate > today) {

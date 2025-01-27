@@ -1161,7 +1161,16 @@ const EmailList: React.FC = () => {
                                     Update plan
                                   </span>
                               </>
-                            ) : (<></>)
+                            ) : (
+                              <>
+                                <Dot className="inline-block items-center content-center" />
+                                <span
+                                  className="text-xs sm:text-sm text-slate-400 inline-block items-center content-center cursor-not-allowed"
+                                >
+                                  Update plan
+                                </span>
+                              </>
+                            )
                           }
                           
                         </p>

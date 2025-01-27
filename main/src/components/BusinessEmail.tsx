@@ -514,18 +514,27 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                       ? (
                         <>
                           <Dot className="inline-block items-center content-center" />
-                            <span
-                              className="text-xs sm:text-sm text-green-500 cursor-pointer inline-block items-center content-center"
-                              onClick={() => {
-                                if(userDetails?.workspace?.workspace_status !== "trial") {
-                                  navigate("/upgrade-plan")
-                                }
-                              }}
-                            >
-                              Update plan
-                            </span>
+                          <span
+                            className="text-xs sm:text-sm text-green-500 cursor-pointer inline-block items-center content-center"
+                            onClick={() => {
+                              if(userDetails?.workspace?.workspace_status !== "trial") {
+                                navigate("/upgrade-plan")
+                              }
+                            }}
+                          >
+                            Update plan
+                          </span>
                         </>
-                      ) : (<></>)
+                      ) : (
+                        <>
+                          <Dot className="inline-block items-center content-center" />
+                          <span
+                            className="text-xs sm:text-sm text-slate-400 inline-block items-center content-center cursor-not-allowed"
+                          >
+                            Update plan
+                          </span>
+                        </>
+                      )
                     }
                   </p>
                 </div>
