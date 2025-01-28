@@ -71,6 +71,7 @@ declare module 'store/user.thunk' {
   export const removeUserAuthTokenFromLSThunk;
   export const getDomainsListThunk;
   export const addEmailsThunk;
+  export const getHordansoAdminDetailsFromLSThunk;
   
   export const changeEmailStatusThunk;
   export const deleteEmailThunk;

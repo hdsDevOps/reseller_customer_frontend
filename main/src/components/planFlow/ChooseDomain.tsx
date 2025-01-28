@@ -41,12 +41,12 @@ const ChooseDomain: React.FC = () => {
     } else {
       setDomainError(false);
       try {
-        const result = await dispatch(domainAvailabilityThunk( `${domainName}${domainExtension}`)).unwrap();
+        const result = await dispatch(domainAvailabilityThunk(domainName)).unwrap();
         console.log("result...", result);
         if(result?.availablity_status === "false") {
-          navigate('/choose-from-list', {state: { ...location.state, selectedDomain: {domain: domainName, domain_extension: domainExtension}, result: result, type: 'new'}});
+          navigate('/choose-from-list', {state: { ...location.state, selectedDomain: domainName, result: result, type: 'new'}});
         } else{
-          navigate('/choose-from-list', {state: {...location.state, selectedDomain: {domain: domainName, domain_extension: domainExtension}, result: result, type: 'new_error'}});
+          navigate('/choose-from-list', {state: {...location.state, selectedDomain: domainName, result: result, type: 'new_error'}});
         }
       } catch (error) {
         
@@ -119,7 +119,7 @@ const ChooseDomain: React.FC = () => {
                   value={domainName}
                   onChange={handleInputChange}
                 />
-                <select
+                {/* <select
                   className="p-3 bg-transparent border-2 border-gray-200 rounded-md focus:border-blue-500 focus:outline-none"
                   onChange={(e) => {setDomainExtension(e.target.value)}}
                   value={domainExtension}
@@ -127,7 +127,7 @@ const ChooseDomain: React.FC = () => {
                   <option>.com</option>
                   <option>.cc</option>
                   <option>.org</option>
-                </select>
+                </select> */}
               </div>
               <p className="text-sm text-gray-400">
                 Search a domain name.

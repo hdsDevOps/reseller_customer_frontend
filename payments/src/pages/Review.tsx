@@ -801,7 +801,7 @@ function Review() {
         products: []
       })).unwrap();
       dispatch(setCart([]));
-      navigate('/add-cart');
+      // navigate('/add-cart');
     } catch (error) {
       console.log(error);
       if(error?.error == "Request failed with status code 401") {
@@ -880,34 +880,6 @@ function Review() {
       }
     }
   }
-
-  // const handleSubmit = async(e) => {
-  //   e.preventDefault();
-  //   if(cart.length > 0) {
-  //     if(paymentMethod !== "") {
-  //       await cart?.map((item) => {
-  //         if(item?.product_type === "google workspace") {
-  //           addSubscriptionForWorkspace(item);
-  //         } else if(item?.product_type.toLowerCase() === "domain") {
-  //           addDomain(item);
-  //           addSubscriptionForDomain(item);
-  //         } else {
-  //           addSubscription(item);
-  //         }
-  //       });
-  //       await updateCart();
-  //       await updateProfile();
-  //       await updatePaymentMethod();
-  //       await useVoucher();
-  //       getUserDetails();
-  //     } else {
-  //       toast.warning("Please select a payment method");
-  //     }
-  //   }
-  //   else {
-  //     navigate('/');
-  //   }
-  // };
 
   const addBillingHistory = async(item, paymentResult, madePaymentMethod, product_type, subscriptionId) => {
     try {
@@ -997,6 +969,7 @@ function Review() {
         setProcessingModalOpen(true);
         const result = await dispatch(stripePayThunk(body)).unwrap();
         console.log("result...", result);
+        const prevCart = [...cart];
         if(result?.message === "Payment successful") {
           setTimeout(async() => {
             // navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: result?.charge}});
@@ -1084,9 +1057,10 @@ function Review() {
                 : "";
                 await getDomains();
               }
-            })
+            });
             await updateCart();
-            setProcessingModalOpen(false);
+            await setProcessingModalOpen(false);
+            navigate('/download-invoice-pdf', {state : {result, prevCart}});
           }, 3000);
         } else {
           toast.error("Error on payment method");

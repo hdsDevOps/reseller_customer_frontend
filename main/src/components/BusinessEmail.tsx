@@ -20,7 +20,7 @@ const intialEmail = {
 
 const EmailList: React.FC = ({data, getDomainsList}) => {
   // console.log("data...", data);
-  const { customerId, userDetails } = useAppSelector(state => state.auth);
+  const { customerId, userDetails, isAdmin } = useAppSelector(state => state.auth);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLicenseModalOpen, setisLicenseModalOpen] = useState<boolean>(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState<boolean>(false);
@@ -500,12 +500,14 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                   <p className="text-sm md:text-md lg:text-lg font-semibold text-gray-600 inline-block items-center content-center">
                     <span className="inline-block items-center content-center">{userDetails?.license_usage ? userDetails?.license_usage : 0} users @{data?.domain_name}</span>
                     <Dot className="inline-block items-center content-center" />
-                    <span
-                      className="text-xs sm:text-sm text-green-500 font-normal cursor-pointer inline-block items-center content-center"
+                    <button
+                      type="button"
+                      className={`text-xs sm:text-sm ${isAdmin ? "text-[#8A8A8A]" : "text-green-500"} font-normal cursor-pointer inline-block items-center content-center`}
                       onClick={() => setisLicenseModalOpen(true)}
+                      disabled={isAdmin}
                     >
                       Add user license
-                    </span>
+                    </button>
                   </p>
                   <p className="text-sm md:text-md text-gray-600">
                     <span className="inline-block items-center content-center">{activePlan?.plan_name}</span>
@@ -514,25 +516,28 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                       ? (
                         <>
                           <Dot className="inline-block items-center content-center" />
-                          <span
-                            className="text-xs sm:text-sm text-green-500 cursor-pointer inline-block items-center content-center"
+                          <button
+                            type="button"
+                            className={`text-xs sm:text-sm ${isAdmin ? "text-[#8A8A8A]" : "text-green-500"} cursor-pointer inline-block items-center content-center`}
                             onClick={() => {
                               if(userDetails?.workspace?.workspace_status !== "trial") {
                                 navigate("/upgrade-plan")
                               }
                             }}
+                            disabled={isAdmin}
                           >
                             Update plan
-                          </span>
+                          </button>
                         </>
                       ) : (
                         <>
                           <Dot className="inline-block items-center content-center" />
-                          <span
-                            className="text-xs sm:text-sm text-slate-400 inline-block items-center content-center cursor-not-allowed"
+                          <button
+                            type="button"
+                            className="text-xs sm:text-sm text-[#8A8A8A] inline-block items-center content-center cursor-not-allowed"
                           >
                             Update plan
-                          </span>
+                          </button>
                         </>
                       )
                     }
@@ -542,20 +547,22 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
 
               <div className="flex flex-col  sm:mt-3 lg:mt-0">
                 <button
-                  className="border-2 border-green-500 text-green-500 bg-white px-4 py-2 rounded-3xl mb-2 transition-transform duration-300 ease-in-out transform hover:scale-105"
+                  className={`border-2 ${isAdmin ? "border-[#8A8A8A] text-[#8A8A8A]" : "border-green-500 text-green-500 "} bg-white px-4 py-2 rounded-3xl mb-2 transition-transform duration-300 ease-in-out transform hover:scale-105`}
                   type="button"
+                  disabled={isAdmin}
                   onClick={() => {window.open("https://accounts.google.com/AddSession/signinchooser?hl=en-GB&continue=https%3A%2F%2Fwww.google.com%3Fhl%3Den-GB&ec=GAlA8wE&ddm=1&flowName=GlifWebSignIn&flowEntry=AddSession")}}
                 >
                   Go to Gmail
                 </button>
                 <button
-                  className="border-2 border-green-500 text-green-500 bg-white px-4 py-2 rounded-3xl mb-2 transition-transform duration-300 ease-in-out transform hover:scale-105"
+                  className={`border-2 ${isAdmin ? "border-[#8A8A8A] text-[#8A8A8A]" : "border-green-500 text-green-500"} bg-white px-4 py-2 rounded-3xl mb-2 transition-transform duration-300 ease-in-out transform hover:scale-105`}
                   onClick={() => {
                     setIsModalOpen(true);
                     setNewEmailsCount(
                       data?.emails?.length > 0 ? parseInt(userDetails?.license_usage) - data?.emails?.length : parseInt(userDetails?.license_usage)
                     );
                   }}
+                  disabled={isAdmin}
                 >
                   Add Email
                 </button>
@@ -607,8 +614,9 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                           className={`px-2 py-6 text-gray-800 text-xs sm:text-sm md:text-md`}
                         >
                           <button
-                            className={`relative w-[100px] h-6 rounded-full border-2 ${row?.status ? "bg-green-500" : "bg-red-600"} flex justify-center items-center text-white`}
+                            className={`relative w-[100px] h-6 rounded-full border-2 ${isAdmin ? "bg-[#8A8A8A]" : row?.status ? "bg-green-500" : "bg-red-600"} flex justify-center items-center text-white`}
                             type="button"
+                            disabled={isAdmin}
                             onClick={() => toggleStatus(data?.id, row?.email, row?.status)}
                           >
                             {
@@ -620,8 +628,10 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                           className={`px-2 py-6 text-right`}
                         >
                           <button
+                            type="button"
+                            disabled={isAdmin}
                             onClick={() => toggleList(row?.uuid)} // Pass event to the handler
-                            className="w-8 h-8 rounded-full border-2 border-green-500 flex justify-center items-center text-md"
+                            className={`w-8 h-8 rounded-full border-2 ${isAdmin ? "border-[#8A8A8A]" : "border-green-500"} flex justify-center items-center text-md`}
                           >
                             <p
                               className="mb-2"

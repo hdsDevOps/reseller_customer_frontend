@@ -70,8 +70,8 @@ declare module 'store/authSlice' {
   export const setCurrentPageNumberSlice: (payload: any) => PayloadAction<any>;
   export const setItemsPerPageSlice: (payload: any) => PayloadAction<any>;
   export const setPaymentDetailsFilterSlice: (payload: any) => PayloadAction<any>;
-  export const setDomains: (payload: string) => PayloadAction<string>;
-  export const setCart: (payload: string) => PayloadAction<string>;
+  export const setDomains: (payload: any) => PayloadAction<any>;
+  export const setCart: (payload: any) => PayloadAction<any>;
   export const setCart: (payload: any) => PayloadAction<any>;
 
   export default authSlice.reducer;

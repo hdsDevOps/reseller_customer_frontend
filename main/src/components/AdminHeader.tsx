@@ -14,14 +14,13 @@ const logoImageSmall = 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gwor
 
 export default function AdminHeader() {
   const dispatch = useAppDispatch();
-  const { isAdmin, adminName } = useAppSelector(state => state.auth);
+  const { isAdmin, adminName, userDetails, expirationTimeSlice } = useAppSelector(state => state.auth);
 
   const exitAccess = async() => {
     try {
-      await dispatch(setIsAdminSlice(false));
-      await dispatch(setAdminNameSlice(""));
       await dispatch(removeUserAuthTokenFromLSThunk());
-      window.location.href="https://main.admin.gworkspace.withhordanso.com/";
+      // window.location.href=`${process.env.}`;
+      window.location.href=`http://localhost:4000/customers`;
     } catch (error) {
       toast.error("Error exiting access");
     }
@@ -31,7 +30,7 @@ export default function AdminHeader() {
     <header className="bg-white flex items-center z-50 fixed top-0 left-0 right-0 h-[70px]">
       {/* bg-white flex text-black px-2 items-center justify-between z-50 fixed top-[70px] left-0 right-0 h-[70px] */}
       <div className="admin-navbar">
-        <h6 className="font-inter font-medium text-2xl text-white">Lemmy Ugochukwu logged in as : Robert Clive </h6>
+        <h6 className="font-inter font-medium text-2xl text-white">{adminName} logged in as : {userDetails?.first_name} {userDetails?.last_name} </h6>
 
         <button
           type="button"

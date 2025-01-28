@@ -45,11 +45,11 @@ const DomainDetails: React.FC = () => {
         console.log("result...", result);
         if(result?.availablity_status === "false") {
           if(location.state.from === "business_info") {
-            navigate('/domainlist', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, selectedDomain: {domain: domainName, domain_extension: domainExtension}, result: result, type: 'new'}});
+            navigate('/domainlist', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, selectedDomain: domainName, result: result, type: 'new'}});
           }
         } else{
           if(location.state.from === "business_info") {
-            navigate('/domainlist', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, selectedDomain: {domain: domainName, domain_extension: domainExtension}, result: result, type: 'new_error'}});
+            navigate('/domainlist', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, selectedDomain: domainName, result: result, type: 'new_error'}});
           }
         }
       } catch (error) {
@@ -123,7 +123,7 @@ const DomainDetails: React.FC = () => {
                   value={domainName}
                   onChange={handleInputChange}
                 />
-                <select
+                {/* <select
                   className="p-3 bg-transparent border-2 border-gray-200 rounded-md focus:border-blue-500 focus:outline-none"
                   onChange={(e) => {setDomainExtension(e.target.value)}}
                   value={domainExtension}
@@ -131,7 +131,7 @@ const DomainDetails: React.FC = () => {
                   <option>.com</option>
                   <option>.cc</option>
                   <option>.org</option>
-                </select>
+                </select> */}
               </div>
               <p className="text-sm text-gray-400">
                 Search a domain name.

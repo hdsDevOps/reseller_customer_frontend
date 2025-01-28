@@ -32,6 +32,7 @@ import RegisterText from "./RegisterText";
 import NewRegister from "./NewRegister";
 import DownloadInvoice from "./DownloadInvoice";
 import AI from "./AI";
+import RedirectedFromAdminPortal from "../components/RedirectedFromAdminPortal";
 
 // const Register = React.lazy(() => import("./NewRegister"));
 
@@ -77,6 +78,9 @@ const AuthApp: React.FC = () => {
             <Route path="/RegisterText" element={<RegisterText />} />
             <Route path="/register" element={<NewRegister />} />
             <Route path="/download-invoice" element={<DownloadInvoice />} />
+
+            {/* redirected from admin portal */}
+            <Route path="/redirecting-to-customer-portal" element={<RedirectedFromAdminPortal />} />
           </Routes>
         </main>
         <div className="absolute top-100">

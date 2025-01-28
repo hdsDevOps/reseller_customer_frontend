@@ -54,21 +54,29 @@ export default function Header() {
       </a>
 
       <div className="flex items-center space-x-4">
-        <button onClick={openModal} className="relative p-2 bg-[#DCEBDFCC] hover:bg-opacity-90 rounded-md">
-          <Bell className="w-6 h-6 text-black" />
-          <span className="absolute top-0 right-0 flex items-center justify-center w-3 h-3 bg-black text-white rounded-full text-[8px] font-semibold">
-            {notificationsList?.length}
-          </span>
-        </button>
+        {
+          !isAdmin && (
+            <button onClick={openModal} className="relative p-2 bg-[#DCEBDFCC] hover:bg-opacity-90 rounded-md">
+              <Bell className="w-6 h-6 text-black" />
+              <span className="absolute top-0 right-0 flex items-center justify-center w-3 h-3 bg-black text-white rounded-full text-[8px] font-semibold">
+                {notificationsList?.length}
+              </span>
+            </button>
+          )
+        }
         {showNotification && <NotificationCenter onClose={closeModal}/> }
        
 
-        <button className="relative p-2 bg-[#DCEBDFCC] hover:bg-opacity-90 rounded-md" onClick={()=> navigate('/add-cart')}>
-          <ShoppingCart className="w-6 h-6 text-black" />
-          <span className="absolute top-0 right-0 flex items-center justify-center w-3 h-3 bg-black text-white rounded-full text-[8px] font-semibold">
-            {cartState?.length || 0}
-          </span>
-        </button>
+        {
+          !isAdmin && (
+            <button className="relative p-2 bg-[#DCEBDFCC] hover:bg-opacity-90 rounded-md" onClick={()=> navigate('/add-cart')}>
+              <ShoppingCart className="w-6 h-6 text-black" />
+              <span className="absolute top-0 right-0 flex items-center justify-center w-3 h-3 bg-black text-white rounded-full text-[8px] font-semibold">
+                {cartState?.length || 0}
+              </span>
+            </button>
+          )
+        }
         <div className="flex items-center justify-center space-x-2">
           {
             userDetails?.profile_image

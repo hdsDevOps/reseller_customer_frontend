@@ -33,7 +33,7 @@ const initialStaff = {
 const MyStaff = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { customerId, rolePermission } = useAppSelector(state => state.auth);
+  const { customerId, rolePermission, isAdmin } = useAppSelector(state => state.auth);
   // console.log("customer id...", customerId);
   
   useEffect(() => {
@@ -341,12 +341,14 @@ const MyStaff = () => {
       <h3 className='text-[#12A833] text-[28px] font-medium font-inter capitalize ml-[18px]'>My Staff</h3>
       <div className='bg-[#F9F9F9] py-3 flex min-[850px]:flex-row max-[850px]:flex-col justify-between px-6 mt-7 gap-4 max-[850px]:items-center'>
         <button
+          type="button"
+          disabled={isAdmin}
           onClick={() => {
             setShowModal(true);
             setIsEdit(false);
             setNewStaff(initialStaff);
           }}
-          className='bg-[#12A833] text-[#F0F0F3] font-bold px-4 py-[10px] font-inter rounded-md max-w-40'
+          className={`${isAdmin ? "bg-[#8A8A8A]" : "bg-[#12A833]"} text-[#F0F0F3] font-bold px-4 py-[10px] font-inter rounded-md max-w-40`}
         >Add Staff</button>
         <div className='flex items-center min-sm:flex-row max-sm:flex-col gap-2'>
           <div className='max-w-[315px] flex flex-col relative' ref={dropdownRef}>
@@ -446,14 +448,16 @@ const MyStaff = () => {
                               setIsEdit(true);
                               setNewStaff(staff);
                             }}
-                          ><BiSolidEditAlt className='text-gray-900 w-4 h-4 hover:text-gray-600' /></button>
+                            disabled={isAdmin}
+                          ><BiSolidEditAlt className={`${isAdmin ? "text-[#8A8A8A80]" : "text-gray-900 hover:text-gray-600"} w-4 h-4`} /></button>
                           <button
                             type='button'
                             onClick={() => {
                               setIsDeleteModalOpen(true);
                               setDeleteId(staff?.id);
                             }}
-                          ><RiDeleteBin6Line className='text-[#F24E1E] w-4 h-4 hover:text-[#f24f1ec7]' /></button>
+                            disabled={isAdmin}
+                          ><RiDeleteBin6Line className={`${isAdmin ? "text-[#8A8A8A80]" : "text-[#F24E1E] hover:text-[#f24f1ec7]"} w-4 h-4`} /></button>
                         </div>
                       )
                     }

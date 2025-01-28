@@ -146,31 +146,31 @@ const SelectedDomain: React.FC = () => {
             <div className="mt-8 text-sm md:text-lg">
               <p className="leading-6 text-gray-600">
                 Domain name registration services will be provided by{" "}
-                <span className="text-green-500">Squarespace Domains</span>,
+                <span className="text-green-500">NameSilo Domains</span>,
                 pursuant to the{" "}
                 <span className="text-green-500">
-                  Squarespace Terms of Service
+                NameSilo Terms of Service
                 </span>{" "}
                 and{" "}
                 <span className="text-green-500">
-                  Squarespace Domain Registration Agreement
+                NameSilo Domain Registration Agreement
                 </span>
                 , which Google resells pursuant to its{" "}
                 <span className="text-green-500">
                   Google Domain Reseller Agreement
                 </span>
-                . Initially, Google will manage your domain(s) on Squarespace's
-                behalf. Once your domain is transitioned to Squarespace Domains,
+                . Initially, Google will manage your domain(s) on NameSilo's
+                behalf. Once your domain is transitioned to NameSilo Domains,
                 Google will share your name, contact information, and other
-                domain-related information with Squarespace. You can review
-                Squarespace's{" "}
+                domain-related information with NameSilo. You can review
+                NameSilo's{" "}
                 <span className="text-green-500"> Privacy Policy</span> for
                 details on how they process your information. Google's{" "}
                 <span className="text-green-500">Privacy Policy</span> describes
                 how Google handles this information as a reseller. By clicking{" "}
                 <span className="text-gray-600 font-bold text-xl">Next</span>{" "}
                 you acknowledge receipt of Google'sPrivacy Policy and direct us
-                to share this information with Squarespace.
+                to share this information with NameSilo.
               </p>
             </div>
 

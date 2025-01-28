@@ -163,7 +163,6 @@ const HeroSection = ({id}:any) => {
     </button>
   );
 
-
   return (
     <div id={id}>
       <div className="w-full overflow-hidden whitespace-nowrap bg-[#12A833] bg-opacity-50 shadow-sm">
@@ -184,65 +183,73 @@ const HeroSection = ({id}:any) => {
             {
               banner?.map((item, index) => (
                 <div
-                  className={`banner-item w-full grid grid-cols-5 relative`}
+                  className={`banner-item w-full grid grid-cols-5 relative pb-4`}
                   style={{backgroundImage: `url('${item?.background_image}')`, backgroundSize: 'cover', backgroundPosition: 'center'}}
                   key={index}
                 >
-                  <div className="col-span-5">
-                    <div className="grid grid-cols-3 h-full">
-                      <div className="sm:col-span-2 col-span-3 text-white bg-[#454545] bg-opacity-20 relative h-full">
-                        <div className="backdrop-blur-xl h-full lg:block hidden"></div>
-                        <div className="absolute top-0 md:py-[40px] py-3 md:px-[70px] px-3">
-                          <h3 className="font-inter font-extrabold sm:text-[40px] text-[30px] text-white">{item?.title}</h3>
-                          {/* <p className="!font-inter !font-normal !text-lg !text-white py-2" dangerouslySetInnerHTML={{__html: item?.description}}></p> */}
-                          <p className="!font-inter !font-normal !text-lg !text-white py-2 text-left inline-block items-start w-full break-words">
-                            <p className="inline-block  w-full break-words" dangerouslySetInnerHTML={{__html: item?.description}}></p>
-                            {
-                              item?.show_video_status && (
-                                <LuTvMinimalPlay className="text-[#12A833] w-6 h-6 ml-2 inline-block cursor-pointer" onClick={() => {
-                                  setIsModalOpen(true);
-                                  setModalLink(item?.video_url);
-                                }} />
-                              )
-                            }
-                          </p>
+                  <div className="col-span-5 lg:col-span-3 flex flex-col relative">
+                    <div className="banner-blur"></div>
+                    <div className="banner-container">
+                      <h3 className="banner-header">{item?.title}</h3>
 
-                          <div className="sm:mt-[80px] mt-[40px] flex gap-[10px] sm:h-[50px] h-[30px] w-full max-w-[500px]">
-                            {
-                              googleImages.map((google, index) => (
-                                <img
-                                  key={index}
-                                  src={google.image}
-                                  alt={google.name}
-                                  className="h-full object-contain"
-                                />
-                              ))
-                            }
-                          </div>
+                      <p className="banner-paragraph">
+                        <span
+                          className="banner-pargraph-text"
+                          dangerouslySetInnerHTML={{
+                            __html: item?.description?.length > 240 
+                            ? `${item.description.substring(0, 240)}...` 
+                            : item?.description
+                          }}
+                        ></span>
+                        {
+                          item?.show_video_status && (
+                            <LuTvMinimalPlay
+                              className="banner-paragraph-icon"
+                              onClick={() => {
+                                setIsModalOpen(true);
+                                setModalLink(item?.video_url);
+                              }}
+                            />
+                          )
+                        }
+                      </p>
 
-                          {
-                            getAmountByCurrency(item?.currency_details)?.amount && (
-                              <h4 className="font-inter font-extrabold text-2xl text-white sm:mt-14 mt-8">Starting at {currencyList.find(item => item.name === defaultCurrencySlice)?.logo}{getAmountByCurrency(item?.currency_details)?.amount}/mth</h4>
-                            )
-                          }
-
-                          <button
-                            type="button"
-                            className="font-inter font-semibold text-base text-white my-8 px-3 py-[10px] rounded-[10px] bg-[#12A833]"
-                            onClick={() => {window.location.href=`${item?.button_url}`}}
-                          >{item?.button_title}</button>
-                        </div>
+                      <div className="sm:mt-[80px] mt-[40px] flex gap-[10px] sm:h-[50px] h-[30px] w-full max-w-[500px]">
+                        {
+                          googleImages.map((google, index) => (
+                            <img
+                              key={index}
+                              src={google.image}
+                              alt={google.name}
+                              className="h-full object-contain"
+                            />
+                          ))
+                        }
                       </div>
-                      <div className="col-span-1 sm:block hidden"></div>
+                      {
+                        getAmountByCurrency(item?.currency_details)?.amount && (
+                          <h4 className="font-inter font-extrabold text-2xl text-white sm:mt-14 mt-8 text-left">Starting at {currencyList.find(item => item.name === defaultCurrencySlice)?.logo}{getAmountByCurrency(item?.currency_details)?.amount}/mth</h4>
+                        )
+                      }
+
+                      <button
+                        type="button"
+                        className="font-inter font-semibold text-base text-white my-8 px-3 py-[10px] rounded-[10px] bg-[#12A833] ml-0 w-fit" 
+                        onClick={() => {window.location.href=`${item?.button_url}`}}
+                      >{item?.button_title}</button>
+
+                      {
+                        item?.show_promotion_status && (
+                          <div className="promotion-div">
+                            <div className="promotion-div-data" dangerouslySetInnerHTML={{__html: activePromotion?.html_template }}></div>
+                          </div>
+                          // <div className="">
+                          //   <div className="" dangerouslySetInnerHTML={{__html: activePromotion?.html_template}}></div>
+                          // </div>
+                        )
+                      }
                     </div>
                   </div>
-                  {
-                    item?.show_promotion_status && (
-                      <div className="promotion-div">
-                        <div className="promotion-div-data" dangerouslySetInnerHTML={{__html: activePromotion?.html_template}}></div>
-                      </div>
-                    )
-                  }
                 </div>
               ))
             }

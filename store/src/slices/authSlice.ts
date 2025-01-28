@@ -1,10 +1,12 @@
 // authSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
-    getUserAuthTokenFromLSThunk,
-    getUserIdFromLSThunk,
-    makeUserLoginThunk,
-    setUserIdToLSThunk
+  getHordansoAdminDetailsFromLSThunk,
+  getUserAuthTokenFromLSThunk,
+  getUserIdFromLSThunk,
+  makeUserLoginThunk,
+  removeUserAuthTokenFromLSThunk,
+  setUserIdToLSThunk
 } from '../thunks/user.thunk';
 import { userLocalStorage } from '../localStorage/user.storage';
 
@@ -81,6 +83,7 @@ export interface UserDetailsState {
   notificationsList: [];
   isAdmin: Boolean;
   adminName: string;
+  expirationTimeSlice: Number;
 }
 
 const initialState: UserDetailsState = {
@@ -108,6 +111,7 @@ const initialState: UserDetailsState = {
   notificationsList: [],
   isAdmin: false,
   adminName: "",
+  expirationTimeSlice: 0
 };
 
 const authSlice = createSlice({
@@ -178,10 +182,10 @@ const authSlice = createSlice({
       state.notificationsList = action.payload;
     },
     setIsAdminSlice: (state, action: PayloadAction<any>) => {
-      state.isAdmin = action.payload;
-    },
-    setAdminNameSlice: (state, action: PayloadAction<any>) => {
-      state.adminName = action.payload;
+      // console.log("payload...", action.payload);
+      state.isAdmin = action.payload?.adminStatus === "true" ? true : false;
+      state.adminName = action.payload?.adminName;
+      state.expirationTimeSlice = action.payload?.expiration;
     },
     resetUserSlice: (state) => {
       state.userAuthStatus = 'PENDING';
@@ -207,7 +211,7 @@ const authSlice = createSlice({
       // state.userAuthStatus = 'UN_AUTHORIZED';
     });
 
-  //-------------
+    //-------------
 
     builder.addCase(getUserAuthTokenFromLSThunk.pending, state => {
       state.userAuthStatus = 'PENDING';
@@ -219,10 +223,11 @@ const authSlice = createSlice({
     });
 
     builder.addCase(getUserAuthTokenFromLSThunk.rejected, state => {
-      state.userAuthStatus = 'UN_AUTHORIZED';
+      // state.userAuthStatus = 'UN_AUTHORIZED';
+      state = initialState;
     });
 
-  //-------------
+    //-------------
 
     builder.addCase(getUserIdFromLSThunk.pending, state => {
       state.userAuthStatus = 'PENDING';
@@ -236,9 +241,49 @@ const authSlice = createSlice({
     builder.addCase(getUserIdFromLSThunk.rejected, state => {
       state.userAuthStatus = 'UN_AUTHORIZED';
     });
+
+    //-------------
+
+    builder.addCase(getHordansoAdminDetailsFromLSThunk.pending, state => {
+      state.userAuthStatus = 'PENDING';
+      // state.isAdmin = false;
+    });
+
+    builder.addCase(getHordansoAdminDetailsFromLSThunk.fulfilled, (state, action: PayloadAction<any>) => {
+      // console.log("action.payload...", action.payload);
+      const data = JSON.parse(action.payload);
+      if(data !== null || data !== undefined || data !== "") {
+        state.userAuthStatus = 'AUTHORIZED';
+        state.isAdmin = data?.adminStatus === "true" ? true : false;
+        state.adminName = data?.adminName;
+        state.expirationTimeSlice = data?.expiration;
+      }
+    });
+
+    builder.addCase(getHordansoAdminDetailsFromLSThunk.rejected, state => {
+      state.userAuthStatus = 'UN_AUTHORIZED';
+      state.isAdmin = false;
+      state.adminName = "";
+      state.expirationTimeSlice = 0;
+    });
+
+    //-------------
+
+    builder.addCase(removeUserAuthTokenFromLSThunk.pending, state => {
+      // state.userAuthStatus = 'PENDING';
+    });
+
+    builder.addCase(removeUserAuthTokenFromLSThunk.fulfilled, (state) => {
+      // state.userAuthStatus = 'AUTHORIZED';
+      state = initialState;
+    });
+
+    builder.addCase(removeUserAuthTokenFromLSThunk.rejected, state => {
+      // state.userAuthStatus = 'UN_AUTHORIZED';
+    });
   },
 });
 
-export const { setTokenDetails, setUserDetails, setUserAuthStatus,  setResellerToken, resetUserSlice, setCart, setDomains, setSaveCards, setPaymentMethodsState, setDefaultCurrencySlice, setWorkSpaceFlowSlice, setCustomerId, setStaffId, setStaffStatus, setBillingHistoryFilterSlice, setPaymentDetailsFilterSlice, setCurrentPageNumberSlice, setItemsPerPageSlice, setMetaDataSlice, setRoleIdSlice, setNotificationsListSlice, setIsAdminSlice, setAdminNameSlice, setRolePermissionsSlice } = authSlice.actions;
+export const { setTokenDetails, setUserDetails, setUserAuthStatus,  setResellerToken, resetUserSlice, setCart, setDomains, setSaveCards, setPaymentMethodsState, setDefaultCurrencySlice, setWorkSpaceFlowSlice, setCustomerId, setStaffId, setStaffStatus, setBillingHistoryFilterSlice, setPaymentDetailsFilterSlice, setCurrentPageNumberSlice, setItemsPerPageSlice, setMetaDataSlice, setRoleIdSlice, setNotificationsListSlice, setIsAdminSlice, setRolePermissionsSlice } = authSlice.actions;
 
 export default authSlice.reducer;

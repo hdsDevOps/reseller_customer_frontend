@@ -7,14 +7,14 @@ import UserAuth from "./hoc/UserAuth.hoc";
 import MainApp from "./pages";
 import AuthApp from "auth/AuthApp";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { getCartThunk, getDomainsListThunk, getLandingPageThunk, getNotificationsListThunk, getPaymentMethodsThunk, getProfileDataThunk, getRoleIdFromLSThunk, getSettingsListThunk, getStaffIdFromLSThunk, getStaffStatusFromLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, removeUserAuthTokenFromLSThunk, savedCardsListThunk } from 'store/user.thunk';
+import { getCartThunk, getDomainsListThunk, getHordansoAdminDetailsFromLSThunk, getLandingPageThunk, getNotificationsListThunk, getPaymentMethodsThunk, getProfileDataThunk, getRoleIdFromLSThunk, getSettingsListThunk, getStaffIdFromLSThunk, getStaffStatusFromLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, removeUserAuthTokenFromLSThunk, savedCardsListThunk } from 'store/user.thunk';
 import { setCart, setCustomerId, setDefaultCurrencySlice, setDomains, setMetaDataSlice, setNotificationsListSlice, setPaymentMethodsState, setResellerToken, setRoleIdSlice, setRolePermissionsSlice, setSaveCards, setStaffId, setStaffStatus, setTokenDetails, setUserDetails } from 'store/authSlice';
 import "auth/AuthCss";
 import "./index.css";
 import { HelmetProvider, Helmet } from 'react-helmet-async';
 import countryToCurrency, { Currencies, Countries } from "country-to-currency";
 import { currencyList } from "./components/CurrencyList";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 
 const initialRolePermissions = [
   {
@@ -148,7 +148,9 @@ const hordansoAdminRolePermissions = [
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { token, customerId, staffId, staffStatus, resellerToken, userDetails, metaDataSlice, defaultCurrencySlice, domainsState, notificationsList, roleId, rolePermission, isAdmin } = useAppSelector((state) => state.auth);
+  const { token, customerId, staffId, staffStatus, resellerToken, userDetails, metaDataSlice, defaultCurrencySlice, domainsState, notificationsList, roleId, rolePermission, isAdmin, adminName, expirationTimeSlice } = useAppSelector((state) => state.auth);
+  
+  // console.log({ customerId, token, isAdmin, adminName });
   // console.log({rolePermission});
   // console.log("notificationsList...", notificationsList);
   // const token ="vvggg"
@@ -161,20 +163,57 @@ const App: React.FC = () => {
   // console.log("domainsState...", domainsState?.find(item => item?.domain_type === "primary"));
 
   useEffect(() => {
-    const getNotificationsList = async() => {
+    const getHordansoAdminDetails = async() => {
       try {
-        const result = await dispatch(getNotificationsListThunk({user_id: customerId, last_id: "", per_page: 5})).unwrap();
-        // console.log("result...", result?.data);
-        if(result?.data?.length > 0) {
-          await dispatch(setNotificationsListSlice(result?.data));
-        }
+        await dispatch(getHordansoAdminDetailsFromLSThunk());
+        await dispatch(getUserAuthTokenFromLSThunk());
+        await dispatch(getUserIdFromLSThunk());
       } catch (error) {
         //
+      }
+    }
+
+    getHordansoAdminDetails();
+  }, [token, dispatch, navigate]);
+  
+  const exitAccess = async() => {
+    try {
+      await dispatch(removeUserAuthTokenFromLSThunk());
+      // window.location.href=`${process.env.}`;
+      window.location.href=`http://localhost:4000/customers`;
+    } catch (error) {
+      toast.error("Error exiting access");
+    }
+  };
+
+  useEffect(() => {
+    const expiryTime = new Date(expirationTimeSlice);
+    const nowTime = new Date();
+    // console.log({expirationTimeSlice, data})
+    if(isAdmin) {
+      if(expiryTime < nowTime) {
+        exitAccess();
+      }
+    }
+  }, [expirationTimeSlice, isAdmin, token, dispatch, navigate]);
+
+  useEffect(() => {
+    const getNotificationsList = async() => {
+      if(token) {
+        try {
+          const result = await dispatch(getNotificationsListThunk({user_id: customerId, last_id: "", per_page: 5})).unwrap();
+          // console.log("result...", result?.data);
+          if(result?.data?.length > 0) {
+            await dispatch(setNotificationsListSlice(result?.data));
+          }
+        } catch (error) {
+          //
+        }
       }
     };
 
     getNotificationsList();
-  }, [customerId]);
+  }, [customerId, token]);
 
   // console.log({roleId, customerId});
   
@@ -185,7 +224,7 @@ const App: React.FC = () => {
       } else {
         try {
           const result = await dispatch(getSettingsListThunk({user_type: "", user_id: customerId})).unwrap();
-          console.log("result...", result?.settings);
+          // console.log("result...", result?.settings);
           if(result) {
             if(staffStatus) {
               const permissions = result?.settings?.find(item => item?.id === roleId)?.permissions;
@@ -305,7 +344,7 @@ const App: React.FC = () => {
       }
     }
     getCartItems();
-  }, [customerId]);
+  }, [customerId, token]);
 
   useEffect(() => {
     const getDomains = async() => {
@@ -326,7 +365,7 @@ const App: React.FC = () => {
       }
     };
     getDomains();
-  }, [customerId]);
+  }, [customerId, token]);
 
   useEffect(() => {
     const getsavedCards = async() => {
@@ -348,7 +387,7 @@ const App: React.FC = () => {
       }
     };
     getsavedCards();
-  }, [customerId]);
+  }, [customerId, token]);
 
   useEffect(() => {
     const getPaymentMethodsState = async() => {
@@ -370,7 +409,7 @@ const App: React.FC = () => {
       }
     };
     getPaymentMethodsState();
-  }, [customerId]);
+  }, [customerId, token]);
 
   useEffect(() => {
     const getLandingPageData = async() => {

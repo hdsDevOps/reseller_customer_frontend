@@ -37,7 +37,7 @@ const EmailList: React.FC = () => {
   const location = useLocation();
   const searchRef = useRef();
 
-  const { customerId, userDetails, saveCardsState, paymentMethodsState, token, defaultCurrencySlice, rolePermission } = useAppSelector(state => state.auth);
+  const { customerId, userDetails, saveCardsState, paymentMethodsState, token, defaultCurrencySlice, rolePermission, isAdmin } = useAppSelector(state => state.auth);
   // console.log("userId...", customerId);
   console.log("user details...", userDetails);
   // console.log("save Cards State...", saveCardsState);
@@ -61,26 +61,30 @@ const EmailList: React.FC = () => {
   }, [rolePermission]);
 
   useEffect(() => {
-    if(userDetails?.workspace?.workspace_status === "trial") {
-      const miliseconds = parseInt(userDetails?.workspace?.next_payment?._seconds) * 1000 + parseInt(userDetails?.workspace?.next_payment?._nanoseconds) / 1e6;
-      const foundDate =  new Date(miliseconds);
-      const today = new Date(Date.now());
-      if(foundDate > today) {
-        //
-      } else {
-        navigate('/');
-      }
-    } else if(userDetails?.workspace?.workspace_status === "active") {
-      const miliseconds = parseInt(userDetails?.workspace?.next_payment?._seconds) * 1000 + parseInt(userDetails?.workspace?.next_payment?._nanoseconds) / 1e6;
-      const foundDate =  new Date(miliseconds);
-      const today = new Date(Date.now());
-      if(foundDate > today) {
-        //
-      } else {
-        navigate('/');
-      }
+    if(isAdmin) {
+      //
     } else {
-      navigate('/');
+      if(userDetails?.workspace?.workspace_status === "trial") {
+        const miliseconds = parseInt(userDetails?.workspace?.next_payment?._seconds) * 1000 + parseInt(userDetails?.workspace?.next_payment?._nanoseconds) / 1e6;
+        const foundDate =  new Date(miliseconds);
+        const today = new Date(Date.now());
+        if(foundDate > today) {
+          //
+        } else {
+          navigate('/');
+        }
+      } else if(userDetails?.workspace?.workspace_status === "active") {
+        const miliseconds = parseInt(userDetails?.workspace?.next_payment?._seconds) * 1000 + parseInt(userDetails?.workspace?.next_payment?._nanoseconds) / 1e6;
+        const foundDate =  new Date(miliseconds);
+        const today = new Date(Date.now());
+        if(foundDate > today) {
+          //
+        } else {
+          navigate('/');
+        }
+      } else {
+        navigate('/');
+      }
     }
   }, [userDetails]);
   
@@ -1135,12 +1139,14 @@ const EmailList: React.FC = () => {
                         <p className="text-sm md:text-md lg:text-lg font-semibold text-gray-600 inline-block items-center content-center">
                           <span className="inline-block items-center content-center">{userDetails?.license_usage ? userDetails?.license_usage : 0} users @{selectedDomain?.domain_name}</span>
                           <Dot className="inline-block items-center content-center" />
-                          <span
-                            className="text-xs sm:text-sm text-green-500 font-normal cursor-pointer inline-block items-center content-center"
+                          <button
+                            type="button"
+                            disabled={isAdmin}
+                            className={`text-xs sm:text-sm ${isAdmin ? "text-[#8A8A8A]" : "text-green-500"} font-normal cursor-pointer inline-block items-center content-center`}
                             onClick={() => setIsLicenseModalOpen(true)}
                           >
                             Add user license
-                          </span>
+                          </button>
                         </p>
 
                         <p className="text-sm md:text-md text-gray-600">
@@ -1150,25 +1156,29 @@ const EmailList: React.FC = () => {
                             ? (
                               <>
                                 <Dot className="inline-block items-center content-center" />
-                                  <span
-                                    className="text-xs sm:text-sm text-green-500 cursor-pointer inline-block items-center content-center"
+                                  <button
+                                    type="button"
+                                    className={`text-xs sm:text-sm ${isAdmin ? "text-[#8A8A8A]" : "text-green-500"} cursor-pointer inline-block items-center content-center`}
                                     onClick={() => {
                                       if(userDetails?.workspace?.workspace_status !== "trial") {
                                         navigate("/upgrade-plan")
                                       }
                                     }}
+                                    disabled={isAdmin}
                                   >
                                     Update plan
-                                  </span>
+                                  </button>
                               </>
                             ) : (
                               <>
                                 <Dot className="inline-block items-center content-center" />
-                                <span
+                                <button
+                                  type="button"
+                                  disabled={isAdmin}
                                   className="text-xs sm:text-sm text-slate-400 inline-block items-center content-center cursor-not-allowed"
                                 >
                                   Update plan
-                                </span>
+                                </button>
                               </>
                             )
                           }
@@ -1184,8 +1194,10 @@ const EmailList: React.FC = () => {
                 selectedDomain?.domain_type === "primary" && (
                   <div className="flex flex-col gap-4 md:ml-4">
                     <button
-                      className="border border-[#12A833] text-[#12A833] bg-white px-4 py-2 rounded-[40px] mb-2 transition-transform duration-300 ease-in-out transform hover:scale-105"
+                      className={`border ${isAdmin ? "border-[#8A8A8A] text-[#8A8A8A]" : "border-[#12A833] text-[#12A833]"} bg-white px-4 py-2 rounded-[40px] mb-2 transition-transform duration-300 ease-in-out transform hover:scale-105`}
                       onClick={() => setIsModalOpen(true)}
+                      type="button"
+                      disabled={isAdmin}
                     >
                       Add Email
                     </button>
@@ -1234,11 +1246,14 @@ const EmailList: React.FC = () => {
                             <td className="p-2 text-gray-800 text-xs sm:text-sm md:text-md">
                               <button
                                 className={`relative w-24 h-10 rounded-[10px] border-2 flex justify-center items-center ${
-                                  row?.status
+                                  isAdmin
+                                  ? "bg-[#8A8A8A]"
+                                  : row?.status
                                     ? "border-green-500 bg-green-500"
                                     : "border-red-500 bg-red-500"
                                 }`}
                                 onClick={() => toggleStatus(selectedDomain?.id, row?.email, row?.status)}
+                                disabled={isAdmin}
                               >
                                 <span className="text-white text-xs">
                                   {row.status ? "Active" : "Inactive"}
@@ -1246,11 +1261,13 @@ const EmailList: React.FC = () => {
                               </button>
                             </td>
                             <td className="p-2 text-center relative">
-                              <button className="w-6 h-6 rounded-full border-2 border-green-500 flex justify-center items-center">
-                                <p
-                                  className="mb-2"
-                                  onClick={(e) => toggleList(row?.uuid)}
-                                >
+                              <button
+                                type="button"
+                                onClick={(e) => toggleList(row?.uuid)}
+                                disabled={isAdmin}
+                                className={`w-6 h-6 rounded-full border-2 ${isAdmin ? "border-[#8A8A8A]" : "border-green-500"} flex justify-center items-center`}
+                              >
+                                <p className="mb-2">
                                   ...
                                 </p>
                               </button>

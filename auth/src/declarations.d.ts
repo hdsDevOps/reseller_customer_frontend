@@ -79,6 +79,12 @@ declare module "store/user.thunk" {
   export const getRoleIdFromLSThunk;
   export const setRoleIdToLSThunk;
   export const removeRoleIdFromLSThunk;
+
+  export const getUserAuthTokenFromLSThunk;
+
+  export const getHordansoAdminDetailsFromLSThunk;
+  export const setHordansoAdminDetailsToLSThunk;
+  export const removeHordansoAdminDetailsFromLSThunk;
 }
 
 
@@ -91,6 +97,8 @@ declare module 'store/authSlice' {
   // Other exports
   export const setWorkSpaceFlowSlice: (payload: string) => PayloadAction<string>;
   export const setRoleIdSlice;
+  export const setIsAdminSlice;
+  export const setAdminNameSlice;
 }
 
 declare module 'store/reseller.thunk' {

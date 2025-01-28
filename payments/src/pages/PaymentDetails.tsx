@@ -88,7 +88,7 @@ const paystackImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gwork
 const PaymentDetails: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { customerId, paymentDetailsFilterSlice, itemsPerPageSlice, currentPageNumber, userDetails, defaultCurrencySlice, cartState, rolePermission } = useAppSelector(state => state.auth);
+  const { customerId, paymentDetailsFilterSlice, itemsPerPageSlice, currentPageNumber, userDetails, defaultCurrencySlice, cartState, rolePermission, isAdmin } = useAppSelector(state => state.auth);
   
   useEffect(() => {
     const checkPermission = (label:String) => {
@@ -651,7 +651,7 @@ const PaymentDetails: React.FC = () => {
               domainDropdown && (
                 <div className="absolute w-full bg-gray-200">
                   {
-                    domains.length > 0 && domains?.filter(domain => domain?.domain_name?.toLowerCase().includes(type.toLowerCase()))?.map((domain, index) => (
+                    domains.length > 0 && domains?.filter((history, idx, self) => self?.findIndex(h => h?.domain_name === history?.domain_name) === idx)?.filter(domain => domain?.domain_name?.toLowerCase().includes(type.toLowerCase()))?.map((domain, index) => (
                       <p key={index} className="px-1 font-inter cursor-pointer" onClick={() => {
                         setSelectedDomain(domain?.domain_name)
                         setType("");
@@ -786,7 +786,9 @@ const PaymentDetails: React.FC = () => {
                     </td>
                     <td className="px-2 pb-10 pt-3 flex items-center content-center justify-center">
                       <button
-                        className="w-6 h-6 rounded-full border-2 border-green-500 flex justify-center  items-center content-center my-auto"
+                        type="button"
+                        disabled={isAdmin}
+                        className={`w-6 h-6 rounded-full border-2 ${isAdmin ? "border-[#8A8A8A]" : "border-green-500"} flex justify-center  items-center content-center my-auto`}
                         onClick={() => {toggleList(index)}}
                       >
                         <p className="mb-2 items-center content-center">...</p>

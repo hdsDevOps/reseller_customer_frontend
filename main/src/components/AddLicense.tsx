@@ -74,7 +74,8 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList,
   const dateFormat2 = (date) => {
     const miliseconds = parseInt(date?._seconds) * 1000 + parseInt(date?._nanoseconds) / 1e6;
     const foundDate =  new Date(miliseconds);
-    if(foundDate === "Invalid Date") {
+    console.log(foundDate)
+    if(foundDate == "Invalid Date") {
       return "Invalid Date";
     } else {
       return format(foundDate, "yyyy-MM-dd");

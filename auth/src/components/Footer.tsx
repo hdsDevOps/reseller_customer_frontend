@@ -123,7 +123,7 @@ export default function Footer() {
           </div>
           <div className="flex flex-col gap-2 col-span-4 sm:col-span-2 lg:col-span-1  ">
             <div className="flex flex-col gap-2">
-              <p className="text-white font-semibold">OUR NEWSLETTER</p>
+              <p className="text-white font-semibold">LEARNING AND SUPPORT</p>
               <progress
                 className="progress w-52 h-0.5"
                 value="25"
@@ -171,7 +171,7 @@ export default function Footer() {
           </div> */}
           
           <p className="font-inter font-bold text-[#EEEEEE] text-base"><span className="font-normal">© Copyright </span>Hordanso LLC All Rights Reserved {pesentYear.toString()} | Web Design & Development by
-          HDS Hordanso</p>
+          Schemaphic Systems Pvt Ltd</p>
           
         </div>
       </div>

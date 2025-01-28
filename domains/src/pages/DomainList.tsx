@@ -30,7 +30,7 @@ const DomainList: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   
-  const { customerId, userDetails, rolePermission } = useAppSelector(state => state.auth);
+  const { customerId, userDetails, rolePermission, isAdmin } = useAppSelector(state => state.auth);
   // console.log("userDetails....", userDetails);
   useEffect(() => {
     const checkPermission = (label:String) => {
@@ -360,15 +360,17 @@ const DomainList: React.FC = () => {
           <div className="domain-buttons">
             <button
               type='button'
+              disabled={isAdmin}
               onClick={() => navigate("/add-domain")}
-              className="px-4 py-2 bg-green-600 text-white font-medium rounded-md shadow-sm hover:bg-opacity-90 sm-max:text-xs"
+              className={`px-4 py-2 ${isAdmin ? "bg-[#8A8A8A80]" : "bg-green-600"} text-white font-medium rounded-md shadow-sm hover:bg-opacity-90 sm-max:text-xs`}
             >
               Add Existing Domain
             </button>
             <button
               type='button'
               onClick={() => navigate("/buy-domain")}
-              className="px-4 py-2 bg-green-600 text-white font-medium rounded-md shadow-sm hover:bg-opacity-90 sm-max:text-xs"
+              disabled={isAdmin}
+              className={`px-4 py-2 ${isAdmin ? "bg-[#8A8A8A80]" : "bg-green-600"} text-white font-medium rounded-md shadow-sm hover:bg-opacity-90 sm-max:text-xs`}
             >
               Buy Domain
             </button>
@@ -385,7 +387,13 @@ const DomainList: React.FC = () => {
                     {
                       domain?.domain_type === "primary" && (
                         <button
-                          className="px-4 py-2 md:px-3 sm-max:px-2 sm-max:text-xs bg-green-600 text-white font-medium rounded-md hover:bg-opacity-90"
+                          className={`px-4 py-2 md:px-3 sm-max:px-2 sm-max:text-xs ${
+                            isAdmin
+                            ? "bg-[#8A8A8A]"
+                            : addEmailDisabled
+                            ? "bg-[#8A8A8A]"
+                            : "bg-green-600"
+                          } text-white font-medium rounded-md hover:bg-opacity-90`}
                           onClick={() => {
                             setIsModalOpen(true);
                             setNewEmailsCount(
@@ -396,7 +404,7 @@ const DomainList: React.FC = () => {
                             setDomainName(domain?.domain_name);
                             setEmailsList(domain?.emails ? domain?.emails : []);
                           }}
-                          disabled={addEmailDisabled}
+                          disabled={isAdmin ? isAdmin : addEmailDisabled}
                         >
                           Add Emails
                         </button>
@@ -439,8 +447,9 @@ const DomainList: React.FC = () => {
                                       type='button'
                                       className="w-6 h-6"
                                       onClick={() => {toggleList(domain?.id)}}
+                                      disabled={isAdmin}
                                     >
-                                      <CircleEllipsis className='w-6 h-6 text-[#12A833]' />
+                                      <CircleEllipsis className={`w-6 h-6 ${isAdmin ? "text-[#8A8A8A]" : "text-[#12A833]"}`} />
                                     </button>
                                     {
                                       showList === domain?.id && (

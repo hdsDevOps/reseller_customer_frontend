@@ -18,7 +18,16 @@ export const setUserAuthTokenToLSThunk = createAsyncThunk(
 export const removeUserAuthTokenFromLSThunk = createAsyncThunk(
   "users/removeUserAuthTokenFromLS",
   async () => {
-    return localStorage.removeItem("LS_KEY_AUTH_TOKEN");
+    // const clearLocalStorageExcept = (keysToKeep:string[]) => {
+    //   Object.keys(localStorage).forEach((key:string) => {
+    //     if (!keysToKeep.includes[key]) {
+    //       localStorage.removeItem(key);
+    //     }
+    //   });
+    // };
+
+    // return clearLocalStorageExcept(["email", "password"]);
+    return localStorage.clear();
   },
 );
 
@@ -50,6 +59,13 @@ export const getRoleIdFromLSThunk = createAsyncThunk(
   },
 );
 
+export const getHordansoAdminDetailsFromLSThunk = createAsyncThunk(
+  "users/getHordansoAdminStatusFromLS",
+  async () => {
+    return localStorage.getItem("LS_KEY_HORDANSO_ADMIN_DETAILS");
+  },
+);
+
 export const setUserIdToLSThunk = createAsyncThunk(
   "users/setUserIdToLS",
   async (customerId: string) => {
@@ -78,6 +94,20 @@ export const setRoleIdToLSThunk = createAsyncThunk(
   },
 );
 
+export const setHordansoAdminDetailsToLSThunk = createAsyncThunk(
+  "users/setHordansoAdminDetailsToLS",
+  async ({hordansoAdminStatus,hordansoAdminName}: any) => {
+    const now = new Date();
+    const expirationTime = now.getTime() + 60*60*1000;
+    const item = {
+      adminStatus: hordansoAdminStatus === true ? "true" : "false",
+      adminName: hordansoAdminName,
+      expiration: expirationTime
+    }
+    return localStorage.setItem("LS_KEY_HORDANSO_ADMIN_DETAILS", JSON.stringify(item));
+  },
+);
+
 export const removeUserIdFromLSThunk = createAsyncThunk(
   "users/removeUserIdFromLS",
   async () => {
@@ -103,6 +133,13 @@ export const removeRoleIdFromLSThunk = createAsyncThunk(
   "users/removeRoleIdFromLS",
   async () => {
     return localStorage.removeItem("LS_KEY_ROLE_ID");
+  },
+);
+
+export const removeHordansoAdminDetailsFromLSThunk = createAsyncThunk(
+  "users/removeHordansoAdminDetailsFromLS",
+  async () => {
+    return localStorage.removeItem("LS_KEY_HORDANSO_ADMIN_DETAILS");
   },
 );
 

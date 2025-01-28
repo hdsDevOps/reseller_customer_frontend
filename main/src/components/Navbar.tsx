@@ -147,7 +147,7 @@ const Sidebar = () => {
 
   const checkPermission = (label:String) => {
     if(rolePermission?.length > 0) {
-      console.log(rolePermission?.find(item => item?.name === label))
+      // console.log(rolePermission?.find(item => item?.name === label))
       return rolePermission?.find(item => item?.name === label)?.value;
     } else {
       return false;

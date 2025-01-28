@@ -34,7 +34,7 @@ const paystackImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gwork
 const Dashboard: React.FC = () => {
   const location = useLocation();
   const dispatch = useAppDispatch();
-  const { customerId, userDetails, cartState, defaultCurrencySlice,token, rolePermission } = useAppSelector(state => state.auth);
+  const { customerId, userDetails, cartState, defaultCurrencySlice,token, rolePermission, isAdmin } = useAppSelector(state => state.auth);
   const navigate = useNavigate();
   // console.log("state...", location.state);
   const isInitialRender = useRef(true);
@@ -59,7 +59,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const checkPermission = (label:String) => {
       if(rolePermission?.length > 0) {
-        console.log(rolePermission?.find(item => item?.name === label))
+        // console.log(rolePermission?.find(item => item?.name === label))
         const permissionStatus = rolePermission?.find(item => item?.name === label)?.value;
         if(permissionStatus) {
           //
@@ -732,7 +732,7 @@ const Dashboard: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-2 pb-10 pt-3 text-right">
-                      <button className="w-6 h-6 rounded-full border-2 border-green-500 flex justify-center items-center" type="button" onClick={() => setShowList(!showList)}>
+                      <button className={`w-6 h-6 rounded-full border-2 ${isAdmin ? "border-[#8A8A8A]" : "border-green-500"} flex justify-center items-center`} type="button" onClick={() => setShowList(!showList)} disabled={isAdmin}>
                         <p className="mb-2">...</p>
                       </button>
                     </td>
@@ -857,7 +857,14 @@ const Dashboard: React.FC = () => {
           }
         </div>
         {
-          activeStatus
+          isAdmin ? (
+            <div>
+              <div className="">
+                <BusinessEmail data={selectedDomain} getDomainsList={getDomainsList} />
+              </div>
+              <SubscriptionModal isOpen={isSubscriptionModalOpen} onClose={() => setSubscriptionModalOpen(false)} />
+            </div>
+          ) : activeStatus
           ? (
             <div>
               <div className="">

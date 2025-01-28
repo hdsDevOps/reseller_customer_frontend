@@ -8,6 +8,7 @@ import Review from "./Review";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from "react-toastify";
 import ViewPaymentDetails from "./ViewPaymentDetails";
+import DownloadInvoice from "./DownloadInvoice";
 
 
 const PaymentApp: React.FC = () => {
@@ -20,6 +21,7 @@ const PaymentApp: React.FC = () => {
           <Route path="/payment-subscription" element={<PaymentDetails />} />
           <Route path="/view-payment-details" element={<ViewPaymentDetails />} />
           <Route path="/review-and-check-out" element={<Review />} />
+          <Route path="/download-invoice-pdf" element={<DownloadInvoice />} />
         </Routes>
       </Suspense>
       

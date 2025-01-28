@@ -16,18 +16,13 @@ const DomainList: React.FC = () => {
 
   console.log("location state...", location.state);
 
-  const initialNewDomain = {
-    domain: location.state.selectedDomain.domain,
-    domain_extension: location.state.selectedDomain.domain_extension
-  };
-
-  const [newDomain, setNewDomain] = useState(initialNewDomain);
+  const [newDomain, setNewDomain] = useState(location.state.selectedDomain);
   const [domainResult, setDomainResult] = useState(location.state.result);
 
   const handleCheckDomain = async(e) => {
     e.preventDefault();
     try {
-      const result = await dispatch(domainAvailabilityThunk(newDomain?.domain+newDomain?.domain_extension)).unwrap();
+      const result = await dispatch(domainAvailabilityThunk(newDomain)).unwrap();
       setDomainResult(result);
     } catch (error) {
       console.log(error);
@@ -36,7 +31,7 @@ const DomainList: React.FC = () => {
   };
 
   const handleDomainClick = (domain) => {
-    navigate('/selected-domain-details', {state: {...location.state, selectedDomain: domain, preSelectedDomain: newDomain, type: 'new'}});
+    navigate('/selected-domain-details', {state: {...location.state, selectedDomain: domain, preSelectedDomain: location.state.selectedDomain, type: 'new'}});
   };
 
 
@@ -57,13 +52,10 @@ const DomainList: React.FC = () => {
               type="text"
               placeholder="domain"
               className="w-full border-2 border-gray-200 bg-transparent rounded-md p-3 pr-32 focus:border-blue-500 focus:outline-none"
-              value={newDomain?.domain}
-              onChange={e => {setNewDomain({
-                ...newDomain,
-                domain: e.target.value,
-              })}}
+              value={newDomain}
+              onChange={e => {setNewDomain(e.target.value)}}
             />
-            <select
+            {/* <select
               className="absolute top-0 right-2 h-full border-0 bg-transparent text-black font-semibold"
               value={newDomain?.domain_extension}
               onChange={e => {setNewDomain({
@@ -74,7 +66,7 @@ const DomainList: React.FC = () => {
               <option value=".com">.com</option>
               <option value=".co">.co</option>
               <option value=".org">.org</option>
-            </select>
+            </select> */}
           </div>
           <button
             type="button"
