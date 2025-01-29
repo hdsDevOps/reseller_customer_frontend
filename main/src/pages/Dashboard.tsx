@@ -81,7 +81,7 @@ const Dashboard: React.FC = () => {
   // console.log("subscription...", subscription);
   // console.log("user details...", userDetails);
 
-  const [selectedDomain, setSelectedDomain] = useState({});
+  const [selectedDomain, setSelectedDomain] = useState<object|null>(null);
   // console.log("selectedDomain...", selectedDomain);
   // console.log("userDetails...", userDetails);
   const [activeStatus, setActiveStatus] = useState<Boolean>(false);
@@ -864,7 +864,9 @@ const Dashboard: React.FC = () => {
               </div>
               <SubscriptionModal isOpen={isSubscriptionModalOpen} onClose={() => setSubscriptionModalOpen(false)} />
             </div>
-          ) : activeStatus
+          ) : selectedDomain === null
+          ? (<></>)
+          : activeStatus
           ? (
             <div>
               <div className="">

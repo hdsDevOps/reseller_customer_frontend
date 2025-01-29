@@ -17,6 +17,7 @@ import { IoMdInformationCircleOutline } from "react-icons/io";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import CustomerAgreement from "./CustomerAgreement";
 import PrivacyPolicy from "./PrivacyPolicy";
+import { domainAvailabilityThunk } from "store/reseller.thunk";
 
 interface Voucher {
   code: string;
@@ -65,6 +66,7 @@ const Cart = () => {
   const [workspacePrice, setWorkspacePrice] = useState(0);
   const [currentPlan, setCurrentPlan] = useState<object|null>(null);
   // console.log("currentPlan...", currentPlan);
+  const [domain, setDomain] = useState("");
 
   const handleLegalModalClose = () => {
     setIsLegalModalOpen(false);
@@ -391,6 +393,33 @@ const Cart = () => {
     );
     // console.log(newCartValue);
     addToCart2(e, newCartValue);
+  };
+
+  const handleDomainSearch = async(e) => {
+    e.preventDefault();
+
+    try {
+      const result = await dispatch(domainAvailabilityThunk(domain)).unwrap();
+      console.log("check domain result...", result);
+      // if(result?.availablity_status) {
+      //   navigate('/domain-details', {state: {result, domain}});
+      // } else {
+      //   navigate('/choose-domain', {state: {result, domain}});
+      // }
+      navigate('/choose-domain', {state: {result, domain}});
+    } catch (error) {
+      console.log(error);
+      if(error?.message == "Authentication token is required") {
+        try {
+          await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+          navigate('/login');
+        } catch (error) {
+          //
+        }
+      }
+    }
+
+    // navigate('/choose-domain');
   }
 
   return (
@@ -403,28 +432,33 @@ const Cart = () => {
           <GoChevronLeft />
           <p className="text-green-500 text-md">Back to previous page</p>
         </div>
-        <div className="relative flex gap-2 flex-grow md:max-w-[850px] w-full">
-            <div className="relative flex-grow">
-              <input
-                type="text"
-                placeholder="domain"
-                className="w-full border-2 border-gray-200 bg-transparent rounded-lg p-[.8rem] pr-32 focus:border-green-500 focus:outline-none"
-              />
-              <select
-                id="domain-select"
-                className="absolute top-0 right-2 h-full border-0 bg-transparent text-black font-semibold"
-                aria-label="Choose a domain extension"
-              >
-                <option value=".com">.com</option>
-                <option value=".co">.co</option>
-                <option value=".org">.org</option>
-              </select>
-            </div>
-            <button className="bg-green-600 text-white p-2 rounded-lg text-sm sm:text-md md:text-lg">
-              Search Domain
-            </button>
-            
+        <form onSubmit={handleDomainSearch} className="relative flex gap-2 flex-grow md:max-w-[850px] w-full">
+          <div className="relative flex-grow">
+            <input
+              type="text"
+              placeholder="Type your desired domain here."
+              className="w-full border-2 border-gray-200 bg-transparent rounded-lg p-[.8rem] pr-32 focus:border-green-500 focus:outline-none"
+              name="domain"
+              value={domain}
+              onChange={e => {setDomain(e.target.value)}}
+              required
+            />
+            {/* <select
+              id="domain-select"
+              className="absolute top-0 right-2 h-full border-0 bg-transparent text-black font-semibold"
+              aria-label="Choose a domain extension"
+            >
+              <option value=".com">.com</option>
+              <option value=".co">.co</option>
+              <option value=".org">.org</option>
+            </select> */}
           </div>
+          <button
+            type="submit"
+            className="bg-green-600 text-white p-2 rounded-lg text-sm sm:text-md md:text-lg">
+            Search Domain
+          </button>
+        </form>
       </div>
 
       <div className="grid-container">

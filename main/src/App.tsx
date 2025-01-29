@@ -312,7 +312,7 @@ const App: React.FC = () => {
     };
 
     getProfileData();
-  }, [token, customerId, staffId, staffStatus]);
+  }, [token, customerId, staffId, staffStatus, dispatch, navigate]);
 
   useEffect(() => {
     const setResellerTokenValue = async() => {

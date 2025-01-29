@@ -997,9 +997,9 @@ function Review() {
                 // }));
                 if(item?.workspace_status === "trial") {
                   await dispatch(makeDefaultPaymentMethodThunk({user_id: customerId, payment_method_id: paymentMethodId}));
-                  const role = await dispatch(addSettingThunk({user_type: "Super Admin", user_id: customerId, permissions: superAdminPermissions})).unwrap();
-                  // settingId
-                  await dispatch(addStaffThunk({user_id: customerId, first_name: userData?.first_name, last_name: userData?.last_name, email: userData?.email, phone_no: userData?.phone_no, user_type_id: role?.settingId}));
+                  // const role = await dispatch(addSettingThunk({user_type: "Super Admin", user_id: customerId, permissions: superAdminPermissions})).unwrap();
+                  // // settingId
+                  // await dispatch(addStaffThunk({user_id: customerId, first_name: userData?.first_name, last_name: userData?.last_name, email: userData?.email, phone_no: userData?.phone_no, user_type_id: role?.settingId}));
                   
                 }
               } else if(item?.product_type?.toLowerCase() === "domain") {
@@ -1060,7 +1060,7 @@ function Review() {
             });
             await updateCart();
             await setProcessingModalOpen(false);
-            navigate('/download-invoice-pdf', {state : {result, prevCart}});
+            await navigate('/download-invoice-pdf', {state : {result, prevCart, body, payment_method: "Stripe", amount_details: {finalTotalPrice, totalPrice, taxAmount, taxedPrice, discountedPrice}, region: userDetails?.country}});
           }, 3000);
         } else {
           toast.error("Error on payment method");
@@ -1094,7 +1094,7 @@ function Review() {
   const body = {
     reference: (new Date()).getTime().toString(),
     email: userData?.email,
-    amount: finalTotalPrice * 100,
+    amount: finalTotalPrice,
     publicKey: 'pk_test_8f89b2c7e1b29dedea53c372de55e3c6e5d1a20e',
     currency: defaultCurrencySlice,
     firstName: userData?.first_name,
@@ -1151,6 +1151,7 @@ function Review() {
           // setIsLicenseModalOpen(false);
           await updateCart();
           setProcessingModalOpen(false);
+          // navigate('/download-invoice-pdf', {state : {result, prevCart}});
         }, 3000);
       } else {
         toast.error("Error on payment method");

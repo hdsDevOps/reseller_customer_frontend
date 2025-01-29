@@ -41,7 +41,7 @@ const DomainDetails: React.FC = () => {
     } else {
       setDomainError(false);
       try {
-        const result = await dispatch(domainAvailabilityThunk( `${domainName}${domainExtension}`)).unwrap();
+        const result = await dispatch(domainAvailabilityThunk(domainName)).unwrap();
         console.log("result...", result);
         if(result?.availablity_status === "false") {
           if(location.state.from === "business_info") {

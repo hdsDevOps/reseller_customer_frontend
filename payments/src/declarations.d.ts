@@ -40,6 +40,7 @@ declare module 'store/hooks' {
 declare module "store/reseller.thunk" {
   import { createAsyncThunk } from '@reduxjs/toolkit';
   export const checkDomainThunk;
+  export const domainAvailabilityThunk;
 }
 
 declare module 'store/authSlice' {
@@ -107,4 +108,5 @@ declare module 'store/user.thunk' {
   export const addEmailsThunk;
   export const makeEmailAdminThunk;
   export const addNewDomainThunk;
+  export const getLandingPageThunk;
 }

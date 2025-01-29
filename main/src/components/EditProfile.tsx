@@ -24,6 +24,20 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
   const [showCPassword, setShowCPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [hereMapList, setHereMapList] = useState([]);
+  // console.log("hereMapList...", hereMapList);
+  const [hereAddress, setHereAddress] = useState<object|null>(userDetails?.address);
+  console.log("hereAddress...", hereAddress);
+  const [hereInput, setHereInput] = useState(userDetails?.address?.title || "");
+  const [isHereDropdownOpen, setIsHereDropdownOpen] = useState(false);
+  const hereRef = useRef(null);
+
+  useEffect(() => {
+    if(hereInput !== '' && hereInput !== data?.address?.title && hereMapList?.length > 0) {
+      setIsHereDropdownOpen(true);
+    }
+  }, [hereMapList, hereInput, data?.address]);
+
   const [data, setData] = useState(userDetails);
   console.log("data...", data);
 
@@ -80,7 +94,26 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
   const [cityDropdownOpen, setCityDropdownOpen] = useState<Boolean>(false);
   // console.log("isDropdownOpen", isDropdownOpen);
   const [isNumberValid, setIsNumberValid] = useState(false);
-  console.log({isNumberValid});
+  // console.log({isNumberValid});
+
+  const getHereMapList = async() => {
+    if(hereInput !== "") {
+      try {
+        const result = await dispatch(hereMapSearchThunk({address: hereInput}));
+        setHereMapList(result?.payload?.data?.items);
+      } catch (error) {
+        setHereMapList([]);
+      }
+    } else {
+      setHereMapList([]);
+    }
+  };
+
+  useEffect(() => {
+    if(hereInput !== "" && hereInput !== null || hereInput !== undefined) {
+      getHereMapList();
+    }
+  }, [hereInput]);
 
   useEffect(() => {
     if(userDetails?.phone_no === data?.phone_no) {
@@ -104,13 +137,18 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
     }
   };
   const handleClickOutsideBusinessState = (event: MouseEvent) => {
-      if(businessStateRef.current && !businessStateRef.current.contains(event.target as Node)) {
-        setBusinessStateDropdownOpen(false);
-      }
+    if(businessStateRef.current && !businessStateRef.current.contains(event.target as Node)) {
+      setBusinessStateDropdownOpen(false);
+    }
   };
   const handleClickOutsideBusinessCity = (event: MouseEvent) => {
     if(businessCityRef.current && !businessCityRef.current.contains(event.target as Node)) {
       setBusinessCityDropdownOpen(false);
+    }
+  };
+  const handleClickOutsideHere = (event: MouseEvent) => {
+    if(hereRef.current && !hereRef.current.contains(event.target as Node)) {
+      setIsHereDropdownOpen(false);
     }
   };
 
@@ -120,14 +158,106 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
     document.addEventListener('mousedown', handleClickOutsideCity);
     document.addEventListener('mousedown', handleClickOutsideBusinessState);
     document.addEventListener('mousedown', handleClickOutsideBusinessCity);
+    document.addEventListener('mousedown', handleClickOutsideHere);
     return () => {
       document.removeEventListener('mousedown', handleClickOutsideCountry);
       document.removeEventListener('mousedown', handleClickOutsideState);
       document.removeEventListener('mousedown', handleClickOutsideCity);
       document.removeEventListener('mousedown', handleClickOutsideBusinessState);
       document.removeEventListener('mousedown', handleClickOutsideBusinessCity);
+      document.removeEventListener('mousedown', handleClickOutsideHere);
     };
   }, []);
+
+  const setHereCountry = (item) => {
+    if(countries?.length > 0) {
+      const findCountry = countries?.find(country => country?.name?.toLowerCase() === item?.address?.countryName?.toLowerCase());
+      if(findCountry) {
+        setCountry(findCountry);
+        setData({
+          ...data,
+          country: findCountry?.name
+        })
+      }
+    }
+  };
+
+  const setHereState = (item) => {
+    if(states?.length > 0) {
+      const findState = states?.find(state => state?.name?.toLowerCase() === item?.address?.state?.toLowerCase());
+      if(findState) {
+        setCountry(findState);
+        setData({
+          ...data,
+          state: findState?.name
+        })
+      }
+    }
+  };
+
+  const setHereCity = (item) => {
+    if(cities?.length > 0) {
+      const findCity = cities?.find(city => city?.name?.toLowerCase() === item?.address?.city?.toLowerCase());
+      if(findCity) {
+        setCountry(findCity);
+        setData({
+          ...data,
+          city: findCity?.name
+        })
+      }
+    }
+  };
+
+  useEffect(() => {
+    setHereCountry(hereAddress);
+    setHereState(hereAddress);
+    setHereCity(hereAddress);
+  }, [hereAddress, countries, states, cities]);
+
+  useEffect(() => {
+    if(data?.country !== "" && countries?.length > 0) {
+      const countryData = countries?.find(country => country?.name === data?.country);
+      if(countryData) {
+        setCountry(countryData);
+      }
+    }
+  }, [data?.country, countries]);
+
+  useEffect(() => {
+    if(data?.state !== "" && states?.length > 0) {
+      const stateData = states?.find(state => state?.name === data?.state);
+      if(stateData) {
+        setState(stateData);
+      }
+    }
+  }, [data?.state, states]);
+
+  useEffect(() => {
+    if(data?.city !== "" && cities?.length > 0) {
+      const cityData = cities?.find(city => city?.name === data?.city);
+      if(cityData) {
+        setCity(cityData);
+      }
+    }
+  }, [data?.city, cities]);
+
+  useEffect(() => {
+    if(data?.business_state !== "" && businessStates?.length > 0) {
+      const stateData = businessStates?.find(state => state?.name === data?.business_state);
+      if(stateData) {
+        setBusinessState(stateData);
+      }
+    }
+  }, [data?.business_state, businessStates]);
+
+  useEffect(() => {
+    if(data?.business_city !== "" && businessCities?.length > 0) {
+      const cityData = businessCities?.find(city => city?.name === data?.business_city);
+      if(cityData) {
+        setCity(cityData);
+      }
+    }
+  }, [data?.business_city, businessCities]);
 
   useEffect(() => {
     if(countries?.length > 0 && countryName !== "") {
@@ -289,70 +419,70 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
     }
   }, [businessCountry, businessState]);
 
-  useEffect(() => {
-    if(countries?.length > 0 && userDetails?.region !== "" && userDetails?.region !== null) {
-      const countryFind = countries?.find(item => item?.name === userDetails?.region);
-      if(countryFind) {
-        setCountry(countryFind);
-      } else {
-        setCountry({});
-      }
-    } else {
-      setCountry({});
-    }
-  }, [countries, userDetails]);
+  // useEffect(() => {
+  //   if(countries?.length > 0 && userDetails?.region !== "" && userDetails?.region !== null) {
+  //     const countryFind = countries?.find(item => item?.name === userDetails?.region);
+  //     if(countryFind) {
+  //       setCountry(countryFind);
+  //     } else {
+  //       setCountry({});
+  //     }
+  //   } else {
+  //     setCountry({});
+  //   }
+  // }, [countries, userDetails]);
 
-  useEffect(() => {
-    if(states?.length > 0 && userDetails?.state !== "" && userDetails?.state !== null) {
-      const stateFind = states?.find(item => item?.name === userDetails?.state);
-      if(stateFind) {
-        setState(stateFind);
-      } else {
-        setState({});
-      }
-    } else {
-      setState({});
-    }
-  }, [states, userDetails]);
+  // useEffect(() => {
+  //   if(states?.length > 0 && userDetails?.state !== "" && userDetails?.state !== null) {
+  //     const stateFind = states?.find(item => item?.name === userDetails?.state);
+  //     if(stateFind) {
+  //       setState(stateFind);
+  //     } else {
+  //       setState({});
+  //     }
+  //   } else {
+  //     setState({});
+  //   }
+  // }, [states, userDetails]);
 
-  useEffect(() => {
-    if(cities?.length > 0 && userDetails?.city !== "" && userDetails?.city !== null) {
-      const cityFind = cities?.find(item => item?.name === userDetails?.city);
-      if(cityFind) {
-        setCity(cityFind);
-      } else {
-        setCity({});
-      }
-    } else {
-      setCity({});
-    }
-  }, [cities, userDetails]);
+  // useEffect(() => {
+  //   if(cities?.length > 0 && userDetails?.city !== "" && userDetails?.city !== null) {
+  //     const cityFind = cities?.find(item => item?.name === userDetails?.city);
+  //     if(cityFind) {
+  //       setCity(cityFind);
+  //     } else {
+  //       setCity({});
+  //     }
+  //   } else {
+  //     setCity({});
+  //   }
+  // }, [cities, userDetails]);
 
-  useEffect(() => {
-    if(businessStates?.length > 0 && userDetails?.business_state !== "" && userDetails?.business_state !== null) {
-      const stateFind = businessStates?.find(item => item?.name === userDetails?.business_state);
-      if(stateFind) {
-        setBusinessState(stateFind);
-      } else {
-        setBusinessState({});
-      }
-    } else {
-      setBusinessState({});
-    }
-  }, [businessStates, userDetails]);
+  // useEffect(() => {
+  //   if(businessStates?.length > 0 && userDetails?.business_state !== "" && userDetails?.business_state !== null) {
+  //     const stateFind = businessStates?.find(item => item?.name === userDetails?.business_state);
+  //     if(stateFind) {
+  //       setBusinessState(stateFind);
+  //     } else {
+  //       setBusinessState({});
+  //     }
+  //   } else {
+  //     setBusinessState({});
+  //   }
+  // }, [businessStates, userDetails]);
 
-  useEffect(() => {
-    if(businessCities?.length > 0 && userDetails?.business_city !== "" && userDetails?.business_city !== null) {
-      const cityFind = businessCities?.find(item => item?.name === userDetails?.business_city);
-      if(cityFind) {
-        setBusinessCity(cityFind);
-      } else {
-        setBusinessCity({});
-      }
-    } else {
-      setBusinessCity({});
-    }
-  }, [businessCities, userDetails]);
+  // useEffect(() => {
+  //   if(businessCities?.length > 0 && userDetails?.business_city !== "" && userDetails?.business_city !== null) {
+  //     const cityFind = businessCities?.find(item => item?.name === userDetails?.business_city);
+  //     if(cityFind) {
+  //       setBusinessCity(cityFind);
+  //     } else {
+  //       setBusinessCity({});
+  //     }
+  //   } else {
+  //     setBusinessCity({});
+  //   }
+  // }, [businessCities, userDetails]);
 
   const validateForm = () => {
     if(
@@ -360,7 +490,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
       data?.last_name === "" || data?.last_name?.trim() === "" ||
       data?.email === "" || data?.email?.trim() === "" ||
       data?.phone_no === "" || data?.phone_no?.trim() === "" ||
-      data?.address === "" || data?.address?.trim() === "" ||
+      data?.address === "" || data?.address === null || data?.address === undefined ||
       data?.state === "" || data?.state?.trim() === "" ||
       data?.city === "" || data?.city?.trim() === "" ||
       data?.country === "" || data?.country?.trim() === "" ||
@@ -494,43 +624,43 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
           <h2 className='text-lg font-bold text-[#14213D] mt-6'>Basic information</h2>
           <div className='grid xl:grid-cols-3 grid-cols-2 gap-3 mt-4 items-center'>
             <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                <label
-                    htmlFor="first_name"
-                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                >First Name</label>
-                <input
-                    type="text"
-                    className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                    value={data?.first_name}
-                    name='first_name'
-                    onChange={handleChangeName}
-                />
+              <label
+                htmlFor="first_name"
+                className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+              >First Name</label>
+              <input
+                type="text"
+                className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
+                value={data?.first_name}
+                name='first_name'
+                onChange={handleChangeName}
+              />
             </div>
             <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                <input
-                    type="text"
-                    className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                    value={data?.last_name}
-                    name='last_name'
-                    onChange={handleChangeName}
-                />
-                <label
-                    htmlFor="last_name"
-                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                >Last Name</label>
+              <input
+                type="text"
+                className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
+                value={data?.last_name}
+                name='last_name'
+                onChange={handleChangeName}
+              />
+              <label
+                htmlFor="last_name"
+                className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+              >Last Name</label>
             </div>
             <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                <input
-                    type="text"
-                    className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                    value={data?.email}
-                    name='email'
-                    disabled
-                />
-                <label
-                    htmlFor="email"
-                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                >Email</label>
+              <input
+                type="text"
+                className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
+                value={data?.email}
+                name='email'
+                disabled
+              />
+              <label
+                htmlFor="email"
+                className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+              >Email</label>
             </div>
             <div className="!max-w-[378px] sm:col-span-1 col-span-2 mx-auto relative !w-full mb-2 !pb-1 !pt-[6px] mt-2">
               <PhoneInput
@@ -557,169 +687,198 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
                 className="absolute bg-white -top-3 left-3 text-gray-500 transition-all duration-300 ease-in-out origin-top-left peer-placeholder-shown:text-gray-400 peer-focus:text-blue-600 peer-focus:text-sm"
               >Phone Number</label>
             </div>
-            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                <input
-                    type="text"
-                    className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                    value={data?.address}
-                    name='address'
-                    onChange={handleChangeData}
-                />
-                <label
-                    htmlFor="address"
-                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                >Address</label>
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto" ref={hereRef}>
+              <input
+                type="text"
+                className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
+                value={hereInput}
+                name='address'
+                onChange={e => {
+                  setHereInput(e.target.value);
+                  setHereAddress(null);
+                }}
+                onFocus={() => {setIsHereDropdownOpen(true)}}
+              />
+              <label
+                htmlFor="address"
+                className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+              >Address</label>
+              {
+                isHereDropdownOpen && hereMapList?.length > 0 && (
+                  <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md'>
+                    {
+                      hereMapList?.map((item, idx) => (
+                        <p
+                          key={idx}
+                          className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                          dropdown-name="country-dropdown"
+                          onClick={async() => {
+                            setHereInput(item?.title);
+                            setHereAddress(item);
+                            setData({
+                              ...data,
+                              address: item,
+                              zipcode: item?.address?.postalCode
+                            });
+                            setIsHereDropdownOpen(false);
+                          }}
+                        >{item?.title}</p>
+                      ))
+                    }
+                  </div>
+                )
+              }
             </div>
-            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                <input
-                    type="text"
-                    className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                    value={data?.country || countryName}
-                    name='country'
-                    onChange={e => {
-                        setData({
-                            ...data,
-                            country: '',
-                            state: '',
-                            city: ''
-                        });
-                        setCountryName(e.target.value);
-                        setStateName('');
-                        setCityName('');
-                        setCountry({});
-                        setState({});
-                        setCity({});
-                    }}
-                    onFocus={() => {setCountryDropdownOpen(true)}}
-                />
-                <label
-                    htmlFor="country"
-                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                >Country</label>
-                {
-                  countryDropdownOpen && (
-                    <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md'>
-                      {
-                        countries?.filter(name => name?.name.toLowerCase().includes(countryName.toLowerCase())).map((country, idx) => (
-                          <p
-                            key={idx}
-                            className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
-                            dropdown-name="country-dropdown"
-                            onClick={() => {
-                              setData({
-                                ...data,
-                                country: country?.name
-                              });
-                              setCountryName("");
-                              setStateName("");
-                              setCityName("");
-                              setCountry(country);
-                              setState({});
-                              setCity({});
-                              setCountryDropdownOpen(false);
-                            }}
-                          >{country?.name}</p>
-                        ))
-                      }
-                    </div>
-                  )
-                }
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto" ref={countryRef}>
+              <input
+                type="text"
+                className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
+                value={data?.country || countryName}
+                name='country'
+                onChange={e => {
+                  setData({
+                    ...data,
+                    country: '',
+                    state: '',
+                    city: ''
+                  });
+                  setCountryName(e.target.value);
+                  setStateName('');
+                  setCityName('');
+                  setCountry({});
+                  setState({});
+                  setCity({});
+                }}
+                onFocus={() => {setCountryDropdownOpen(true)}}
+              />
+              <label
+                htmlFor="country"
+                className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+              >Country</label>
+              {
+                countryDropdownOpen && (
+                  <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md'>
+                    {
+                      countries?.filter(name => name?.name.toLowerCase().includes(countryName.toLowerCase())).map((country, idx) => (
+                        <p
+                          key={idx}
+                          className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                          dropdown-name="country-dropdown"
+                          onClick={() => {
+                            setData({
+                              ...data,
+                              country: country?.name
+                            });
+                            setCountryName("");
+                            setStateName("");
+                            setCityName("");
+                            setCountry(country);
+                            setState({});
+                            setCity({});
+                            setCountryDropdownOpen(false);
+                          }}
+                        >{country?.name}</p>
+                      ))
+                    }
+                  </div>
+                )
+              }
             </div>
-            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                <input
-                    type="text"
-                    className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                    value={data?.state || stateName}
-                    name='state'
-                    onChange={e => {
-                        setData({
-                          ...data,
-                          state: "",
-                          city: ""
-                        });
-                        setStateName(e.target.value);
-                        setCityName("");
-                        setState({});
-                        setCity({});
-                    }}
-                    onFocus={() => {setStateDropdownOpen(true)}}
-                />
-                <label
-                    htmlFor="state"
-                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                >State</label>
-                {
-                  stateDropdownOpen && (
-                    <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
-                      {
-                        states?.filter(name => name?.name.toLowerCase().includes(stateName.toLowerCase())).map((region, idx) => (
-                          <p
-                            key={idx}
-                            className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
-                            onClick={() => {
-                              setData({
-                                ...data,
-                                state: region?.name,
-                                city: ""
-                              });
-                              setStateName("");
-                              setCityName("");
-                              setState(region);
-                              setCity({});
-                              setStateDropdownOpen(false);
-                            }}
-                            dropdown-name="state_dropdown"
-                          >{region?.name}</p>
-                        ))
-                      }
-                    </div>
-                  )
-                }
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto" ref={stateRef}>
+              <input
+                type="text"
+                className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
+                value={data?.state || stateName}
+                name='state'
+                onChange={e => {
+                  setData({
+                    ...data,
+                    state: "",
+                    city: ""
+                  });
+                  setStateName(e.target.value);
+                  setCityName("");
+                  setState({});
+                  setCity({});
+                }}
+                onFocus={() => {setStateDropdownOpen(true)}}
+              />
+              <label
+                htmlFor="state"
+                className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+              >State</label>
+              {
+                stateDropdownOpen && (
+                  <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+                    {
+                      states?.filter(name => name?.name.toLowerCase().includes(stateName.toLowerCase())).map((region, idx) => (
+                        <p
+                          key={idx}
+                          className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                          onClick={() => {
+                            setData({
+                              ...data,
+                              state: region?.name,
+                              city: ""
+                            });
+                            setStateName("");
+                            setCityName("");
+                            setState(region);
+                            setCity({});
+                            setStateDropdownOpen(false);
+                          }}
+                          dropdown-name="state_dropdown"
+                        >{region?.name}</p>
+                      ))
+                    }
+                  </div>
+                )
+              }
             </div>
-            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                <input
-                    type="text"
-                    className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                    value={data?.city || cityName}
-                    name='city'
-                    onChange={e => {
-                        setData({
-                          ...data,
-                          city: ''
-                        });
-                        setCityName(e.target.value);
-                        setCity({});
-                    }}
-                    onFocus={() => {setCityDropdownOpen(true)}}
-                />
-                <label
-                    htmlFor="city"
-                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                >City</label>
-                {
-                  cityDropdownOpen && (
-                    <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
-                      {
-                        cities?.filter(name => name?.name.toLowerCase().includes(cityName.toLowerCase())).map((city_name, idx) => (
-                          <p
-                            key={idx}
-                            className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
-                            onClick={() => {
-                              setData({
-                                ...data,
-                                city: city_name?.name
-                              });
-                              setCityName("");
-                              setCity(city_name);
-                              setCityDropdownOpen(false);
-                            }}
-                            dropdown-name="city-dropdown"
-                          >{city_name?.name}</p>
-                        ))
-                      }
-                    </div>
-                  )
-                }
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto" ref={cityRef}>
+              <input
+                type="text"
+                className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
+                value={data?.city || cityName}
+                name='city'
+                onChange={e => {
+                  setData({
+                    ...data,
+                    city: ''
+                  });
+                  setCityName(e.target.value);
+                  setCity({});
+                }}
+                onFocus={() => {setCityDropdownOpen(true)}}
+              />
+              <label
+                htmlFor="city"
+                className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+              >City</label>
+              {
+                cityDropdownOpen && (
+                  <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+                    {
+                      cities?.filter(name => name?.name.toLowerCase().includes(cityName.toLowerCase())).map((city_name, idx) => (
+                        <p
+                          key={idx}
+                          className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                          onClick={() => {
+                            setData({
+                              ...data,
+                              city: city_name?.name
+                            });
+                            setCityName("");
+                            setCity(city_name);
+                            setCityDropdownOpen(false);
+                          }}
+                          dropdown-name="city-dropdown"
+                        >{city_name?.name}</p>
+                      ))
+                    }
+                  </div>
+                )
+              }
             </div>
             <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
               <label
@@ -727,7 +886,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
                 className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
               >Zip code</label>
               <input
-                type="number"
+                type="text"
                 className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
                 value={data?.zipcode}
                 name='zipcode'
@@ -735,164 +894,164 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
               />
             </div>
             <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                <input
-                    type={showPassword ? "text" : "password"}
-                    className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                    name='password'
-                    onChange={handleChangeData}
-                    minLength={8}
-                />
-                <label
-                    htmlFor="password"
-                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                >Password</label>
-                <button
-                    type='button'
-                    className='absolute right-2 -mt-[22px]'
-                    onClick={() => {setShowPassword(!showPassword)}}
-                >
-                    {
-                        showPassword ?
-                        (<FaEye className='w-5' />) : 
-                        (<FaEyeSlash className='w-5' />)
-                    }
-                </button>
+              <input
+                type={showPassword ? "text" : "password"}
+                className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
+                name='password'
+                onChange={handleChangeData}
+                minLength={8}
+              />
+              <label
+                htmlFor="password"
+                className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+              >Password</label>
+              <button
+                type='button'
+                className='absolute right-2 -mt-[22px]'
+                onClick={() => {setShowPassword(!showPassword)}}
+              >
+                {
+                  showPassword ?
+                  (<FaEye className='w-5' />) : 
+                  (<FaEyeSlash className='w-5' />)
+                }
+              </button>
             </div>
             <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                <input
-                    type={showCPassword ? "text" : "password"}
-                    className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                    name='confirm_password'
-                    onChange={e => {setConfirmPassword(e.target.value)}}
-                    minLength={8}
-                />
-                <label
-                    htmlFor="confirm_password"
-                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                >Confirm Password</label>
-                <button
-                    type='button'
-                    className='absolute right-2 -mt-[22px]'
-                    onClick={() => {setShowCPassword(!showCPassword)}}
-                >
-                    {
-                        showCPassword ?
-                        (<FaEye className='w-5' />) : 
-                        (<FaEyeSlash className='w-5' />)
-                    }
-                </button>
+              <input
+                type={showCPassword ? "text" : "password"}
+                className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
+                name='confirm_password'
+                onChange={e => {setConfirmPassword(e.target.value)}}
+                minLength={8}
+              />
+              <label
+                htmlFor="confirm_password"
+                className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+              >Confirm Password</label>
+              <button
+                type='button'
+                className='absolute right-2 -mt-[22px]'
+                onClick={() => {setShowCPassword(!showCPassword)}}
+              >
+                {
+                  showCPassword ?
+                  (<FaEye className='w-5' />) : 
+                  (<FaEyeSlash className='w-5' />)
+                }
+              </button>
             </div>
           </div>
           <h2 className='text-lg font-bold text-[#14213D] mt-6'>Business information</h2>
           <div className='grid grid-cols-2 gap-3 mt-4 items-center'>
             <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                <input
-                    type="text"
-                    className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                    value={data?.business_name}
-                    name='business_name'
-                    onChange={handleChangeData}
-                />
-                <label
-                    htmlFor="business_name"
-                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                >Business Name</label>
+              <input
+                type="text"
+                className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
+                value={data?.business_name}
+                name='business_name'
+                onChange={handleChangeData}
+              />
+              <label
+                htmlFor="business_name"
+                className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+              >Business Name</label>
             </div>
-            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                <input
-                    type="text"
-                    className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                    value={data?.business_state || businessStateName}
-                    name='business_state'
-                    onChange={e => {
-                        setData({
-                          ...data,
-                          business_state: "",
-                          business_city: ""
-                        });
-                        setBusinessStateName(e.target.value);
-                        setBusinessCityName("");
-                        setBusinessState({});
-                        setBusinessCity({});
-                    }}
-                    onFocus={() => {setBusinessStateDropdownOpen(true)}}
-                />
-                <label
-                    htmlFor="business_state"
-                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                >Business State</label>
-                {
-                  businessStateDropdownOpen && (
-                    <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
-                      {
-                        businessStates?.filter(name => name?.name.toLowerCase().includes(businessStateName.toLowerCase())).map((region, idx) => (
-                          <p
-                            key={idx}
-                            className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
-                            onClick={() => {
-                              setData({
-                                ...data,
-                                business_state: region?.name,
-                                business_city: ""
-                              });
-                              setBusinessStateName("");
-                              setBusinessCityName("");
-                              setBusinessState(region);
-                              setBusinessCity({});
-                              setBusinessStateDropdownOpen(false);
-                            }}
-                            dropdown-name="state_dropdown"
-                          >{region?.name}</p>
-                        ))
-                      }
-                    </div>
-                  )
-                }
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto" ref={businessStateRef}>
+              <input
+                type="text"
+                className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
+                value={data?.business_state || businessStateName}
+                name='business_state'
+                onChange={e => {
+                  setData({
+                    ...data,
+                    business_state: "",
+                    business_city: ""
+                  });
+                  setBusinessStateName(e.target.value);
+                  setBusinessCityName("");
+                  setBusinessState({});
+                  setBusinessCity({});
+                }}
+                onFocus={() => {setBusinessStateDropdownOpen(true)}}
+              />
+              <label
+                htmlFor="business_state"
+                className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+              >Business State</label>
+              {
+                businessStateDropdownOpen && (
+                  <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+                    {
+                      businessStates?.filter(name => name?.name.toLowerCase().includes(businessStateName.toLowerCase())).map((region, idx) => (
+                        <p
+                          key={idx}
+                          className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                          onClick={() => {
+                            setData({
+                              ...data,
+                              business_state: region?.name,
+                              business_city: ""
+                            });
+                            setBusinessStateName("");
+                            setBusinessCityName("");
+                            setBusinessState(region);
+                            setBusinessCity({});
+                            setBusinessStateDropdownOpen(false);
+                          }}
+                          dropdown-name="state_dropdown"
+                        >{region?.name}</p>
+                      ))
+                    }
+                  </div>
+                )
+              }
             </div>
-            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-                <input
-                    type="text"
-                    className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                    value={data?.business_city || businessCityName}
-                    name='business_city'
-                    onChange={e => {
-                        setData({
-                          ...data,
-                          business_city: ""
-                        });
-                        setBusinessCityName(e.target.value);
-                        setBusinessCity({});
-                    }}
-                    onFocus={() => {setBusinessCityDropdownOpen(true)}}
-                />
-                <label
-                    htmlFor="business_city"
-                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-                >Business City*</label>
-                {
-                  businessCityDropdownOpen && (
-                    <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
-                      {
-                        businessCities?.filter(name => name?.name.toLowerCase().includes(businessCityName.toLowerCase())).map((region, idx) => (
-                          <p
-                            key={idx}
-                            className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
-                            onClick={() => {
-                              setData({
-                                ...data,
-                                business_city: region?.name
-                              });
-                              setBusinessCityName("");
-                              setBusinessCity(region);
-                              setBusinessCityDropdownOpen(false);
-                            }}
-                            dropdown-name="state_dropdown"
-                          >{region?.name}</p>
-                        ))
-                      }
-                    </div>
-                  )
-                }
+            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto" ref={businessCityRef}>
+              <input
+                type="text"
+                className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
+                value={data?.business_city || businessCityName}
+                name='business_city'
+                onChange={e => {
+                  setData({
+                    ...data,
+                    business_city: ""
+                  });
+                  setBusinessCityName(e.target.value);
+                  setBusinessCity({});
+                }}
+                onFocus={() => {setBusinessCityDropdownOpen(true)}}
+              />
+              <label
+                htmlFor="business_city"
+                className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+              >Business City*</label>
+              {
+                businessCityDropdownOpen && (
+                  <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+                    {
+                      businessCities?.filter(name => name?.name.toLowerCase().includes(businessCityName.toLowerCase())).map((region, idx) => (
+                        <p
+                          key={idx}
+                          className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                          onClick={() => {
+                            setData({
+                              ...data,
+                              business_city: region?.name
+                            });
+                            setBusinessCityName("");
+                            setBusinessCity(region);
+                            setBusinessCityDropdownOpen(false);
+                          }}
+                          dropdown-name="state_dropdown"
+                        >{region?.name}</p>
+                      ))
+                    }
+                  </div>
+                )
+              }
             </div>
           </div>
           <div className='flex items-center justify-between mt-3 px-6'>

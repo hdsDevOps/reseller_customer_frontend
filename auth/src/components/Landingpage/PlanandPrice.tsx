@@ -11,11 +11,6 @@ import { checkDomainThunk, domainAvailabilityThunk } from "store/reseller.thunk"
 import { plansAndPricesListThunk } from "store/user.thunk";
 import { Base_URL } from "../../Constant";
 
-const initialDomain = {
-  domain: '',
-  domain_extension: '.com'
-};
-
 const PlanandPrice = ({id}:any) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -23,7 +18,7 @@ const PlanandPrice = ({id}:any) => {
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
   // console.log("defaultCurrencySlice...", defaultCurrencySlice);
 
-  const [domain, setDomain] = useState(initialDomain);
+  const [domain, setDomain] = useState("");
   // console.log("domain...", domain);
   const [basePlans, setBasePlans] = useState([]);
   // console.log("basePlans...", basePlans);
@@ -115,7 +110,7 @@ const PlanandPrice = ({id}:any) => {
   const handleDomainSearch = async(e) => {
     e.preventDefault();
     try {
-      const result = await dispatch(domainAvailabilityThunk(domain?.domain+domain?.domain_extension)).unwrap();
+      const result = await dispatch(domainAvailabilityThunk(domain)).unwrap();
       console.log("result...", result);
       navigate('/domainlist', {state: {selectedDomain: domain, result: result, from: 'home', type: 'new'}});
     } catch (error) {
@@ -131,8 +126,8 @@ const PlanandPrice = ({id}:any) => {
           <>
             <form onSubmit={handleDomainSearch} className="py-[4.175rem] flex flex-col md:flex-row justify-center gap-4 items-center mx-auto">
               <div className="relative flex justify-center flex-1 w-full bg-white">
-                <input className="bg-transparent border py-6 px-10  w-full rounded-md shadow-md font-normal text-2x" placeholder="Type your desired domain here." onChange={handleDomainChange} name="domain" value={domain?.domain} />
-                <div className="flex justify-center items-center absolute top-5 right-[2rem]">
+                <input className="bg-transparent border py-6 px-10  w-full rounded-md shadow-md font-normal text-2x" placeholder="Type your desired domain here." onChange={e => {setDomain(e.target.value)}} name="domain" value={domain} />
+                {/* <div className="flex justify-center items-center absolute top-5 right-[2rem]">
                   <select onChange={handleDomainChange} name="domain_extension" value={domain?.domain_extension}>
                     <option value=".com">.com</option>
                     <option value=".co.in">.co.in</option>
@@ -141,7 +136,7 @@ const PlanandPrice = ({id}:any) => {
                     <option value=".in">.in</option>
                     <option value=".co.uk">.co.uk</option>
                   </select>
-                </div>
+                </div> */}
               </div>
               <button className="px-4 py-6 text-lg font-semibold text-white rounded-md bg-greenbase" type="submit">Search Domain</button>
             </form>

@@ -124,7 +124,7 @@ const DownloadInvoice: React.FC = () => {
   };
 
   useEffect(() => {
-    const saveAllData = async(e) => {
+    const saveAllData = async() => {
       try {
         await dispatch(udpateBusinessDataThunk({
           user_id: data?.customer_id,

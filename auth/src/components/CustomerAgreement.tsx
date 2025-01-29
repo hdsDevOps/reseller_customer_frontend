@@ -1,7 +1,10 @@
-import paragraph from 'antd/es/skeleton/paragraph'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { useAppDispatch } from 'store/hooks';
+import { getLandingPageThunk } from 'store/user.thunk';
 
 function CustomerAgreement() {
+  const dispatch = useAppDispatch();
+
   const list = [
     {header: 'Provision of the Service', paragraph: '<p class="font-inter font-normal text-sm text-black"></p>'},
     {header: '', paragraph: '<p class="font-inter font-normal text-sm text-black">The Service is provided, maintained and operated by Google and not by Wix. Google has appointed Wix to perform certain administrative actions in relation to the Service including collection of the subscription fees. In addition, Google has delegated to Wix certain administrative access to Google application accounts purchased through Wix.<br />In order to ensure that you do not experience any interruption or loss of services, the Service set to automatically renew, by default.  Unless you turn-off the auto-renewal option, such Service will automatically renew upon the end of the applicable Service period, for the same term then-currently in place for the Services, and at the then-current price for the Services (which may be higher or lower than the original price for the Services). To learn how to turn-off the auto-renewal option, please click here: https://support.wix.com/en/article/google-workspace-turning-off-auto-renewal-for-a-business-email.<br />Wix will attempt to charge your payment method on file, for the renewal fee within up-to 30 days before the expiration date of the Service and extends the Service period for an equivalent period as the original period. Wix will also endeavor to provide you a notice at least 30 prior the renewal date.<br />In the event of failure to collect the fees owed by you, we may in our sole discretion (but shall not be obligated to) retry to collect at a later time and/or suspend or cancel your Service, without further notice. In the event that Wix is unable to charge all fees through your payment method or if Wix receives notification of a chargeback, reversal, payment dispute, or is charged a penalty for any fee it previously charged to your selected payment method, Wix may pursue all available lawful remedies to obtain payment, including immediately suspending or cancelling the Service provided to you. Automatic renewal will not be effective until payment is final.<br />You are solely responsible for ensuring that the payment method you have on file with Wix is current and valid. By entering into this Agreement, You acknowledge the automatic renewal terms of your Service as indicated herein and you authorize Wix to charge the applicable fees to your authorized method of payment until you turn-off the auto-renewal.<br /><br />​IT IS HEREBY MADE CLEAR THAT YOU ARE SOLELY RESPONSIBLE FOR ENSURING THE SERVICES ARE RENEWED. WIX SHALL HAVE NO LIABILITY TO YOU OR ANY THIRD PARTY IN CONNECTION WITH THE RENEWAL AS DESCRIBED HEREIN, INCLUDING, BUT NOT LIMITED TO, ANY FAILURE OR ERRORS IN RENEWING THE SERVICES.​</p>'},
@@ -14,11 +17,30 @@ function CustomerAgreement() {
     {header: 'No Liability', paragraph: '<p class="font-inter font-normal text-sm text-black">​You acknowledge that Google is responsible for the provision of the Service to you. Wix shall have no responsibility or liability in relation to the provision of the Service by Google, the quality or functionality of the Service, its availability, the support services provided by Google and/or any other aspect of the Service or its provision to you other than Wix❜s responsibility in relation to the technical billing actions conducted by Wix on behalf of Google.</p>'},
     {header: 'Modifications', paragraph: '<p class="font-inter font-normal text-sm text-black">This Agreement, the Google TOS, the SLA and the Wix Policies may be changed from time to time without notification. You should review this Agreement (as posted on the Wix website) and all of the policies periodically to ensure you remain in compliance.</p>'},
   ];
+
+  const [customerAgreementData, setCustomerAgreementData] = useState("");
+  // console.log("CustomerAgreement...", customerAgreementData);
+
+  const getCustomerAgreement = async() => {
+    try {
+      const result = await dispatch(getLandingPageThunk()).unwrap();
+      setCustomerAgreementData(result?.data?.customer_agreement?.content);
+    } catch (error) {
+      setCustomerAgreementData("");
+    }
+  };
+
+  useEffect(() => {
+    getCustomerAgreement();
+  }, []);
+
   return (
     <div className='mt-5 flex flex-col'>
       <h2 className='font-inter font-medium text-[32px] text-[#12A833] py-5'>Google Mailing Application – Customer Agreement</h2>
 
-      <div className='flex flex-col'>
+      <div dangerouslySetInnerHTML={{__html: customerAgreementData}}></div>
+
+      {/* <div className='flex flex-col'>
         <p className='py-5 font-inter font-medium text-sm text-black'>By clicking the "Submit Purchase" button and/or purchasing the Google Mailing Application ("Service") you approve your consent to the following terms and conditions that constitute an agreement between you and Wix ("Agreement"): </p>
 
         <ol type='1'>
@@ -31,7 +53,7 @@ function CustomerAgreement() {
             ))
           }
         </ol>
-      </div>
+      </div> */}
     </div>
   )
 }

@@ -28,11 +28,7 @@ const BuyDomain: React.FC = () => {
   }, [location.state]);
 
   const [domains, setDomains] = useState(location.state.domain);
-  const initialDomain = {
-    domain: domains?.domain,
-    domain_extension: domains?.domain_extension,
-  };
-  const [searchDomain, setSearchDomain] = useState(initialDomain);
+  const [searchDomain, setSearchDomain] = useState(location.state.domain);
   console.log("searchDomain...", searchDomain);
 
   const [availableDomains, setAvailableDomains] = useState<string[]>([]);
@@ -47,13 +43,6 @@ const BuyDomain: React.FC = () => {
       navigate('/login');
     }
   }, [location.state]);
-
-  const handleChangeDomain = (e) => {
-    setSearchDomain({
-      ...searchDomain,
-      [e.target.name]: e.target.value,
-    });
-  };
 
   return (
     <div>
@@ -79,11 +68,11 @@ const BuyDomain: React.FC = () => {
                 type="text"
                 placeholder="domain"
                 className="w-full border-2 border-gray-200 bg-transparent rounded-lg p-[.8rem] pr-32 focus:border-green-500 focus:outline-none"
-                onChange={handleChangeDomain}
-                value={searchDomain?.domain}
+                onChange={e => {setSearchDomain(e.target.value)}}
+                value={searchDomain}
                 name="domain"
               />
-              <select
+              {/* <select
                 id="domain-select"
                 className="absolute top-0 right-2 h-full border-0 bg-transparent text-black font-semibold"
                 aria-label="Choose a domain extension"
@@ -94,7 +83,7 @@ const BuyDomain: React.FC = () => {
                 <option value=".com">.com</option>
                 <option value=".co">.co</option>
                 <option value=".org">.org</option>
-              </select>
+              </select> */}
             </div>
             <button
               type="button"

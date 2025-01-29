@@ -20,6 +20,7 @@ import { DateRangePicker } from "rsuite";
 import "rsuite/dist/rsuite.min.css";
 import { setCurrentPageNumberSlice, setBillingHistoryFilterSlice, setItemsPerPageSlice } from "store/authSlice";
 import ReactPaginate from "react-paginate";
+import DataTable from "react-data-table-component";
 
 const stripeImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/stripe.png?alt=media&token=23bd6672-665c-4dfb-9d75-155abd49dc58";
 const paystackImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/paystack.png?alt=media&token=8faf3870-4256-4810-9844-5fd3c147d7a3";
@@ -235,6 +236,33 @@ const BillingHistory: React.FC = () => {
       }
     }
   };
+
+  const [rowData, setRowData] = useState([]);
+  const [colDefs, setColDefs] = useState([
+    { name: 'Transaction ID', selector: (row:any) => row.transaction_id, sortable: true},
+    { name: 'Date / Invoice', selector: (row:any) => row.date, sortable: false},
+    { name: 'Production Type', selector: (row:any) => row.product_type, sortable: true},
+    { name: 'Description', selector: (row:any) => row.description, sortable: true},
+    { name: 'Domain', selector: (row:any) => row.domain, sortable: true},
+    { name: 'Payment Method', selector: (row:any) => row.payment_method, sortable: true},
+    { name: 'Status', selector: (row:any) => row.payment_status, sortable: true},
+    { name: 'Amount', selector: (row:any) => row.amount, sortable: true},
+    { name: 'Invoice', sortable: false},
+  ]);
+
+  useEffect(() => {
+    if(BillingDetails?.length > 0) {
+      const newData = BillingDetails?.map((item) => ({
+        transaction_id: item?.transaction_id,
+        date: `${formatDate(item?.created_at?._seconds, item?.created_at?._nanoseconds)}\n${item?.invoice}`,
+        product_type: item?.product_type,
+        description: item?.description,
+        domain: item?.domain,
+        payment_method: item?.payment_method,
+        amount: item?.amount,
+      }))
+    }
+  }, [BillingDetails]);
   
   const [currentPage, setCurrentPage] = useState(billingHistoryFilterSlice === null ? 0 : currentPageNumber);
   const [itemsPerPage, setItemsPerPage] = useState(itemsPerPageSlice);
@@ -450,6 +478,8 @@ const BillingHistory: React.FC = () => {
           <label>items</label>
         </div>
       </div>
+      
+      {/* <DataTable columns={colDefs} data={BillingDetails} fixedHeader pagination style={{'white-space': 'nowrap'}} /> */}
 
       <div className="overflow-x-auto">
         <table className="min-w-[1360px] w-full" ref={pdfRef}>

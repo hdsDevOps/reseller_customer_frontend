@@ -12,7 +12,7 @@ const BillingInvoice: React.FC = ({pdfRef, data}) => {
 
   const [subscriptionList, setSubscriptionList] = useState([]);
   const [subscription, setSubscription] = useState<object|null>(null);
-  console.log("subscription...", subscription);
+  // console.log("subscription...", subscription);
   
   const getSubscriptionList = async() => {
     try {
@@ -35,7 +35,7 @@ const BillingInvoice: React.FC = ({pdfRef, data}) => {
     }
   }, [subscriptionList, data]);
 
-  console.log("data...", data);
+  // console.log("data...", data);
 
   const { userDetails } = useAppSelector(state => state.auth);
   const dispatch = useAppDispatch();

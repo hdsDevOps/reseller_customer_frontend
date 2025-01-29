@@ -309,7 +309,7 @@ const HdsProfile = () => {
                     type="text"
                     id="Address"
                     className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                    value={userDetails?.address}
+                    value={userDetails?.address?.title}
                     disabled
                 />
                 <label

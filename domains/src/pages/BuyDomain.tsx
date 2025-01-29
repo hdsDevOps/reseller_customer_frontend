@@ -5,30 +5,18 @@ import { useAppDispatch, useAppSelector } from "store/hooks";
 import { checkDomainThunk, domainAvailabilityThunk } from 'store/reseller.thunk';
 import { removeUserAuthTokenFromLSThunk } from "store/user.thunk";
 
-const initialDomain = {
-  domain: "",
-  domain_extension: ".com",
-};
-
 const BuyDomain: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { userAuthStatus = "" } = useAppSelector((state: any) => state.auth);
-  const [domain, setDomain] = useState(initialDomain);
+  const [domain, setDomain] = useState("");
   // console.log("domain...", domain);
-
-  const handleChangeDomain = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setDomain({
-      ...domain,
-      [e.target.name]: e.target.value,
-    });
-  };
 
   const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // console.log(domain);
     try {
-      const result = await dispatch(domainAvailabilityThunk(domain.domain+domain.domain_extension)).unwrap();
+      const result = await dispatch(domainAvailabilityThunk(domain)).unwrap();
       console.log("check domain result...", result);
       // if(result?.availablity_status) {
       //   navigate('/domain-details', {state: {result, domain}});
@@ -91,15 +79,15 @@ const BuyDomain: React.FC = () => {
                 <div className="flex gap-2">
                   <input
                     type="text"
-                    placeholder="Enter your domain"
+                    placeholder="Type your desired domain here."
                     className={`flex-1 border-2 bg-transparent rounded-lg p-[.65rem] focus:border-green-500 focus:outline-none px-2`}
                     style={{height: '50px'}}
-                    value={domain.domain}
+                    value={domain}
                     name="domain"
-                    onChange={handleChangeDomain}
+                    onChange={e => {setDomain(e.target.value)}}
                     required
                   />
-                  <div className="flex gap-4">
+                  {/* <div className="flex gap-4">
                     <label htmlFor="domain-select" className="sr-only">
                       Choose a domain extension
                     </label>
@@ -114,7 +102,7 @@ const BuyDomain: React.FC = () => {
                       <option value=".cc">.cc</option>
                       <option value=".org">.org</option>
                     </select>
-                  </div>
+                  </div> */}
                 </div>
                 <p className="text-gray-400 text-sm">Search available domains</p>
                 

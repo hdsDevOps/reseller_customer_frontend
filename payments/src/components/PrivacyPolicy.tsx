@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './list.css';
+import { useAppDispatch } from 'store/hooks';
+import { getLandingPageThunk } from 'store/user.thunk';
 
 function PrivacyPolicy() {
+  const dispatch = useAppDispatch();
+
   const list2_1 = [
     'Information you provide us. When you register for our Services, sign up for any Wix events, subscribe to our blog(s) or newsletter(s), purchase and/or register domain names, use any of our Services; and/or when you contact us directly by any communication channel (e.g., Wix’s support tickets, emails), you may provide us Personal Information, such as name, email address, phone number, payment information (for Users with Paid Services), information you include in your communications with us and with other users on our platform, and Personal Information contained in scanned identification documents (such as an ID card, driver’s license, passport, or official company registration documents).',
     'Information we collect when you use the Services. When you visit, download, and/or use any of our Services, we may collect aggregated usage Personal Information, such as Visitors’ and Users’ browsing and ‘click-stream’ activity on the Services, session heatmaps and scrolls, non-identifying Personal Information regarding the Visitor’s or User’s device, operating system, internet browser, screen resolution, language and keyboard settings, internet service provider, referring/exit pages, date/time stamps, etc',
@@ -24,12 +28,30 @@ function PrivacyPolicy() {
     'To enhance our data security and fraud prevention capabilities; and',
     'To comply with any applicable laws and regulations.'
   ];
+
+  const [privacyPolicyData, setPrivacyPolicyData] = useState("");
+  console.log("privacyPolicyData...", privacyPolicyData);
+
+  const getPrivacyPolicyData = async() => {
+    try {
+      const result = await dispatch(getLandingPageThunk()).unwrap();
+      setPrivacyPolicyData(result?.data?.privacy_policy?.content);
+    } catch (error) {
+      setPrivacyPolicyData("");
+    }
+  };
+
+  useEffect(() => {
+    getPrivacyPolicyData();
+  }, []);
   
   return (
     <div className='mt-5 flex flex-col'>
       <h2 className='font-inter font-medium text-[32px] text-[#12A833] py-5'>Our Privacy Policies</h2>
 
-      <div className='flex flex-col'>
+      <div dangerouslySetInnerHTML={{__html: privacyPolicyData}}></div>
+
+      {/* <div className='flex flex-col'>
         <ol type='1'>
           <li className='py-2'>
             <h6 className='font-inter font-bold text-[20px] text-black'>Please read carefully</h6>
@@ -80,7 +102,7 @@ function PrivacyPolicy() {
             <p className="font-inter font-normal text-sm text-black mt-2">We may use techniques like “machine learning” (European law refers to this as “automated decision-making”) to help us improve our services. When we use machine learning, we either: (i) still have a human being involved in the process (and so are not fully automated); or (ii) use machine learning in ways that don’t have significant privacy implications (for example, reordering how applications might appear when you visit the Wix App Market). We may also use machine learning to help us monitor, identify, and suspend accounts sending spam, or engaging in other abusive or fraudulent activity.</p>
           </li>
         </ol>
-      </div>
+      </div> */}
     </div>
   )
 }
