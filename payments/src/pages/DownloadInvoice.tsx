@@ -158,10 +158,10 @@ const DownloadInvoice: React.FC = () => {
               </div>
             </div>
           </div>
-        ) : ()
+        ) : () 
       } */}
       <div className="min-w-full max-w-[500px] mx-auto py-1 border-b border-black0 flex items-center flex-col justify-center">
-        <div className="p-[10px] rounded-full mx-auto w-32 h-32 bg-[#1251D4] bg-opacity-5">
+        <div className="p-[10px] rounded-full mx-auto w-32 h-32 bg-[#1251D4] bg-opacity-5"> 
           <div className="rounded-full bg-[#43C148] w-full h-full items-center align-middle">
             {/* <BiCheck className="w-20 h-20 text-white" /> */}
             <Check className="w-24 h-24 text-white mx-auto pt-[13px]" />

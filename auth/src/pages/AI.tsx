@@ -5,7 +5,7 @@ const AI = () => {
 
   return (
     <div>
-      AI
+      AI 
     </div>
   );
 };

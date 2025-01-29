@@ -300,7 +300,7 @@ const App: React.FC = () => {
           await dispatch(setRoleIdSlice(roleData));
         } catch (error) {
           if(error?.message == "Request failed with status code 401") {
-            try {
+            try { 
               const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
               navigate('/login');
             } catch (error) {

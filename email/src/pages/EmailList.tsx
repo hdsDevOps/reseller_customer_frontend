@@ -1244,7 +1244,7 @@ const EmailList: React.FC = () => {
                               {row?.email}
                             </td>
                             <td className="p-2 text-gray-800 text-xs sm:text-sm md:text-md">
-                              <button
+                              <button 
                                 className={`relative w-24 h-10 rounded-[10px] border-2 flex justify-center items-center ${
                                   isAdmin
                                   ? "bg-[#8A8A8A]"
