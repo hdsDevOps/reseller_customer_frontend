@@ -20,7 +20,8 @@ export default function AdminHeader() {
     try {
       await dispatch(removeUserAuthTokenFromLSThunk());
       // window.location.href=`${process.env.}`;
-      window.location.href=`http://localhost:4000/customers`;
+      // window.location.href=`http://localhost:4000/customers`;
+      window.location.href=`https://main.admin.gworkspace.withhordanso.com/`;
     } catch (error) {
       toast.error("Error exiting access");
     }
