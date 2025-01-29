@@ -423,7 +423,7 @@ const MyStaff = () => {
               <th>Phone</th>
               <th>User Type</th>
               <th>Action</th>
-            </tr>
+            </tr> 
           </thead>
           <tbody>
             {
