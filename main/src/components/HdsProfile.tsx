@@ -493,7 +493,7 @@ const HdsProfile = () => {
                                     className='w-[300px] h-[300px] relative overflow-hidden'
                                 >
                                     {
-                                        image === null || userDetails?.profile_image === null || userDetails?.profile_image === "" || userDetails?.profile_image === undefined
+                                        image === null && userDetails?.profile_image === null || image === null && userDetails?.profile_image === "" || image === null && userDetails?.profile_image === undefined
                                         ? (
                                             <div className={`absolute top-0 left-0 bottom-0 right-0 transform duration-200 ease-in-out w-full h-full items-center`}>
                                                 <p className='my-auto text-center items-center pt-32'>Add profile photo from the camera icon</p>
