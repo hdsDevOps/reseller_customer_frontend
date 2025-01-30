@@ -186,31 +186,52 @@ const HdsProfile = () => {
             newImage.src = URL.createObjectURL(imageFile);
     
             newImage.onload = async () => {
-                const originalWidth  = newImage.width;
-                const originalHeight  = newImage.height;
-
-                const maxWidth = 300;
-                const maxHeight = 300;
+                const maxSize = 300; // Fixed output size (300x300)
 
                 let scale = zoom;
-                
-                if (originalWidth > maxWidth || originalHeight > maxHeight) {
-                    const widthRatio = maxWidth / originalWidth;
-                    const heightRatio = maxHeight / originalHeight;
-                    scale = Math.min(widthRatio, heightRatio)
+                // if (zoom < 1) scale = 1; // Prevent shrink below 1x
+              
+                // Set canvas size to fixed 300x300
+                canvas.width = maxSize;
+                canvas.height = maxSize;
+              
+                // Get original image dimensions
+                const originalWidth = newImage.width;
+                const originalHeight = newImage.height;
+              
+                // Preserve aspect ratio while fitting within maxSize
+                const aspectRatio = originalWidth / originalHeight;
+                let targetWidth, targetHeight;
+              
+                if (aspectRatio > 1) {
+                  // Landscape image
+                  targetWidth = maxSize * scale;
+                  targetHeight = (maxSize / aspectRatio) * scale;
+                } else {
+                  // Portrait or square image
+                  targetHeight = maxSize * scale;
+                  targetWidth = (maxSize * aspectRatio) * scale;
                 }
-                
-                canvas.width = maxWidth;
-                canvas.height = maxHeight;
-
-                const newWidth = originalHeight * scale;
-                const newHeight = originalHeight * scale;
-        
-                const offsetX = (maxWidth - newWidth) / 2;
-                const offsetY = (maxHeight - newHeight) / 2;
-        
-                ctx?.clearRect(0, 0, maxWidth, maxHeight);
-                ctx.drawImage(newImage, offsetX, offsetY, newWidth, newHeight);
+              
+                // Ensure at least maxSize x maxSize (crop if needed)
+                // if (targetWidth < maxSize) targetWidth = maxSize;
+                // if (targetHeight < maxSize) targetHeight = maxSize;
+              
+                // Calculate center position (so it doesn't cut off incorrectly)
+                const offsetX = (maxSize - targetWidth) / 2;
+                const offsetY = (maxSize - targetHeight) / 2;
+              
+                // Clear canvas
+                ctx.clearRect(0, 0, maxSize, maxSize);
+              
+                if (zoom < 1) {
+                  // Add transparency for padding when zooming out
+                  ctx.fillStyle = "rgba(0,0,0,0)";
+                  ctx.fillRect(0, 0, maxSize, maxSize);
+                }
+              
+                // Draw the scaled image properly centered
+                ctx.drawImage(newImage, offsetX, offsetY, targetWidth, targetHeight);
                 
                 canvas.toBlob(async (blob) => {
                     if (!blob) {
