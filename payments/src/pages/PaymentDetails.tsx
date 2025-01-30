@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import PaymentModal from "../components/PaymentModal";
 import DateSearch from "../components/DateSearch";
-import { addToCartThunk, cancelSubscriptionThunk, changeAutoRenewThunk, getBillingHistoryThunk, getDomainsListThunk, getPaymentMethodsThunk, getPaymentSubscriptionsListThunk, makeDefaultPaymentMethodThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
+import { addToCartThunk, cancelSubscriptionThunk, changeAutoRenewThunk, getBase64ImageThunk, getBillingHistoryThunk, getDomainsListThunk, getPaymentMethodsThunk, getPaymentSubscriptionsListThunk, makeDefaultPaymentMethodThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { DateRangePicker } from "rsuite";
@@ -89,6 +89,8 @@ const PaymentDetails: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { customerId, paymentDetailsFilterSlice, itemsPerPageSlice, currentPageNumber, userDetails, defaultCurrencySlice, cartState, rolePermission, isAdmin } = useAppSelector(state => state.auth);
+
+  console.log("customer id...", customerId);
   
   useEffect(() => {
     const checkPermission = (label:String) => {
@@ -107,12 +109,19 @@ const PaymentDetails: React.FC = () => {
     checkPermission("Payment Subscription");
   }, [rolePermission]);
 
-  const initialFilter = {
+  const [initialFilter, setInitialFilter] = useState({
     customer_id: customerId,
     start_date: "",
     end_date: "",
     domain_name: ""
-  };
+  });
+
+  useEffect(() => {
+    setInitialFilter({
+      ...initialFilter,
+      customer_id: customerId
+    })
+  }, [customerId]);
 
   const [openModalIndex, setOpenModalIndex] = useState<number | null>(null);
   const [modalPosition, setModalPosition] = useState<{
@@ -127,7 +136,7 @@ const PaymentDetails: React.FC = () => {
   };
 
   const [paymentDetails, setPaymentDetails]= useState([]);
-  // console.log("payment details...", paymentDetails);
+  console.log("payment details...", paymentDetails);
   const [filter, setFilter] = useState(paymentDetailsFilterSlice === null ? initialFilter : paymentDetailsFilterSlice);
   console.log("filter...", filter);
   const [range, setRange] = useState<[Date | null, Date | null]>([null, null]);
@@ -145,7 +154,7 @@ const PaymentDetails: React.FC = () => {
   console.log("invoiceData...",invoiceData);
   const pdfRef = useRef(null);
   const [paymentMethods, setPaymentMethods] = useState([]);
-  // console.log("paymentMethods...", paymentMethods);
+  console.log("paymentMethods...", paymentMethods);
   const [subscriptionId, setSubscriptionId] = useState("");
   const [selectedDomain, setSelectedDomain] = useState(paymentDetailsFilterSlice === null ? "" : paymentDetailsFilterSlice?.domain_name);
 
@@ -176,6 +185,40 @@ const PaymentDetails: React.FC = () => {
   const [renewalStatus, setRenewalStatus] = useState(false);
 
   const [activePlan, setActivePlan] = useState<object|null>(null);
+
+  const [base64ImageLogo, setBase64ImageLogo] = useState("");
+  // console.log("base64ImageLogo...", base64ImageLogo);
+  const [paymentMethodImage, setPaymentMethodImage] = useState("");
+  console.log("paymentMethodImage...", paymentMethodImage);
+
+  const getBase64ImageLogo = async() => {
+    try {
+      const result = await dispatch(getBase64ImageThunk({url: logo})).unwrap();
+      setBase64ImageLogo(result?.base64);
+    } catch (error) {
+      setBase64ImageLogo("");
+    }
+  };
+
+  useEffect(() => {
+    getBase64ImageLogo();
+  }, []);
+
+  const getBase64ImagePaymentMethod = async(url:string) => {
+    try {
+      const result = await dispatch(getBase64ImageThunk({url: url})).unwrap();
+      setPaymentMethodImage(result?.base64);
+    } catch (error) {
+      setPaymentMethodImage("");
+    }
+  };
+
+  useEffect(() => {
+    if(billingHistoryData !== null && paymentMethods?.length > 0) {
+      const paymentGatewayImage = paymentMethods?.find(item => item?.method_name?.toLowerCase() === billingHistoryData?.payment_method?.toLowerCase())?.method_image;
+      getBase64ImagePaymentMethod(paymentGatewayImage);
+    }
+  }, [paymentMethods, billingHistoryData]);
 
   const renewalDate = (datee) => {
     const miliseconds = parseInt(datee?._seconds) * 1000 + parseInt(datee?._nanoseconds) / 1e6;
@@ -290,6 +333,7 @@ const PaymentDetails: React.FC = () => {
   useEffect(() => {
     if(billingHistoryList?.length > 0 && invoiceData !== null) {
       const foundData = billingHistoryList?.find(item => item?.subscription_id === invoiceData?.id);
+      console.log("foundData...", foundData);
       setBillingHistoryData(foundData);
     } else {
       setBillingHistoryData(null);
@@ -404,11 +448,13 @@ const PaymentDetails: React.FC = () => {
   }, [range]);
 
   useEffect(() => {
-    setFilter({
-      ...filter,
-      customer_id: customerId,
-    });
-  }, [customerId]);
+    if(filter?.customer_id === "") {
+      setFilter({
+        ...filter,
+        customer_id: customerId,
+      });
+    }
+  }, [customerId, filter]);
 
   useEffect(() => {
     setFilter({
@@ -486,14 +532,21 @@ const PaymentDetails: React.FC = () => {
     if (imgData.startsWith('data:image/png;base64,')) {
       const pdf = new jsPDF('p', 'mm', 'a4');
 
-      const fixedPdfWidth = 150;
-      const imgWidth = canvas.width / 2;
-      const imgHeight = canvas.height / 2;
+      const pdfWidth = 210;
+      const PdfHeight = 297;
 
-      const aspectRatio = imgHeight / imgWidth;
-      const adjustedHeight = fixedPdfWidth * aspectRatio;
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
 
-      pdf.addImage(imgData, 'PNG', 0, 0, fixedPdfWidth, adjustedHeight);
+      const scaleFactor = Math.min(pdfWidth / imgWidth, PdfHeight / imgHeight);
+
+      const adjustedWidth = (imgWidth * scaleFactor) - 10;
+      const adjustedHeight = (imgHeight * scaleFactor) - 10;
+
+      const xOffset = (pdfWidth - adjustedWidth) / 2;
+      const yOffset = (PdfHeight - adjustedHeight) / 2;
+
+      pdf.addImage(imgData, 'PNG', xOffset, 0, adjustedWidth, adjustedHeight);
 
       pdf.save('invoice.pdf');
     } else {
@@ -1103,7 +1156,7 @@ const PaymentDetails: React.FC = () => {
                         className='relative h-40 bg-white overflow-hidden'
                       >
                         <div
-                          className='absolute top-0 w-full h-full bg-[#12A833] transform -skew-y-[11deg] origin-top-left z-10'
+                          style={{position: 'absolute', top: 0, width: "100%", height: "100%", backgroundColor: '#12A833', zIndex: '10', transform: 'skewY(-11deg)', transformOrigin: 'top left'}}
                         ></div>
                         <div
                           className='absolute top-0 right-0 w-[200px] h-[80%] bg-[#f4f4f6] opacity-50 transform -skew-y-[17deg] origin-top-left z-10'
@@ -1121,7 +1174,7 @@ const PaymentDetails: React.FC = () => {
                             className='w-[60px] h-[60px] bg-white rounded-full border-4 border-white flex items-center justify-center shadow-lg'
                           >
                             <img
-                              src={logo}
+                              src={base64ImageLogo}
                               className='w-[51px] rounded-full object-cover'
                             />
                           </div>
@@ -1152,7 +1205,7 @@ const PaymentDetails: React.FC = () => {
                               <td className="font-inter font-normal text-sm items-start text-start content-start">Payment Method</td>
                               <td>
                                 <img
-                                  src={paymentMethods?.find(item => item?.method_name?.toLowerCase() === billingHistoryData?.payment_method?.toLowerCase())?.method_image}
+                                  src={paymentMethodImage}
                                   alt={billingHistoryData?.payment_method}
                                   className="w-10 object-contain"
                                 />

@@ -947,6 +947,15 @@ async function hereMapSearchApi(address:object): Promise<any> {
   }
 };
 
+async function getBase64ImageApi(url:string): Promise<any> {
+  try {
+    const result = await postApiCall(endPoints.getBase64Image, {url});
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 export const userApis = {
   userLoginApi,
   resendLoginOtpApi,
@@ -1040,4 +1049,6 @@ export const userApis = {
   paystackPayApi,
 
   hereMapSearchApi,
+
+  getBase64ImageApi,
 };

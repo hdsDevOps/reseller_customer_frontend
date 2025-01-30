@@ -101,6 +101,8 @@ export const endPoints = {
     // here platform
     hereMapSearch: 'customerservices/user/api/v1/get_address',
 
+    // change image to base64
+    getBase64Image: 'customerservices/customer/api/v1/create_base64',
 };
 
 export const resellerEndPoints = {

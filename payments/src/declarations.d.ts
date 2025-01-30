@@ -109,4 +109,5 @@ declare module 'store/user.thunk' {
   export const makeEmailAdminThunk;
   export const addNewDomainThunk;
   export const getLandingPageThunk;
+  export const getBase64ImageThunk;
 }

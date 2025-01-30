@@ -4,7 +4,7 @@ import SubscriptionModal from "../components/SubscriptionModal";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { addToCartThunk, cancelSubscriptionThunk, changeAutoRenewThunk, getBillingHistoryThunk, getDomainsListThunk, getPaymentMethodsThunk, getPaymentSubscriptionsListThunk, getStaffIdFromLSThunk, getStaffStatusFromLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, makeDefaultPaymentMethodThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
+import { addToCartThunk, cancelSubscriptionThunk, changeAutoRenewThunk, getBase64ImageThunk, getBillingHistoryThunk, getDomainsListThunk, getPaymentMethodsThunk, getPaymentSubscriptionsListThunk, getStaffIdFromLSThunk, getStaffStatusFromLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, makeDefaultPaymentMethodThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
 import { Download, Plus, X } from "lucide-react";
 import { format } from "date-fns";
 import html2canvas from 'html2canvas-pro';
@@ -129,6 +129,40 @@ const Dashboard: React.FC = () => {
   const [isExpirySectionOpen, setIsExpirySectionOpen] = useState(false);
   const [expiryData, setExpiryData] = useState(initialExpiryData);
   // console.log("expiryData...", expiryData);
+
+  const [base64ImageLogo, setBase64ImageLogo] = useState("");
+  // console.log("base64ImageLogo...", base64ImageLogo);
+  const [paymentMethodImage, setPaymentMethodImage] = useState("");
+  console.log("paymentMethodImage...", paymentMethodImage);
+
+  const getBase64ImageLogo = async() => {
+    try {
+      const result = await dispatch(getBase64ImageThunk({url: logo})).unwrap();
+      setBase64ImageLogo(result?.base64);
+    } catch (error) {
+      setBase64ImageLogo("");
+    }
+  };
+
+  useEffect(() => {
+    getBase64ImageLogo();
+  }, []);
+
+  const getBase64ImagePaymentMethod = async(url:string) => {
+    try {
+      const result = await dispatch(getBase64ImageThunk({url: url})).unwrap();
+      setPaymentMethodImage(result?.base64);
+    } catch (error) {
+      setPaymentMethodImage("");
+    }
+  };
+
+  useEffect(() => {
+    if(billingHistoryData !== null && paymentMethods?.length > 0) {
+      const paymentGatewayImage = paymentMethods?.find(item => item?.method_name?.toLowerCase() === billingHistoryData?.payment_method?.toLowerCase())?.method_image;
+      getBase64ImagePaymentMethod(paymentGatewayImage);
+    }
+  }, [paymentMethods, billingHistoryData]);
 
   useEffect(() => {
     const getExpiryDate = () => {
@@ -364,13 +398,13 @@ const Dashboard: React.FC = () => {
 
       const scaleFactor = Math.min(pdfWidth / imgWidth, PdfHeight / imgHeight);
 
-      const adjustedWidth = imgWidth * scaleFactor;
-      const adjustedHeight = imgHeight * scaleFactor;
+      const adjustedWidth = (imgWidth * scaleFactor) - 10;
+      const adjustedHeight = (imgHeight * scaleFactor) - 10;
 
       const xOffset = (pdfWidth - adjustedWidth) / 2;
       const yOffset = (PdfHeight - adjustedHeight) / 2;
 
-      pdf.addImage(imgData, 'PNG', xOffset, yOffset, adjustedWidth, adjustedHeight);
+      pdf.addImage(imgData, 'PNG', xOffset, 0, adjustedWidth, adjustedHeight);
 
       pdf.save('invoice.pdf');
     } else {
@@ -1009,7 +1043,7 @@ const Dashboard: React.FC = () => {
                           className='relative h-40 bg-white overflow-hidden'
                         >
                           <div
-                            className='absolute top-0 w-full h-full bg-[#12A833] transform -skew-y-[11deg] origin-top-left z-10'
+                            style={{position: 'absolute', top: 0, width: "100%", height: "100%", backgroundColor: '#12A833', zIndex: '10', transform: 'skewY(-11deg)', transformOrigin: 'top left'}}
                           ></div>
                           <div
                             className='absolute top-0 right-0 w-[200px] h-[80%] bg-[#f4f4f6] opacity-50 transform -skew-y-[17deg] origin-top-left z-10'
@@ -1027,7 +1061,7 @@ const Dashboard: React.FC = () => {
                               className='w-[60px] h-[60px] bg-white rounded-full border-4 border-white flex items-center justify-center shadow-lg'
                             >
                               <img
-                                src={logo}
+                                src={base64ImageLogo}
                                 className='w-[51px] rounded-full object-cover'
                               />
                             </div>
@@ -1058,7 +1092,7 @@ const Dashboard: React.FC = () => {
                                 <td className="font-inter font-normal text-sm items-start text-start content-start">Payment Method</td>
                                 <td>
                                   <img
-                                    src={paymentMethods?.find(item => item?.method_name?.toLowerCase() === billingHistoryData?.payment_method?.toLowerCase())?.method_image}
+                                    src={paymentMethodImage}
                                     alt={billingHistoryData?.payment_method}
                                     className="w-10 object-contain"
                                   />

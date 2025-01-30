@@ -8,11 +8,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { toast } from 'react-toastify';
-import { getProfileDataThunk, removeUserAuthTokenFromLSThunk, udpateProfileDataThunk, uploadProfilePhotoThunk } from 'store/user.thunk';
+import { getBase64ImageThunk, getProfileDataThunk, removeUserAuthTokenFromLSThunk, udpateProfileDataThunk, uploadProfilePhotoThunk } from 'store/user.thunk';
 import { setUserDetails } from 'store/authSlice';
 import ReactCrop, { centerCrop, Crop, makeAspectCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import { RiCameraFill } from 'react-icons/ri';
+import { Scale } from 'lucide-react';
 
 
 const HdsProfile = () => {
@@ -54,7 +55,9 @@ const HdsProfile = () => {
     const [image, setImage] = useState(null);
     // console.log("image...", image);
     console.log("user details...", userDetails);
-  
+
+    const [base64ProfileImage, setBase64ProfileImage] = useState("");
+
     const [crop, setCrop] = useState<Crop>({
       x: 0,
       y: 0,
@@ -63,6 +66,7 @@ const HdsProfile = () => {
       unit: '%',
     });
     const [zoom, setZoom] = useState(1);
+    console.log("zoom...", zoom);
     const imgRef = useRef(null);
     console.log("image ref...", imgRef);
 
@@ -90,6 +94,23 @@ const HdsProfile = () => {
         }
     };
 
+    const getBase64ProfileImage = async (url:string) => {
+        try {
+            const result = await dispatch(getBase64ImageThunk({url: url})).unwrap();
+            setBase64ProfileImage(result?.base64)
+        } catch (error) {
+            setBase64ProfileImage("")
+        }
+    };
+
+    useEffect(() => {
+        if(userDetails?.profile_image) {
+            getBase64ProfileImage(userDetails?.profile_image);
+        } else {
+            getBase64ProfileImage("https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/profile-image.png?alt=media&token=faf9b1b9-7e08-496a-a6c1-355911d7b384");
+        }
+    }, [userDetails?.profile_image]);
+
     useEffect(() => {
         showImage();
     }, [image]);
@@ -97,7 +118,7 @@ const HdsProfile = () => {
     const imageUpload = async(e) => {
         e.preventDefault();
         if(image === null) {
-          const defaultImageURL = userDetails?.profile_image;
+          const defaultImageURL = base64ProfileImage;
           // const defaultImageURL = 'http://localhost:3000/images/logo.jpeg'
     
           const response = await fetch(defaultImageURL);
@@ -132,8 +153,10 @@ const HdsProfile = () => {
               } else {
                 const file = new File([blob], "resized-image.png", {type: 'image/png'});
                 const result = await dispatch(uploadProfilePhotoThunk({image: file, user_id: customerId, staff_id: staffId, is_staff: staffStatus})).unwrap();
-                // toast.success("Profile image updated successfully");
-                console.log("result...", result);
+                toast.success("Profile image updated successfully");
+                // console.log("result...", result);
+                const getProfile = await dispatch(getProfileDataThunk({user_id: customerId})).unwrap();
+                await dispatch(setUserDetails(getProfile?.customerData));
               }
             })
           } catch (error) {
@@ -148,47 +171,60 @@ const HdsProfile = () => {
             }
             console.log("error...", error);
           } finally {
-            // dispatch(setUserDetails(profile));
-            // setImageModal(false);
-            // setImage(null);
-            // setZoom(1);
+                setImageModal(false);
+                setImage(null);
+                setZoom(1);
           }
         } else {
           try {
-            const imageFile = imgRef.current;
+            const imageFile = image;
     
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
+
+            const newImage = new Image();
+            newImage.src = URL.createObjectURL(imageFile);
     
-            const scale = zoom;
-            const naturalWidth = imageFile.naturalWidth;
-            const naturalHeight = imageFile.naturalHeight;
-            const width = naturalWidth * scale;
-            const height = naturalHeight * scale;
-            
-            canvas.width = 300;
-            canvas.height = 300;
-    
-            const offsetX = (300 - width) / 2;
-            const offsetY = (300 - height) / 2;
-    
-            ctx?.clearRect(0, 0, 300, 300);
-            ctx.drawImage(imageFile, offsetX, offsetY, width, height);
-            
-            canvas.toBlob(async (blob) => {
-              if (!blob) {
-                return;
-              } else {
-                const file = new File([blob], "resized-image.png", {type: 'image/png'});
-                const result = await dispatch(uploadProfilePhotoThunk({image: file, user_id: customerId, staff_id: staffId, is_staff: staffStatus})).unwrap();
-                console.log("result2...", result);
-                toast.success("Profile image updated successfully");
-                const getProfile = await dispatch(getProfileDataThunk({
-                  user_id: customerId
-                })).unwrap();
-                await dispatch(setUserDetails(getProfile?.customerData));
-              }
-            })
+            newImage.onload = async () => {
+                const originalWidth  = newImage.width;
+                const originalHeight  = newImage.height;
+
+                const maxWidth = 300;
+                const maxHeight = 300;
+
+                let scale = zoom;
+                
+                if (originalWidth > maxWidth || originalHeight > maxHeight) {
+                    const widthRatio = maxWidth / originalWidth;
+                    const heightRatio = maxHeight / originalHeight;
+                    scale = Math.min(widthRatio, heightRatio)
+                }
+                
+                canvas.width = maxWidth;
+                canvas.height = maxHeight;
+
+                const newWidth = originalHeight * scale;
+                const newHeight = originalHeight * scale;
+        
+                const offsetX = (maxWidth - newWidth) / 2;
+                const offsetY = (maxHeight - newHeight) / 2;
+        
+                ctx?.clearRect(0, 0, maxWidth, maxHeight);
+                ctx.drawImage(newImage, offsetX, offsetY, newWidth, newHeight);
+                
+                canvas.toBlob(async (blob) => {
+                    if (!blob) {
+                        return;
+                    } else {
+                        const file = new File([blob], "resized-image.png", {type: 'image/png'});
+                        const result = await dispatch(uploadProfilePhotoThunk({image: file, user_id: customerId, staff_id: staffId, is_staff: staffStatus})).unwrap();
+                        // console.log("result2...", result);
+                        toast.success("Profile image updated successfully");
+                        const getProfile = await dispatch(getProfileDataThunk({user_id: customerId})).unwrap();
+                        await dispatch(setUserDetails(getProfile?.customerData));
+                    }
+                })
+            }
           } catch (error) {
             toast.error("Error uploading profile image");
             if(error?.message == "Request failed with status code 401") {
@@ -460,12 +496,12 @@ const HdsProfile = () => {
                                         ref={imgRef}
                                         src={
                                             image === null
-                                            ? userDetails?.profile_image
-                                                ? userDetails?.profile_image : 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/profile-image.png?alt=media&token=faf9b1b9-7e08-496a-a6c1-355911d7b384'
+                                            ? base64ProfileImage
                                             : image
                                         }
                                         alt='profile picture'
-                                        className={`absolute top-0 left-0 transform scale-[${zoom}] duration-200 ease-in-out w-full h-full`}
+                                        // className={`absolute top-0 left-0 transform scale-[${zoom}] duration-200 ease-in-out w-full h-full`}
+                                        style={{position: 'absolute', top: '0', left: '0', transform: `scale(${zoom})`, transition: "transform 0.2s ease-in-out", width: "100%", height: "100%"}}
                                     />
                                     <div className='absolute inset-0 flex items-center justify-center'>
                                         <div className='w-full h-full rounded-full bg-transparent z-10' style={{boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.6)'}}></div>

@@ -12,7 +12,7 @@ import html2pdf from 'html2pdf.js'
 import BillingInvoice from "../components/BillingInvoice";
 import './invoice.css';
 import './pagination.css';
-import { getBillingHistoryThunk, getDomainsListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
+import { getBase64ImageThunk, getBillingHistoryThunk, getDomainsListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { useNavigate } from "react-router-dom";
 import { addDays, addMonths, endOfMonth, endOfWeek, format, startOfMonth, startOfWeek, subDays } from "date-fns";
@@ -21,6 +21,8 @@ import "rsuite/dist/rsuite.min.css";
 import { setCurrentPageNumberSlice, setBillingHistoryFilterSlice, setItemsPerPageSlice } from "store/authSlice";
 import ReactPaginate from "react-paginate";
 import DataTable from "react-data-table-component";
+
+const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899";
 
 const stripeImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/stripe.png?alt=media&token=23bd6672-665c-4dfb-9d75-155abd49dc58";
 const paystackImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/paystack.png?alt=media&token=8faf3870-4256-4810-9844-5fd3c147d7a3";
@@ -366,13 +368,13 @@ const BillingHistory: React.FC = () => {
 
       const scaleFactor = Math.min(pdfWidth / imgWidth, PdfHeight / imgHeight);
 
-      const adjustedWidth = imgWidth * scaleFactor;
-      const adjustedHeight = imgHeight * scaleFactor;
+      const adjustedWidth = (imgWidth * scaleFactor) - 10;
+      const adjustedHeight = (imgHeight * scaleFactor) - 10;
 
       const xOffset = (pdfWidth - adjustedWidth) / 2;
       const yOffset = (PdfHeight - adjustedHeight) / 2;
 
-      pdf.addImage(imgData, 'PNG', xOffset, yOffset, adjustedWidth, adjustedHeight);
+      pdf.addImage(imgData, 'PNG', xOffset, 0, adjustedWidth, adjustedHeight);
 
       pdf.save('invoice.pdf');
     } else {

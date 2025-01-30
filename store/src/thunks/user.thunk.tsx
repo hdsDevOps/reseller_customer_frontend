@@ -632,3 +632,10 @@ export const hereMapSearchThunk = createAsyncThunk(
     return await userApis.hereMapSearchApi(address);
   }
 );
+
+export const getBase64ImageThunk = createAsyncThunk(
+  "users/getBase64Image",
+  async ({url}:any) => {
+    return await userApis.getBase64ImageApi(url);
+  }
+);

@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { getPaymentMethodsThunk, getPaymentSubscriptionsListThunk } from 'store/user.thunk';
+import { getBase64ImageThunk, getPaymentMethodsThunk, getPaymentSubscriptionsListThunk } from 'store/user.thunk';
 
 const BillingInvoice: React.FC = ({pdfRef, data}) => {
   const { customerId } = useAppSelector(state => state.auth);
@@ -10,9 +10,58 @@ const BillingInvoice: React.FC = ({pdfRef, data}) => {
   const visa = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/visa-logo-grey.png?alt=media&token=00881596-2fad-4385-82bb-a0269ae4b4fb";
   // const visa = "";
 
+  const stripeImageUrl = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/stripe.png?alt=media&token=23bd6672-665c-4dfb-9d75-155abd49dc58";
+  const paystackImageUrl = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/paystack.png?alt=media&token=8faf3870-4256-4810-9844-5fd3c147d7a3";
+
+  const { userDetails } = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
+
+  const [paymentMethods, setPaymentMethods] = useState([]);
+
   const [subscriptionList, setSubscriptionList] = useState([]);
   const [subscription, setSubscription] = useState<object|null>(null);
   // console.log("subscription...", subscription);
+  
+  const [base64ImageLogo, setBase64ImageLogo] = useState("");
+  // console.log("base64ImageLogo...", base64ImageLogo);
+  const [stripeImage, setStripeImage] = useState("");
+  const [paystackImage, setPaystackImage] = useState("");
+  // console.log("paymentMethodImage...", paymentMethodImage);
+
+  const getBase64ImageLogo = async() => {
+    try {
+      const result = await dispatch(getBase64ImageThunk({url: logo})).unwrap();
+      setBase64ImageLogo(result?.base64);
+    } catch (error) {
+      setBase64ImageLogo("");
+    }
+  };
+
+  useEffect(() => {
+    getBase64ImageLogo();
+  }, []);
+
+  const getBase64ImageStripe = async() => {
+    try {
+      const result = await dispatch(getBase64ImageThunk({url: stripeImageUrl})).unwrap();
+      setStripeImage(result?.base64);
+    } catch (error) {
+      setStripeImage("");
+    }
+  };
+  const getBase64ImagePaystack = async() => {
+    try {
+      const result = await dispatch(getBase64ImageThunk({url: paystackImageUrl})).unwrap();
+      setStripeImage(result?.base64);
+    } catch (error) {
+      setStripeImage("");
+    }
+  };
+
+  useEffect(() => {
+    getBase64ImageStripe();
+    getBase64ImagePaystack();
+  }, []);
   
   const getSubscriptionList = async() => {
     try {
@@ -36,11 +85,6 @@ const BillingInvoice: React.FC = ({pdfRef, data}) => {
   }, [subscriptionList, data]);
 
   // console.log("data...", data);
-
-  const { userDetails } = useAppSelector(state => state.auth);
-  const dispatch = useAppDispatch();
-
-  const [paymentMethods, setPaymentMethods] = useState([]);
 
   const formatDate = (seconds, nanoseconds) => {
     const miliseconds = parseInt(seconds) * 1000 + parseInt(nanoseconds) / 1e6;
@@ -77,7 +121,7 @@ const BillingInvoice: React.FC = ({pdfRef, data}) => {
         className='relative h-40 bg-white overflow-hidden'
       >
         <div
-          className='absolute top-0 w-full h-full bg-[#12A833] transform -skew-y-[11deg] origin-top-left z-10'
+          style={{position: 'absolute', top: 0, width: "100%", height: "100%", backgroundColor: '#12A833', zIndex: '10', transform: 'skewY(-11deg)', transformOrigin: 'top left'}}
         ></div>
         <div
           className='absolute top-0 right-0 w-[200px] h-[80%] bg-[#f4f4f6] opacity-50 transform -skew-y-[17deg] origin-top-left z-10'
@@ -95,7 +139,7 @@ const BillingInvoice: React.FC = ({pdfRef, data}) => {
             className='w-[60px] h-[60px] bg-white rounded-full border-4 border-white flex items-center justify-center shadow-lg'
           >
             <img
-              src={logo}
+              src={base64ImageLogo}
               className='w-[51px] rounded-full object-cover'
             />
           </div>
@@ -126,7 +170,13 @@ const BillingInvoice: React.FC = ({pdfRef, data}) => {
               <td className="font-inter font-normal text-sm items-start text-start content-start">Payment Method</td>
               <td>
                 <img
-                  src={paymentMethods?.find(item => item?.method_name?.toLowerCase() === data?.payment_method?.toLowerCase())?.method_image}
+                  src={
+                    data?.payment_method?.toLowerCase() === "stripe"
+                    ? stripeImage
+                    : data?.payment_method?.toLowerCase() === "paystack"
+                    ? paystackImage
+                    : ""
+                  }
                   alt={data?.payment_method}
                   className="w-10 object-contain"
                 />

@@ -110,6 +110,7 @@ declare module 'store/user.thunk' {
   export const getBillingHistoryThunk;
   export const verifyReCaptchaThunk;
   export const addSettingThunk;
+  export const getBase64ImageThunk;
 }
 
 declare module 'store/authSlice' {
