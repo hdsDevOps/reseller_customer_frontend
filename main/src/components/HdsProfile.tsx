@@ -492,17 +492,26 @@ const HdsProfile = () => {
                                     onChange={(newCrop) => { setCrop(newCrop) }}
                                     className='w-[300px] h-[300px] relative overflow-hidden'
                                 >
-                                    <img
-                                        ref={imgRef}
-                                        src={
-                                            image === null
-                                            ? base64ProfileImage
-                                            : image
-                                        }
-                                        alt='profile picture'
-                                        // className={`absolute top-0 left-0 transform scale-[${zoom}] duration-200 ease-in-out w-full h-full`}
-                                        style={{position: 'absolute', top: '0', left: '0', transform: `scale(${zoom})`, transition: "transform 0.2s ease-in-out", width: "100%", height: "100%"}}
-                                    />
+                                    {
+                                        image === null || userDetails?.profile_image === null || userDetails?.profile_image === "" || userDetails?.profile_image === undefined
+                                        ? (
+                                            <div className={`absolute top-0 left-0 bottom-0 right-0 transform duration-200 ease-in-out w-full h-full items-center`}>
+                                                <p className='my-auto text-center items-center pt-32'>Add profile photo from the camera icon</p>
+                                            </div>
+                                        ) : (
+                                            <img
+                                                ref={imgRef}
+                                                src={
+                                                    image === null
+                                                    ? base64ProfileImage
+                                                    : image
+                                                }
+                                                alt='profile picture'
+                                                // className={`absolute top-0 left-0 transform scale-[${zoom}] duration-200 ease-in-out w-full h-full`}
+                                                style={{position: 'absolute', top: '0', left: '0', transform: `scale(${zoom})`, transition: "transform 0.2s ease-in-out", width: "100%", height: "100%"}}
+                                            />
+                                        )
+                                    }
                                     <div className='absolute inset-0 flex items-center justify-center'>
                                         <div className='w-full h-full rounded-full bg-transparent z-10' style={{boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.6)'}}></div>
                                         {/* <div className='absolute inset-0 bg-black opacity-50 mix-blend-darken pointer-events-none'></div> */}

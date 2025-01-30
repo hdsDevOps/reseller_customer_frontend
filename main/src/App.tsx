@@ -302,7 +302,7 @@ const App: React.FC = () => {
           if(error?.message == "Request failed with status code 401") {
             try { 
               const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
-              navigate('/login');
+              navigate('/home');
             } catch (error) {
               //
             }
