@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { addSettingThunk, deleteSettingThunk, editSettingThunk, getSettingsListThunk, removeUserAuthTokenFromLSThunk } from 'store/user.thunk';
+import { ArrowRightLeft, ChevronRight } from 'lucide-react';
 
 const initialData = {
   user_type: '', permissions: [
@@ -60,6 +61,7 @@ const Settings = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef();
   const [deleteId, setDeleteId] = useState("");
+  const [sortdata, setSortdata] = useState({sort_text: "", order: "asc"});
 
   useEffect(() => {
     if(userTypes.length > 0 && filter !== "") {
@@ -73,7 +75,8 @@ const Settings = () => {
     try {
       const result = await dispatch(getSettingsListThunk({
         user_id: customerId,
-        user_type: type
+        user_type: type,
+        sortdata: sortdata
       })).unwrap();
 
       setUserTypes(result?.settings);
@@ -92,7 +95,7 @@ const Settings = () => {
 
   useEffect(() => {
     getUserTypes();
-  }, [customerId, type]);
+  }, [customerId, type, sortdata]);
 
   const handleClickOutsideDropdown = (event: MouseEvent) => {
     if(dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -304,7 +307,15 @@ const Settings = () => {
           <table className='mt-6 min-w-full text-center'>
             <thead>
               <tr className='text-[#777777] text-base font-bold font-inter bg-[#F7FAFF]'>
-                <th>User Type</th>
+                <th>
+                  User Type
+                  <span className="ml-1"><button type="button" onClick={() => {
+                  setSortdata({
+                    sort_text: "user_type",
+                    order: sortdata?.sort_text === "user_type" ? "desc" : "asc"
+                  })
+                }}><ArrowRightLeft className="w-3 h-3" style={{rotate: "90deg"}} /></button></span>
+                </th>
                 <th>Permission</th>
                 <th>Action</th>
               </tr>

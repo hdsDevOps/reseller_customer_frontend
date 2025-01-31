@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { removeUserAuthTokenFromLSThunk, udpateProfileDataThunk, hereMapSearchThunk, getProfileDataThunk, getRoleIdFromLSThunk } from 'store/user.thunk';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { setRoleIdSlice, setUserDetails } from 'store/authSlice';
+import { setRoleIdSlice, setStaffDetails, setUserDetails } from 'store/authSlice';
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import axios from 'axios';
@@ -18,7 +18,18 @@ interface EditProfileProps  {
 const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { userDetails, customerId, staffId, staffStatus } = useAppSelector(state => state.auth);
+  const { userDetails, staffDetails, customerId, staffId, staffStatus,rolePermission } = useAppSelector(state => state.auth);
+  
+  const [profileDetails, setProfileDetails] = useState({});
+  // console.log("profile details...", profileDetails);
+
+  useEffect(() => {
+    if(staffStatus) {
+      setProfileDetails(staffDetails);
+    } else {
+      setProfileDetails(userDetails);
+    }
+  }, [staffStatus, staffDetails, userDetails]);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showCPassword, setShowCPassword] = useState(false);
@@ -26,11 +37,16 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
 
   const [hereMapList, setHereMapList] = useState([]);
   // console.log("hereMapList...", hereMapList);
-  const [hereAddress, setHereAddress] = useState<object|null>(userDetails?.address);
+  const [hereAddress, setHereAddress] = useState<object|null>(profileDetails?.address);
   console.log("hereAddress...", hereAddress);
-  const [hereInput, setHereInput] = useState(userDetails?.address?.title || "");
+  const [hereInput, setHereInput] = useState(profileDetails?.address?.title || "");
   const [isHereDropdownOpen, setIsHereDropdownOpen] = useState(false);
   const hereRef = useRef(null);
+
+  useEffect(() => {
+    setHereAddress(profileDetails?.address);
+    setHereInput(profileDetails?.address?.title || "");
+  }, [profileDetails?.address]);
 
   useEffect(() => {
     if(hereInput !== '' && hereInput !== data?.address?.title && hereMapList?.length > 0) {
@@ -38,8 +54,12 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
     }
   }, [hereMapList, hereInput, data?.address]);
 
-  const [data, setData] = useState(userDetails);
+  const [data, setData] = useState(profileDetails);
   console.log("data...", data);
+
+  useEffect(() => {
+    setData({...profileDetails});
+  }, [profileDetails]);
 
   const handleChangeData = e => {
     setData({
@@ -109,6 +129,15 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
     }
   };
 
+  const checkPermission = () => {
+    if(rolePermission?.length > 0) {
+        console.log(rolePermission?.find(item => item?.name === "Profile"))
+        return rolePermission?.find(item => item?.name === "Profile")?.value;
+    } else {
+        return false;
+    }
+};
+
   useEffect(() => {
     if(hereInput !== "" && hereInput !== null || hereInput !== undefined) {
       getHereMapList();
@@ -116,10 +145,10 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
   }, [hereInput]);
 
   useEffect(() => {
-    if(userDetails?.phone_no === data?.phone_no) {
+    if(profileDetails?.phone_no === data?.phone_no) {
       setIsNumberValid(true);
     }
-  }, [userDetails, data]);
+  }, [profileDetails, data]);
   
   const handleClickOutsideCountry = (event: MouseEvent) => {
     if(countryRef.current && !countryRef.current.contains(event.target as Node)) {
@@ -505,19 +534,40 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
   };
 
   const getProfileData = async() => {
-    try {
-      const result = await dispatch(getProfileDataThunk({user_id: customerId, staff_id: staffId, is_staff: staffStatus})).unwrap();
-      // console.log("result...", result);
-      const roleData = await dispatch(getRoleIdFromLSThunk()).unwrap();
-      await dispatch(setUserDetails(result?.customerData));
-      await dispatch(setRoleIdSlice(roleData));
-    } catch (error) {
-      if(error?.message == "Request failed with status code 401") {
-        try {
-          const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
-          navigate('/login');
-        } catch (error) {
-          //
+    if(staffStatus) {
+      try {
+        const result = await dispatch(getProfileDataThunk({user_id: customerId, staff_id: staffId, is_staff: true})).unwrap();
+        const customerResult = await dispatch(getProfileDataThunk({user_id: customerId, staff_id: "", is_staff: false})).unwrap();
+        // console.log("result...", result);
+        const roleData = await dispatch(getRoleIdFromLSThunk()).unwrap();
+        await dispatch(setUserDetails(customerResult?.customerData));
+        await dispatch(setStaffDetails(result?.customerData));
+        await dispatch(setRoleIdSlice(roleData));
+      } catch (error) {
+        if(error?.message == "Request failed with status code 401") {
+          try { 
+            const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+            navigate('/home');
+          } catch (error) {
+            //
+          }
+        }
+      }
+    } else {
+      try {
+        const result = await dispatch(getProfileDataThunk({user_id: customerId, staff_id: "", is_staff: false})).unwrap();
+        // console.log("result...", result);
+        const roleData = await dispatch(getRoleIdFromLSThunk()).unwrap();
+        await dispatch(setUserDetails(result?.customerData));
+        await dispatch(setRoleIdSlice(roleData));
+      } catch (error) {
+        if(error?.message == "Request failed with status code 401") {
+          try { 
+            const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+            navigate('/home');
+          } catch (error) {
+            //
+          }
         }
       }
     }
@@ -536,27 +586,69 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
               toast.warning("Password and Confirm Password do not match");
             } else {
               if(validateForm()) {
-                const result = await dispatch(udpateProfileDataThunk({
-                  user_id: customerId,
-                  first_name: data?.first_name,
-                  last_name: data?.last_name,
-                  email: data?.email,
-                  phone_no: data?.phone_no,
-                  address: data?.address,
-                  state: data?.state,
-                  city: data?.city,
-                  country: data?.country,
-                  password: data?.password,
-                  business_name: data?.business_name,
-                  business_state: data?.business_state,
-                  business_city: data?.business_city,
-                  zipcode: data?.zipcode,
-                  staff_id: staffId,
-                  is_staff: staffStatus
-                })).unwrap();
-                toast.success(result?.message);
-                handleCloseShowModal();
-                await dispatch(setUserDetails(data));
+                if(staffStatus) {
+                  const result = await dispatch(udpateProfileDataThunk({
+                    user_id: customerId,
+                    first_name: data?.first_name,
+                    last_name: data?.last_name,
+                    email: data?.email,
+                    phone_no: data?.phone_no,
+                    address: data?.address,
+                    state: data?.state,
+                    city: data?.city,
+                    country: data?.country,
+                    password: data?.password,
+                    business_name: "",
+                    business_state: "",
+                    business_city: "",
+                    zipcode: data?.zipcode,
+                    staff_id: staffId,
+                    is_staff: true
+                  })).unwrap();
+                  await dispatch(udpateProfileDataThunk({
+                    user_id: customerId,
+                    first_name: userDetails?.first_name,
+                    last_name: userDetails?.last_name,
+                    email: userDetails?.email,
+                    phone_no: userDetails?.phone_no,
+                    address: userDetails?.address,
+                    state: userDetails?.state,
+                    city: userDetails?.city,
+                    country: userDetails?.country,
+                    password: "",
+                    business_name: data?.business_name,
+                    business_state: data?.business_state,
+                    business_city: data?.business_city,
+                    zipcode: userDetails?.zipcode,
+                    staff_id: "",
+                    is_staff: false
+                  })).unwrap();
+                  await getProfileData();
+                  toast.success(result?.message);
+                  handleCloseShowModal();
+                } else {
+                  const result = await dispatch(udpateProfileDataThunk({
+                    user_id: customerId,
+                    first_name: data?.first_name,
+                    last_name: data?.last_name,
+                    email: data?.email,
+                    phone_no: data?.phone_no,
+                    address: data?.address,
+                    state: data?.state,
+                    city: data?.city,
+                    country: data?.country,
+                    password: data?.password,
+                    business_name: data?.business_name,
+                    business_state: data?.business_state,
+                    business_city: data?.business_city,
+                    zipcode: data?.zipcode,
+                    staff_id: "",
+                    is_staff: false
+                  })).unwrap();
+                  await getProfileData();
+                  toast.success(result?.message);
+                  handleCloseShowModal();
+                }
               } else {
                 toast.warning("Input fields cannot be empty");
               }
@@ -566,26 +658,69 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
           }
         } else {
           if(validateForm()) {
-            const result = await dispatch(udpateProfileDataThunk({
-              user_id: customerId,
-              first_name: data?.first_name,
-              last_name: data?.last_name,
-              email: data?.email,
-              phone_no: data?.phone_no,
-              address: data?.address,
-              state: data?.state,
-              city: data?.city,
-              country: data?.country,
-              business_name: data?.business_name,
-              business_state: data?.business_state,
-              business_city: data?.business_city,
-              zipcode: data?.zipcode,
-              staff_id: staffId,
-              is_staff: staffStatus
-            })).unwrap();
-            toast.success(result?.message);
-            handleCloseShowModal();
-            await dispatch(setUserDetails(data));
+            if(staffStatus) {
+              const result = await dispatch(udpateProfileDataThunk({
+                user_id: customerId,
+                first_name: data?.first_name,
+                last_name: data?.last_name,
+                email: data?.email,
+                phone_no: data?.phone_no,
+                address: data?.address,
+                state: data?.state,
+                city: data?.city,
+                country: data?.country,
+                password: "",
+                business_name: "",
+                business_state: "",
+                business_city: "",
+                zipcode: data?.zipcode,
+                staff_id: staffId,
+                is_staff: true
+              })).unwrap();
+              await dispatch(udpateProfileDataThunk({
+                user_id: customerId,
+                first_name: userDetails?.first_name,
+                last_name: userDetails?.last_name,
+                email: userDetails?.email,
+                phone_no: userDetails?.phone_no,
+                address: userDetails?.address,
+                state: userDetails?.state,
+                city: userDetails?.city,
+                country: userDetails?.country,
+                password: "",
+                business_name: data?.business_name,
+                business_state: data?.business_state,
+                business_city: data?.business_city,
+                zipcode: userDetails?.zipcode,
+                staff_id: "",
+                is_staff: false
+              })).unwrap();
+              await getProfileData();
+              toast.success(result?.message);
+              handleCloseShowModal();
+            } else {
+              const result = await dispatch(udpateProfileDataThunk({
+                user_id: customerId,
+                first_name: data?.first_name,
+                last_name: data?.last_name,
+                email: data?.email,
+                phone_no: data?.phone_no,
+                address: data?.address,
+                state: data?.state,
+                city: data?.city,
+                country: data?.country,
+                password: "",
+                business_name: data?.business_name,
+                business_state: data?.business_state,
+                business_city: data?.business_city,
+                zipcode: data?.zipcode,
+                staff_id: "",
+                is_staff: false
+              })).unwrap();
+              await getProfileData();
+              toast.success(result?.message);
+              handleCloseShowModal();
+            }
           } else {
             toast.warning("Input fields cannot be empty");
           }
@@ -942,118 +1077,125 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
               </button>
             </div>
           </div>
-          <h2 className='text-lg font-bold text-[#14213D] mt-6'>Business information</h2>
-          <div className='grid grid-cols-2 gap-3 mt-4 items-center'>
-            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
-              <input
-                type="text"
-                className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                value={data?.business_name}
-                name='business_name'
-                onChange={handleChangeData}
-              />
-              <label
-                htmlFor="business_name"
-                className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-              >Business Name</label>
-            </div>
-            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto" ref={businessStateRef}>
-              <input
-                type="text"
-                className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                value={data?.business_state || businessStateName}
-                name='business_state'
-                onChange={e => {
-                  setData({
-                    ...data,
-                    business_state: "",
-                    business_city: ""
-                  });
-                  setBusinessStateName(e.target.value);
-                  setBusinessCityName("");
-                  setBusinessState({});
-                  setBusinessCity({});
-                }}
-                onFocus={() => {setBusinessStateDropdownOpen(true)}}
-              />
-              <label
-                htmlFor="business_state"
-                className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-              >Business State</label>
-              {
-                businessStateDropdownOpen && (
-                  <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+          {
+            checkPermission() && (
+              <React.Fragment>
+                <h2 className='text-lg font-bold text-[#14213D] mt-6'>Business information</h2>
+                <div className='grid grid-cols-2 gap-3 mt-4 items-center'>
+                  <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto">
+                    <input
+                      type="text"
+                      className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
+                      value={data?.business_name}
+                      name='business_name'
+                      onChange={handleChangeData}
+                    />
+                    <label
+                      htmlFor="business_name"
+                      className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+                    >Business Name</label>
+                  </div>
+                  <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto" ref={businessStateRef}>
+                    <input
+                      type="text"
+                      className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
+                      value={data?.business_state || businessStateName}
+                      name='business_state'
+                      onChange={e => {
+                        setData({
+                          ...data,
+                          business_state: "",
+                          business_city: ""
+                        });
+                        setBusinessStateName(e.target.value);
+                        setBusinessCityName("");
+                        setBusinessState({});
+                        setBusinessCity({});
+                      }}
+                      onFocus={() => {setBusinessStateDropdownOpen(true)}}
+                    />
+                    <label
+                      htmlFor="business_state"
+                      className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+                    >Business State</label>
                     {
-                      businessStates?.filter(name => name?.name.toLowerCase().includes(businessStateName.toLowerCase())).map((region, idx) => (
-                        <p
-                          key={idx}
-                          className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
-                          onClick={() => {
-                            setData({
-                              ...data,
-                              business_state: region?.name,
-                              business_city: ""
-                            });
-                            setBusinessStateName("");
-                            setBusinessCityName("");
-                            setBusinessState(region);
-                            setBusinessCity({});
-                            setBusinessStateDropdownOpen(false);
-                          }}
-                          dropdown-name="state_dropdown"
-                        >{region?.name}</p>
-                      ))
+                      businessStateDropdownOpen && (
+                        <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+                          {
+                            businessStates?.filter(name => name?.name.toLowerCase().includes(businessStateName.toLowerCase())).map((region, idx) => (
+                              <p
+                                key={idx}
+                                className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                                onClick={() => {
+                                  setData({
+                                    ...data,
+                                    business_state: region?.name,
+                                    business_city: ""
+                                  });
+                                  setBusinessStateName("");
+                                  setBusinessCityName("");
+                                  setBusinessState(region);
+                                  setBusinessCity({});
+                                  setBusinessStateDropdownOpen(false);
+                                }}
+                                dropdown-name="state_dropdown"
+                              >{region?.name}</p>
+                            ))
+                          }
+                        </div>
+                      )
                     }
                   </div>
-                )
-              }
-            </div>
-            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto" ref={businessCityRef}>
-              <input
-                type="text"
-                className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                value={data?.business_city || businessCityName}
-                name='business_city'
-                onChange={e => {
-                  setData({
-                    ...data,
-                    business_city: ""
-                  });
-                  setBusinessCityName(e.target.value);
-                  setBusinessCity({});
-                }}
-                onFocus={() => {setBusinessCityDropdownOpen(true)}}
-              />
-              <label
-                htmlFor="business_city"
-                className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
-              >Business City*</label>
-              {
-                businessCityDropdownOpen && (
-                  <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+                  <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto" ref={businessCityRef}>
+                    <input
+                      type="text"
+                      className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
+                      value={data?.business_city || businessCityName}
+                      name='business_city'
+                      onChange={e => {
+                        setData({
+                          ...data,
+                          business_city: ""
+                        });
+                        setBusinessCityName(e.target.value);
+                        setBusinessCity({});
+                      }}
+                      onFocus={() => {setBusinessCityDropdownOpen(true)}}
+                    />
+                    <label
+                      htmlFor="business_city"
+                      className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+                    >Business City*</label>
                     {
-                      businessCities?.filter(name => name?.name.toLowerCase().includes(businessCityName.toLowerCase())).map((region, idx) => (
-                        <p
-                          key={idx}
-                          className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
-                          onClick={() => {
-                            setData({
-                              ...data,
-                              business_city: region?.name
-                            });
-                            setBusinessCityName("");
-                            setBusinessCity(region);
-                            setBusinessCityDropdownOpen(false);
-                          }}
-                          dropdown-name="state_dropdown"
-                        >{region?.name}</p>
-                      ))
+                      businessCityDropdownOpen && (
+                        <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+                          {
+                            businessCities?.filter(name => name?.name.toLowerCase().includes(businessCityName.toLowerCase())).map((region, idx) => (
+                              <p
+                                key={idx}
+                                className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                                onClick={() => {
+                                  setData({
+                                    ...data,
+                                    business_city: region?.name
+                                  });
+                                  setBusinessCityName("");
+                                  setBusinessCity(region);
+                                  setBusinessCityDropdownOpen(false);
+                                }}
+                                dropdown-name="state_dropdown"
+                              >{region?.name}</p>
+                            ))
+                          }
+                        </div>
+                      )
                     }
                   </div>
-                )
-              }
-            </div>
-          </div>
+                </div>
+              </React.Fragment>
+            )
+          }
+          
           <div className='flex items-center justify-between mt-3 px-6'>
             <button
               type='submit' 

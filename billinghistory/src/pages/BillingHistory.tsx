@@ -10,6 +10,7 @@ import jsPDF from "jspdf";
 import { useReactToPrint } from 'react-to-print';
 import html2pdf from 'html2pdf.js'
 import BillingInvoice from "../components/BillingInvoice";
+import { ArrowRightLeft, ChevronRight } from 'lucide-react';
 import './invoice.css';
 import './pagination.css';
 import { getBase64ImageThunk, getBillingHistoryThunk, getDomainsListThunk, removeUserAuthTokenFromLSThunk } from "store/user.thunk";
@@ -99,6 +100,18 @@ const BillingHistory: React.FC = () => {
   const [selectedDomain, setSelectedDomain] = useState("");
   const [search, setSearch] = useState("");
   const [domainDropdownOpen, setDomainDropdownOpen] = useState(false);
+
+  const tableHeader = [
+    {name: "Transaction ID", label: "transaction_id"},
+    {name: "Date / Invoice", label: "date"},
+    {name: "Product Type", label: "product_type"},
+    {name: "Description", label: "description"},
+    {name: "Domain", label: "domain"},
+    {name: "Payment Method", label: "payment_method"},
+    {name: "Status", label: ""},
+    {name: "Amount", label: "amount"},
+    {name: "Invoice", label: ""},
+  ]
     
   useEffect(() => {
     const checkPermission = (label:String) => {
@@ -125,7 +138,11 @@ const BillingHistory: React.FC = () => {
     user_id: customerId,
     start_date: "",
     end_date: "",
-    domain: ""
+    domain: "",
+    sortdata: {
+      sort_text: "",
+      order: "asc"
+    }
   };
 
   const [billingHistoryFilter, setBillingHistoryFilter] = useState(billingHistoryFilterSlice === null ? initialFilter : billingHistoryFilterSlice);
@@ -491,22 +508,28 @@ const BillingHistory: React.FC = () => {
         <table className="min-w-[1360px] w-full" ref={pdfRef}>
           <thead>
             <tr className="bg-gray-100">
-              {[
-                "Transaction ID",
-                "Date / Invoice",
-                "Production Type",
-                "Description",
-                "Domain",
-                "Payment Method",
-                "Status",
-                "Amount",
-                "Invoice",
-              ].map((header) => (
+              {tableHeader.map((header, index) => (
                 <th
-                  key={header}
+                  key={index}
                   className="p-3 text-center text-xs sm:text-[0.8rem] font-semibold text-gray-500"
                 >
-                  {header}
+                  {header?.name}
+                  {
+                    header?.label === "domain" ||
+                    header?.label === "amount" ||
+                    header?.label === "date"
+                    ? (
+                      <span className="ml-1"><button type="button" onClick={() => {
+                        setBillingHistoryFilter({
+                          ...billingHistoryFilter,
+                          sortdata: {
+                            sort_text: header?.label,
+                            order: billingHistoryFilter?.sortdata?.sort_text === header?.label ? "desc" : "asc"
+                          }
+                        })
+                      }}><ArrowRightLeft className="w-3 h-3" style={{rotate: "90deg"}} /></button></span>
+                    ) : ""
+                  }
                 </th>
               ))}
             </tr>

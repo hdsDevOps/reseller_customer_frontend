@@ -47,6 +47,17 @@ const HdsProfile = () => {
     console.log("user details...", userDetails);
     console.log("staff details...", staffDetails);
 
+    const [profileDetails, setProfileDetails] = useState({});
+    // console.log("profile details...", profileDetails);
+
+    useEffect(() => {
+        if(staffStatus) {
+            setProfileDetails(staffDetails);
+        } else {
+            setProfileDetails(userDetails);
+        }
+    }, [staffStatus, staffDetails, userDetails]);
+
     const [base64ProfileImage, setBase64ProfileImage] = useState("");
 
     const [crop, setCrop] = useState<Crop>({
@@ -95,12 +106,12 @@ const HdsProfile = () => {
     };
 
     useEffect(() => {
-        if(userDetails?.profile_image) {
-            getBase64ProfileImage(userDetails?.profile_image);
+        if(profileDetails?.profile_image) {
+            getBase64ProfileImage(profileDetails?.profile_image);
         } else {
             getBase64ProfileImage("https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/profile-image.png?alt=media&token=faf9b1b9-7e08-496a-a6c1-355911d7b384");
         }
-    }, [userDetails?.profile_image]);
+    }, [profileDetails?.profile_image]);
 
     
 
@@ -280,16 +291,16 @@ const HdsProfile = () => {
         <div className='flex justify-between items-center pt-4'>
             <div className='relative'>
                 {
-                    userDetails?.profile_image
+                    profileDetails?.profile_image
                     ? (
                         <img
-                            src={userDetails?.profile_image}
+                            src={profileDetails?.profile_image}
                             className={`w-[93px] h-[93px] rounded-full object-contain border border-black`}
                             alt='profile_image'
                         />
                     ) : (
                         <div className='w-[93px] h-[93px] rounded-full object-contain border border-black bg-[#FF7272] items-center'>
-                            <p className='m-auto text-5xl px-[10px] py-4 text-white'>{getInitials(userDetails?.first_name || "J")}{getInitials(userDetails?.last_name || "D")}</p>
+                            <p className='m-auto text-5xl px-[10px] py-4 text-white'>{getInitials(profileDetails?.first_name || "J")}{getInitials(profileDetails?.last_name || "D")}</p>
                         </div>
                     )
                 }
@@ -304,9 +315,9 @@ const HdsProfile = () => {
              {showEditModal && <EditProfile handleCloseShowModal={handleCloseShowModal}/>}
         </div>
         <h4 className='text-[#14213D] font-medium text-3xl pt-3'>
-            <span className='capitalize'>{userDetails?.first_name || "John"}</span>
+            <span className='capitalize'>{profileDetails?.first_name || "John"}</span>
             &nbsp;
-            <span className='capitalize'>{userDetails?.last_name || "Doe"}</span>
+            <span className='capitalize'>{profileDetails?.last_name || "Doe"}</span>
         </h4>
         <p className='text-sm text-[#434D64] pt-2 '>{staffStatus ? "Staff" : "User"}</p>
         <h2 className='text-lg font-bold text-[#14213D] mt-6'>Basic information</h2>
@@ -320,7 +331,7 @@ const HdsProfile = () => {
                     type="text"
                     id="userType"
                     className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                    value={userDetails?.first_name || "John"}
+                    value={profileDetails?.first_name || "John"}
                     disabled
                 />
             </div>
@@ -329,7 +340,7 @@ const HdsProfile = () => {
                     type="text"
                     id="userType"
                     className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                    value={userDetails?.last_name}
+                    value={profileDetails?.last_name}
                     disabled
                 />
                 <label
@@ -342,7 +353,7 @@ const HdsProfile = () => {
                     type="text"
                     id="Email"
                     className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                    value={userDetails?.email}
+                    value={profileDetails?.email}
                     disabled
                 />
                 <label
@@ -355,7 +366,7 @@ const HdsProfile = () => {
                     type="text"
                     id="8777593945"
                     className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-xs  bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                    value={`+${userDetails?.phone_no}`}
+                    value={`+${profileDetails?.phone_no}`}
                     disabled
                 />
                 <label
@@ -368,7 +379,7 @@ const HdsProfile = () => {
                     type="text"
                     id="Address"
                     className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                    value={userDetails?.address?.title}
+                    value={profileDetails?.address?.title}
                     disabled
                 />
                 <label
@@ -381,7 +392,7 @@ const HdsProfile = () => {
                     type="text"
                     id="Country"
                     className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                    value={userDetails?.country}
+                    value={profileDetails?.country}
                     disabled
                 />
                 <label
@@ -394,7 +405,7 @@ const HdsProfile = () => {
                     type="text"
                     id="State"
                     className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                    value={userDetails?.state}
+                    value={profileDetails?.state}
                     disabled
                 />
                 <label
@@ -407,7 +418,7 @@ const HdsProfile = () => {
                     type="text"
                     id="City"
                     className="block px-2.5 pb-1 pt-2 w-full text-[#14213D] text-sm  bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#434D64] focus:ring-0 focus:border-black peer"
-                    value={userDetails?.city}
+                    value={profileDetails?.city}
                     disabled
                 />
                 <label
@@ -424,7 +435,7 @@ const HdsProfile = () => {
                     type="text"
                     id="Zip code"
                     className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                    value={userDetails?.zipcode}
+                    value={profileDetails?.zipcode}
                     disabled
                 />
             </div>
@@ -522,7 +533,7 @@ const HdsProfile = () => {
                                     className='w-[300px] h-[300px] relative overflow-hidden'
                                 >
                                     {
-                                        image === null && userDetails?.profile_image === null || image === null && userDetails?.profile_image === "" || image === null && userDetails?.profile_image === undefined
+                                        image === null && profileDetails?.profile_image === null || image === null && profileDetails?.profile_image === "" || image === null && profileDetails?.profile_image === undefined
                                         ? (
                                             <div className={`absolute top-0 left-0 bottom-0 right-0 transform duration-200 ease-in-out w-full h-full items-center`}>
                                                 <p className='my-auto text-center items-center pt-32'>Add profile photo from the camera icon</p>

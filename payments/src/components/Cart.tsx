@@ -132,7 +132,8 @@ const Cart = () => {
           const priceArray = amountArray?.find(amount => amount?.currency_code === defaultCurrencySlice)?.price;
           const finalArray = priceArray?.find(price => price?.type?.toLowerCase() === workspaceCart?.payment_cycle?.toLowerCase());
           console.log({pre: finalArray?.discount_price, final: parseFloat(cartAddAmount(currentPlan, userDetails?.workspace?.payment_cycle)?.discount_price)})
-          setWorkspacePrice(cartAddAmount(currentPlan, userDetails?.workspace?.payment_cycle)?.discount_price ? (parseFloat(finalArray?.discount_price) - parseFloat(cartAddAmount(currentPlan, userDetails?.workspace?.payment_cycle)?.discount_price))?.toFixed(2) : finalArray?.discount_price);
+          // setWorkspacePrice(cartAddAmount(currentPlan, userDetails?.workspace?.payment_cycle)?.discount_price ? (parseFloat(finalArray?.discount_price) - parseFloat(cartAddAmount(currentPlan, userDetails?.workspace?.payment_cycle)?.discount_price))?.toFixed(2) : finalArray?.discount_price);
+          setWorkspacePrice(finalArray?.discount_price);
         } catch (error) {
           setWorkspacePrice(0);
         }
@@ -557,38 +558,10 @@ const Cart = () => {
                       <div className="flex flex-col justify-start
                      text-left">
                         <p className="text-xl font-inter font-bold text-black text-end flex flex-row">
-                          {
-                            item?.workspace_status === "trial"
-                            ? item?.product_type === "google workspace"
-                              ? (
-                                <>
-                                  <span className="line-through text-red-600">
-                                    {item?.total_year} x {currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{
-                                      item?.product_type === "google workspace"
-                                      ? workspacePrice
-                                      : item?.price[defaultCurrencySlice]
-                                    }
-                                  </span>
-                                  <span className="">{" "}{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}0</span>
-                                </>
-                              ) : (
-                                <>
-                                  {item?.total_year} x {currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{
-                                    item?.product_type === "google workspace"
-                                    ? workspacePrice
-                                    : item?.price[defaultCurrencySlice]
-                                  }
-                                </>
-                              )
-                            : (
-                              <>
-                                {item?.total_year} x {currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{
-                                  item?.product_type === "google workspace"
-                                  ? workspacePrice
-                                  : item?.price[defaultCurrencySlice]
-                                }
-                              </>
-                            )
+                          {item?.total_year} x {currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{
+                            item?.product_type === "google workspace"
+                            ? workspacePrice
+                            : item?.price[defaultCurrencySlice]
                           }
                         </p>
                         <small className="font-inter font-medium text-[8px] text-gray-400 self-end max-w-[70px]">

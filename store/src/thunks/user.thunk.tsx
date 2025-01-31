@@ -327,8 +327,8 @@ export const addToCartThunk = createAsyncThunk(
 
 export const getStaffListThunk = createAsyncThunk(
   "users/verifyLoginOtp",
-  async ({ user_type_id, user_id, search_text }: any) => {
-    return await userApis.getStaffListApi( user_type_id, user_id, search_text );
+  async ({ user_type_id, user_id, search_text, sortdata }: any) => {
+    return await userApis.getStaffListApi( user_type_id, user_id, search_text, sortdata );
   }
 );
 
@@ -362,8 +362,8 @@ export const deleteStaffThunk = createAsyncThunk(
 
 export const getSettingsListThunk = createAsyncThunk(
   "users/getSettingsList",
-  async ({ user_type, user_id }: any) => {
-    return await userApis.getSettingsListApi( user_type, user_id );
+  async ({ user_type, user_id, sortdata }: any) => {
+    return await userApis.getSettingsListApi( user_type, user_id, sortdata );
   }
 );
 
@@ -411,8 +411,8 @@ export const useVoucherThunk = createAsyncThunk(
 
 export const getBillingHistoryThunk = createAsyncThunk(
   "users/getBillingHistory",
-  async ({ user_id, start_date, end_date, domain }: any) => {
-    return await userApis.getBillingHistoryApi( user_id, start_date, end_date, domain );
+  async ({ user_id, start_date, end_date, domain, sortdata }: any) => {
+    return await userApis.getBillingHistoryApi( user_id, start_date, end_date, domain, sortdata );
   }
 );
 

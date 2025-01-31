@@ -22,7 +22,7 @@ const inititalCancel = {
 const initialExpiryData = {
   plan_name: "",
   is_trial: "",
-  days: 0,
+  days: 30,
   date: format(new Date(), "dd-MM-yyyy"),
 }
 
@@ -231,7 +231,7 @@ const Dashboard: React.FC = () => {
 
   const getBillingHistoryList = async() => {
     try {
-      const result = await dispatch(getBillingHistoryThunk({user_id: customerId, start_date: "", end_date: "", domain: ""})).unwrap();
+      const result = await dispatch(getBillingHistoryThunk({user_id: customerId, start_date: "", end_date: "", domain: "", sortdata:{sort_text: "", order: "asc"}})).unwrap();
       setBillingHistoryList(result?.data);
     } catch (error) {
       setBillingHistoryList([]);
@@ -363,6 +363,7 @@ const Dashboard: React.FC = () => {
         products: newCart
       })).unwrap();
       dispatch(setCart(newCart));
+      // console.log(newCart)
       navigate('/add-cart');
     } catch (error) {
       // console.log(error);
@@ -651,6 +652,7 @@ const Dashboard: React.FC = () => {
                   ? "text-[#FF0000]"
                   : ""
                 } border border-[#E02424] font-inter font-semibold text-sm rounded-[40px]`}
+                onClick={(e) => renewalAddToCart(e)}
               >{
                 expiryData?.days < 0
                 ? "Renew Plan"
@@ -736,15 +738,15 @@ const Dashboard: React.FC = () => {
                         }`}
                       >{
                         userDetails?.workspace?.workspace_status === "trial"
-                        ? formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days === 0
+                        ? expiryData?.days < 0
+                          ? "Expired"
+                          : expiryData?.days === 0
                           ? "Expired today"
-                          :  formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days === 1
+                          : expiryData?.days === 1
                           ? "1 day due"
-                          : formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days < 10
-                          ? `${formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days} days due`
-                          : formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days > 10
-                          ? "Free Trial"
-                          : "Expired"
+                          :  expiryData?.days < 10
+                          ? `${expiryData?.days} days due`
+                          : "Free Trial"
                         : formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.expired
                         ? formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days === 0
                           ? "Expired today"

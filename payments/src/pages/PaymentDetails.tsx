@@ -335,7 +335,7 @@ const PaymentDetails: React.FC = () => {
 
   const getBillingHistoryList = async() => {
     try {
-      const result = await dispatch(getBillingHistoryThunk({user_id: customerId, start_date: "", end_date: "", domain: ""})).unwrap();
+      const result = await dispatch(getBillingHistoryThunk({user_id: customerId, start_date: "", end_date: "", domain: "", sortdata:{sort_text: "", order: "asc"}})).unwrap();
       setBillingHistoryList(result?.data);
     } catch (error) {
       setBillingHistoryList([]);

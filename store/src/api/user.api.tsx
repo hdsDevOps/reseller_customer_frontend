@@ -356,9 +356,10 @@ async function getStaffListApi(
   user_type_id: string,
   user_id: string,
   search_text: string,
+  sortdata: object
 ): Promise<any> {
   try {
-    const result = await postApiCall(endPoints.getStaffList, { user_type_id, user_id, search_text });
+  const result = await postApiCall(endPoints.getStaffList, { user_type_id, user_id, search_text, sortdata });
     return result;
   } catch (error: any) {
     throw error;
@@ -427,10 +428,11 @@ async function deleteStaffApi(
 
 async function getSettingsListApi(
   user_type:string,
-  user_id:string
+  user_id:string,
+  sortdata: object
 ): Promise<any> {
   try {
-    const result = await postApiCall(endPoints.getSettingsList, { user_type, user_id });
+    const result = await postApiCall(endPoints.getSettingsList, { user_type, user_id, sortdata });
     return result;
   } catch (error: any) {
     throw error;
@@ -515,10 +517,11 @@ async function getBillingHistoryApi(
   user_id:string,
   start_date:string,
   end_date:string,
-  domain:string
+  domain:string,
+  sortdata:object
 ): Promise<any> {
   try {
-    const result = await postApiCall(endPoints.getBillingHistory, { user_id, start_date, end_date, domain });
+    const result = await postApiCall(endPoints.getBillingHistory, { user_id, start_date, end_date, domain, sortdata });
     return result;
   } catch (error: any) {
     throw error;

@@ -223,7 +223,7 @@ const App: React.FC = () => {
         await dispatch(setRolePermissionsSlice(hordansoAdminRolePermissions));
       } else {
         try {
-          const result = await dispatch(getSettingsListThunk({user_type: "", user_id: customerId})).unwrap();
+          const result = await dispatch(getSettingsListThunk({user_type: "", user_id: customerId, sortdata: {sort_text: "", order: ""}})).unwrap();
           // console.log("result...", result?.settings);
           if(result) {
             if(staffStatus) {

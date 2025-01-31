@@ -13,6 +13,7 @@ import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { useNavigate } from 'react-router-dom';
 import { addStaffThunk, deleteStaffThunk, editStaffThunk, getSettingsListThunk, getStaffListThunk, removeUserAuthTokenFromLSThunk } from 'store/user.thunk';
 import { toast } from 'react-toastify';
+import { ArrowRightLeft, ChevronRight } from 'lucide-react';
 
 const initialstaffs = [
   {initials:'RC',bgColor:'#23B7E5', name:'Robert Clive ',email:'Robertclive@domain.co.in',Phone:'(123) 456 - 7890',
@@ -56,7 +57,11 @@ const MyStaff = () => {
   const initialFilter = {
     user_type_id: '',
     user_id: customerId,
-    search_text: ''
+    search_text: '',
+    sortdata: {
+      sort_text: "",
+      order: "asc"
+    }
   };
   
   const [staffs, setStaffs] = useState([]);
@@ -113,7 +118,8 @@ const MyStaff = () => {
     try {
       const result = await dispatch(getSettingsListThunk({
         user_id: customerId,
-        user_type: ""
+        user_type: "",
+        sortdata: {sort_text: "", order: ""}
       })).unwrap();
       setUserTypes(result?.settings);
     } catch (error) {
@@ -418,7 +424,18 @@ const MyStaff = () => {
         <table className='mt-6 min-w-full text-center'>
           <thead>
             <tr className='text-[#777777] text-base font-bold font-inter bg-[#F7FAFF]'>
-              <th>Name</th>
+              <th>
+                Name
+                <span className="ml-1"><button type="button" onClick={() => {
+                  setFilter({
+                    ...filter,
+                    sortdata: {
+                      sort_text: "first_name",
+                      order: filter?.sortdata?.sort_text === "first_name" ? "desc" : "asc"
+                    }
+                  })
+                }}><ArrowRightLeft className="w-3 h-3" style={{rotate: "90deg"}} /></button></span>
+              </th>
               <th>Email</th>
               <th>Phone</th>
               <th>User Type</th>
