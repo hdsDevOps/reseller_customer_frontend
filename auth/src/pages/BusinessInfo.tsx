@@ -17,6 +17,13 @@ const BusinessInfo: React.FC = () => {
   const dispatch = useAppDispatch();
   const stateRef = useRef(null);
   const cityRef = useRef(null);
+              
+  useEffect(() => {
+  const section = document.getElementById("top_business_info");
+  if(section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+  }
+  }, []);
 
   console.log("state....", location.state);
 
@@ -299,7 +306,7 @@ const BusinessInfo: React.FC = () => {
   }, [formData]);
 
   return (
-    <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative">
+    <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative" id="top_business_info">
       {/* <p
         className="flex items-center gap-1 text-green-600 cursor-pointer absolute left-4 top-2"
         onClick={() => navigate(-1)}

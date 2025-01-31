@@ -85,6 +85,7 @@ declare module "store/user.thunk" {
   export const getHordansoAdminDetailsFromLSThunk;
   export const setHordansoAdminDetailsToLSThunk;
   export const removeHordansoAdminDetailsFromLSThunk;
+  export const getBase64ImageThunk;
 }
 
 

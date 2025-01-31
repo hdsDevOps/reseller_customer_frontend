@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { IoChevronBackSharp } from "react-icons/io5";
 import { AiOutlineCheck } from "react-icons/ai";
@@ -8,6 +8,13 @@ import { useAppSelector } from "store/hooks";
 const SelectedDomain: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+      
+  useEffect(() => {
+    const section = document.getElementById("top_selected_domain");
+    if(section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
 
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
@@ -19,7 +26,7 @@ const SelectedDomain: React.FC = () => {
   }
 
   return (
-    <div className="relative flex flex-col items-center justify-center w-full h-full gap-6 p-4">
+    <div className="relative flex flex-col items-center justify-center w-full h-full gap-6 p-4" id="top_selected_domain">
       <p
         className="absolute flex items-center gap-1 text-green-600 cursor-pointer left-4 top-2"
         onClick={() => navigate('/adddomain', {state: location.state})}

@@ -329,17 +329,21 @@ const BillingHistory: React.FC = () => {
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
 
-      const imgWidth = canvas.width / 2;
-      const imgHeight = canvas.height / 2;
+      const pdfWidth = 210;
+      const PdfHeight = 297;
 
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
 
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const finalWidth = imgWidth * ratio;
-      const finalHeight = imgHeight * ratio;
+      const scaleFactor = Math.min(pdfWidth / imgWidth, PdfHeight / imgHeight);
 
-      pdf.addImage(imgData, 'PNG', 0, 0, finalWidth, finalHeight);
+      const adjustedWidth = (imgWidth * scaleFactor) - 10;
+      const adjustedHeight = (imgHeight * scaleFactor) - 10;
+
+      const xOffset = (pdfWidth - adjustedWidth) / 2;
+      const yOffset = (PdfHeight - adjustedHeight) / 2;
+
+      pdf.addImage(imgData, 'PNG', xOffset, 0, adjustedWidth, adjustedHeight);
 
       pdf.save('revenue.pdf');
     } else {

@@ -20,9 +20,9 @@ const Subscribe: React.FC = () => {
     if(section) {
       section.scrollIntoView({ behavior: 'smooth' });
     }
-  })
+  }, []);
 
-  console.log("state...", location.state);
+  // console.log("state...", location.state);
 
   useEffect(() => {
     if(!location.state) {

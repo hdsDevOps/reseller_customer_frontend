@@ -96,8 +96,8 @@ const DropdownMenu = () => {
             </div>
           </li>
           <li className="border-t border-gray-200 my-1"></li>
-          {
-            checkPermission() && (
+          {/* {
+            checkPermission() && ( */}
               <li
                 onClick={() => {
                   navigate('/profile');
@@ -112,8 +112,8 @@ const DropdownMenu = () => {
                   <span>Profile Settings</span>
                 </a>
               </li>
-            )
-          }
+            {/* )
+          } */}
           
           <li className="cursor-pointer">
             <a

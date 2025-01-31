@@ -193,9 +193,9 @@ const Sidebar = () => {
                 className="w-10 h-10 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full border-2 border-gray-300 object-cover cursor-pointer"
               />
             ) : (
-              <div className='w-10 h-10 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-[#FF7272] items-center'>
-                <p className='m-auto text-base px-[10px] py-2 sm:px-[5px] sm:py-0 sm:!-mt-1 md:!mt-0 md:px-[10px] md:py-2 text-white'>{getInitials(userDetails?.first_name || "J")}{getInitials(userDetails?.last_name || "D")}</p>
-              </div>
+              <button className="relative p-2 bg-[#FF7272] hover:bg-opacity-90 rounded-full" type="button">
+                <p className="text-white">{getInitials(userDetails?.first_name || "J")}{getInitials(userDetails?.last_name || "D")}</p>
+              </button>
             )
           }
           <div className={`flex items-center gap-2 overflow-hidden ${isOpen ? "flex" : "hidden  sm:flex"}`}>

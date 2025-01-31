@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import { FaClover } from "react-icons/fa6";
@@ -9,6 +9,13 @@ import { currencyList } from "../components/CurrencyList";
 const PlanCard: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    const section = document.getElementById("top_gemini");
+    if(section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
 
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
@@ -29,7 +36,7 @@ const PlanCard: React.FC = () => {
 
 
   return (
-    <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative">
+    <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative" id="top_gemini">
       <p
         className="flex items-center gap-1 text-green-600 cursor-pointer absolute left-4 top-2"
         onClick={() => navigate('/free-trial', {state: location.state})}

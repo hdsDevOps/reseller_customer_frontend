@@ -514,7 +514,7 @@ const DomainList: React.FC = () => {
                 </div>
               ))
             ) : (
-              <div>Loading...</div>
+              <div className='flex justify-center'>No Domains Available</div>
             )
           }
         </div>

@@ -5,7 +5,7 @@ import { BiCheck } from "react-icons/bi";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { addBillingHistoryThunk, addEmailsWithoutLoginThunk, addNewDomainWithoutLoginThunk, addSettingWithoutLoginThunk, addStaffWithoutLoginThunk, addSubscriptionWithoutLoginThunk, getPaymentMethodsWithoutLoginThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, makeDefaultPaymentMethodThunk, makeDefaultPaymentMethodWithoutLoginThunk, makeEmailAdminWithoutLoginThunk, plansAndPricesListThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, udpateBusinessDataThunk } from "store/user.thunk";
+import { addBillingHistoryThunk, addEmailsWithoutLoginThunk, addNewDomainWithoutLoginThunk, addSettingWithoutLoginThunk, addStaffWithoutLoginThunk, addSubscriptionWithoutLoginThunk, getBase64ImageThunk, getPaymentMethodsWithoutLoginThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, makeDefaultPaymentMethodThunk, makeDefaultPaymentMethodWithoutLoginThunk, makeEmailAdminWithoutLoginThunk, plansAndPricesListThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, udpateBusinessDataThunk } from "store/user.thunk";
 import { currencyList } from "../components/CurrencyList";
 import { setDefaultCurrencySlice } from "store/authSlice";
 import { Dialog, DialogPanel } from "@headlessui/react";
@@ -56,11 +56,21 @@ const superAdminPermissions = [
 ];
 
 const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899";
+// const logo = "";
+const stripeImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/stripe.png?alt=media&token=23bd6672-665c-4dfb-9d75-155abd49dc58";
+const paystackImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/paystack.png?alt=media&token=8faf3870-4256-4810-9844-5fd3c147d7a3";
 
 const DownloadInvoice: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const section = document.getElementById("top_download_invoice");
+    if(section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
 
   // const { workSpaceFlowSlice } = useAppSelector(state => state.auth);
   // console.log("workSpaceFlowSlice...", workSpaceFlowSlice);
@@ -84,6 +94,39 @@ const DownloadInvoice: React.FC = () => {
   const [planExpiryDate, setPlanExpiryDate] = useState("");
   console.log({todayDate, domainExpiryDate, planExpiryDate});
   const [paymentMethods, setPaymentMethods] = useState([]);
+  
+  const [base64ImageLogo, setBase64ImageLogo] = useState("");
+  // console.log("base64ImageLogo...", base64ImageLogo);
+  const [paymentMethodImage, setPaymentMethodImage] = useState("");
+
+  const getBase64ImageLogo = async() => {
+    try {
+      const result = await dispatch(getBase64ImageThunk({url: logo})).unwrap();
+      setBase64ImageLogo(result?.base64);
+    } catch (error) {
+      setBase64ImageLogo("");
+    }
+  };
+
+  useEffect(() => {
+    getBase64ImageLogo();
+  }, []);
+
+  const getBase64ImagePaymentMethod = async(url:string) => {
+    try {
+      const result = await dispatch(getBase64ImageThunk({url: url})).unwrap();
+      setPaymentMethodImage(result?.base64);
+    } catch (error) {
+      setPaymentMethodImage("");
+    }
+  };
+
+  useEffect(() => {
+    if(data?.payment_method !== null && paymentMethods?.length > 0 || data?.payment_method !== "" && paymentMethods?.length > 0 || data?.payment_method !== undefined && paymentMethods?.length > 0) {
+      const paymentGatewayImage = paymentMethods?.find(item => item?.method_name?.toLowerCase() === data?.payment_method?.toLowerCase())?.method_image;
+      getBase64ImagePaymentMethod(paymentGatewayImage);
+    }
+  }, [paymentMethods, data?.payment_method]);
     
   useEffect(() => {
     const dayToday = new Date();
@@ -418,7 +461,7 @@ const DownloadInvoice: React.FC = () => {
   };
 
   return (
-    <div>
+    <div id="top_download_invoice">
       {
         disabled ? (
           <div className="fixed top-0 bottom-0 left-0 right-0 inset-0 bg-white z-50 w-screen overflow-y-auto">
@@ -553,7 +596,7 @@ const DownloadInvoice: React.FC = () => {
                     className='relative h-40 bg-white overflow-hidden'
                   >
                     <div
-                      className='absolute top-0 w-full h-full bg-[#12A833] transform -skew-y-[11deg] origin-top-left z-10'
+                      style={{position: 'absolute', top: 0, width: "100%", height: "100%", backgroundColor: '#12A833', zIndex: '10', transform: 'skewY(-11deg)', transformOrigin: 'top left'}}
                     ></div>
                     <div
                       className='absolute top-0 right-0 w-[200px] h-[80%] bg-[#f4f4f6] opacity-50 transform -skew-y-[17deg] origin-top-left z-10'
@@ -571,7 +614,7 @@ const DownloadInvoice: React.FC = () => {
                         className='w-[60px] h-[60px] bg-white rounded-full border-4 border-white flex items-center justify-center shadow-lg'
                       >
                         <img
-                          src={logo}
+                          src={base64ImageLogo}
                           className='w-[51px] rounded-full object-cover'
                         />
                       </div>
@@ -608,7 +651,7 @@ const DownloadInvoice: React.FC = () => {
                           <td className="font-inter font-normal text-sm items-start text-start content-start">Payment Method</td>
                            <td>
                             <img
-                              src={paymentMethods?.find(item => item?.method_name?.toLowerCase() === data?.payment_method?.toLowerCase())?.method_image}
+                              src={paymentMethodImage}
                               alt={data?.payment_method}
                               className="w-10 object-contain"
                             />

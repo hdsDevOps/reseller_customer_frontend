@@ -33,6 +33,13 @@ const Review = () => {
   const location = useLocation();
   // console.log("location state...", location.state);
   const dispatch = useAppDispatch();
+    
+  useEffect(() => {
+    const section = document.getElementById("top_review");
+    if(section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
 
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
@@ -479,6 +486,7 @@ const Review = () => {
       <div
         className="flex flex-col w-full"
         // onSubmit={handleSubmit}
+        id="top_review"
       >
         <div className="flex max-[700px]:flex-col items-center justify-start min-[700px]:gap-10 max-[700px]:gap-2 mt-8">
           <button

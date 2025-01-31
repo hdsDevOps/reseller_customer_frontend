@@ -19,6 +19,13 @@ const Summary: React.FC = () => {
   const location = useLocation();
   // console.log("location state...", location.state);
   const dispatch = useAppDispatch();
+  
+  useEffect(() => {
+    const section = document.getElementById("top_summary");
+    if(section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
 
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
@@ -269,7 +276,7 @@ const Summary: React.FC = () => {
   }
 
   return (
-    <div className="relative grid grid-cols-1 w-full h-full gap-6 p-4">
+    <div className="relative grid grid-cols-1 w-full h-full gap-6 p-4" id="top_summary">
       {" "}
       <p
         className="absolute flex items-center gap-1 text-green-600 cursor-pointer left-4 top-2"

@@ -10,6 +10,13 @@ const OTP: React.FC = () => {
     const location = useLocation();
     console.log("state....", location.state);
     const dispatch = useAppDispatch();
+            
+    useEffect(() => {
+    const section = document.getElementById("top_subscribe_otp");
+    if(section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+    }
+    }, []);
 
     const customerId = location.state.customer_id;
     // console.log("customerId...", customerId);
@@ -141,7 +148,7 @@ const OTP: React.FC = () => {
     };
 
     return (
-        <div className="w-full flex flex-col justify-center items-center relative">
+        <div className="w-full flex flex-col justify-center items-center relative" id="top_subscribe_otp">
             <p className="flex items-center gap-1 text-green-600 cursor-pointer absolute left-4 top-2" onClick={handleBack}>
                 <IoChevronBackSharp /> Back to previous page
             </p>

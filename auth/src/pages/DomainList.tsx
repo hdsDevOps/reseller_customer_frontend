@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GoArrowRight } from "react-icons/go";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoChevronBackSharp } from "react-icons/io5";
@@ -11,6 +11,13 @@ const DomainList: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
+    
+  useEffect(() => {
+    const section = document.getElementById("top_domain_list");
+    if(section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
 
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
@@ -36,7 +43,7 @@ const DomainList: React.FC = () => {
 
 
   return (
-    <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative">
+    <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative" id="top_domain_list">
       <p
         className="flex items-center gap-1 text-green-600 cursor-pointer absolute left-4 top-2"
         onClick={() => navigate('/adddomain', {state: location.state})}

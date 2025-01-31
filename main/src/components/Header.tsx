@@ -89,7 +89,7 @@ export default function Header() {
                 />
               </button>
             ) : (
-              <button className="relative p-2 bg-[#FF7272] hover:bg-opacity-90 rounded-full">
+              <button className="relative p-2 bg-[#FF7272] hover:bg-opacity-90 rounded-full" type="button">
                 <p className="text-white">{getInitials(userDetails?.first_name || "J")}{getInitials(userDetails?.last_name || "D")}</p>
               </button>
             )

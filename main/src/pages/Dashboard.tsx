@@ -128,7 +128,7 @@ const Dashboard: React.FC = () => {
 
   const [isExpirySectionOpen, setIsExpirySectionOpen] = useState(false);
   const [expiryData, setExpiryData] = useState(initialExpiryData);
-  // console.log("expiryData...", expiryData);
+  console.log("expiryData...", expiryData);
 
   const [base64ImageLogo, setBase64ImageLogo] = useState("");
   // console.log("base64ImageLogo...", base64ImageLogo);
@@ -174,17 +174,19 @@ const Dashboard: React.FC = () => {
         const today = new Date();
 
         const timeDifference = Math.abs(date - today);
+        const isNegative = (date - today) < 0;
         // console.log("timeDifference...", timeDifference);
         const days = Math.floor(timeDifference / (1000*60*60*24));
         const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
-        if(timeDifference < 0) {
+        if(isNegative) {
           setExpiryData({
             ...expiryData,
             days: -1,
             date: format(new Date(), "dd-MM-yyyy")
-          })
+          });
+          setIsExpirySectionOpen(true);
         } else {
           if(days < 3) {
             setExpiryData({
@@ -630,7 +632,7 @@ const Dashboard: React.FC = () => {
   return (
     <div>
       {
-        isExpirySectionOpen && (
+        isExpirySectionOpen && !isAdmin && (
           <div className="warning-box">
             <div className={`${
               expiryData?.days < 0
@@ -639,7 +641,7 @@ const Dashboard: React.FC = () => {
               ? "expire-warning"
               : ""
             } common-warning`}>
-              <p className="font-inter font-normal text-lg text-black">Your {userDetails?.workspace?.wokrspace_status === "trial" ? "free trial" : "plan"} {expiryData?.days >= 0 ? "will be expired" : "has been expired"} {expiryData?.days > 0 ? `in ${expiryData?.days} days ` : expiryData?.days === 0 ? "today" : ""}{expiryData?.days !== 0 ? `on ${expiryData?.date}` : ""}.</p>
+              <p className="font-inter font-normal text-lg text-black">Your {userDetails?.workspace?.workspace_status === "trial" ? "free trial" : "plan"} {expiryData?.days >= 0 ? "will be expired" : "has been expired"} {expiryData?.days > 0 ? `in ${expiryData?.days} days ` : expiryData?.days === 0 ? "today" : ""}{expiryData?.days !== 0 ? `on ${expiryData?.date}` : ""}.</p>
               <button
                 type="button"
                 className={`px-6 py-2 ${
@@ -717,7 +719,9 @@ const Dashboard: React.FC = () => {
                       <button
                         className={`w-[80px] h-[30px] rounded hover:text-white capitalize ${
                           userDetails?.workspace?.workspace_status === "trial"
-                          ? "text-green-500 border-2 border-green-500 hover:bg-green-500"
+                          ? expiryData?.days < 0
+                            ? "bg-gray-300 text-gray-700 border-2 border-gray-500 hover:bg-gray-700"
+                            :"text-green-500 border-2 border-green-500 hover:bg-green-500"
                           : formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.expired
                           ? "bg-gray-300 text-gray-700 border-2 border-gray-500 hover:bg-gray-700"
                           : subscription?.subscription_status === "Cancelled"
@@ -732,7 +736,15 @@ const Dashboard: React.FC = () => {
                         }`}
                       >{
                         userDetails?.workspace?.workspace_status === "trial"
-                        ? "Trial Period"
+                        ? formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days === 0
+                          ? "Expired today"
+                          :  formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days === 1
+                          ? "1 day due"
+                          : formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days < 10
+                          ? `${formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days} days due`
+                          : formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days > 10
+                          ? "Free Trial"
+                          : "Expired"
                         : formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.expired
                         ? formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days === 0
                           ? "Expired today"

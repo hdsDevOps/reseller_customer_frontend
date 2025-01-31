@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaTriangleExclamation } from "react-icons/fa6";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoChevronBackSharp } from "react-icons/io5";
@@ -6,12 +6,20 @@ import "./cumtel.css";
 import { useAppDispatch } from "store/hooks";
 import { toast } from "react-toastify";
 import { checkDomainThunk, domainAvailabilityThunk } from "store/reseller.thunk";
+import { getBase64ImageThunk } from "store/user.thunk";
 
 const DomainDetails: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
   console.log("location state....", location.state);
+  
+  useEffect(() => {
+    const section = document.getElementById("top_add_domain");
+    if(section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
 
   const navigatedFrom = location.state.from;
   // console.log("navigated from...", navigatedFrom);
@@ -87,7 +95,7 @@ const DomainDetails: React.FC = () => {
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center w-full h-full gap-6 p-4">
+    <div className="relative flex flex-col items-center justify-center w-full h-full gap-6 p-4" id="top_add_domain">
       <p
         className="absolute flex items-center gap-1 text-green-600 cursor-pointer left-4 top-2"
         onClick={() => navigate('/businessinfo', {state: location.state})}

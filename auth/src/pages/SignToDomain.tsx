@@ -17,6 +17,13 @@ const SignInForm: React.FC = () => {
   const location = useLocation();
   const dispatch = useAppDispatch();
   console.log("location state...", location.state);
+                
+  useEffect(() => {
+  const section = document.getElementById("top_signin_domain");
+  if(section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+  }
+  }, []);
   
   // Retrieve the domain from the location state
   const domain = location.state.selectedDomain?.domain?.domain;
@@ -84,7 +91,7 @@ const SignInForm: React.FC = () => {
   };
 
   return (
-    <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative">
+    <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative" id="top_signin_domain">
       <p
         className="flex items-center gap-1 text-green-600 cursor-pointer absolute left-4 top-2"
         onClick={() => navigate('/selected-domain', {state: location.state})}

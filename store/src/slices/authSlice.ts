@@ -61,6 +61,7 @@ export interface Permission {
 export interface UserDetailsState {
   userAuthStatus: 'AUTHORIZED' | 'UN_AUTHORIZED' | 'PENDING' | 'UPGRADE';
   userDetails: any;
+  staffDetails: any;
   userId: number | null;
   token: string | null;
   customerId: string | null;
@@ -89,6 +90,7 @@ export interface UserDetailsState {
 const initialState: UserDetailsState = {
   userAuthStatus: 'PENDING',
   userDetails: {},
+  staffDetails: {},
   userId: null,
   token: '',
   customerId:'',
@@ -123,6 +125,9 @@ const authSlice = createSlice({
     },
     setUserDetails: (state, action: PayloadAction<any>) => {
       state.userDetails = action.payload;
+    },
+    setStaffDetails: (state, action: PayloadAction<any>) => {
+      state.staffDetails = action.payload;
     },
     setCustomerId: (state, action: PayloadAction<any>) => {
       state.customerId = action.payload;
@@ -284,6 +289,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setTokenDetails, setUserDetails, setUserAuthStatus,  setResellerToken, resetUserSlice, setCart, setDomains, setSaveCards, setPaymentMethodsState, setDefaultCurrencySlice, setWorkSpaceFlowSlice, setCustomerId, setStaffId, setStaffStatus, setBillingHistoryFilterSlice, setPaymentDetailsFilterSlice, setCurrentPageNumberSlice, setItemsPerPageSlice, setMetaDataSlice, setRoleIdSlice, setNotificationsListSlice, setIsAdminSlice, setRolePermissionsSlice } = authSlice.actions;
+export const { setTokenDetails, setUserDetails, setStaffDetails, setUserAuthStatus,  setResellerToken, resetUserSlice, setCart, setDomains, setSaveCards, setPaymentMethodsState, setDefaultCurrencySlice, setWorkSpaceFlowSlice, setCustomerId, setStaffId, setStaffStatus, setBillingHistoryFilterSlice, setPaymentDetailsFilterSlice, setCurrentPageNumberSlice, setItemsPerPageSlice, setMetaDataSlice, setRoleIdSlice, setNotificationsListSlice, setIsAdminSlice, setRolePermissionsSlice } = authSlice.actions;
 
 export default authSlice.reducer;

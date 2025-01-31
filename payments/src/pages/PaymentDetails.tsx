@@ -239,6 +239,22 @@ const PaymentDetails: React.FC = () => {
     renewalDate(userDetails?.workspace?.next_payment);
   }, [userDetails?.workspace?.next_payment]);
 
+  const formatExpiryDate = (seconds, nanoseconds) => {
+    const miliseconds = parseInt(seconds) * 1000 + parseInt(nanoseconds) / 1e6;
+
+    const date = new Date(miliseconds);
+    // const date = new Date();
+    const today = new Date();
+
+    const timeDifference = today - date;
+    const days = timeDifference / (1000 * 60 * 60 *24);
+    if(today > date) {
+      return {expired: true, days: parseInt(days)};
+    } else {
+      return {expired: false, days: 0};
+    }
+  };
+
   const getPlanNameById = async() => {
     try {
       const result = await dispatch(plansAndPricesListThunk({
@@ -773,207 +789,442 @@ const PaymentDetails: React.FC = () => {
           </thead>
           <tbody>
             {
-              paymentDetails.length > 0 ? currentItems.map((detail, index) => (
-                <React.Fragment key={index}>
-                  <tr className="text-xs text-gray-400 relative">
-                    <td className="px-2 pb-10 pt-3 text-center">
-                      {detail?.product_type}
-                    </td>
-                    <td className="px-2 pb-10 pt-3 text-center">
-                      {detail?.domain !== "" ? detail?.payment_cycle : "Yearly"}
-                    </td>
-                    <td className="px-2 pb-10 pt-3 text-center">
-                      {detail?.description}
-                    </td>
-                    <td className="px-2 pb-10 pt-3 text-center">
-                      {detail?.domain !== "" ? detail?.domain : detail?.domain}
-                    </td>
-                    <td className="px-2 pb-10 pt-3 text-center">
-                      {formatDate(detail?.last_payment?._seconds, detail?.last_payment?._nanoseconds)}
-                    </td>
-                    <td className="px-2 pb-10 pt-3 text-center">
-                      {formatDate(detail?.next_payment?._seconds, detail?.next_payment?._nanoseconds)}
-                    </td>
-                    <td className="px-2 pb-10 pt-3 text-center">
-                      <button
-                        className={`w-[80px] h-[30px] rounded hover:text-white capitalize ${
-                          detail?.subscription_status === "Cancelled"
-                          ? "text-red-700 border-2 border-red-500 hover:bg-red-500"
-                          : detail?.subscription_status === "Expired"
-                          ? "bg-gray-300 text-gray-700 border-2 border-gray-500 hover:bg-gray-700"
-                          : detail?.subscription_status === "Cancel Requested"
-                          ? "text-yellow-600 border-2 border-yellow-600 hover:bg-gray-300"
-                          : detail?.subscription_status?.toLowerCase() === "manual"
-                          ? "text-yellow-600 border-2 border-yellow-600 hover:bg-gray-300"
-                          : "text-green-500 border-2 border-green-500 hover:bg-green-500"
-                        }`}
-                      >
-                        {detail?.subscription_status}
-                      </button>
-                    </td>
-                    <td className="px-2 pb-10 pt-3 text-center">
-                      <span className="flex items-center justify-center">
-                        {detail?.payment_method ? (
-                          <>
-                            <img
-                              src={
-                                detail?.payment_method?.toLowerCase() === "stripe"
-                                ? stripeImage
-                                : detail?.payment_method?.toLowerCase() === "paystack"
-                                ? paystackImage
-                                : ""
-                              }
-                              alt={detail?.payment_method}
-                              className="h-6 object-contain"
-                            />
-                            {"..."}{
-                              Number(detail?.payment_details[detail?.payment_details?.length - 1]?.card_number) % 10000
-                            }
-                          </>
-                        ) : (
-                          <span className="text-gray-800 font-bold text-3xl text-center">
-                            -
+              paymentDetails.length > 0 ? currentItems.map((detail, index) => {
+                if(detail?.product_type === "google workspace") {
+                  return (
+                    <React.Fragment key={index}>
+                      <tr className="text-xs text-gray-400 relative">
+                        <td className="px-2 pb-10 pt-3 text-center">
+                          {detail?.product_type}
+                        </td>
+                        <td className="px-2 pb-10 pt-3 text-center">
+                          {detail?.domain !== "" ? detail?.payment_cycle : "Yearly"}
+                        </td>
+                        <td className="px-2 pb-10 pt-3 text-center">
+                          {detail?.description}
+                        </td>
+                        <td className="px-2 pb-10 pt-3 text-center">
+                          {detail?.domain !== "" ? detail?.domain : detail?.domain}
+                        </td>
+                        <td className="px-2 pb-10 pt-3 text-center">
+                          {formatDate(detail?.last_payment?._seconds, detail?.last_payment?._nanoseconds)}
+                        </td>
+                        <td className="px-2 pb-10 pt-3 text-center">
+                          {formatDate(detail?.next_payment?._seconds, detail?.next_payment?._nanoseconds)}
+                        </td>
+                        <td className="px-2 pb-10 pt-3 text-center">
+                          <button
+                            className={`w-[80px] h-[30px] rounded hover:text-white capitalize ${
+                              userDetails?.workspace?.workspace_status === "trial"
+                              ? "text-green-500 border-2 border-green-500 hover:bg-green-500"
+                              : formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.expired
+                              ? "bg-gray-300 text-gray-700 border-2 border-gray-500 hover:bg-gray-700"
+                              : detail?.subscription_status === "Cancelled"
+                              ? "text-red-700 border-2 border-red-500 hover:bg-red-500"
+                              : detail?.subscription_status === "Expired"
+                              ? "bg-gray-300 text-gray-700 border-2 border-gray-500 hover:bg-gray-700"
+                              : detail?.subscription_status === "Cancel Requested"
+                              ? "text-yellow-600 border-2 border-yellow-600 hover:bg-gray-300"
+                              : detail?.subscription_status?.toLowerCase() === "manual"
+                              ? "text-yellow-600 border-2 border-yellow-600 hover:bg-gray-300"
+                              : "text-green-500 border-2 border-green-500 hover:bg-green-500"
+                            }`}
+                          >{
+                            userDetails?.workspace?.workspace_status === "trial"
+                            ? "Trial Period"
+                            : formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.expired
+                            ? formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days === 0
+                              ? "Expired today"
+                              :  formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days === 1
+                              ? "1 day due"
+                              : formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days < 10
+                              ? `${formatExpiryDate(userDetails?.workspace?.next_payment?._seconds, userDetails?.workspace?.next_payment?._nanoseconds)?.days} days due`
+                              :  "Expired"
+                            : detail?.subscription_status
+                          }</button>
+                          {/* <button
+                            className={`w-[80px] h-[30px] rounded hover:text-white capitalize ${
+                              detail?.subscription_status === "Cancelled"
+                              ? "text-red-700 border-2 border-red-500 hover:bg-red-500"
+                              : detail?.subscription_status === "Expired"
+                              ? "bg-gray-300 text-gray-700 border-2 border-gray-500 hover:bg-gray-700"
+                              : detail?.subscription_status === "Cancel Requested"
+                              ? "text-yellow-600 border-2 border-yellow-600 hover:bg-gray-300"
+                              : detail?.subscription_status?.toLowerCase() === "manual"
+                              ? "text-yellow-600 border-2 border-yellow-600 hover:bg-gray-300"
+                              : "text-green-500 border-2 border-green-500 hover:bg-green-500"
+                            }`}
+                          >
+                            {detail?.subscription_status}
+                          </button> */}
+                        </td>
+                        <td className="px-2 pb-10 pt-3 text-center">
+                          <span className="flex items-center justify-center">
+                            {detail?.payment_method ? (
+                              <>
+                                <img
+                                  src={
+                                    detail?.payment_method?.toLowerCase() === "stripe"
+                                    ? stripeImage
+                                    : detail?.payment_method?.toLowerCase() === "paystack"
+                                    ? paystackImage
+                                    : ""
+                                  }
+                                  alt={detail?.payment_method}
+                                  className="h-6 object-contain"
+                                />
+                                {"..."}{
+                                  Number(detail?.payment_details[detail?.payment_details?.length - 1]?.card_number) % 10000
+                                }
+                              </>
+                            ) : (
+                              <span className="text-gray-800 font-bold text-3xl text-center">
+                                -
+                              </span>
+                            )}
                           </span>
-                        )}
-                      </span>
-                    </td>
-                    <td className="px-2 pb-10 pt-3 flex items-center content-center justify-center">
-                      <button
-                        type="button"
-                        disabled={isAdmin}
-                        className={`w-6 h-6 rounded-full border-2 ${isAdmin ? "border-[#8A8A8A]" : "border-green-500"} flex justify-center  items-center content-center my-auto`}
-                        onClick={() => {toggleList(index)}}
-                      >
-                        <p className="mb-2 items-center content-center">...</p>
-                      </button>
-                    </td>
-                  </tr>
-                  {
-                    showList === index && (
-                      <div
-                        className="p-2 w-80 max-w-[12rem] absolute right-1 -mt-10 z-10"
-                        onClick={(e) => {e.stopPropagation()}}
-                        ref={listRef}
-                      >
-                        <ul className="bg-gray-100 rounded-xl shadow-md space-y-2 flex-grow flex-col items-start justify-center p-1">
-                          {
-                            showListTable.map((list, idx) => {
-                              if(list?.type === "link") {
-                                if(list?.label === "View payment details") {
-                                  return (
-                                    <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={() => {navigate(list?.link, {state: detail})}}>{list?.label}</li>
-                                  )
-                                } else if(list?.label === "Renew Plan") {
-                                  if(detail?.product_type?.toLowerCase() === "google workspace") {
-                                    if(renewalStatus) {
+                        </td>
+                        <td className="px-2 pb-10 pt-3 flex items-center content-center justify-center">
+                          <button
+                            type="button"
+                            disabled={isAdmin}
+                            className={`w-6 h-6 rounded-full border-2 ${isAdmin ? "border-[#8A8A8A]" : "border-green-500"} flex justify-center  items-center content-center my-auto`}
+                            onClick={() => {toggleList(index)}}
+                          >
+                            <p className="mb-2 items-center content-center">...</p>
+                          </button>
+                        </td>
+                      </tr>
+                      {
+                        showList === index && (
+                          <div
+                            className="p-2 w-80 max-w-[12rem] absolute right-1 -mt-10 z-10"
+                            onClick={(e) => {e.stopPropagation()}}
+                            ref={listRef}
+                          >
+                            <ul className="bg-gray-100 rounded-xl shadow-md space-y-2 flex-grow flex-col items-start justify-center p-1">
+                              {
+                                showListTable.map((list, idx) => {
+                                  if(list?.type === "link") {
+                                    if(list?.label === "View payment details") {
                                       return (
-                                        <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => {renewalAddToCart(e)}}>{list?.label}</li>
+                                        <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={() => {navigate(list?.link, {state: detail})}}>{list?.label}</li>
                                       )
-                                    }
-                                  }
-                                } else if(list?.label === "Update Plan") {
-                                  if(detail?.product_type?.toLowerCase() === "google workspace") {
-                                    if(userDetails?.workspace?.workspace_status !== "trial") {
-                                      return (
-                                        <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => renewalAddToCart(e)}>{list?.label}</li>
-                                      )
-                                    }
-                                  }
-                                } else {
-                                  if(detail?.product_type?.toLowerCase() === "google workspace") {
-                                    return (
-                                      <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={() => {navigate(list?.link, {state: detail})}}>{list?.label}</li>
-                                    )
-                                  }
-                                }
-                              } else if(list?.type === "modal") {
-                                if(list?.label === "Cancel Subscription") {
-                                  if(detail?.product_type?.toLowerCase() === "google workspace") {
-                                    return (
-                                      <li
-                                        key={idx}
-                                        className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
-                                        // onClick={() => {
-                                        //   setIsModalOpen(true);
-                                        //   setModalType(list?.label);
-                                        //   setSubscriptionId(detail?.id);
-                                        //   setInvoiceData({});
-                                        // }}
-                                      >{list?.label}</li>
-                                    )
-                                  } else if(detail?.product_type?.toLowerCase() === "domain")  {
-                                    return (
-                                      <li
-                                        key={idx}
-                                        className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
-                                        // onClick={() => {
-                                        //   setIsModalOpen(true);
-                                        //   setModalType("Cancel Domain");
-                                        //   setSubscriptionId(detail?.id);
-                                        //   setInvoiceData({});
-                                        // }}
-                                      >Cancel Domain</li>
-                                    )
-                                  }
-                                } else if(list?.label === "Transfer Subscription") {
-                                  if(detail?.product_type?.toLowerCase() === "google workspace") {
-                                    return (
-                                      <li
-                                        key={idx}
-                                        className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
-                                        // onClick={() => {
-                                        //   setIsModalOpen(true);
-                                        //   setModalType(list?.label);
-                                        //   setSubscriptionId(detail?.id);
-                                        //   setInvoiceData({});
-                                        // }}
-                                      >{list?.label}</li>
-                                    )
-                                  } else if(detail?.product_type?.toLowerCase() === "domain") {
-                                    return (
-                                      <li
-                                        key={idx}
-                                        className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
-                                        // onClick={() => {
-                                        //   setIsModalOpen(true);
-                                        //   setModalType("Transfer Domain");
-                                        //   setSubscriptionId(detail?.id);
-                                        //   setInvoiceData({});
-                                        // }}
-                                      >Transfer Domain</li>
-                                    )
-                                  }
-                                } else {
-                                  return (
-                                    <li
-                                      key={idx}
-                                      className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
-                                      onClick={() => {
-                                        setIsModalOpen(true);
-                                        setModalType(list?.label);
-                                        setSubscriptionId(detail?.id);
-                                        if(list?.label === "View Invoice") {
-                                          setInvoiceData(detail);
-                                        } else {
-                                          setInvoiceData({});
+                                    } else if(list?.label === "Renew Plan") {
+                                      if(detail?.product_type?.toLowerCase() === "google workspace") {
+                                        if(renewalStatus) {
+                                          return (
+                                            <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => {renewalAddToCart(e)}}>{list?.label}</li>
+                                          )
                                         }
-                                      }}
-                                    >{list?.label}</li>
-                                  )
-                                }
-                              } else {
-                                return (
-                                  <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer">{list?.label}</li>
-                                )
+                                      }
+                                    } else if(list?.label === "Update Plan") {
+                                      if(detail?.product_type?.toLowerCase() === "google workspace") {
+                                        if(userDetails?.workspace?.workspace_status !== "trial") {
+                                          return (
+                                            <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => renewalAddToCart(e)}>{list?.label}</li>
+                                          )
+                                        }
+                                      }
+                                    } else {
+                                      if(detail?.product_type?.toLowerCase() === "google workspace") {
+                                        return (
+                                          <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={() => {navigate(list?.link, {state: detail})}}>{list?.label}</li>
+                                        )
+                                      }
+                                    }
+                                  } else if(list?.type === "modal") {
+                                    if(list?.label === "Cancel Subscription") {
+                                      if(detail?.product_type?.toLowerCase() === "google workspace") {
+                                        return (
+                                          <li
+                                            key={idx}
+                                            className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
+                                            // onClick={() => {
+                                            //   setIsModalOpen(true);
+                                            //   setModalType(list?.label);
+                                            //   setSubscriptionId(detail?.id);
+                                            //   setInvoiceData({});
+                                            // }}
+                                          >{list?.label}</li>
+                                        )
+                                      } else if(detail?.product_type?.toLowerCase() === "domain")  {
+                                        return (
+                                          <li
+                                            key={idx}
+                                            className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
+                                            // onClick={() => {
+                                            //   setIsModalOpen(true);
+                                            //   setModalType("Cancel Domain");
+                                            //   setSubscriptionId(detail?.id);
+                                            //   setInvoiceData({});
+                                            // }}
+                                          >Cancel Domain</li>
+                                        )
+                                      }
+                                    } else if(list?.label === "Transfer Subscription") {
+                                      if(detail?.product_type?.toLowerCase() === "google workspace") {
+                                        return (
+                                          <li
+                                            key={idx}
+                                            className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
+                                            // onClick={() => {
+                                            //   setIsModalOpen(true);
+                                            //   setModalType(list?.label);
+                                            //   setSubscriptionId(detail?.id);
+                                            //   setInvoiceData({});
+                                            // }}
+                                          >{list?.label}</li>
+                                        )
+                                      } else if(detail?.product_type?.toLowerCase() === "domain") {
+                                        return (
+                                          <li
+                                            key={idx}
+                                            className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
+                                            // onClick={() => {
+                                            //   setIsModalOpen(true);
+                                            //   setModalType("Transfer Domain");
+                                            //   setSubscriptionId(detail?.id);
+                                            //   setInvoiceData({});
+                                            // }}
+                                          >Transfer Domain</li>
+                                        )
+                                      }
+                                    } else {
+                                      return (
+                                        <li
+                                          key={idx}
+                                          className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
+                                          onClick={() => {
+                                            setIsModalOpen(true);
+                                            setModalType(list?.label);
+                                            setSubscriptionId(detail?.id);
+                                            if(list?.label === "View Invoice") {
+                                              setInvoiceData(detail);
+                                            } else {
+                                              setInvoiceData({});
+                                            }
+                                          }}
+                                        >{list?.label}</li>
+                                      )
+                                    }
+                                  } else {
+                                    return (
+                                      <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer">{list?.label}</li>
+                                    )
+                                  }
+                                })
                               }
-                            })
-                          }
-                        </ul>
-                      </div>
-                    )
-                  }
-                </React.Fragment>
-              )) : (
+                            </ul>
+                          </div>
+                        )
+                      }
+                    </React.Fragment>
+                  )
+                } else {
+                  return (
+                    <React.Fragment key={index}>
+                      <tr className="text-xs text-gray-400 relative">
+                        <td className="px-2 pb-10 pt-3 text-center">
+                          {detail?.product_type}
+                        </td>
+                        <td className="px-2 pb-10 pt-3 text-center">
+                          {detail?.domain !== "" ? detail?.payment_cycle : "Yearly"}
+                        </td>
+                        <td className="px-2 pb-10 pt-3 text-center">
+                          {detail?.description}
+                        </td>
+                        <td className="px-2 pb-10 pt-3 text-center">
+                          {detail?.domain !== "" ? detail?.domain : detail?.domain}
+                        </td>
+                        <td className="px-2 pb-10 pt-3 text-center">
+                          {formatDate(detail?.last_payment?._seconds, detail?.last_payment?._nanoseconds)}
+                        </td>
+                        <td className="px-2 pb-10 pt-3 text-center">
+                          {formatDate(detail?.next_payment?._seconds, detail?.next_payment?._nanoseconds)}
+                        </td>
+                        <td className="px-2 pb-10 pt-3 text-center">
+                          <button
+                            className={`w-[80px] h-[30px] rounded hover:text-white capitalize ${
+                              detail?.subscription_status === "Cancelled"
+                              ? "text-red-700 border-2 border-red-500 hover:bg-red-500"
+                              : detail?.subscription_status === "Expired"
+                              ? "bg-gray-300 text-gray-700 border-2 border-gray-500 hover:bg-gray-700"
+                              : detail?.subscription_status === "Cancel Requested"
+                              ? "text-yellow-600 border-2 border-yellow-600 hover:bg-gray-300"
+                              : detail?.subscription_status?.toLowerCase() === "manual"
+                              ? "text-yellow-600 border-2 border-yellow-600 hover:bg-gray-300"
+                              : "text-green-500 border-2 border-green-500 hover:bg-green-500"
+                            }`}
+                          >
+                            {detail?.subscription_status}
+                          </button>
+                        </td>
+                        <td className="px-2 pb-10 pt-3 text-center">
+                          <span className="flex items-center justify-center">
+                            {detail?.payment_method ? (
+                              <>
+                                <img
+                                  src={
+                                    detail?.payment_method?.toLowerCase() === "stripe"
+                                    ? stripeImage
+                                    : detail?.payment_method?.toLowerCase() === "paystack"
+                                    ? paystackImage
+                                    : ""
+                                  }
+                                  alt={detail?.payment_method}
+                                  className="h-6 object-contain"
+                                />
+                                {"..."}{
+                                  Number(detail?.payment_details[detail?.payment_details?.length - 1]?.card_number) % 10000
+                                }
+                              </>
+                            ) : (
+                              <span className="text-gray-800 font-bold text-3xl text-center">
+                                -
+                              </span>
+                            )}
+                          </span>
+                        </td>
+                        <td className="px-2 pb-10 pt-3 flex items-center content-center justify-center">
+                          <button
+                            type="button"
+                            disabled={isAdmin}
+                            className={`w-6 h-6 rounded-full border-2 ${isAdmin ? "border-[#8A8A8A]" : "border-green-500"} flex justify-center  items-center content-center my-auto`}
+                            onClick={() => {toggleList(index)}}
+                          >
+                            <p className="mb-2 items-center content-center">...</p>
+                          </button>
+                        </td>
+                      </tr>
+                      {
+                        showList === index && (
+                          <div
+                            className="p-2 w-80 max-w-[12rem] absolute right-1 -mt-10 z-10"
+                            onClick={(e) => {e.stopPropagation()}}
+                            ref={listRef}
+                          >
+                            <ul className="bg-gray-100 rounded-xl shadow-md space-y-2 flex-grow flex-col items-start justify-center p-1">
+                              {
+                                showListTable.map((list, idx) => {
+                                  if(list?.type === "link") {
+                                    if(list?.label === "View payment details") {
+                                      return (
+                                        <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={() => {navigate(list?.link, {state: detail})}}>{list?.label}</li>
+                                      )
+                                    } else if(list?.label === "Renew Plan") {
+                                      if(detail?.product_type?.toLowerCase() === "google workspace") {
+                                        if(renewalStatus) {
+                                          return (
+                                            <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => {renewalAddToCart(e)}}>{list?.label}</li>
+                                          )
+                                        }
+                                      }
+                                    } else if(list?.label === "Update Plan") {
+                                      if(detail?.product_type?.toLowerCase() === "google workspace") {
+                                        if(userDetails?.workspace?.workspace_status !== "trial") {
+                                          return (
+                                            <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => renewalAddToCart(e)}>{list?.label}</li>
+                                          )
+                                        }
+                                      }
+                                    } else {
+                                      if(detail?.product_type?.toLowerCase() === "google workspace") {
+                                        return (
+                                          <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={() => {navigate(list?.link, {state: detail})}}>{list?.label}</li>
+                                        )
+                                      }
+                                    }
+                                  } else if(list?.type === "modal") {
+                                    if(list?.label === "Cancel Subscription") {
+                                      if(detail?.product_type?.toLowerCase() === "google workspace") {
+                                        return (
+                                          <li
+                                            key={idx}
+                                            className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
+                                            // onClick={() => {
+                                            //   setIsModalOpen(true);
+                                            //   setModalType(list?.label);
+                                            //   setSubscriptionId(detail?.id);
+                                            //   setInvoiceData({});
+                                            // }}
+                                          >{list?.label}</li>
+                                        )
+                                      } else if(detail?.product_type?.toLowerCase() === "domain")  {
+                                        return (
+                                          <li
+                                            key={idx}
+                                            className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
+                                            // onClick={() => {
+                                            //   setIsModalOpen(true);
+                                            //   setModalType("Cancel Domain");
+                                            //   setSubscriptionId(detail?.id);
+                                            //   setInvoiceData({});
+                                            // }}
+                                          >Cancel Domain</li>
+                                        )
+                                      }
+                                    } else if(list?.label === "Transfer Subscription") {
+                                      if(detail?.product_type?.toLowerCase() === "google workspace") {
+                                        return (
+                                          <li
+                                            key={idx}
+                                            className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
+                                            // onClick={() => {
+                                            //   setIsModalOpen(true);
+                                            //   setModalType(list?.label);
+                                            //   setSubscriptionId(detail?.id);
+                                            //   setInvoiceData({});
+                                            // }}
+                                          >{list?.label}</li>
+                                        )
+                                      } else if(detail?.product_type?.toLowerCase() === "domain") {
+                                        return (
+                                          <li
+                                            key={idx}
+                                            className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-not-allowed bg-slate-300 opacity-50"
+                                            // onClick={() => {
+                                            //   setIsModalOpen(true);
+                                            //   setModalType("Transfer Domain");
+                                            //   setSubscriptionId(detail?.id);
+                                            //   setInvoiceData({});
+                                            // }}
+                                          >Transfer Domain</li>
+                                        )
+                                      }
+                                    } else {
+                                      return (
+                                        <li
+                                          key={idx}
+                                          className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
+                                          onClick={() => {
+                                            setIsModalOpen(true);
+                                            setModalType(list?.label);
+                                            setSubscriptionId(detail?.id);
+                                            if(list?.label === "View Invoice") {
+                                              setInvoiceData(detail);
+                                            } else {
+                                              setInvoiceData({});
+                                            }
+                                          }}
+                                        >{list?.label}</li>
+                                      )
+                                    }
+                                  } else {
+                                    return (
+                                      <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer">{list?.label}</li>
+                                    )
+                                  }
+                                })
+                              }
+                            </ul>
+                          </div>
+                        )
+                      }
+                    </React.Fragment>
+                  )
+                }
+              }) : (
                 <tr>
                   <td colSpan={9} className="text-center">No Data Available</td>
                 </tr>

@@ -19,7 +19,7 @@ import { Scale } from 'lucide-react';
 const HdsProfile = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const { userDetails, customerId, staffId, staffStatus,rolePermission } = useAppSelector(state => state.auth);
+    const { userDetails, customerId, staffId, staffStatus,rolePermission, isAdmin, staffDetails } = useAppSelector(state => state.auth);
     const [showModal,setShowModal] = useState<boolean>(false);
     const [showEditModal,setEditShowModal] = useState<boolean>(false);
     const displayModal=()=>{
@@ -35,26 +35,17 @@ const HdsProfile = () => {
         setEditShowModal(false)
     };
     useEffect(() => {
-        const checkPermission = (label:String) => {
-            if(rolePermission?.length > 0) {
-                console.log(rolePermission?.find(item => item?.name === label))
-                const permissionStatus = rolePermission?.find(item => item?.name === label)?.value;
-                if(permissionStatus) {
-                //
-                } else {
-                navigate('/');
-                }
-            } else {
-                navigate('/');
-            }
-        };
-    
-        checkPermission("Profile");
-    }, [rolePermission]);
+        if(isAdmin) {
+            navigate('/');
+        } else {
+            //
+        }
+    }, [isAdmin]);
     const [imageModal, setImageModal] = useState(false);
     const [image, setImage] = useState(null);
     // console.log("image...", image);
     console.log("user details...", userDetails);
+    console.log("staff details...", staffDetails);
 
     const [base64ProfileImage, setBase64ProfileImage] = useState("");
 
@@ -110,6 +101,17 @@ const HdsProfile = () => {
             getBase64ProfileImage("https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/profile-image.png?alt=media&token=faf9b1b9-7e08-496a-a6c1-355911d7b384");
         }
     }, [userDetails?.profile_image]);
+
+    
+
+    const checkPermission = () => {
+        if(rolePermission?.length > 0) {
+            console.log(rolePermission?.find(item => item?.name === "Profile"))
+            return rolePermission?.find(item => item?.name === "Profile")?.value;
+        } else {
+            return false;
+        }
+    };
 
     useEffect(() => {
         showImage();
@@ -427,48 +429,54 @@ const HdsProfile = () => {
                 />
             </div>
         </div>
-        <h2 className='text-lg font-bold text-[#14213D] mt-6'>Business information</h2>
-        <div className='grid grid-cols-2 gap-3 mt-4'>
-            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative">
-                <input
-                    type="text"
-                    id="ABC Business"
-                    className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                    value={userDetails?.business_name}
-                    disabled
-                />
-                <label
-                    htmlFor="ABC Business"
-                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 left-2"
-                >Business Name</label>
-            </div>
-            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative">
-                <input
-                    type="text"
-                    id="userType"
-                    className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                    value={userDetails?.business_state}
-                    disabled
-                />
-                <label
-                    htmlFor="userType"
-                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 left-2"
-                >Business State</label>
-            </div>
-            <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative">
-                <input
-                    type="text"
-                    id="Mumbai"
-                    className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
-                    value={userDetails?.business_city}
-                    disabled
-                />
-                <label
-                    htmlFor="Mumbai"
-                    className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 left-2"
-                >Business City*</label>
-            </div>
-        </div>
+        {
+            checkPermission() && (
+                <React.Fragment>
+                    <h2 className='text-lg font-bold text-[#14213D] mt-6'>Business information</h2>
+                    <div className='grid grid-cols-2 gap-3 mt-4'>
+                        <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative">
+                            <input
+                                type="text"
+                                id="ABC Business"
+                                className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
+                                value={userDetails?.business_name}
+                                disabled
+                            />
+                            <label
+                                htmlFor="ABC Business"
+                                className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 left-2"
+                            >Business Name</label>
+                        </div>
+                        <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative">
+                            <input
+                                type="text"
+                                id="userType"
+                                className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
+                                value={userDetails?.business_state}
+                                disabled
+                            />
+                            <label
+                                htmlFor="userType"
+                                className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 left-2"
+                            >Business State</label>
+                        </div>
+                        <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative">
+                            <input
+                                type="text"
+                                id="Mumbai"
+                                className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-xl border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#14213D] focus:ring-0 focus:border-black peer"
+                                value={userDetails?.business_city}
+                                disabled
+                            />
+                            <label
+                                htmlFor="Mumbai"
+                                className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 left-2"
+                            >Business City*</label>
+                        </div>
+                    </div>
+                </React.Fragment>
+            )
+        } 
         <Dialog
             open={imageModal}
             as="div"

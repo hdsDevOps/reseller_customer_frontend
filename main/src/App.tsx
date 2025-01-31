@@ -8,7 +8,7 @@ import MainApp from "./pages";
 import AuthApp from "auth/AuthApp";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { getCartThunk, getDomainsListThunk, getHordansoAdminDetailsFromLSThunk, getLandingPageThunk, getNotificationsListThunk, getPaymentMethodsThunk, getProfileDataThunk, getRoleIdFromLSThunk, getSettingsListThunk, getStaffIdFromLSThunk, getStaffStatusFromLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, removeUserAuthTokenFromLSThunk, savedCardsListThunk } from 'store/user.thunk';
-import { setCart, setCustomerId, setDefaultCurrencySlice, setDomains, setMetaDataSlice, setNotificationsListSlice, setPaymentMethodsState, setResellerToken, setRoleIdSlice, setRolePermissionsSlice, setSaveCards, setStaffId, setStaffStatus, setTokenDetails, setUserDetails } from 'store/authSlice';
+import { setCart, setCustomerId, setDefaultCurrencySlice, setDomains, setMetaDataSlice, setNotificationsListSlice, setPaymentMethodsState, setResellerToken, setRoleIdSlice, setRolePermissionsSlice, setSaveCards, setStaffDetails, setStaffId, setStaffStatus, setTokenDetails, setUserDetails } from 'store/authSlice';
 import "auth/AuthCss";
 import "./index.css";
 import { HelmetProvider, Helmet } from 'react-helmet-async';
@@ -292,19 +292,40 @@ const App: React.FC = () => {
   useEffect(() => {
     const getProfileData = async() => {
       if(token) {
-        try {
-          const result = await dispatch(getProfileDataThunk({user_id: customerId, staff_id: staffId, is_staff: staffStatus})).unwrap();
-          // console.log("result...", result);
-          const roleData = await dispatch(getRoleIdFromLSThunk()).unwrap();
-          await dispatch(setUserDetails(result?.customerData));
-          await dispatch(setRoleIdSlice(roleData));
-        } catch (error) {
-          if(error?.message == "Request failed with status code 401") {
-            try { 
-              const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
-              navigate('/home');
-            } catch (error) {
-              //
+        if(staffStatus) {
+          try {
+            const result = await dispatch(getProfileDataThunk({user_id: customerId, staff_id: staffId, is_staff: true})).unwrap();
+            const customerResult = await dispatch(getProfileDataThunk({user_id: customerId, staff_id: "", is_staff: false})).unwrap();
+            // console.log("result...", result);
+            const roleData = await dispatch(getRoleIdFromLSThunk()).unwrap();
+            await dispatch(setUserDetails(customerResult?.customerData));
+            await dispatch(setStaffDetails(result?.customerData));
+            await dispatch(setRoleIdSlice(roleData));
+          } catch (error) {
+            if(error?.message == "Request failed with status code 401") {
+              try { 
+                const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+                navigate('/home');
+              } catch (error) {
+                //
+              }
+            }
+          }
+        } else {
+          try {
+            const result = await dispatch(getProfileDataThunk({user_id: customerId, staff_id: "", is_staff: false})).unwrap();
+            // console.log("result...", result);
+            const roleData = await dispatch(getRoleIdFromLSThunk()).unwrap();
+            await dispatch(setUserDetails(result?.customerData));
+            await dispatch(setRoleIdSlice(roleData));
+          } catch (error) {
+            if(error?.message == "Request failed with status code 401") {
+              try { 
+                const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
+                navigate('/home');
+              } catch (error) {
+                //
+              }
             }
           }
         }

@@ -8,6 +8,13 @@ const Plans: React.FC = () => {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const navigate = useNavigate();
+        
+  useEffect(() => {
+    const section = document.getElementById("top_plans");
+    if(section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
 
   useEffect(() => {
     if(!location.state) {
@@ -33,7 +40,7 @@ const Plans: React.FC = () => {
     getPlansList();
   }, []);
   return (
-    <main className="h-full w-full flex flex-col justify-center items-center">
+    <main className="h-full w-full flex flex-col justify-center items-center" id="top_plans">
       <PlanCard plans={plans} />
     </main>
   );

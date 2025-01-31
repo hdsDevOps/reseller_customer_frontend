@@ -11,6 +11,13 @@ const FreeTrial: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
+                  
+  useEffect(() => {
+  const section = document.getElementById("top_free_trial");
+  if(section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+  }
+  }, []);
 
   // console.log("location state...", location.state);
   // const plan = location.state.plan;
@@ -59,7 +66,7 @@ const FreeTrial: React.FC = () => {
   }, [plan, defaultCurrencySlice]);
 
   return (
-    <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative">
+    <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative" id="top_free_trial">
     <p
       className="flex items-center gap-1 text-green-600 cursor-pointer absolute left-4 top-2"
       onClick={() => navigate('/signin-domain', {state: location.state})}

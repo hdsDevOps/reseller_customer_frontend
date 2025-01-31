@@ -134,6 +134,7 @@ declare module 'store/authSlice' {
   export const setNotificationsListSlice: (payload: any) => PayloadAction<any>;
   export const setAdminNameSlice;
   export const setIsAdminSlice;
+  export const setStaffDetails;
 }
 
 declare module 'store/reseller.thunk' {
