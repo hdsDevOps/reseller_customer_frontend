@@ -370,31 +370,25 @@ function Review() {
   }, [cart, appliedVoucher, cartPrice]);
 
   const getPlan = async() => {
-    if(userDetails?.workspace?.workspace_status === "trial") {
-      setWorkspacePrice(0);
-      const result = await dispatch(plansAndPricesListThunk({subscription_id: userDetails?.plan_name_id})).unwrap();
-      setUsedPlan(result?.data[0]);
-    } else {
-      const workspaceCart = cart?.find(item => item?.product_type === "google workspace");
-      if(workspaceCart) {
-        try {
-          const result = await dispatch(plansAndPricesListThunk({subscription_id: workspaceCart?.plan_name_id})).unwrap();
-          setUsedPlan(result?.data[0]);
-          const amountArray = result?.data[0]?.amount_details;
-          const priceArray = amountArray?.find(amount => amount?.currency_code === defaultCurrencySlice)?.price;
-          const finalArray = priceArray?.find(price => price?.type?.toLowerCase() === workspaceCart?.payment_cycle?.toLowerCase());
-          setWorkspacePrice(finalArray?.discount_price);
-        } catch (error) {
-          setWorkspacePrice(0);
-        }
-      } else {
-        const result = await dispatch(plansAndPricesListThunk({subscription_id: userDetails?.plan_name_id})).unwrap();
+    const workspaceCart = cart?.find(item => item?.product_type === "google workspace");
+    if(workspaceCart) {
+      try {
+        const result = await dispatch(plansAndPricesListThunk({subscription_id: workspaceCart?.plan_name_id})).unwrap();
         setUsedPlan(result?.data[0]);
         const amountArray = result?.data[0]?.amount_details;
         const priceArray = amountArray?.find(amount => amount?.currency_code === defaultCurrencySlice)?.price;
         const finalArray = priceArray?.find(price => price?.type?.toLowerCase() === workspaceCart?.payment_cycle?.toLowerCase());
         setWorkspacePrice(finalArray?.discount_price);
+      } catch (error) {
+        setWorkspacePrice(0);
       }
+    } else {
+      const result = await dispatch(plansAndPricesListThunk({subscription_id: userDetails?.plan_name_id})).unwrap();
+      setUsedPlan(result?.data[0]);
+      const amountArray = result?.data[0]?.amount_details;
+      const priceArray = amountArray?.find(amount => amount?.currency_code === defaultCurrencySlice)?.price;
+      const finalArray = priceArray?.find(price => price?.type?.toLowerCase() === workspaceCart?.payment_cycle?.toLowerCase());
+      setWorkspacePrice(finalArray?.discount_price);
     }
   };
 
@@ -410,11 +404,7 @@ function Review() {
     if(cart?.length > 0) {
       const priceList = cart.map((item) => {
         if(item?.product_type === "google workspace"){
-          if(item?.workspace_status === "trial") {
-            return {total_year: item?.total_year, price: 0};
-          } else {
-            return {total_year: item?.total_year, price: workspacePrice};
-          }
+          return {total_year: item?.total_year, price: workspacePrice};
         } else if(item?.product_type?.toLowerCase() === "domain") {
           return {total_year: item?.total_year, price: item?.price[defaultCurrencySlice]};
         }
