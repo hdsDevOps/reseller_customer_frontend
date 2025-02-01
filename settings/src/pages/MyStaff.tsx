@@ -431,7 +431,11 @@ const MyStaff = () => {
                     ...filter,
                     sortdata: {
                       sort_text: "first_name",
-                      order: filter?.sortdata?.sort_text === "first_name" ? "desc" : "asc"
+                      order: filter?.sortdata?.sort_text === "first_name"
+                      ? filter?.sortdata?.order === "desc"
+                        ? "asc"
+                        : "desc"
+                      : "asc"
                     }
                   })
                 }}><ArrowRightLeft className="w-3 h-3" style={{rotate: "90deg"}} /></button></span>

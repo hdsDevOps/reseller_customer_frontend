@@ -312,7 +312,11 @@ const Settings = () => {
                   <span className="ml-1"><button type="button" onClick={() => {
                   setSortdata({
                     sort_text: "user_type",
-                    order: sortdata?.sort_text === "user_type" ? "desc" : "asc"
+                    order: sortdata?.sort_text === "user_type"
+                    ? sortdata?.order === "desc"
+                      ? "asc"
+                      : "desc"
+                    : "asc"
                   })
                 }}><ArrowRightLeft className="w-3 h-3" style={{rotate: "90deg"}} /></button></span>
                 </th>

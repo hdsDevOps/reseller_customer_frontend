@@ -103,7 +103,7 @@ const BillingHistory: React.FC = () => {
 
   const tableHeader = [
     {name: "Transaction ID", label: "transaction_id"},
-    {name: "Date / Invoice", label: "date"},
+    {name: "Date / Invoice", label: "created_at"},
     {name: "Product Type", label: "product_type"},
     {name: "Description", label: "description"},
     {name: "Domain", label: "domain"},
@@ -517,14 +517,18 @@ const BillingHistory: React.FC = () => {
                   {
                     header?.label === "domain" ||
                     header?.label === "amount" ||
-                    header?.label === "date"
+                    header?.label === "created_at"
                     ? (
                       <span className="ml-1"><button type="button" onClick={() => {
                         setBillingHistoryFilter({
                           ...billingHistoryFilter,
                           sortdata: {
                             sort_text: header?.label,
-                            order: billingHistoryFilter?.sortdata?.sort_text === header?.label ? "desc" : "asc"
+                            order: billingHistoryFilter?.sortdata?.sort_text === header?.label
+                            ? billingHistoryFilter?.sortdata?.order === "desc"
+                              ? "asc"
+                              : "desc"
+                            : "asc"
                           }
                         })
                       }}><ArrowRightLeft className="w-3 h-3" style={{rotate: "90deg"}} /></button></span>
