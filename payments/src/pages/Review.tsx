@@ -936,17 +936,17 @@ function Review() {
           productBy: "test",
           currency: defaultCurrencySlice,
           description: `purchasing ${productNameJoined}`,
-          domain: {
+          domain: cart?.find(item => item?.product_type?.toLowerCase() === "domain") ? {
             domain_name: cart?.find(item => item?.product_type?.toLowerCase() === "domain")?.product_name || "",
             type: cart?.find(item => item?.product_type?.toLowerCase() === "domain")?.workspace_status || "",
             year: cart?.find(item => item?.product_type?.toLowerCase() === "domain")?.total_year || ""
-          },
-          workspace: {
+          } : "",
+          workspace: cart?.find((item) => item?.product_type === "google workspace") ? {
             plan: usedPlan || "",
             license_usage: cart?.find((item) => item?.product_type === "google workspace")?.total_year,
             plan_period: cart?.find((item) => item?.product_type === "google workspace")?.payment_cycle,
             trial_plan: cart?.find((item) => item?.product_type === "google workspace")?.workspace_status === "trial" ? "yes" : "no"
-          },
+          } : "",
           customer_id: customerId,
           email: userData?.email,
           voucher: appliedVoucher === null ? "" : appliedVoucher?.id
