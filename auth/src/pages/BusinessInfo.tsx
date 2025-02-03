@@ -6,7 +6,7 @@ import { IoChevronBackSharp } from "react-icons/io5";
 import "./cumtel.css";
 import { useAppDispatch } from "store/hooks";
 import axios from "axios";
-import { hereMapSearchThunk, udpateBusinessDataThunk } from "store/user.thunk";
+import { hereMapSearchThunk, udpateBusinessDataThunk } from "store/user.thunk"; 
 import { toast } from "react-toastify";
 
 //user_id, first_name, last_name, email, phone_no, address, state, city, country, password, business_name, business_state, business_city, zipcode

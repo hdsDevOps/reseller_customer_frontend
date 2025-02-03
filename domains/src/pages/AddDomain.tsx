@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { checkDomainThunk } from "store/reseller.thunk";
-import { removeUserAuthTokenFromLSThunk } from "store/user.thunk";
+import { removeUserAuthTokenFromLSThunk } from "store/user.thunk"; 
 
 const initialDomain = {
   domain: '',

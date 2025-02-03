@@ -286,7 +286,7 @@ const authSlice = createSlice({
     builder.addCase(removeUserAuthTokenFromLSThunk.rejected, state => {
       // state.userAuthStatus = 'UN_AUTHORIZED';
     });
-  },
+  }, 
 });
 
 export const { setTokenDetails, setUserDetails, setStaffDetails, setUserAuthStatus,  setResellerToken, resetUserSlice, setCart, setDomains, setSaveCards, setPaymentMethodsState, setDefaultCurrencySlice, setWorkSpaceFlowSlice, setCustomerId, setStaffId, setStaffStatus, setBillingHistoryFilterSlice, setPaymentDetailsFilterSlice, setCurrentPageNumberSlice, setItemsPerPageSlice, setMetaDataSlice, setRoleIdSlice, setNotificationsListSlice, setIsAdminSlice, setRolePermissionsSlice } = authSlice.actions;

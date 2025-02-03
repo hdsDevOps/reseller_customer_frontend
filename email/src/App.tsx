@@ -9,7 +9,7 @@ const App: React.FC = () => {
     <>
       <Suspense fallback={<h2>Loading.....</h2>}>
         <EmailApp />
-      </Suspense>
+      </Suspense> 
     </>
   );
 };
