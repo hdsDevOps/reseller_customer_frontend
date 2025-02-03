@@ -557,6 +557,8 @@ function Review() {
     }
   };
 
+  console.log("domainsState...", domainsState);
+
   const addSubscriptionForWorkspace = async(item, result2) => {
     try {
       const planData = await dispatch(plansAndPricesListThunk({
@@ -568,7 +570,11 @@ function Review() {
         customer_id: customerId,
         description: `purchase google workspace ${item?.product_name} ${item?.total_year}`,
         domain: [
-          domainsState?.find(item => item?.domain_type === "primary")?.domain_name || cart?.find(item => item?.product_type === "domain") ? cart?.find(item => item?.product_type === "domain")?.product_name : ""
+          domainsState?.find(item => item?.domain_type === "primary")
+          ? domainsState?.find(item => item?.domain_type === "primary")?.domain_name
+          : cart?.find(item => item?.product_type === "domain")
+          ? cart?.find(item => item?.product_type === "domain")?.product_name
+          : ""
         ],
         last_payment: todayDate,
         next_payment: planExpiryDate,

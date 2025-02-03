@@ -396,7 +396,7 @@ const DownloadInvoice: React.FC = () => {
                                 item?.product_type === "google workspace"
                                 ? item?.workspace_status === "trial"
                                   ? 0.00
-                                  : (parseFloat(data?.plan?.amount_details?.find(amount => amount?.currency_code === data?.body?.product?.currency)?.price?.find(priceList => priceList?.type === data?.period)?.discount_price)*item?.total_year)?.toFixed(2)
+                                  : (parseFloat(data?.body?.product?.workspace?.plan?.amount_details?.find(amount => amount?.currency_code === data?.body?.product?.currency)?.price?.find(priceList => priceList?.type === data?.body?.product?.workspace?.plan_period)?.discount_price)*item?.total_year)?.toFixed(2)
                                 : item?.product_type === "domain"
                                 ? (parseFloat(item?.price[data?.body?.product?.currency])*item?.total_year)?.toFixed(2)
                                 : ""
