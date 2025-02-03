@@ -197,7 +197,7 @@ const authSlice = createSlice({
       state.userAuthStatus = 'PENDING';
       state.userDetails = {};
       state.userId = null;
-      state.token = '';
+      state.token = ''; 
     },
   },
   extraReducers: builder => {
