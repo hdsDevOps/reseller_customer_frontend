@@ -2,6 +2,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   getHordansoAdminDetailsFromLSThunk,
+  getProfileDataThunk,
   getUserAuthTokenFromLSThunk,
   getUserIdFromLSThunk,
   makeUserLoginThunk,
@@ -286,6 +287,23 @@ const authSlice = createSlice({
     builder.addCase(removeUserAuthTokenFromLSThunk.rejected, state => {
       // state.userAuthStatus = 'UN_AUTHORIZED';
     });
+
+    //-------------
+
+    builder.addCase(getProfileDataThunk.pending, state => {
+      state.userAuthStatus = 'PENDING';
+    });
+
+    builder.addCase(getProfileDataThunk.fulfilled, (state, action: PayloadAction<any>) => {
+      state.userAuthStatus = 'AUTHORIZED';
+      state.userDetails = action.payload.customerData;
+    });
+
+    builder.addCase(getProfileDataThunk.rejected, state => {
+      state.userAuthStatus = 'UN_AUTHORIZED';
+    });
+
+    //-------------
   }, 
 });
 

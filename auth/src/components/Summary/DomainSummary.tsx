@@ -43,13 +43,13 @@ const DomainSummary = ({state, plan}:any) => {
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
   // console.log("plan...", plan);
-  console.log("state...", state);
+  // console.log("state...", state);
 
   const [showVoucherInput, setShowVoucherInput] = useState(false);
   const [showAvailableVoucher, setShowAvailableVoucher] = useState(false);
   const [voucherCode, setVoucherCode] = useState("");
   const [appliedVoucher, setAppliedVoucher] = useState<Voucher | null>(null);
-  console.log("applied voucher...", appliedVoucher);
+  // console.log("applied voucher...", appliedVoucher);
   const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
   const [isVoucherApplied, setIsVoucherApplied] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);

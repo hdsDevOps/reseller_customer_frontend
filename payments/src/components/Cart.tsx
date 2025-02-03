@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { GoChevronLeft } from "react-icons/go";
 import { useNavigate } from "react-router-dom";
 import { LuPencilLine } from "react-icons/lu";
@@ -8,16 +8,17 @@ import { BiSolidCheckShield } from "react-icons/bi";
 import { MdClose, MdOutlineAddShoppingCart } from "react-icons/md";
 import { cartItems, recommendations } from "../utils/Utils";
 import "./Cart.css";
-import { addNewDomainThunk, addToCartThunk, getCartThunk, getVouchersListThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk } from 'store/user.thunk';
+import { addNewDomainThunk, addToCartThunk, getCartThunk, getProfileDataThunk, getVouchersListThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk, udpateProfileDataThunk } from 'store/user.thunk';
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { toast } from "react-toastify";
-import { setCart } from "store/authSlice";
+import { setCart, setUserDetails } from "store/authSlice";
 import { currencyList } from "./CurrencyList";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import CustomerAgreement from "./CustomerAgreement";
 import PrivacyPolicy from "./PrivacyPolicy";
 import { domainAvailabilityThunk } from "store/reseller.thunk";
+import axios from "axios";
 
 interface Voucher {
   code: string;
@@ -27,7 +28,13 @@ interface Voucher {
 const initialCartPrice = {
   total_year: 0,
   price: 0
-}
+};
+
+const preInitialBusinessData = {
+  business_name: "",
+  business_state: "",
+  business_city: "",
+};
 
 const logoImage = 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo-2.png?alt=media&token=9315e750-1f5d-4032-ba46-1aeafa340a75';
 const logoImageSmall = 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899';
@@ -36,7 +43,12 @@ const Cart = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { customerId, defaultCurrencySlice, userDetails } = useAppSelector(state => state.auth);
-  // console.log(userDetails);
+  console.log(userDetails);
+  const [initialBusinessData, setInitialBusinessData] = useState({
+    business_name: "",
+    business_state: "",
+    business_city: "",
+  });
   const [showVoucherInput, setShowVoucherInput] = useState(false);
   const [showAvailableVouchers, setShowAvailableVouchers] = useState(false);
   const [voucherCode, setVoucherCode] = useState("");
@@ -67,6 +79,74 @@ const Cart = () => {
   const [currentPlan, setCurrentPlan] = useState<object|null>(null);
   // console.log("currentPlan...", currentPlan);
   const [domain, setDomain] = useState("");
+  const [isBusinessModalOpen, setIsBusinessModalOpen] = useState<Boolean>(false);
+  const [businessData, setBusinessData] = useState(initialBusinessData);
+  console.log("businessData...", businessData);
+
+  const [businessStateName, setBusinessStateName] = useState("");
+  const [businessCityName, setBusinessCityName] = useState("");
+  const [businessCountries, setBusinessCountries] = useState([]);
+  const [businessStates, setBusinessStates] = useState([]);
+  const [businessCities, setBusinessCities] = useState([]);
+  const [businessCountry, setBusinessCountry] = useState({});
+  const [businessState, setBusinessState] = useState({});
+  const [businessCity, setBusinessCity] = useState({});
+  const [businessStateDropdownOpen, setBusinessStateDropdownOpen] = useState<Boolean>(false);
+  const [businessCityDropdownOpen, setBusinessCityDropdownOpen] = useState<Boolean>(false);
+  const businessStateRef = useRef(null);
+  const businessCityRef = useRef(null);
+
+  useEffect(() => {
+    setInitialBusinessData({
+      business_name: userDetails?.business_name,
+      business_state: userDetails?.business_state,
+      business_city: userDetails?.business_city,
+    })
+  }, [userDetails]);
+  
+  useEffect(() => {
+    setBusinessData({...initialBusinessData});
+  }, [initialBusinessData]);
+
+  const handleClickOutsideBusinessState = (event: MouseEvent) => {
+    if(businessStateRef.current && !businessStateRef.current.contains(event.target as Node)) {
+      setBusinessStateDropdownOpen(false);
+    }
+  };
+
+  const handleClickOutsideBusinessCity = (event: MouseEvent) => {
+    if(businessCityRef.current && !businessCityRef.current.contains(event.target as Node)) {
+      setBusinessCityDropdownOpen(false);
+    }
+  };
+
+  useEffect(() => {
+   document.addEventListener('mousedown', handleClickOutsideBusinessState);
+    document.addEventListener('mousedown', handleClickOutsideBusinessCity);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutsideBusinessState);
+      document.removeEventListener('mousedown', handleClickOutsideBusinessCity);
+    };
+  }, []);
+
+  useEffect(() => {
+    var config = {
+      method: 'get',
+      url: 'https://api.countrystatecity.in/v1/countries',
+      headers: {
+        'X-CSCAPI-KEY': 'Nk5BN011UlE5QXZ6eXc1c05Id3VsSmVwMlhIWWNwYm41S1NRTmJHMA=='
+      }
+    };
+    axios(config)
+      .then(res => {
+        setBusinessCountries(res.data);
+        // console.log(res.data);
+      })
+      .catch(err => {
+        setBusinessCountries([]);
+        console.log("error...", err);
+      })
+  }, []);
 
   const handleLegalModalClose = () => {
     setIsLegalModalOpen(false);
@@ -93,6 +173,77 @@ const Cart = () => {
   useEffect(() => {
     getPlansAndPricesList();
   }, []);
+  
+  useEffect(() => {
+    if(businessCountry?.iso2 !== undefined) {
+      var config = {
+        method: 'get',
+        url: `https://api.countrystatecity.in/v1/countries/${businessCountry?.iso2}/states`,
+        headers: {
+          'X-CSCAPI-KEY': 'Nk5BN011UlE5QXZ6eXc1c05Id3VsSmVwMlhIWWNwYm41S1NRTmJHMA=='
+        }
+      };
+      axios(config)
+      .then(res => {
+        setBusinessStates(res.data);
+      })
+      .catch(err => {
+        setBusinessStates([]);
+        console.log("error...", err);
+      })
+    } else {
+      setBusinessStates([]);
+    }
+  }, [businessCountry]);
+  
+  useEffect(() => {
+    if(businessCountry?.iso2 !== undefined && businessState?.iso2 !== undefined) {
+      var config = {
+        method: 'get',
+        url: `https://api.countrystatecity.in/v1/countries/${businessCountry?.iso2}/states/${businessState?.iso2}/cities`,
+        headers: {
+          'X-CSCAPI-KEY': 'Nk5BN011UlE5QXZ6eXc1c05Id3VsSmVwMlhIWWNwYm41S1NRTmJHMA=='
+        }
+      };
+      axios(config)
+      .then(res => {
+        setBusinessCities(res.data);
+      })
+      .catch(err => {
+        setBusinessCities([]);
+        console.log("error...", err);
+      })
+    } else {
+      setBusinessCities([]);
+    }
+  }, [businessCountry, businessState]);
+
+  useEffect(() => {
+    if(userDetails?.country !== "" && businessCountries?.length > 0) {
+      const countryData = businessCountries?.find(state => state?.name === userDetails?.country);
+      if(countryData) {
+        setBusinessCountry(countryData);
+      }
+    }
+  }, [userDetails?.country, businessCountries]);
+
+  useEffect(() => {
+    if(businessData?.business_state !== "" && businessStates?.length > 0) {
+      const stateData = businessStates?.find(state => state?.name === businessData?.business_state);
+      if(stateData) {
+        setBusinessState(stateData);
+      }
+    }
+  }, [businessData?.business_state, businessStates]);
+
+  useEffect(() => {
+    if(businessData?.business_city !== "" && businessCities?.length > 0) {
+      const cityData = businessCities?.find(city => city?.name === businessData?.business_city);
+      if(cityData) {
+        setBusinessCity(cityData);
+      }
+    }
+  }, [businessData?.business_city, businessCities]);
 
   const [plansList, setPlansList] = useState([]);
   // console.log("plans list...", plansList);
@@ -421,6 +572,60 @@ const Cart = () => {
     }
 
     // navigate('/choose-domain');
+  };
+
+  const updateBusinessData = async(e) => {
+    e.preventDefault();
+    if(
+      businessData?.business_name !== "" && businessData?.business_name?.trim() !== "" &&
+      businessData?.business_state !== "" && businessData?.business_state?.trim() !== "" &&
+      businessData?.business_city !== "" && businessData?.business_city?.trim() !== ""
+    ) {
+      try {
+        const result = await dispatch(udpateProfileDataThunk({
+          user_id: customerId,
+          first_name: userDetails?.first_name,
+          last_name: userDetails?.last_name,
+          email: userDetails?.email,
+          phone_no: userDetails?.phone_no,
+          address: userDetails?.address,
+          state: userDetails?.state,
+          city: userDetails?.city,
+          country: userDetails?.country,
+          password: userDetails?.password,
+          business_name: businessData?.business_name,
+          business_state: businessData?.business_state,
+          business_city: businessData?.business_city,
+          zipcode: userDetails?.zipcode,
+          staff_id: "",
+          is_staff: false
+        })).unwrap();
+        // console.log("result...", result);
+        if(result?.message === "Profile updated successfully") {
+          toast.success("Business data updated successfully");
+        } else {
+          toast.error("Error updating business summary details");
+        }
+      } catch (error) {
+        toast.error("Error updating business summary details");
+      } finally {
+        const profile = await dispatch(getProfileDataThunk({
+          user_id: customerId,
+          staff_id: "",
+          is_staff: false
+        })).unwrap()
+        // console.log("profile...", profile?.customerData);
+        setInitialBusinessData({
+          business_name: profile?.customerData?.business_name,
+          business_state: profile?.customerData?.business_state,
+          business_city: profile?.customerData?.business_city,
+        });
+        await dispatch(setUserDetails(profile?.customerData));
+        setIsBusinessModalOpen(false);
+      }
+    } else {
+      toast.warning("Input fields cannot be empty");
+    }
   }
 
   return (
@@ -637,7 +842,7 @@ const Cart = () => {
         </div>
 
         <div className="flex flex-col gap-4">
-          <h1 className="flex items-center gap-1 underline text-xl font-semibold justify-end mb-4">
+          <h1 className="flex items-center gap-1 underline text-xl font-semibold justify-end mb-4 cursor-pointer" onClick={() => {setIsBusinessModalOpen(true)}}>
             Business Summary <LuPencilLine className="text-xl text-green-500" />
           </h1>
           <div className="flex flex-col gap-8">
@@ -1013,6 +1218,185 @@ const Cart = () => {
                   }
                 </DialogPanel>
               </div>
+            </div>
+          </Dialog>
+        )
+      }
+
+      {
+        isBusinessModalOpen && (
+          <Dialog
+            open={isBusinessModalOpen}
+            as="div"
+            className="relative z-50 focus:outline-none"
+            onClose={() => {
+              setIsBusinessModalOpen(false);
+              setBusinessData(initialBusinessData);
+            }}
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-10 w-screen overflow-y-auto mt-16">
+              <form onSubmit={updateBusinessData} className="flex min-h-full items-center justify-center py-4">
+                <DialogPanel
+                  transition
+                  className="w-full max-w-[700px] rounded-xl bg-white p-6 duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+                >
+                  <div className="flex justify-between items-center mb-6">
+                    <DialogTitle
+                      as="h3"
+                      className="text-lg font-semibold text-gray-900"
+                    >Business Summary</DialogTitle>
+                    <div className='btn-close-bg'>
+                      <button
+                        type='button'
+                        className='text-black items-center'
+                        onClick={() => {
+                          setIsBusinessModalOpen(false);
+                          setBusinessData(initialBusinessData);
+                        }}
+                      ><RiCloseFill className="w-6 h-6" /></button>
+                    </div>
+                  </div>
+
+                  <div
+                    className="mt-8 px-8 grid grid-cols-1"
+                  >
+                    <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto mt-2">
+                      <input
+                        type="text"
+                        className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#8A8A8A] focus:ring-0 focus:border-black peer"
+                        value={businessData?.business_name}
+                        name='business_name'
+                        onChange={e => {
+                          setBusinessData({
+                            ...businessData,
+                            business_name: e.target.value
+                          })
+                        }}
+                        placeholder="Enter your business name"
+                      />
+                      <label
+                        htmlFor="business_name"
+                        className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+                      >Business Name</label>
+                    </div>
+                    <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto mt-2" ref={businessStateRef}>
+                      <input
+                        type="text"
+                        className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#8A8A8A] focus:ring-0 focus:border-black peer"
+                        value={businessData?.business_state || businessStateName}
+                        name='business_state'
+                        onChange={e => {
+                          setBusinessData({
+                            ...businessData,
+                            business_state: "",
+                            business_city: ""
+                          });
+                          setBusinessStateName(e.target.value);
+                          setBusinessCityName("");
+                          setBusinessState({});
+                          setBusinessCity({});
+                        }}
+                        onFocus={() => {setBusinessStateDropdownOpen(true)}}
+                        placeholder="Enter your business state"
+                      />
+                      <label
+                        htmlFor="business_state"
+                        className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+                      >Business State</label>
+                      {
+                        businessStateDropdownOpen && (
+                          <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+                            {
+                              businessStates?.filter(name => name?.name.toLowerCase()?.includes(businessStateName.toLowerCase()))?.map((region, idx) => (
+                                <p
+                                  key={idx}
+                                  className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                                  onClick={() => {
+                                    setBusinessData({
+                                      ...businessData,
+                                      business_state: region?.name,
+                                      business_city: ""
+                                    });
+                                    setBusinessStateName("");
+                                    setBusinessCityName("");
+                                    setBusinessState(region);
+                                    setBusinessCity({});
+                                    setBusinessStateDropdownOpen(false);
+                                  }}
+                                  dropdown-name="state_dropdown"
+                                >{region?.name}</p>
+                              ))
+                            }
+                          </div>
+                        )
+                      }
+                    </div>
+                    <div className="max-w-[378px] w-full sm:col-span-1 col-span-2 relative mx-auto mt-2" ref={businessCityRef}>
+                      <input
+                        type="text"
+                        className="block px-2.5 pb-2 pt-2 w-full text-[#14213D] text-sm   bg-white rounded-[6px] border border-[#E4E4E4] appearance-none focus:outline-none placeholder:text-[#8A8A8A] focus:ring-0 focus:border-black peer"
+                        value={businessData?.business_city || businessCityName}
+                        name='business_city'
+                        onChange={e => {
+                          setBusinessData({
+                            ...businessData,
+                            business_city: ""
+                          });
+                          setBusinessCityName(e.target.value);
+                          setBusinessCity({});
+                        }}
+                        onFocus={() => {setBusinessCityDropdownOpen(true)}}
+                        placeholder="Enter your business city"
+                      />
+                      <label
+                        htmlFor="business_city"
+                        className="absolute text-sm text-[#8A8A8A] font-inter duration-300 transform -translate-y-4 scale-75 top-2 origin-[0] bg-white px-2 left-2"
+                      >Business City*</label>
+                      {
+                        businessCityDropdownOpen && (
+                          <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+                            {
+                              businessCities?.filter(name => name?.name.toLowerCase()?.includes(businessCityName.toLowerCase()))?.map((region, idx) => (
+                                <p
+                                  key={idx}
+                                  className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                                  onClick={() => {
+                                    setBusinessData({
+                                      ...businessData,
+                                      business_city: region?.name
+                                    });
+                                    setBusinessCityName("");
+                                    setBusinessCity(region);
+                                    setBusinessCityDropdownOpen(false);
+                                  }}
+                                  dropdown-name="state_dropdown"
+                                >{region?.name}</p>
+                              ))
+                            }
+                          </div>
+                        )
+                      }
+                    </div>
+                  </div>
+
+                  <div
+                    className="flex flex-row justify-center items-center mt-14 gap-5"
+                  >
+                    <button
+                      className="py-[10px] rounded-[10px] bg-[#12A833] text-[#F0F0F3] align-middle focus:outline-none font-inter font-semibold text-base w-[105px]"
+                      type="submit"
+                    >Update</button>
+                    <button
+                      className="py-[10px] rounded-[10px] bg-[#E02424] text-[#F0F0F3] align-middle focus:outline-none font-inter font-semibold text-base w-[105px]"
+                      type="button"
+                      onClick={() => {
+                        setIsBusinessModalOpen(false);
+                        setBusinessData(initialBusinessData);
+                      }}
+                    >Cancel</button>
+                  </div>
+                </DialogPanel>
+              </form>
             </div>
           </Dialog>
         )

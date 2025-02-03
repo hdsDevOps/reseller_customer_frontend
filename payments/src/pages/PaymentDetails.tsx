@@ -884,11 +884,11 @@ const PaymentDetails: React.FC = () => {
                             )}
                           </span>
                         </td>
-                        <td className="px-2 pb-10 pt-3 flex items-center content-center justify-center">
+                        <td className="px-2 pb-10 pt-3 items-center content-center">
                           <button
                             type="button"
                             disabled={isAdmin}
-                            className={`w-6 h-6 rounded-full border-2 ${isAdmin ? "border-[#8A8A8A]" : "border-green-500"} flex justify-center  items-center content-center my-auto`}
+                            className={`w-6 h-6 rounded-full border-2 ${isAdmin ? "border-[#8A8A8A]" : "border-green-500"} flex justify-center  items-center content-center mx-auto my-auto`}
                             onClick={() => {toggleList(index)}}
                           >
                             <p className="mb-2 items-center content-center">...</p>
@@ -920,9 +920,13 @@ const PaymentDetails: React.FC = () => {
                                       }
                                     } else if(list?.label === "Update Plan") {
                                       if(detail?.product_type?.toLowerCase() === "google workspace") {
-                                        if(userDetails?.workspace?.workspace_status !== "trial") {
+                                        if(userDetails?.workspace?.workspace_status === "trial") {
                                           return (
                                             <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => renewalAddToCart(e)}>{list?.label}</li>
+                                          )
+                                        } else {
+                                          return (
+                                            <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={() => {navigate(list?.link, {state: detail})}}>{list?.label}</li>
                                           )
                                         }
                                       }
@@ -1086,11 +1090,11 @@ const PaymentDetails: React.FC = () => {
                             )}
                           </span>
                         </td>
-                        <td className="px-2 pb-10 pt-3 flex items-center content-center justify-center">
+                        <td className="px-2 pb-10 pt-3 items-center content-center">
                           <button
                             type="button"
                             disabled={isAdmin}
-                            className={`w-6 h-6 rounded-full border-2 ${isAdmin ? "border-[#8A8A8A]" : "border-green-500"} flex justify-center  items-center content-center my-auto`}
+                            className={`w-6 h-6 rounded-full border-2 ${isAdmin ? "border-[#8A8A8A]" : "border-green-500"} flex justify-center  items-center content-center my-auto mx-auto`}
                             onClick={() => {toggleList(index)}}
                           >
                             <p className="mb-2 items-center content-center">...</p>

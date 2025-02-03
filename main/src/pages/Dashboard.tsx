@@ -807,9 +807,13 @@ const Dashboard: React.FC = () => {
                                     )
                                   }
                                 } else if(list?.label === "Update Plan") {
-                                  if(userDetails?.workspace?.workspace_status !== "trial") {
+                                  if(userDetails?.workspace?.workspace_status === "trial") {
                                     return (
                                       <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => renewalAddToCart(e)}>{list?.label}</li>
+                                    )
+                                  } else {
+                                    return (
+                                      <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={() => {navigate(list?.link, {state: subscription})}}>{list?.label}</li>
                                     )
                                   }
                                 } else {

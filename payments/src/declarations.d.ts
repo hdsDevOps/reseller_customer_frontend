@@ -74,6 +74,7 @@ declare module 'store/authSlice' {
   export const setDomains: (payload: any) => PayloadAction<any>;
   export const setCart: (payload: any) => PayloadAction<any>;
   export const setCart: (payload: any) => PayloadAction<any>;
+  export const setUserDetails;
 
   export default authSlice.reducer;
 }

@@ -17,7 +17,7 @@ import { plansAndPricesListThunk } from "store/user.thunk";
 const Summary: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  // console.log("location state...", location.state);
+  console.log("location state...", location.state);
   const dispatch = useAppDispatch();
   
   useEffect(() => {
@@ -86,10 +86,10 @@ const Summary: React.FC = () => {
 
   useEffect(() => {
     if(countries?.length > 0) {
-      const countryData = countries?.find(item => item?.name === data.formData.region);
+      const countryData = countries?.find(item => item?.name === data.formData.country);
       setCountry(countryData);
     };
-  }, [countries, data.formData.region]);
+  }, [countries, data.formData.country]);
 
   useEffect(() => {
     if(states?.length > 0) {
@@ -250,20 +250,16 @@ const Summary: React.FC = () => {
     // if(isNumberValid) {
     if(
       editData?.business_name !== "" && editData?.business_name?.trim() !== "" &&
-      editData?.region !== "" && editData?.region?.trim() !== "" &&
       editData?.business_state !== "" && editData?.business_state?.trim() !== "" &&
-      editData?.business_city !== "" && editData?.business_city?.trim() !== "" &&
-      editData?.business_zip_code !== "" && editData?.business_zip_code?.trim() !== ""
+      editData?.business_city !== "" && editData?.business_city?.trim() !== ""
     ) {
       setData({
         ...data,
         formData: {
           ...data.formData,
           business_name: editData?.business_name,
-          region: editData?.region,
           business_state: editData?.business_state,
           business_city: editData?.business_city,
-          business_zip_code: editData?.business_zip_code
         },
       });
       setOpenBusinessModal(false);
@@ -498,67 +494,6 @@ const Summary: React.FC = () => {
 
                     <div
                       className='flex flex-col px-2 mb-2 w-full max-w-[500px] mx-auto relative'
-                      ref={countryRef}
-                    >
-                      <label
-                        className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
-                      >Region</label>
-                      <input
-                        type="text"
-                        name="region"
-                        required
-                        className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
-                        onChange={(e) => {
-                          setEditData({
-                            ...editData,
-                            region: '',
-                            business_state: '',
-                            business_city: '',
-                          });
-                          setCountryName(e.target.value);
-                          setStateName('');
-                          setCityName('');
-                          setCountry({});
-                          setState({});
-                          setCity({});
-                        }}
-                        value={editData?.region || countryName}
-                        onFocus={() => {setCountryDropdownOpen(true)}}
-                        placeholder="Search your country"
-                        // cypress-name={item.name+"_input"}
-                      />
-                      {
-                        countryDropdownOpen && (
-                          <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md'>
-                            {
-                              countries?.filter(name => name?.name.toLowerCase().includes(countryName.toLowerCase())).map((country, idx) => (
-                                <p
-                                  key={idx}
-                                  className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
-                                  dropdown-name="country-dropdown"
-                                  onClick={() => {
-                                    setEditData({
-                                      ...editData,
-                                      region: country?.name
-                                    });
-                                    setCountryName("");
-                                    setStateName("");
-                                    setCityName("");
-                                    setCountry(country);
-                                    setState({});
-                                    setCity({});
-                                    setCountryDropdownOpen(false);
-                                  }}
-                                >{country?.name}</p>
-                              ))
-                            }
-                          </div>
-                        )
-                      }
-                    </div>
-
-                    <div
-                      className='flex flex-col px-2 mb-2 w-full max-w-[500px] mx-auto relative'
                       ref={stateRef}
                     >
                       <label
@@ -662,24 +597,6 @@ const Summary: React.FC = () => {
                           </div>
                         )
                       }
-                    </div>
-
-                    <div
-                      className='flex flex-col px-2 mb-2 w-full max-w-[500px] mx-auto'
-                    >
-                      <label
-                        className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
-                      >Business Zip Code</label>
-                      <input
-                        type="text"
-                        name="business_zip_code"
-                        required
-                        className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
-                        onChange={updateEditData}
-                        value={editData?.business_zip_code}
-                        placeholder="Enter business zip code"
-                        // cypress-name={item.name+"_input"}
-                      />
                     </div>
                   </div>
 

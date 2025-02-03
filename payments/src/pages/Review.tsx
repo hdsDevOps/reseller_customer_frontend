@@ -1662,7 +1662,7 @@ function Review() {
           <Dialog
             open={isOpenModal}
             as="div"
-            className="relative z-10 focus:outline-none"
+            className="relative z-50 focus:outline-none"
             onClose={() => {
               setIsOpenModal(false);
               setPrimaryContact(initialPrimaryContact);
