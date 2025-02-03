@@ -606,16 +606,18 @@ const BillingHistory: React.FC = () => {
                     <td className="px-2 pb-10 pt-3 text-center text-green-500">
                       {detail?.amount}
                     </td>
-                    <td className="cursor-pointer flex justify-center">
-                      <button
-                        type="button"
-                        className="flex items-center justify-center mt-3 w-4 h-4"
-                        onClick={() => {downloadInvoice()}}
-                        // disabled={!rolePermissionsSlice?.billing_history?.download ? true : false}
-                        cypress-name="invoice_download"
-                      >
-                        <FaDownload className="text-green-500 w-full h-full" />
-                      </button>
+                    <td className="cursor-pointer px-2 pb-10 pt-3">
+                      <div className="w-full flex justify-center">
+                        <button
+                          type="button"
+                          className="w-4 h-4 mx-auto"
+                          onClick={() => {downloadInvoice()}}
+                          // disabled={!rolePermissionsSlice?.billing_history?.download ? true : false}
+                          cypress-name="invoice_download"
+                        >
+                          <FaDownload className="text-green-500 w-full h-full" />
+                        </button>
+                      </div>
                       <div className={pdfDownload}>
                         <BillingInvoice pdfRef={invoiceRef} data={detail} />
                       </div>

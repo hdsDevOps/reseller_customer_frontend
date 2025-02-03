@@ -23,12 +23,12 @@ const PlanandPrice = ({id}:any) => {
   const [basePlans, setBasePlans] = useState([]);
   // console.log("basePlans...", basePlans);
   const [plans, setPlans] = useState([]);
-  // console.log("plans...", plans);
+  console.log("plans...", plans);
 
   const [plansLength, setPlansLength] = useState(0);
   // console.log("plansLength...", plansLength);
   const [activePlans, setActivePlans] = useState([]);
-  // console.log("activePlans...", activePlans);
+  console.log("activePlans...", activePlans);
   const [activePlanIndex, setActivePlanIndex] = useState(0);
   // console.log("activePlanIndex...", activePlanIndex);
 
@@ -36,7 +36,7 @@ const PlanandPrice = ({id}:any) => {
     if(basePlans?.length > 0) {
       const currentPlans = basePlans?.filter(planName => planName?.amount_details?.some(detail => detail?.currency_code === defaultCurrencySlice));
       // console.log("currentPlans....", currentPlans);
-      setPlans(currentPlans);
+      setPlans([...currentPlans]);
     } else {
       setPlans([]);
     }
@@ -44,8 +44,12 @@ const PlanandPrice = ({id}:any) => {
 
   useEffect(() => {
     if(plans?.length > 0) {
-      const plansList = plans?.filter((_, index) => index < 3);
-      setActivePlans(plansList);
+      // if(plans?.length > 3) {
+      //   const plansList = plans?.filter((_, index) => index < 3);
+      //   setActivePlans(plansList);
+      // } else {
+      //   setActivePlans(plans);
+      // }
       setActivePlanIndex(0);
       setPlansLength(plans?.length);
     };
@@ -68,22 +72,34 @@ const PlanandPrice = ({id}:any) => {
     }
   };
 
+  // useEffect(() => {
+  //   if(plansLength - activePlanIndex >= 3) {
+  //     setActivePlans(plans?.filter((_,index) => index >= activePlanIndex && index < activePlanIndex+3));
+  //   } else if(plansLength - activePlanIndex < 3) {
+  //     const diff = plansLength - activePlanIndex;
+  //     // console.log("diff...", diff);
+  //     if(diff === 2) {
+  //       const customPlans = plans?.filter((_,index) => index >= activePlanIndex);
+  //       customPlans?.push(plans[0]);
+  //       setActivePlans(customPlans);
+  //     } else if(diff === 1) {
+  //       const customPlans = [plans[activePlanIndex]];
+  //       console.log([plans[activePlanIndex]])
+  //       customPlans?.push(plans[0], plans[1]);
+  //       setActivePlans(customPlans);
+  //     }
+  //   }
+  // }, [plans, plansLength, activePlanIndex]);
+  
   useEffect(() => {
-    if(plansLength - activePlanIndex >= 3) {
-      setActivePlans(plans?.filter((_,index) => index >= activePlanIndex && index < activePlanIndex+3));
-    } else if(plansLength - activePlanIndex < 3) {
-      const diff = plansLength - activePlanIndex;
-      // console.log("diff...", diff);
-      if(diff === 2) {
-        const customPlans = plans?.filter((_,index) => index >= activePlanIndex);
-        customPlans?.push(plans[0]);
-        setActivePlans(customPlans);
-      } else if(diff === 1) {
-        const customPlans = [plans[activePlanIndex]];
-        console.log([plans[activePlanIndex]])
-        customPlans?.push(plans[0], plans[1]);
-        setActivePlans(customPlans);
+    if(plansLength === 0) {
+      setActivePlans([]);
+    } else {
+      let newActivePlans = [];
+      for(let i=0; i < Math.min(3, plansLength); i++) {
+        newActivePlans.push(plans[(activePlanIndex + i) % plansLength]);
       }
+      setActivePlans([...newActivePlans]);
     }
   }, [plans, plansLength, activePlanIndex]);
 

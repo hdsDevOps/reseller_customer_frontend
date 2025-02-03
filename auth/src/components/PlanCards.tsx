@@ -38,7 +38,7 @@ const PlanCard: React.FC = ({plans, handleLeftPlan, handleRightPlan, plansLength
   const trialExpirationDate = (count) => {
     const today = new Date();
     const monthFromToday = new Date();
-    monthFromToday.setDate(today.getDate() + parseInt(count));
+    monthFromToday.setDate(today?.getDate() + parseInt(count));
     return format(monthFromToday, "dd-MM-yyyy");
   };
   
@@ -102,7 +102,7 @@ const PlanCard: React.FC = ({plans, handleLeftPlan, handleRightPlan, plansLength
       </div>
 
       {/* <div className="flex min-sm:flex-row  items-end justify-center gap-2 w-full max-sm:flex-col max-sm:items-center   mt-6"> */}
-      <div className="flex flex-col xl:flex-row lg:flex-row  lg:items-stretch justify-center gap-2 w-full sm:flex-col sm:items-center mt-6 bg-white relative">
+      <div className="flex flex-col xl:flex-row lg:flex-row  lg:items-stretch justify-start gap-2 w-full sm:flex-col sm:items-center mt-6 bg-white relative">
       {/* <div className="grid   md:grid-cols-3  grid-cols-1 w-full    mt-6"> */}
         {
           plansLength > 3 && (
@@ -225,7 +225,7 @@ const PlanCard: React.FC = ({plans, handleLeftPlan, handleRightPlan, plansLength
 
                       {/* Next Renewal Date */}
                       <div className="text-gray-500 text-xs sm:text-xs text-right mt-1">
-                        Next renewal date: {trialExpirationDate(plan?.trial_period)}
+                        Next renewal date: {trialExpirationDate(plan?.trial_period || 0)}
                       </div>
                     </div>
 

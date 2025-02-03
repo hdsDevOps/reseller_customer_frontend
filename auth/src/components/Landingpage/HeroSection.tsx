@@ -126,7 +126,10 @@ const HeroSection = ({id}:any) => {
   const customPrevArrow = (onClickHandler, hasPrev) => (
     <button
       type="button"
-      onClick={onClickHandler}
+      onClick={() => {
+        onClickHandler();
+        setActivePromotion("");
+      }}
       style={{
         position: 'absolute',
         top: '50%',
@@ -146,7 +149,10 @@ const HeroSection = ({id}:any) => {
   const CustomNextArrow = (onClickHandler, hasNext) => (
     <button
       type="button"
-      onClick={onClickHandler}
+      onClick={() => {
+        onClickHandler();
+        setActivePromotion("");
+      }}
       style={{
         position: "absolute",
         top: "50%",

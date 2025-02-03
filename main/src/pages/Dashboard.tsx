@@ -1066,12 +1066,12 @@ const Dashboard: React.FC = () => {
                           <div
                             className='absolute top-0 right-0 w-[200px] h-[80%] bg-[#f4f4f6] opacity-50 transform -skew-y-[17deg] origin-top-left z-10'
                           ></div>
-                          <div
+                          {/* <div
                             className='absolute h-full w-[2px] bg-[#535E7C] top-0 ml-[300px]'
                           ></div>
                           <div
                             className='absolute h-full w-[2px] bg-[#535E7C] top-0 ml-[390px]'
-                          ></div>
+                          ></div> */}
                           <div
                             className='absolute bottom-7 left-1/2 transform -translate-x-1/2 z-30'
                           >
