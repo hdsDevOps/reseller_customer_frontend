@@ -1883,8 +1883,8 @@ function Review() {
                         name="email"
                         disabled
                         className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
-                        value={useData?.email}
-                        placeholder="Enter first name"
+                        value={userDetails?.email}
+                        placeholder="Enter your email"
                         // cypress-name={item.name+"_input"}
                       />
                     </div>
