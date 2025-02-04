@@ -137,9 +137,6 @@ const HowToSignInToDomain: React.FC = () => {
           >
             Username
           </label>
-          <span className="absolute right-3 -bottom-4 text-xs text-gray-500">
-            {charCount?.username}/64
-          </span>
           <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">
             @{location.state.selectedDomain?.domain}
           </span>
@@ -173,9 +170,6 @@ const HowToSignInToDomain: React.FC = () => {
               <RiEyeCloseLine className="h-5 w-5 text-black" aria-hidden="true" />
             )}
           </button>
-          <span className="absolute right-3 -bottom-4 text-xs text-gray-500">
-            {charCount.password}/100
-          </span>
         </div>
         <p className="tex">
           We know you are probably not a robot, but we just have to ask.
