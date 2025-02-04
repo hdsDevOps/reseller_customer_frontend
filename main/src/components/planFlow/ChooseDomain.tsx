@@ -50,7 +50,7 @@ const ChooseDomain: React.FC = () => {
         }
       } catch (error) {
         
-        toast.error("Error searching for the domain");
+        toast.error(error?.message || "Error searching for the domain");
       }
     }
   };
@@ -77,7 +77,7 @@ const ChooseDomain: React.FC = () => {
         }
       } catch (error) {
         
-        toast.error("Error searching domain");
+        toast.error(error?.message || "Error searching domain");
       }
     }
   };

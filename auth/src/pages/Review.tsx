@@ -411,7 +411,7 @@ const Review = () => {
         toast.error("Error on payment method");
       }
     } catch (error) {
-      toast.error("Error on payment method");
+      toast.error(error?.message || "Error");
     }
   };
 

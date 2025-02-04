@@ -325,7 +325,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList,
       }
     } catch (error) {
       onclose;
-      toast.error("Error updating License Usage");
+      toast.error(error?.message || "Error updating License Usage");
       if(error?.message == "Authentication token is required") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -372,7 +372,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList,
       const result = await dispatch(deleteCardThunk({user_id: customerId, rec_id: id})).unwrap();
       toast.success(result?.message);
     } catch (error) {
-      toast.error("Error deleting card");
+      toast.error(error?.message || "Error deleting card");
     } finally {
       getCardsList();
     }
@@ -449,7 +449,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList,
         toast.error("Error on payment method");
       }
     } catch (error) {
-      toast.error("Error on payment method");
+      toast.error(error?.message || "Error on payment method");
     }
   };
 

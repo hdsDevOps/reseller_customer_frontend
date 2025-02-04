@@ -109,7 +109,7 @@ const OTP: React.FC = () => {
             console.log("result...", result);
             toast.success(result?.message);
         } catch (error) {
-            toast.error("Error resending otp");
+            toast.error(error?.message || "Error resending otp");
         }
     };
 
@@ -127,7 +127,7 @@ const OTP: React.FC = () => {
                 setToken(result?.token);
                 setShowModal(true);
             } catch (error) {
-                toast.error("Error verifying OTP");
+                toast.error(error?.message || "Error verifying OTP");
             }
         } else {
             alert("Please enter all 6 digits.");

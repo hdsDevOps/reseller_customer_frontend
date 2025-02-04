@@ -453,7 +453,7 @@ const EmailList: React.FC = () => {
         toast.success("User status changed successfully");
       }, 1000);
     } catch (error) {
-      toast.error("Error updating email status");
+      toast.error(error?.message || "Error updating email status");
       if(error?.message == "Authentication token is required") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -621,7 +621,7 @@ const EmailList: React.FC = () => {
         })).unwrap();
         toast.success(result?.message);
       } catch (error) {
-        toast.error("Error adding email");
+        toast.error(error?.message || "Error adding email");
         if(error?.message == "Authentication token is required") {
           try {
             const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -662,7 +662,7 @@ const EmailList: React.FC = () => {
       // console.log("result...", result);
       toast.success(result?.message);
     } catch (error) {
-      toast.error("Error removing email");
+      toast.error(error?.message || "Error removing email");
       if(error?.message == "Authentication token is required") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -697,7 +697,7 @@ const EmailList: React.FC = () => {
       const result = await dispatch(makeEmailAdminThunk({domain_id: selectedDomain?.id, rec_id: selectedEmail?.email})).unwrap();
       toast.success(result?.message);
     } catch (error) {
-      toast.error("Error making email admin");
+      toast.error(error?.message || "Error making email admin");
       if(error?.message == "Authentication token is required") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -751,7 +751,7 @@ const EmailList: React.FC = () => {
           setConfirmPassword("");
         }
       } catch (error) {
-        toast.error("Error updating user password");
+        toast.error(error?.message || "Error updating user password");
         setIsResetUserPasswordModalOpen(false);
         setSelectedEmail({});
         setPassword("");
@@ -805,7 +805,7 @@ const EmailList: React.FC = () => {
         setIsRenameUserAccountModalOpen(false);
         setSelectedEmail({});
       } catch (error) {
-        toast.error("Error udpating email");
+        toast.error(error?.message || "Error udpating email");
         setIsRenameUserAccountModalOpen(false);
         setSelectedEmail({});
         if(error?.message == "Authentication token is required") {
@@ -865,7 +865,7 @@ const EmailList: React.FC = () => {
         toast.warning("Number of user cannot be 0");
       }
     } catch (error) {
-      toast.error("Error updating License Usage");
+      toast.error(error?.message || "Error updating License Usage");
       if(error?.message == "Authentication token is required") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -930,7 +930,7 @@ const EmailList: React.FC = () => {
       const result = await dispatch(deleteCardThunk({user_id: customerId, rec_id: id})).unwrap();
       toast.success(result?.message);
     } catch (error) {
-      toast.error("Error deleting card");
+      toast.error(error?.message || "Error deleting card");
     } finally {
       getCardsList();
     }
@@ -1007,7 +1007,7 @@ const EmailList: React.FC = () => {
         toast.error("Error on payment method");
       }
     } catch (error) {
-      toast.error("Error on payment method");
+      toast.error(error?.message || "Error on payment method");
     }
   };
 

@@ -149,7 +149,7 @@ const Settings = () => {
           // console.log("result...", result);
           toast.success("User Type added successfully.");
         } catch (error) {
-          toast.error("Error adding a new user type");
+          toast.error(error?.message || "Error adding a new user type");
           if(error?.message == "Authentication token is required") {
             try {
               const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -190,7 +190,7 @@ const Settings = () => {
           toast.success("User Type edited successfully.");
         } catch (error) {
           console.log(error);
-          toast.error("Error editing a new user type");
+          toast.error(error?.message || "Error editing a new user type");
           if(error?.message == "Authentication token is required") {
             try {
               const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -230,7 +230,7 @@ const Settings = () => {
         toast.success(result?.message);
       }, 1000);
     } catch (error) {
-      toast.error("Error deleting user type");
+      toast.error(error?.message || "Error deleting user type");
       if(error?.message == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();

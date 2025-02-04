@@ -126,7 +126,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
         toast.success("User status changed successfully");
       }, 1000);
     } catch (error) {
-      toast.error("Error updating email status");
+      toast.error(error?.message || "Error updating email status");
       if(error?.message == "Authentication token is required") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -243,7 +243,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
         setIsModalOpen(false);
         setEmailClicked(false);
       } catch (error) {
-        toast.error("Error adding email");
+        toast.error(error?.message || "Error adding email");
         setEmailClicked(false);
         if(error?.message == "Authentication token is required") {
           try {
@@ -280,7 +280,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
       // console.log("result...", result);
       toast.success(result?.message);
     } catch (error) {
-      toast.error("Error removing email");
+      toast.error(error?.message || "Error removing email");
       if(error?.message == "Authentication token is required") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -328,7 +328,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
       const result = await dispatch(makeEmailAdminThunk({domain_id: data?.id, rec_id: selectedEmail?.email})).unwrap();
       toast.success(result?.message);
     } catch (error) {
-      toast.error("Error making email admin");
+      toast.error(error?.message || "Error making email admin");
       if(error?.message == "Authentication token is required") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -382,7 +382,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
           setConfirmPassword("");
         }
       } catch (error) {
-        toast.error("Error updating user password");
+        toast.error(error?.message || "Error updating user password");
         setIsResetUserPasswordModalOpen(false);
         setSelectedEmail({});
         setPassword("");
@@ -436,7 +436,7 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
         setIsRenameUserAccountModalOpen(false);
         setSelectedEmail({});
       } catch (error) {
-        toast.error("Error udpating email");
+        toast.error(error?.message || "Error udpating email");
         setIsRenameUserAccountModalOpen(false);
         setSelectedEmail({});
         if(error?.message == "Authentication token is required") {

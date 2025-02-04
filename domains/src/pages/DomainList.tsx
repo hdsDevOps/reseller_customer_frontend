@@ -299,7 +299,7 @@ const DomainList: React.FC = () => {
         })).unwrap();
         toast.success(result?.message);
       } catch (error) {
-        toast.error("Error adding email");
+        toast.error(error?.message || "Error adding email");
         if(error?.message == "Authentication token is required") {
           try {
             const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();

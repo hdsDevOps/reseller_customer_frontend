@@ -319,7 +319,7 @@ const BusinessInfo: React.FC = () => {
         navigate("/choose-your-domain", {state: { ...location.state}})
       } catch (error) {
         setIsLoading(true);
-        toast.error("Error updating Business Information");
+        toast.error(error?.message || "Error updating Business Information");
       }
     } else {
       setIsLoading(true);

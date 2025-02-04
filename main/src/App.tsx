@@ -221,7 +221,7 @@ const App: React.FC = () => {
       // window.location.href=`${process.env.}`;
       window.location.href=`http://localhost:4000/customers`;
     } catch (error) {
-      toast.error("Error exiting access");
+      toast.error(error?.message || "Error exiting access");
     }
   };
 

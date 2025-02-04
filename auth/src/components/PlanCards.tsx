@@ -216,7 +216,7 @@ const PlanCard: React.FC = ({plans, handleLeftPlan, handleRightPlan, plansLength
                               onMouseEnter={() => setIsHovering(index)}
                               onMouseLeave={() => setIsHovering(null)}
                             >
-                              <p className="font-inter font-medium text-base text-white w-full max-w-[300px] bg-[#12A833] border-2 border-black h-[200px] mx-auto px-3 py-2 rounded-[10px]">Gemini for Workspace now available Use generative AI to create or modify emails, documents, spreadsheets and more, directly in Google Workspace. Get started with a 14-day no-cost trial. <span className="text-black">See how it works</span></p>
+                              <p className="font-inter font-medium text-base text-white w-full max-w-[300px] bg-[#12A833] border-2 border-black h-[200px] mx-auto px-3 py-2 rounded-[10px] z-10">Gemini for Workspace now available Use generative AI to create or modify emails, documents, spreadsheets and more, directly in Google Workspace. Get started with a 14-day no-cost trial. <span className="text-black">See how it works</span></p>
                               <div className="w-1 h-3 bg-[#12A833] border-2 border-black mx-auto"></div>
                             </div>
                           )

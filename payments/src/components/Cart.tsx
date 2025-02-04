@@ -470,7 +470,7 @@ const Cart = () => {
       })).unwrap();
       toast.success("Your cart item has been deleted.");
     } catch (error) {
-      toast.error("Error on deleting cart item.");
+      toast.error(error?.message || "Error on deleting cart item.");
       if(error?.error == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -607,7 +607,7 @@ const Cart = () => {
           toast.error("Error updating business summary details");
         }
       } catch (error) {
-        toast.error("Error updating business summary details");
+        toast.error(error?.message || "Error updating business summary details");
       } finally {
         const profile = await dispatch(getProfileDataThunk({
           user_id: customerId,
@@ -673,10 +673,6 @@ const Cart = () => {
             <h1 className="text-green-500 text-3xl font-semibold">
               Shopping Cart
             </h1>
-            <small>
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Non fuga
-              repudiandae natus, perspiciatis tenetur maxime!.
-            </small>
           </div>
           {
             cart.length > 0 ? cart?.map((item, index) => (

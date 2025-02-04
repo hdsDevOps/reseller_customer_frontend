@@ -235,7 +235,7 @@ const OTP: React.FC = () => {
             setLoading(false);
           } else {
             
-            toast.error("OTP error");
+            toast.error(error?.message || "Error");
             setLoading(false);
           }
         } finally {

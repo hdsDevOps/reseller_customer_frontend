@@ -104,7 +104,7 @@ const Login: React.FC = () => {
         toast.error("Please enter correct email or password");
       } else {
         
-        toast.error("Error logging in");
+        toast.error(error?.message || "Error");
       }
     }
   };

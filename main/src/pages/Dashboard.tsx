@@ -369,7 +369,7 @@ const Dashboard: React.FC = () => {
       navigate('/add-cart');
     } catch (error) {
       // console.log(error);
-      toast.error("Error renewing plan");
+      toast.error(error?.message || "Error renewing plan");
       if(error?.error == "Request failed with status code 401") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
@@ -451,7 +451,7 @@ const Dashboard: React.FC = () => {
     } catch (error) {
       if(error?.message == "Request failed with status code 401") {
         
-        toast.error("Error making default payment method");
+        toast.error(error?.message || "Error making default payment method");
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');
@@ -478,7 +478,7 @@ const Dashboard: React.FC = () => {
     } catch (error) {
       if(error?.message == "Request failed with status code 401") {
         
-        toast.error("Error making default payment method");
+        toast.error(error?.message || "Error making default payment method");
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');
@@ -626,7 +626,7 @@ const Dashboard: React.FC = () => {
     } catch (error) {
       if(error?.message == "Request failed with status code 401") {
         
-        toast.error("Auto Renew Status updation failed");
+        toast.error(error?.message || "Auto Renew Status updation failed");
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');

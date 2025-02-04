@@ -214,7 +214,7 @@ const Subscribe: React.FC = () => {
         console.log("result...", result);
         navigate('/subscribeotp', { state: { ...location.state, formData: formData, customer_id: result?.customer_id, license_usage: count }});
       } catch (error) {
-        toast.error("Error registering");
+        toast.error(error?.message || "Error");
         setIsLoading(false);
       }
     } else {

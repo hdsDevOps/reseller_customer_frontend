@@ -281,7 +281,7 @@ const RegisterPage: React.FC = () => {
             navigate("/otp?mode=signup", { state: {customer_id: result?.customer_id, from: "registration", data: customer} });
           } catch (error) {
             
-            toast.error("Error registering customer");
+            toast.error(error?.message || "Error");
             setLoading(false);
           }
         } else {

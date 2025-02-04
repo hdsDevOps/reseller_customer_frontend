@@ -63,7 +63,7 @@ const PaymentMethod = () => {
       }, 1000);
     } catch (error) {
       if(error?.message == "Request failed with status code 401") {
-        toast.error("Error making default payment method");
+        toast.error(error?.message || "Error making default payment method");
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
           navigate('/login');

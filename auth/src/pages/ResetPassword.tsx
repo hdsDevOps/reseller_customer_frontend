@@ -59,7 +59,7 @@ const ResetPassword: React.FC = () => {
           })).unwrap();
           navigate("/successpassword", {state: "Password reset successfull"});
         } catch (error) {
-          toast.error("Error updating password.")
+          toast.error(error?.message || "Error")
         }
       } else {
         toast.warning("Password and Confirm Password do not match");

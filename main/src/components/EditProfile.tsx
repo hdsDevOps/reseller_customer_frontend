@@ -729,7 +729,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
         }
       } catch (error) {
         handleCloseShowModal();
-        toast.error("Error updating profile");
+        toast.error(error?.message || "Error updating profile");
         console.log(error)
         if(error?.message == "Request failed with status code 401") {
           try {

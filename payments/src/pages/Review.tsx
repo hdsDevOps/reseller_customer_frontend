@@ -1131,7 +1131,7 @@ function Review() {
           }, 1500);
         }
       } catch (error) {
-        toast.error("Error on payment method");
+        toast.error(error?.message || "Error on payment method");
         setTimeout(() => {
           navigate('/add-cart');
         }, 1500);

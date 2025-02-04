@@ -264,7 +264,7 @@ const Subscribe: React.FC = () => {
         await getProfileData();
         navigate('/business-information', { state: { ...location.state, license_usage: count }});
       } catch (error) {
-        toast.error("Error updating information");
+        toast.error(error?.message || "Error updating information");
         setIsLoading(false);
       }
     } else {

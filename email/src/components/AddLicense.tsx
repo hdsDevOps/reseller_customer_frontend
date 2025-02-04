@@ -32,7 +32,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose, data }) => {
       onClose();
     } catch (error) {
       onClose();
-      toast.error("Error updating License Usage");
+      toast.error(error?.message || "Error updating License Usage");
       if(error?.message == "Authentication token is required") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();

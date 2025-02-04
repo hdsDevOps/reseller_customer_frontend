@@ -233,7 +233,7 @@ const MyStaff = () => {
         })).unwrap();
         toast.success(result?.message);
       } catch (error) {
-        toast.error("Error adding a new staff");
+        toast.error(error?.message || "Error adding a new staff");
         // console.log("error", error);
         if(error?.message == "Authentication token is required") {
           try {
@@ -273,7 +273,7 @@ const MyStaff = () => {
         })).unwrap();
         toast.success(result?.message);
       } catch (error) {
-        toast.error("Error editing the staff");
+        toast.error(error?.message || "Error editing the staff");
         // console.log("error", error);
         if(error?.message == "Authentication token is required") {
           try {
@@ -325,7 +325,7 @@ const MyStaff = () => {
       await dispatch(deleteStaffThunk({id: deleteId})).unwrap();
       toast.success("Staff deleted successfully");
     } catch (error) {
-      toast.error("Error deleting staff");
+      toast.error(error?.message || "Error deleting staff");
       if(error?.message == "Authentication token is required") {
         try {
           const removeToken = await dispatch(removeUserAuthTokenFromLSThunk()).unwrap();
