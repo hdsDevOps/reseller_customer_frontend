@@ -1706,17 +1706,23 @@ function Review() {
                 By clicking{" "}
                 <span className="font-bold text-black">Agree and continue</span>, you
                 agree to the{" "}
-                <a href="#" className="font-semibold text-green-500">
+                <button type='button' onClick={() => {
+                  //
+                }} className="font-semibold text-green-500">
                   Google Workspace Agreement
-                </a>
+                </button>
                 ,{" "}
-                <a href="#" className="font-semibold text-green-500">
+                <button type='button' onClick={() => {
+                  //
+                }} className="font-semibold text-green-500">
                   Google Workspace purchase Agreement
-                </a>
+                </button>
                 , and{" "}
-                <a href="#" className="font-semibold text-green-500 ">
+                <button type='button' onClick={() => {
+                  //
+                }} className="font-semibold text-green-500">
                   Supplemental Terms and Conditions
-                </a>{" "}
+                </button>{" "}
                 for Google Workspace Free Trial Agreement.
               </p>
             </div>
