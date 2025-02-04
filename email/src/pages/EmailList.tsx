@@ -99,7 +99,8 @@ const EmailList: React.FC = () => {
   const domainName = params.get("domain") || "schemaphic.com";
   const [domains, setDomains] = useState([]);
   // console.log("domains...", domains);
-  const [selectedDomain, setSelectedDomain] = useState({});
+  const [selectedDomain, setSelectedDomain] = useState<object|null>(null);
+  const [selectedDomain2, setSelectedDomain2] = useState<string>("");
   // console.log("selected domain...", selectedDomain);
   const [showList, setShowList] = useState("");
   const listRef = useRef(null);
@@ -441,6 +442,7 @@ const EmailList: React.FC = () => {
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
+    setSelectedDomain2("");
   };
 
   const toggleStatus = async( domainId:string, email:string, status:Boolean ) => {
@@ -1092,7 +1094,7 @@ const EmailList: React.FC = () => {
               <input
                 type="text"
                 placeholder="Search domain..."
-                value={searchTerm}
+                value={searchTerm || selectedDomain2}
                 onChange={handleSearchChange}
                 className="bg-transparent border rounded px-2 py-1 relative"
                 onFocus={() => {setSearchDropdown(true)}}
@@ -1108,6 +1110,7 @@ const EmailList: React.FC = () => {
                           className="px-2 first:border-0 border-t border-white cursor-pointer"
                           onClick={() => {
                             setSelectedDomain(item2);
+                            setSelectedDomain2(item2?.domain_name);
                             setSearchDropdown(false);
                             setSearchTerm("");
                           }}
@@ -1117,7 +1120,14 @@ const EmailList: React.FC = () => {
                   </div>
                 )
               }
-              <FilterX className="text-green-500" size={24} />
+              <FilterX
+                className="text-green-500 cursor-pointer"
+                size={24}
+                onClick={() => {
+                  setSearchTerm("");
+                  setSelectedDomain2("");
+                }}
+              />
             </div>
           </div>
 
@@ -1176,6 +1186,7 @@ const EmailList: React.FC = () => {
                                   type="button"
                                   disabled={isAdmin}
                                   className="text-xs sm:text-sm text-slate-400 inline-block items-center content-center cursor-not-allowed"
+                                  onClick={() => {toast.error("You cannot update plan during trial period")}}
                                 >
                                   Update plan
                                 </button>

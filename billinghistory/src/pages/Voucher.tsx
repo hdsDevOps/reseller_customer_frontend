@@ -69,6 +69,7 @@ const VoucherCard: React.FC = () => {
     const miliseconds = parseInt(date?._seconds) * 1000 + parseInt(date?._nanoseconds) / 1e6;
     const foundDate =  new Date(miliseconds);
     const today = new Date(Date.now());
+    // console.log("foundDate///", foundDate);
     if(foundDate > today) {
       return true;
     } else {
@@ -92,16 +93,25 @@ const VoucherCard: React.FC = () => {
           voucherList?.length > 0
           ? voucherList?.map((coupon, index) => (
             <div className="max-w-[400px] h-[200px] relative w-full items-center border border-black overflow-hidden" key={index}>
-              <div className={`w-full h-full ${
-                coupon?.status === "used"
-                ? "bg-gray-600 text-white"
-                : coupon?.status === "active"
-                ? dateFormat(coupon?.expire_date)
-                  ? ""
-                  : "bg-gray-600 text-white"
-                : ""
-              }`} dangerouslySetInnerHTML={{__html: coupon?.voucher?.template_details}} />
-              <div className={`absolute right-0 top-0 w-[80px] h-[30px] ${
+              <div dangerouslySetInnerHTML={{__html: coupon?.voucher?.template_details}} />
+              <div
+                className={`absolute top-0 bottom-0 left-0 right-0 z-10 ${
+                  // coupon?.used_date !== null
+                  // ? "#4B556340 text-white"
+                  // : dateFormat(coupon?.expire_date)
+                  // ? ""
+                  // : "#4B556340 text-white"
+                  ""
+                }`}
+                style={
+                  coupon?.used_date !== null
+                  ? {backgroundColor: "#4B556340", color: "white"}
+                  : dateFormat(coupon?.expire_date)
+                  ? {opacity: 0}
+                  : {backgroundColor: "#4B556340", color: "white"}
+                }
+              ></div>
+              {/* <div className={`absolute right-0 top-0 w-[80px] h-[30px] ${
                 coupon?.status === "used"
                 ? "bg-[#12A833]"
                 : coupon?.status === "active"
@@ -118,6 +128,25 @@ const VoucherCard: React.FC = () => {
                     ? ""
                     : "EXPIRED"
                   : ""
+                }
+              </div> */}
+              <div
+                className={
+                  `absolute top-[10px] right-0 ${
+                    coupon?.used_date !== null
+                    ? "bg-[#12A833]"
+                    : dateFormat(coupon?.expire_date)
+                    ? "hidden"
+                    : "bg-[#E02424]"
+                  } bg-[#12A833] text-white text-xs font-bold px-[25px] py-[5px] rotate-45 object-left-bottom uppercase z-20`
+                }
+              >
+                {
+                  coupon?.used_date !== null
+                  ? "APPLIED"
+                  : dateFormat(coupon?.expire_date)
+                  ? ""
+                  : "EXPIRED"
                 }
               </div>
             </div>

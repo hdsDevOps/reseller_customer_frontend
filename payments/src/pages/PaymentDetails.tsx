@@ -677,9 +677,19 @@ const PaymentDetails: React.FC = () => {
     return maskedParts?.join(" ");
   };
 
+  const formatDateInvoice = (datee) => {
+    const date = new Date(datee);
+
+    if(date == "Invalid Date") {
+      return {top: "Invalid Date", bottom: ""};
+    } else {
+      return {top: format(date, "MMM dd, yyyy"), bottom: format(date, "h:mm:ss a")}
+    }
+  };
+
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex flex-col gap-1 mb-6">
+      <div className="flex flex-col gap-1 mb-2">
          <h1 className="text-green-500 text-3xl font-medium">
           Payment Subscription
         </h1>
@@ -745,7 +755,7 @@ const PaymentDetails: React.FC = () => {
         </div> */}
       </div>
 
-      <div className="flex justify-start items-center mt-12 relative bottom-2 right-0">
+      <div className="flex justify-start items-center mt-3 relative bottom-2 right-0">
         <div className="flex items-center gap-1">
           <select
             onChange={e => {
@@ -921,9 +931,11 @@ const PaymentDetails: React.FC = () => {
                                     } else if(list?.label === "Update Plan") {
                                       if(detail?.product_type?.toLowerCase() === "google workspace") {
                                         if(userDetails?.workspace?.workspace_status === "trial") {
-                                          return (
-                                            <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => renewalAddToCart(e)}>{list?.label}</li>
-                                          )
+                                          if(renewalStatus) {
+                                            return (
+                                              <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => renewalAddToCart(e)}>{list?.label}</li>
+                                            )
+                                          }
                                         } else {
                                           return (
                                             <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={() => {navigate(list?.link, {state: detail})}}>{list?.label}</li>
@@ -1422,6 +1434,15 @@ const PaymentDetails: React.FC = () => {
                         <div
                           className='absolute h-full w-[2px] bg-[#535E7C] top-0 ml-[390px]'
                         ></div> */}
+                         <div className='absolute top-2 right-2 flex flex-row z-20 items-start'>
+                          <div className='flex flex-col items-start'>
+                            <p className='mr-1 text-white font-normal font-inter text-sm'>Date:</p>
+                          </div>
+                          <div className='flex flex-col items-start'>
+                            <p className='mr-1 text-white font-normal font-inter text-sm p-0'>{formatDateInvoice(billingHistoryData?.date)?.top}</p>
+                            <p className='mr-1 text-white font-normal font-inter text-sm p-0 mt-0'>{formatDateInvoice(billingHistoryData?.date)?.bottom}</p>
+                          </div>
+                        </div>
                         <div
                           className='absolute bottom-7 left-1/2 transform -translate-x-1/2 z-30'
                         >

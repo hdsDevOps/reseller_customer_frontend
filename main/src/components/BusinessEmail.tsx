@@ -522,6 +522,8 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                             onClick={() => {
                               if(userDetails?.workspace?.workspace_status !== "trial") {
                                 navigate("/upgrade-plan")
+                              } else {
+                                toast.error("You cannot update plan during trial period");
                               }
                             }}
                             disabled={isAdmin}
@@ -535,6 +537,9 @@ const EmailList: React.FC = ({data, getDomainsList}) => {
                           <button
                             type="button"
                             className="text-xs sm:text-sm text-[#8A8A8A] inline-block items-center content-center cursor-not-allowed"
+                            onClick={() => {
+                              toast.error("You cannot update plan during trial period");
+                            }}
                           >
                             Update plan
                           </button>

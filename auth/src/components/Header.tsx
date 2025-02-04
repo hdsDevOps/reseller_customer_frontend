@@ -74,6 +74,12 @@ export default function Header() {
     }
   };
 
+  useEffect(() => {
+    if(location.state) {
+      handleScroll(location.state);
+    }
+  }, [location.state]);
+
   const handleScrollTop = () => {
     window.scrollTo({
       top: 0,

@@ -22,6 +22,7 @@ const BusinessInfo: React.FC = () => {
   const dispatch = useAppDispatch();
   const stateRef = useRef(null);
   const cityRef = useRef(null);
+  const hereRef = useRef(null);
 
   const { userDetails, customerId, staffId, staffStatus } = useAppSelector(state => state.auth);
 
@@ -36,7 +37,7 @@ const BusinessInfo: React.FC = () => {
   }, [location.state]);
 
   const [formData, setFormData] = useState<object|null>(null);
-  // console.log("form data...", formData);
+  console.log("form data...", formData);
   
   const [isNumberValid, setIsNumberValid] = useState(false);
   // console.log({isNumberValid});
@@ -60,8 +61,8 @@ const BusinessInfo: React.FC = () => {
   // console.log("country...", country);
   const [state, setState] = useState({});
   const [city, setCity] = useState({});
-  // console.log({countries, states, cities});
-  // console.log({country, state, city});
+  console.log({countries, states, cities});
+  console.log({country, state, city});
 
   useEffect(() => {
     if(userDetails !== null) {
@@ -70,19 +71,19 @@ const BusinessInfo: React.FC = () => {
   }, [userDetails]);
 
   useEffect(() => {
-    const countryFind = countries?.find(item => item?.name === userDetails?.country);
+    const countryFind = countries?.find(item => item?.name === formData?.country);
     setCountry(countryFind || {});
-  }, [countries, userDetails]);
+  }, [countries, formData?.country]);
 
   useEffect(() => {
-    const stateFind = states?.find(item => item?.name === userDetails?.state);
+    const stateFind = states?.find(item => item?.name === formData?.state);
     setState(stateFind || {});
-  }, [states, userDetails]);
+  }, [states, formData?.state]);
 
   useEffect(() => {
-    const cityFind = cities?.find(item => item?.name === userDetails?.city);
+    const cityFind = cities?.find(item => item?.name === formData?.city);
     setCity(cityFind || {});
-  }, [cities, userDetails]);
+  }, [cities, formData?.city]);
 
   const [stateDropdownOpen, setStateDropdownOpen] = useState<Boolean>(false);
   const [cityDropdownOpen, setCityDropdownOpen] = useState<Boolean>(false);
@@ -97,13 +98,20 @@ const BusinessInfo: React.FC = () => {
       setCityDropdownOpen(false);
     }
   };
+  const handleClickOutsideHere = (event: MouseEvent) => {
+    if(hereRef.current && !hereRef.current.contains(event.target as Node)) {
+      setCityDropdownOpen(false);
+    }
+  };
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutsideState);
     document.addEventListener('mousedown', handleClickOutsideCity);
+    document.addEventListener('mousedown', handleClickOutsideHere);
     return () => {
       document.removeEventListener('mousedown', handleClickOutsideState);
       document.removeEventListener('mousedown', handleClickOutsideCity);
+      document.removeEventListener('mousedown', handleClickOutsideHere);
     };
   }, []);
 
@@ -324,7 +332,7 @@ const BusinessInfo: React.FC = () => {
   useEffect(() => {
     if(
       formData?.business_name === "" || formData?.business_name?.trim() === "" ||
-      formData?.address === "" || formData?.address?.trim() === "" ||
+      formData?.address === "" || formData?.address === null || formData?.address === undefined ||
       formData?.city?.trim() === "" ||
       formData?.state?.trim() === "" ||
       formData?.zipcode === "" || formData?.zipcode?.trim() === "" ||
@@ -379,12 +387,12 @@ const BusinessInfo: React.FC = () => {
           <input
             name="address"
             type="text"
-            placeholder="123 Main St"
-            value={formData?.address || address}
+            placeholder="Enter your address"
+            value={formData?.address?.title || address}
             onChange={(e) => {
               setFormData({
                 ...formData,
-                address: ""
+                address: null
               });
               setAddress(e.target.value);
             }}
@@ -407,7 +415,7 @@ const BusinessInfo: React.FC = () => {
                       onClick={() => {
                         setFormData({
                           ...formData,
-                          address: addressItem?.address?.label,
+                          address: addressItem,
                           zipcode: addressItem?.address?.postalCode,
                         });
                         setAddressObject(addressItem);

@@ -460,6 +460,18 @@ const DownloadInvoice: React.FC = () => {
     };
   };
 
+  const formatDateInvoice = (seconds, nanoseconds) => {
+    const miliseconds = (parseInt(seconds) * 1000) + (parseInt(nanoseconds) / 1e6);
+
+    const date = new Date(Date.now());
+
+    if(date == "Invalid Date") {
+      return {top: "Invalid Date", bottom: ""};
+    } else {
+      return {top: format(date, "MMM dd, yyyy"), bottom: format(date, "h:mm:ss a")}
+    }
+  };
+
   return (
     <div id="top_download_invoice">
       {
@@ -607,6 +619,15 @@ const DownloadInvoice: React.FC = () => {
                     <div
                       className='absolute h-full w-[2px] bg-[#535E7C] top-0 ml-[390px]'
                     ></div> */}
+                    <div className='absolute top-2 right-2 flex flex-row z-20 items-start'>
+                      <div className='flex flex-col items-start'>
+                        <p className='mr-1 text-white font-normal font-inter text-sm'>Date:</p>
+                      </div>
+                      <div className='flex flex-col items-start'>
+                        <p className='mr-1 text-white font-normal font-inter text-sm p-0'>{formatDateInvoice(0, 0)?.top}</p>
+                        <p className='mr-1 text-white font-normal font-inter text-sm p-0 mt-0'>{formatDateInvoice(0, 0)?.bottom}</p>
+                      </div>
+                    </div>
                     <div
                       className='absolute bottom-7 left-1/2 transform -translate-x-1/2 z-30'
                     >

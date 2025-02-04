@@ -484,7 +484,7 @@ const BillingHistory: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex justify-start items-center mt-12 relative bottom-2 right-0">
+      <div className="flex justify-start items-center mt-3 relative bottom-2 right-0">
         <div className="flex items-center gap-1">
           <select
             onChange={e => {

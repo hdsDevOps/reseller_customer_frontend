@@ -111,4 +111,5 @@ declare module 'store/user.thunk' {
   export const addNewDomainThunk;
   export const getLandingPageThunk;
   export const getBase64ImageThunk;
+  export const hereMapSearchThunk;
 }

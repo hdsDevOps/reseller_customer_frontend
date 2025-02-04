@@ -13,6 +13,18 @@ const SummaryDomainDetails = ({state, handleContactModalOpen, handleBusinessModa
   const [todayMinusYear, setTodayMinusYear] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [amount, setAmount] = useState(0);
+  const [planDate, setPlanDate] = useState(format(new Date(), "MMMM dd"));
+  
+  useEffect(() => {
+    const today = new Date();
+    // console.log("today before...", today);
+    const trialPeriod = Number(state?.plan?.trial_period);
+    
+    today.setDate(today?.getDate() + trialPeriod);
+    // console.log("today after...", today);
+    
+    setPlanDate(format(today, "MMMM dd"));
+  }, [state?.plan?.trial_period]);
   
   useEffect(() => {
     const dayToday = new Date();
@@ -56,9 +68,7 @@ const SummaryDomainDetails = ({state, handleContactModalOpen, handleBusinessModa
             <span className="text-[#12A833] underline">cancel at any time</span>.
           </p>
           <p className="text-gray-500">
-            Recurs at the end of every {
-              state.period === "Yearly" ? "year" : "month"
-            }.
+            Recurs {state?.period?.toLowerCase() === "yearly" ? "yearly" : "monthly"} from {planDate}
           </p>
         </div>
       </div>

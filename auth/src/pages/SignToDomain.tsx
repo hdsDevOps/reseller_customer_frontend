@@ -197,17 +197,35 @@ const SignInForm: React.FC = () => {
             By clicking{" "}
             <span className="text-black font-bold">Agree and Continue</span>,
             you agree to the{" "}
-            <a href="#" className="text-green-600">
+            <button
+              type="button"
+              onClick={() => {
+                //
+              }}
+              className="text-green-600"
+            >
               Google Workspace Agreement, Google Workspace purchase Agreement
-            </a>{" "}
+            </button>{" "}
             and{" "}
-            <a href="#" className="text-green-600">
+            <button
+              type="button"
+              onClick={() => {
+                //
+              }}
+              className="text-green-600"
+            >
               Supplemental Terms
-            </a>{" "}
+            </button>{" "}
             and{" "}
-            <a href="#" className="text-green-600">
+            <button
+              type="button"
+              onClick={() => {
+                //
+              }}
+              className="text-green-600"
+            >
               Conditions for Google Workspace Free Trial Agreement.
-            </a>
+            </button>
           </p>
         </div>
 

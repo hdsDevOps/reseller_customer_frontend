@@ -1,7 +1,7 @@
 // src/index.tsx
 import React, { Suspense, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter, useNavigate } from "react-router-dom";
+import { BrowserRouter, useLocation, useNavigate } from "react-router-dom";
 import ReduxProvider from "store/ReduxProvider";
 import UserAuth from "./hoc/UserAuth.hoc";
 import MainApp from "./pages";
@@ -148,6 +148,7 @@ const hordansoAdminRolePermissions = [
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { token, customerId, staffId, staffStatus, resellerToken, userDetails, metaDataSlice, defaultCurrencySlice, domainsState, notificationsList, roleId, rolePermission, isAdmin, adminName, expirationTimeSlice } = useAppSelector((state) => state.auth);
   
   // console.log({ customerId, token, isAdmin, adminName });
@@ -161,6 +162,44 @@ const App: React.FC = () => {
   // console.log("meta data...", metaDataSlice);
   // console.log("defaultCurrencySlice...", defaultCurrencySlice);
   // console.log("domainsState...", domainsState?.find(item => item?.domain_type === "primary"));
+
+  useEffect(() => {
+    localStorage.setItem("last_visited_page", location.pathname);
+  }, [location.pathname]);
+
+  // useEffect(() => {
+  //   const lastVisitedPage = localStorage.getItem("last_visited_page") || '/dashboard';
+
+  //   const hasPermission = rolePermission.some(
+  //     perm => perm.name === `${
+  //       lastVisitedPage === "/profile"
+  //       ? "Profile"
+  //       :  lastVisitedPage === "/domain"
+  //       ? "Domain"
+  //       : lastVisitedPage === "/payment-subscription"
+  //       ? "Payment Subscription"
+  //       : lastVisitedPage === "/email"
+  //       ? "Email"
+  //       : lastVisitedPage === "/payment-method"
+  //       ? "Payment Method"
+  //       : lastVisitedPage === "/voucher"
+  //       ? "Vouchers"
+  //       : lastVisitedPage === "/my-staff"
+  //       ? "My Staff"
+  //       : lastVisitedPage === "/billing-history"
+  //       ? "Billing History"
+  //       : lastVisitedPage === "/settings"
+  //       ? "Settings"
+  //       : "Dashboard"
+  //     }`
+  //   );
+
+  //   if(hasPermission) {
+  //     navigate(lastVisitedPage)
+  //   } else {
+  //     navigate('/dashboard')
+  //   }
+  // }, [navigate])
 
   useEffect(() => {
     const getHordansoAdminDetails = async() => {

@@ -42,6 +42,7 @@ const DomainSummary = ({state, plan}:any) => {
   
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
+  console.log("defaultCurrencySlice...", defaultCurrencySlice);
   // console.log("plan...", plan);
   // console.log("state...", state);
 
@@ -122,7 +123,9 @@ const DomainSummary = ({state, plan}:any) => {
   const getPromotionList = async() => {
     try {
       const result = await dispatch(getPromotionListThunk({promotion_id: ""})).unwrap();
-      setVouchers(result);
+      const foundVouchers = result?.filter(item => item?.discount?.some(disc => disc?.currency_code === defaultCurrencySlice));
+      console.log("foundVouchers...", foundVouchers);
+      setVouchers(foundVouchers);
     } catch (error) {
       //
     }
@@ -130,7 +133,7 @@ const DomainSummary = ({state, plan}:any) => {
 
   useEffect(() => {
     getPromotionList();
-  }, []);
+  }, [defaultCurrencySlice]);
 
   useEffect(() => {
     if(state?.selectedDomain?.domain !== "") {

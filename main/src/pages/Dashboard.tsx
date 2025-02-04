@@ -47,11 +47,13 @@ const Dashboard: React.FC = () => {
     if(location.state) {
       if(location.state?.from === "otp") {
       
-        toast.success(`Successfully logged`, {autoClose: 4000});
+        toast.success(`Successfully logged`);
+        navigate(location.pathname, { replace: true, state: {} });
         // toast.success(`Successfully logged in ${Math.random() * 3}`);
         // console.log(`Successfully logged in ${Math.random() * 3}`)
       } else if(location.state?.from === "registration") {
-        toast.success("Successfully registered", {autoClose: 4000});
+        toast.success("Successfully registered");
+        navigate(location.pathname, { replace: true, state: {} });
       }
     }
   }, [location.state]);
@@ -108,7 +110,7 @@ const Dashboard: React.FC = () => {
   const [modalType, setModalType] = useState("");
   const [cancelReason, setCancelReason] = useState(inititalCancel);
   const [invoiceData, setInvoiceData] = useState<object|null>(null);
-  // console.log("invoiceData...", invoiceData);
+  console.log("invoiceData...", invoiceData);
   const pdfRef = useRef(null);
   const [paymentMethods, setPaymentMethods] = useState([]);
   // console.log("paymentMethods...", paymentMethods);
@@ -120,20 +122,20 @@ const Dashboard: React.FC = () => {
   // console.log("activePlan...", activePlan);
 
   const [billingHistoryList, setBillingHistoryList] = useState([]);
-  // console.log("billingHistoryList...", billingHistoryList);
+  console.log("billingHistoryList...", billingHistoryList);
   const [billingHistoryData, setBillingHistoryData] = useState<object|null>(null);
-  // console.log("billingHistoryData...", billingHistoryData);
+  console.log("billingHistoryData...", billingHistoryData);
   const [renewalStatus, setRenewalStatus] = useState(false);
   // console.log("renewalStatus...", renewalStatus);
 
   const [isExpirySectionOpen, setIsExpirySectionOpen] = useState(false);
   const [expiryData, setExpiryData] = useState(initialExpiryData);
-  console.log("expiryData...", expiryData);
+  // console.log("expiryData...", expiryData);
 
   const [base64ImageLogo, setBase64ImageLogo] = useState("");
   // console.log("base64ImageLogo...", base64ImageLogo);
   const [paymentMethodImage, setPaymentMethodImage] = useState("");
-  console.log("paymentMethodImage...", paymentMethodImage);
+  // console.log("paymentMethodImage...", paymentMethodImage);
 
   const getBase64ImageLogo = async() => {
     try {
@@ -580,6 +582,16 @@ const Dashboard: React.FC = () => {
     return formattedDate;
   };
 
+  const formatDateInvoice = (datee) => {
+    const date = new Date(datee);
+
+    if(date == "Invalid Date") {
+      return {top: "Invalid Date", bottom: ""};
+    } else {
+      return {top: format(date, "MMM dd, yyyy"), bottom: format(date, "h:mm:ss a")}
+    }
+  };
+
   const formatExpiryDate = (seconds, nanoseconds) => {
     const miliseconds = parseInt(seconds) * 1000 + parseInt(nanoseconds) / 1e6;
 
@@ -808,9 +820,11 @@ const Dashboard: React.FC = () => {
                                   }
                                 } else if(list?.label === "Update Plan") {
                                   if(userDetails?.workspace?.workspace_status === "trial") {
-                                    return (
-                                      <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => renewalAddToCart(e)}>{list?.label}</li>
-                                    )
+                                    if(renewalStatus) {
+                                      return (
+                                        <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={(e) => renewalAddToCart(e)}>{list?.label}</li>
+                                      )
+                                    }
                                   } else {
                                     return (
                                       <li key={idx} className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer" onClick={() => {navigate(list?.link, {state: subscription})}}>{list?.label}</li>
@@ -1072,6 +1086,15 @@ const Dashboard: React.FC = () => {
                           <div
                             className='absolute h-full w-[2px] bg-[#535E7C] top-0 ml-[390px]'
                           ></div> */}
+                          <div className='absolute top-2 right-2 flex flex-row z-20 items-start'>
+                            <div className='flex flex-col items-start'>
+                              <p className='mr-1 text-white font-normal font-inter text-sm'>Date:</p>
+                            </div>
+                            <div className='flex flex-col items-start'>
+                              <p className='mr-1 text-white font-normal font-inter text-sm p-0'>{formatDateInvoice(billingHistoryData?.date)?.top}</p>
+                              <p className='mr-1 text-white font-normal font-inter text-sm p-0 mt-0'>{formatDateInvoice(billingHistoryData?.date)?.bottom}</p>
+                            </div>
+                          </div>
                           <div
                             className='absolute bottom-7 left-1/2 transform -translate-x-1/2 z-30'
                           >

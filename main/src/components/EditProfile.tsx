@@ -38,10 +38,13 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
   const [hereMapList, setHereMapList] = useState([]);
   // console.log("hereMapList...", hereMapList);
   const [hereAddress, setHereAddress] = useState<object|null>(profileDetails?.address);
-  console.log("hereAddress...", hereAddress);
+  // console.log("hereAddress...", hereAddress);
   const [hereInput, setHereInput] = useState(profileDetails?.address?.title || "");
   const [isHereDropdownOpen, setIsHereDropdownOpen] = useState(false);
   const hereRef = useRef(null);
+
+  const [data, setData] = useState(profileDetails);
+  console.log("data...", data);
 
   useEffect(() => {
     setHereAddress(profileDetails?.address);
@@ -53,9 +56,6 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
       setIsHereDropdownOpen(true);
     }
   }, [hereMapList, hereInput, data?.address]);
-
-  const [data, setData] = useState(profileDetails);
-  console.log("data...", data);
 
   useEffect(() => {
     setData({...profileDetails});
@@ -131,12 +131,12 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
 
   const checkPermission = () => {
     if(rolePermission?.length > 0) {
-        console.log(rolePermission?.find(item => item?.name === "Profile"))
+        // console.log(rolePermission?.find(item => item?.name === "Profile"))
         return rolePermission?.find(item => item?.name === "Profile")?.value;
     } else {
         return false;
     }
-};
+  };
 
   useEffect(() => {
     if(hereInput !== "" && hereInput !== null || hereInput !== undefined) {
@@ -215,7 +215,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
     if(states?.length > 0) {
       const findState = states?.find(state => state?.name?.toLowerCase() === item?.address?.state?.toLowerCase());
       if(findState) {
-        setCountry(findState);
+        setState(findState);
         setData({
           ...data,
           state: findState?.name
@@ -228,7 +228,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
     if(cities?.length > 0) {
       const findCity = cities?.find(city => city?.name?.toLowerCase() === item?.address?.city?.toLowerCase());
       if(findCity) {
-        setCountry(findCity);
+        setCity(findCity);
         setData({
           ...data,
           city: findCity?.name
@@ -649,6 +649,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
                   toast.success(result?.message);
                   handleCloseShowModal();
                 }
+                getProfileData();
               } else {
                 toast.warning("Input fields cannot be empty");
               }
@@ -721,6 +722,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
               toast.success(result?.message);
               handleCloseShowModal();
             }
+            getProfileData();
           } else {
             toast.warning("Input fields cannot be empty");
           }
@@ -737,8 +739,6 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
           //
           }
         }
-      } finally {
-        getProfileData();
       }
     } else {
       toast.warning("Please enter a valid phone number");

@@ -6,7 +6,7 @@ import { TbInfoTriangleFilled } from "react-icons/tb";
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { format } from "date-fns";
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { addBillingHistoryThunk, addEmailsThunk, addNewDomainThunk, addSettingThunk, addStaffThunk, addSubscriptionThunk, addToCartThunk, getDomainsListThunk, getPaymentMethodsThunk, getProfileDataThunk, makeDefaultPaymentMethodThunk, makeEmailAdminThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk, stripePayThunk, udpateProfileDataThunk, useVoucherThunk } from 'store/user.thunk';
+import { addBillingHistoryThunk, addEmailsThunk, addNewDomainThunk, addSettingThunk, addStaffThunk, addSubscriptionThunk, addToCartThunk, getDomainsListThunk, getPaymentMethodsThunk, getProfileDataThunk, hereMapSearchThunk, makeDefaultPaymentMethodThunk, makeEmailAdminThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk, stripePayThunk, udpateProfileDataThunk, useVoucherThunk } from 'store/user.thunk';
 import { setCart, setDomains, setUserDetails, staffStatus, staffId, domainsState } from 'store/authSlice';
 import { toast } from 'react-toastify';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
@@ -155,9 +155,46 @@ function Review() {
   const [preDiscountedPrice, setPreDiscountedPrice] = useState(0.00);
   const [paymentMethodHover, setPaymentMethodHover] = useState(false);
   const [nameAndAddressHover, setNameAndAddressHover] = useState(false);
+
+  const [hereObject, setHereObject] = useState<object|null>(null);
+  const [hereSearch, setHereSearch] = useState("");
+  const [isHereDropdownOpen, setIsHereDropdownOpen] = useState(false);
+  const [hereList, setHereList] = useState([]);
+  const hereRef = useRef(null);
+
+  useEffect(() => {
+    if(typeof userDetails?.address === "object") {
+      setHereObject(userDetails?.address);
+    }
+  }, [userDetails?.address]);
+
+  useEffect(() => {
+    setUserData({
+      ...userData,
+      address: hereObject,
+      zipcode: hereObject?.address?.postalCode
+    })
+  }, [hereObject]);
   
   const [primaryDomain, setPrimaryDomain] = useState<object|null>(null);
   console.log("primaryDomain...", primaryDomain);
+  const [allDataFilled, setAllDataFilled] = useState(false);
+
+  useEffect(() => {
+    if(
+      userData?.business_name !== "" && userData?.business_name?.trim() !== "" && userData?.business_name !== null && userData?.business_name !== undefined &&
+      userData?.first_name !== "" && userData?.first_name?.trim() !== "" && userData?.first_name !== null && userData?.first_name !== undefined &&
+      userData?.last_name !== "" && userData?.last_name?.trim() !== "" && userData?.last_name !== null && userData?.last_name !== undefined &&
+      userData?.address !== null && userData?.address !== undefined &&
+      userData?.zipcode !== "" && userData?.zipcode?.trim() !== "" && userData?.zipcode !== null && userData?.zipcode !== undefined &&
+      userData?.business_state !== "" && userData?.business_state?.trim() !== "" && userData?.business_state !== null && userData?.business_state !== undefined &&
+      userData?.business_city !== "" && userData?.business_city?.trim() !== "" && userData?.business_city !== null && userData?.business_city !== undefined
+    ) {
+      setAllDataFilled(true);
+    } else {
+      setAllDataFilled(false);
+    }
+  }, [userData?.business_name, userData?.first_name, userData?.last_name, userData?.address,userData?.zipcode, userData?.business_state, userData?.business_city]);
   
   const getProfileData = async() => {
     try {
@@ -235,15 +272,28 @@ function Review() {
       setCityDropdownOpen(false);
     }
   };
+  const handleClickOutsideHere = (event: MouseEvent) => {
+    if(hereRef.current && !hereRef.current.contains(event.target as Node)) {
+      setIsHereDropdownOpen(false);
+    }
+  };
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutsideState);
     document.addEventListener('mousedown', handleClickOutsideCity);
+    document.addEventListener('mousedown', handleClickOutsideHere);
     return () => {
       document.removeEventListener('mousedown', handleClickOutsideState);
       document.removeEventListener('mousedown', handleClickOutsideCity);
+      document.removeEventListener('mousedown', handleClickOutsideHere);
     };
   }, []);
+
+  useEffect(() => {
+    if(hereList?.length > 0 && hereSearch !== "") {
+      setIsHereDropdownOpen(true);
+    }
+  }, [hereList, hereSearch]);
 
   useEffect(() => {
     if(states.length > 0 && stateName !== "") {
@@ -506,6 +556,22 @@ function Review() {
     }
   }, [location.state]);
 
+  const getHereMapData = async () => {
+    try {
+      const result = await dispatch(hereMapSearchThunk({address: hereSearch})).unwrap();
+      // console.log("result...", result?.data?.items);
+      setHereList(result?.data?.items);
+    } catch (error) {
+      setHereList([]);
+    }
+  };
+
+  useEffect(() => {
+    if(hereSearch !== "") {
+      getHereMapData();
+    }
+  }, [hereSearch]);
+
   const toggleCheckbox = () => {
     setIsChecked(!isChecked);
   };
@@ -536,7 +602,7 @@ function Review() {
     { label: 'First Name', name: 'first_name', placeholder: 'Enter your First Name', type: 'text', },
     { label: 'Last Name', name: 'last_name', placeholder: 'Enter your Last Name', type: 'text', },
     { label: 'Address', name: 'address', placeholder: 'Enter your Address', type: 'text', },
-    { label: 'Business Zip code', name: 'zipcode', placeholder: 'Enter your Zip Code', type: 'number', },
+    { label: 'Zip code', name: 'zipcode', placeholder: 'Enter your Zip Code', type: 'number', },
     { label: 'Business State', name: 'business_state', placeholder: 'Select your State', type: 'drowpdown', },
     { label: 'Business City*', name: 'business_city', placeholder: 'Select your City', type: 'drowpdown', },
   ];
@@ -816,8 +882,8 @@ function Review() {
       userData?.business_name !== "" && userData?.business_name?.trim() !== "" && userData?.business_name !== null && userData?.business_name !== undefined &&
       userData?.first_name !== "" && userData?.first_name?.trim() !== "" && userData?.first_name !== null && userData?.first_name !== undefined &&
       userData?.last_name !== "" && userData?.last_name?.trim() !== "" && userData?.last_name !== null && userData?.last_name !== undefined &&
-      userData?.address !== "" && userData?.address?.trim() !== "" &&
-      userData?.business_zip_code !== "" && userData?.business_zip_code?.trim() !== "" && userData?.address !== null && userData?.address !== undefined &&
+      userData?.address !== "" && userData?.address !== null && userData?.address !== undefined &&
+      userData?.zipcode !== "" && userData?.zipcode?.trim() !== "" && userData?.address !== null && userData?.address !== undefined &&
       userData?.business_state !== "" && userData?.business_state?.trim() !== "" && userData?.business_state !== null && userData?.business_state !== undefined &&
       userData?.business_city !== "" && userData?.business_city?.trim() !== "" && userData?.business_city !== undefined && userData?.business_city !== null
     ) {
@@ -835,7 +901,7 @@ function Review() {
           business_name: userData?.business_name,
           business_state: userData?.business_state,
           business_city: userData?.business_city,
-          business_zip_code: userData?.business_zip_code,
+          zipcode: userData?.zipcode,
           staff_id: staffId,
           is_staff: staffStatus
         })).unwrap();
@@ -926,8 +992,8 @@ function Review() {
       userData?.business_name !== "" && userData?.business_name?.trim() !== "" && userData?.business_name !== null && userData?.business_name !== undefined &&
       userData?.first_name !== "" && userData?.first_name?.trim() !== "" && userData?.first_name !== null && userData?.first_name !== undefined &&
       userData?.last_name !== "" && userData?.last_name?.trim() !== "" && userData?.last_name !== null && userData?.last_name !== undefined &&
-      userData?.address !== "" && userData?.address?.trim() !== "" &&
-      userData?.business_zip_code !== "" && userData?.business_zip_code?.trim() !== "" && userData?.address !== null && userData?.address !== undefined &&
+      userData?.address !== "" && userData?.address !== null && userData?.address !== undefined &&
+      userData?.zipcode !== "" && userData?.zipcode?.trim() !== "" && userData?.address !== null && userData?.address !== undefined &&
       userData?.business_state !== "" && userData?.business_state?.trim() !== "" && userData?.business_state !== null && userData?.business_state !== undefined &&
       userData?.business_city !== "" && userData?.business_city?.trim() !== "" && userData?.business_city !== undefined && userData?.business_city !== null
     ) {
@@ -1117,8 +1183,8 @@ function Review() {
       userData?.business_name !== "" && userData?.business_name?.trim() !== "" &&
       userData?.first_name !== "" && userData?.first_name?.trim() !== "" &&
       userData?.last_name !== "" && userData?.last_name?.trim() !== "" &&
-      userData?.address !== "" && userData?.address?.trim() !== "" &&
-      userData?.business_zip_code !== "" && userData?.business_zip_code?.trim() !== "" &&
+      userData?.address !== "" && userData?.address !== null && userData?.address !== undefined &&
+      userData?.zipcode !== "" && userData?.zipcode?.trim() !== "" &&
       userData?.business_state !== "" && userData?.business_state?.trim() !== "" &&
       userData?.business_city !== "" && userData?.business_city?.trim() !== ""
     ) {
@@ -1312,7 +1378,7 @@ function Review() {
                             ref={stateRef}
                           >
                             <label
-                              className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
+                              className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2 text-[#8A8A8A]'
                             >Business State</label>
                             <input
                               type="text"
@@ -1371,7 +1437,7 @@ function Review() {
                             ref={cityRef}
                           >
                             <label
-                              className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
+                              className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2 text-[#8A8A8A]'
                             >Business City</label>
                             <input
                               type="text"
@@ -1410,6 +1476,55 @@ function Review() {
                                           setCityDropdownOpen(false);
                                         }}
                                       >{city?.name}</p>
+                                    ))
+                                  }
+                                </div>
+                              )
+                            }
+                          </div>
+                        )
+                      } else if(form.name === "address") {
+                        return (
+                          <div
+                            className='flex flex-col mb-3 w-full mx-auto relative'
+                            ref={hereRef}
+                          >
+                            <label
+                              className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2 text-[#8A8A8A]'
+                            >Address</label>
+                            <input
+                              type="text"
+                              name="address"
+                              required
+                              className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                              onChange={(e) => {
+                                setUserData({
+                                  ...userData,
+                                  address: null,
+                                });
+                                setHereSearch(e.target.value);
+                                setHereObject(null);
+                              }}
+                              value={hereObject?.title || hereSearch}
+                              onFocus={() => {setIsHereDropdownOpen(true)}}
+                              placeholder="Search your business city"
+                              // cypress-name={item.name+"_input"}
+                            />
+                            {
+                              isHereDropdownOpen && (
+                                <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md max-h-32 overflow-auto'>
+                                  {
+                                    hereList?.map((street, idx) => (
+                                      <p
+                                        key={idx}
+                                        className='py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer'
+                                        dropdown-name="country-dropdown"
+                                        onClick={() => {
+                                          setHereObject(street);
+                                          setHereSearch("");
+                                          setIsHereDropdownOpen(false);
+                                        }}
+                                      >{street?.title}</p>
                                     ))
                                   }
                                 </div>
@@ -1610,42 +1725,53 @@ function Review() {
 
         {/* Submit Button */}
         <div className='flex justify-between w-full'>
-        {
-            paymentMethod?.toLowerCase() === "stripe"
-            ? (
+          {
+            allDataFilled
+            ?
+              paymentMethod?.toLowerCase() === "stripe"
+              ? (
+                <button
+                  className="w-[30%] px-2 py-2 mb-5 ml-5 font-medium text-white bg-green-500 rounded-[10px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 mx-auto"
+                  type="button"
+                >
+                  <StripeCheckout
+                    name='Hordanso'
+                    description="Purchasing google workspace and domain"
+                    image="https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899"
+                    ComponentClass="div"
+                    panelLabel="Submit"
+                    // amount={data?.finalTotalPrice * 100}
+                    // currency={defaultCurrencySlice}
+                    stripeKey="pk_test_51HCGY4HJst0MFfZtYup1hAW3VcsAmcJJ4lwg9fDjPLvStToUiLixgF679sFDyWfVH1awUIU3UGOd2TyAYDUkJrPF002WD2USoG"
+                    email={userDetails?.email}
+                    // billingAddress
+                    token={makePayment}
+                    allowRememberMe
+                  >Agree and continue</StripeCheckout>
+                </button>
+              ) : paymentMethod?.toLowerCase() === "paystack"
+              ? (
+                <button
+                  className="w-[30%] px-2 py-2 mb-5 ml-5 font-medium text-white bg-green-500 rounded-[10px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 mx-auto"
+                  type="button"
+                  // onClick={() => {() => initializePayment(handleSuccess, handleClose)}}
+                >
+                  <PaystackButton {...componentProps} />
+                </button>
+              ) : (
+                <button
+                  className="w-[30%] px-2 py-2 mb-5 ml-5 font-medium text-white bg-green-500 rounded-[10px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 mx-auto"
+                  type="button"
+                  onClick={() => {toast.warning("Please select a payment method")}}
+                >
+                  Agree and continue
+                </button>
+              )
+            : (
               <button
                 className="w-[30%] px-2 py-2 mb-5 ml-5 font-medium text-white bg-green-500 rounded-[10px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 mx-auto"
                 type="button"
-              >
-                <StripeCheckout
-                  name='Hordanso'
-                  description="Purchasing google workspace and domain"
-                  image="https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899"
-                  ComponentClass="div"
-                  panelLabel="Submit"
-                  // amount={data?.finalTotalPrice * 100}
-                  // currency={defaultCurrencySlice}
-                  stripeKey="pk_test_51HCGY4HJst0MFfZtYup1hAW3VcsAmcJJ4lwg9fDjPLvStToUiLixgF679sFDyWfVH1awUIU3UGOd2TyAYDUkJrPF002WD2USoG"
-                  email={userDetails?.email}
-                  // billingAddress
-                  token={makePayment}
-                  allowRememberMe
-                >Agree and continue</StripeCheckout>
-              </button>
-            ) : paymentMethod?.toLowerCase() === "paystack"
-            ? (
-              <button
-                className="w-[30%] px-2 py-2 mb-5 ml-5 font-medium text-white bg-green-500 rounded-[10px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 mx-auto"
-                type="button"
-                // onClick={() => {() => initializePayment(handleSuccess, handleClose)}}
-              >
-                <PaystackButton {...componentProps} />
-              </button>
-            ) : (
-              <button
-                className="w-[30%] px-2 py-2 mb-5 ml-5 font-medium text-white bg-green-500 rounded-[10px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 mx-auto"
-                type="button"
-                onClick={() => {toast.warning("Please select a payment method")}}
+                onClick={() => {toast.warning("Please fill all the data")}}
               >
                 Agree and continue
               </button>
@@ -1793,7 +1919,7 @@ function Review() {
             }}
             // static
           >
-            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 w-screen overflow-y-auto">
+            <div className="fixed inset-0 bg-white top-0 bottom-0 left-0 right-0 z-50 w-screen overflow-y-auto">
               <div className="flex min-h-full items-center justify-center py-4">
                 <DialogPanel
                   transition

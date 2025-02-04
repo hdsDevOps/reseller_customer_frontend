@@ -14,7 +14,7 @@ import { ArrowRightLeft, ChevronRight } from 'lucide-react';
 
 const initialData = {
   user_type: '', permissions: [
-    {name: 'Dashboard', value: false,},
+    {name: 'Dashboard', value: true,},
     {name: 'Profile', value: false,},
     {name: 'Domain', value: false,},
     {name: 'Payment Subscription', value: false,},
@@ -54,8 +54,8 @@ const Settings = () => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [currentData, setCurrentData] = useState(initialData);
-  // console.log("current data...", currentData);
-  const permissionsList = ['Dashboard', 'Profile', 'Domain', 'Payment Subscription', 'Email', 'Payment Method', 'Vouhcers', 'My Staff', 'Billing History', 'Settings',];
+  console.log("current data...", currentData);
+  const permissionsList = ['Profile', 'Domain', 'Payment Subscription', 'Email', 'Payment Method', 'Vouhcers', 'My Staff', 'Billing History', 'Settings',];
   const [filter, setFilter] = useState("");
   const [type, setType] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
