@@ -197,7 +197,7 @@ const BillingHistory: React.FC = () => {
     }
   }, [domains, search]);
 
-  const [range, setRange] = useState<[Date | null, Date | null]>([null, null]);
+  const [range, setRange] = useState<[Date | null, Date | null]|null>(null);
   // console.log("range...", range);
   
   const handleChange = (value: [Date | null, Date | null]) => {
