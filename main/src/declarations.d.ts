@@ -111,6 +111,10 @@ declare module 'store/user.thunk' {
   export const verifyReCaptchaThunk;
   export const addSettingThunk;
   export const getBase64ImageThunk;
+  export const getBannerThunk;
+  export const getPromotionListThunk;
+  export const getFaqsThunk;
+  export const contactFormThunk;
 }
 
 declare module 'store/authSlice' {

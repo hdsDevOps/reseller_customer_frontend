@@ -630,7 +630,7 @@ const Cart = () => {
 
   return (
     <div className="flex flex-col gap-6 px-2">
-      <div className="flex flex-col md:flex-row items-center justify-between md:justify-between mb-6">
+      <div className="buy-domain-section">
         <div
           className="flex items-center gap-1 text-green-500 text-lg cursor-pointer mr-3n whitespace-nowrap mr-2"
           onClick={() => navigate(-1)}
@@ -688,7 +688,7 @@ const Cart = () => {
                       className="size-[97%] object-cover"
                     />
                   </div>
-                  <div className="flex flex-row justify-between w-full">
+                  <div className="cart-details">
                     <div className="flex flex-col justify-center">
                       <h3 className="text-xl font-semibold">{item?.product_name}</h3>
                       <small className="text-sm my-1">({item?.product_type})</small>

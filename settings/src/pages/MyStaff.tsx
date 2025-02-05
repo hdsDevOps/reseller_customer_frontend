@@ -453,7 +453,7 @@ const MyStaff = () => {
                   return <tr key={index}  className='mx-2'>
                   <td className='flex items-center min-w-40'>
                     <div className={`text-xs text-[#000000] font-semibold rounded-full p-[10px] mr-2 ${backgroundColors[index % backgroundColors.length]}`}>{getInitials(staff?.first_name)}{getInitials(staff?.last_name)}</div>
-                    <p className='text-xs text-[#000000] font-medium'>{staff?.first_name}&nbsp;{staff?.last_name}</p>
+                    <p className='text-xs text-[#000000] font-medium pr-1'>{staff?.first_name}&nbsp;{staff?.last_name}</p>
                   </td>
                   <td className='text-[#000000] text-xs font-montserrat min-w-40'>{staff?.email}</td>
                   <td className='text-[#000000] text-xs font-montserrat min-w-40'>+{staff?.phone_no}</td>

@@ -1,20 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Base_URL } from "../../Constant";
+// import { Base_URL } from "../../Constant";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import { Link, useNavigate } from "react-router-dom";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { BsChatLeftText } from "react-icons/bs";
-import '../../styles/styles.css';
+import './styles.css';
 import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { getBannerThunk, getPromotionListThunk } from "store/user.thunk";
 import { currencyList } from "../CurrencyList";
-import { LuTvMinimalPlay } from "react-icons/lu";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import ReactPlayer from "react-player";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { LuTvMinimalPlay } from "react-icons/lu";
 
 
 const HeroSection = ({id}:any) => {
@@ -73,7 +73,6 @@ const HeroSection = ({id}:any) => {
     try {
       const result = await dispatch(getBannerThunk()).unwrap();
       setBanner(result?.data);
-      console.log(result)
     } catch (error) {
       setBanner([]);
     }
@@ -178,7 +177,7 @@ const HeroSection = ({id}:any) => {
           <div className="flex items-center py-[2px] pb-1">
             <p className="font-inter font-normal text-base text-white">
               Gemini for Workspace: Google's AI-powered assistant seamlessly integrated into Gmail, Docs, Sheets, and more. Discover the future of productivity.{" "}
-              <span className="font-bold cursor-pointer" onClick={() => {navigate('/ai')}}>LEARN MORE</span>
+              <span className="font-bold cursor-pointer" onClick={() => {navigate('/ai-page')}}>LEARN MORE</span>
             </p>
             <FaArrowRightLong className="w-9 h-6 text-white" />
           </div>

@@ -91,7 +91,11 @@ const HowToSignInToDomain: React.FC = () => {
           formData?.username !== "" && formData?.username?.trim() !== "" &&
           formData?.password !== "" && formData?.password?.trim() !== ""
         ) {
-          navigate('/free-trial-page', { state: { ...location.state, emailData: {username: `${formData?.username}@${location.state.selectedDomain?.domain}`, password: formData?.password} } });
+          if(location.state.from === "dashboard") {
+            navigate('/free-trial-page', { state: { ...location.state, emailData: {username: `${formData?.username}@${location.state.selectedDomain?.domain}`, password: formData?.password} } });
+          } else if(location.state.from === "home") {
+            navigate('/choose-your-plan', { state: { ...location.state, emailData: {username: `${formData?.username}@${location.state.selectedDomain?.domain}`, password: formData?.password} } });
+          }
         } else {
           toast.error("Please fill all the fields");
         }

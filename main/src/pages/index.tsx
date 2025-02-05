@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
 import DomainApp from "domains/DomainApp";
@@ -26,6 +26,8 @@ import HowToSignInToDomain from "../components/planFlow/HowToSignInToDomain";
 import TrialSummary from "../components/planFlow/TrialSummary";
 import GeminiSummary from "../components/planFlow/GeminiSummary";
 import AdminHeader from "../components/AdminHeader";
+import LadningPage from "./LadningPage";
+import LandingApp from "./LandingApp";
 
 const routes = [
   { path: "/", element: <Dashboard /> },
@@ -44,32 +46,44 @@ const routes = [
 ];
 
 const MainApp: React.FC = () => {
+  const location = useLocation();
   const { isAdmin } = useAppSelector(state => state.auth);
 
   return (
   <div className="main-wrapper">
     {
-      isAdmin && (<AdminHeader />)
+      location.pathname === "/home-page" || location.pathname === "/ai-page"
+      ? (
+        <React.Fragment>
+          <LandingApp />
+        </React.Fragment>
+      ) : (
+        <React.Fragment>
+          {
+            isAdmin && (<AdminHeader />)
+          }
+          <Header />
+          <div className={`content-body relative min-h-screen pl-[5.2rem] lg:pl-[17rem] ${isAdmin ? "pt-[150px]" : "pt-[80px]"} pr-[0.8rem] pb-4`}>
+            <ToastContainer />
+            <Routes>
+              {routes.map((route, index) => (
+                <Route key={index} path={route.path} element={route.element} />
+              ))}
+            </Routes>
+            <LandingApp />
+            <DomainApp />
+            <SettingsApp/>
+            <PaymentApp />
+            <HistoryApp />
+            <EmailApp />
+            <div className="absolute bottom-0 left-0 right-0 w-full">
+              <Footer />
+            </div>
+          </div>
+          <Navbar />
+        </React.Fragment>
+      )
     }
-    <Header />
-    <div className={`content-body relative min-h-screen pl-[5.2rem] lg:pl-[17rem] ${isAdmin ? "pt-[150px]" : "pt-[80px]"} pr-[0.8rem] pb-4`}>
-      <ToastContainer />
-      <Routes>
-        {routes.map((route, index) => (
-          <Route key={index} path={route.path} element={route.element} />
-        ))}
-      </Routes>
-      <DomainApp />
-      <SettingsApp/>
-      <PaymentApp />
-      <HistoryApp />
-      <EmailApp />
-      <div className="absolute bottom-0 left-0 right-0 w-full">
-        <Footer />
-      </div>
-    </div>
-    <Navbar />
-  
   </div>
   )
 

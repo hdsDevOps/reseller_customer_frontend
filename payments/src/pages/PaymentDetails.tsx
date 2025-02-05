@@ -139,7 +139,7 @@ const PaymentDetails: React.FC = () => {
   console.log("payment details...", paymentDetails);
   const [filter, setFilter] = useState(paymentDetailsFilterSlice === null ? initialFilter : paymentDetailsFilterSlice);
   console.log("filter...", filter);
-  const [range, setRange] = useState<[Date | null, Date | null]>([null, null]);
+  const [range, setRange] = useState<[Date | null, Date | null]|null>(null);
   const [domains, setDomains] = useState([]);
   // console.log("domains...", domains);
   const [type, setType] = useState("");

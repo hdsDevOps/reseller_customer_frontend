@@ -4,35 +4,16 @@ import { FaClover } from "react-icons/fa6";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { currencyList } from "../CurrencyList";
-import { useAppDispatch, useAppSelector } from "store/hooks";
+import { useAppSelector } from "store/hooks";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { plansAndPricesListThunk } from "store/user.thunk";
+import { toast } from "react-toastify";
 
-const ChooseYourPlan: React.FC = ({}:any) => {
+const PlanCard: React.FC = ({plans, handleLeftPlan, handleRightPlan, plansLength, handleAddToCart}:any) => {
   const navigate = useNavigate();
   const location = useLocation();
-  console.log(location.state);
-  const dispatch = useAppDispatch();
+  // console.log(location.state);
   
   const { defaultCurrencySlice, userDetails } = useAppSelector(state => state.auth);
-
-  useEffect(() => {
-    if(userDetails?.workspace) {
-      navigate('/');
-    }
-  }, [userDetails]);
-
-  const [basePlans, setBasePlans] = useState([]);
-  // console.log("basePlans...", basePlans);
-  const [plans, setPlans] = useState([]);
-  console.log("plans...", plans);
-
-  const [plansLength, setPlansLength] = useState(0);
-  // console.log("plansLength...", plansLength);
-  const [activePlans, setActivePlans] = useState([]);
-  // console.log("activePlans...", activePlans);
-  const [activePlanIndex, setActivePlanIndex] = useState(0);
-  // console.log("activePlanIndex...", activePlanIndex);
 
   const [isYearly, setIsYearly] = useState(false);
   const [checkbox, setCheckbox] = useState<null|string>(null);
@@ -49,85 +30,16 @@ const ChooseYourPlan: React.FC = ({}:any) => {
   // console.log("plans...", plans);
 
   useEffect(() => {
-    if(basePlans?.length > 0) {
-      const currentPlans = basePlans?.filter(planName => planName?.amount_details?.some(detail => detail?.currency_code === defaultCurrencySlice));
-      // console.log("currentPlans....", currentPlans);
-      setPlans(currentPlans);
-    } else {
-      setPlans([]);
-    }
-  }, [basePlans, defaultCurrencySlice]);
-
-  useEffect(() => {
     if(plans?.length > 0) {
-      const plansList = plans?.filter((_, index) => index < 3);
-      setActivePlans(plansList);
-      setActivePlanIndex(0);
-      setPlansLength(plans?.length);
-    };
-  }, [plans]);
-
-  const handleLeftPlan = () => {
-    // console.log("left");
-    if(activePlanIndex === 0) {
-      setActivePlanIndex(plansLength-1);
-    } else {
-      setActivePlanIndex(prev => prev-1);
-    }
-  };
-
-  const handleRightPlan = () => {
-    if(activePlanIndex === plansLength -1) {
-      setActivePlanIndex(0);
-    } else {
-      setActivePlanIndex(prev => prev+1);
-    }
-  };
-
-  useEffect(() => {
-    if(plansLength - activePlanIndex >= 3) {
-      setActivePlans(plans?.filter((_,index) => index >= activePlanIndex && index < activePlanIndex+3));
-    } else if(plansLength - activePlanIndex < 3) {
-      const diff = plansLength - activePlanIndex;
-      // console.log("diff...", diff);
-      if(diff === 2) {
-        const customPlans = plans?.filter((_,index) => index >= activePlanIndex);
-        customPlans?.push(plans[0]);
-        setActivePlans(customPlans);
-      } else if(diff === 1) {
-        const customPlans = [plans[activePlanIndex]];
-        console.log([plans[activePlanIndex]])
-        customPlans?.push(plans[0], plans[1]);
-        setActivePlans(customPlans);
-      }
-    }
-  }, [plans, plansLength, activePlanIndex]);
-
-  const getPlansList = async() => {
-    try {
-      const result = await dispatch(plansAndPricesListThunk({subscription_id: ""})).unwrap();
-      setBasePlans(result?.data);
-    } catch (error) {
-      setBasePlans([]);
-    }
-  };
-
-  useEffect(() => {
-    getPlansList();
-  }, []);
-
-
-  useEffect(() => {
-    if(activePlans?.length > 0) {
-      const data = activePlans?.filter((plan, index) => index < 3 );
+      const data = plans?.filter((plan, index) => index < 3 );
       setCurrentPlans(data);
     }
-  }, [activePlans]);
+  }, [plans]);
 
   const trialExpirationDate = (count) => {
     const today = new Date();
     const monthFromToday = new Date();
-    monthFromToday.setDate(today.getDate() + parseInt(count));
+    monthFromToday.setDate(today?.getDate() + parseInt(count));
     return format(monthFromToday, "dd-MM-yyyy");
   };
   
@@ -143,7 +55,6 @@ const ChooseYourPlan: React.FC = ({}:any) => {
     const discount = parseFloat((((parseFloat(amount?.price) - parseFloat(amount?.discount_price)) / parseFloat(amount?.price)) * 100).toFixed(2));
     return discount;
   };
-
 
   return (
     <div className="flex flex-col items-center justify-center w-full">
@@ -191,7 +102,7 @@ const ChooseYourPlan: React.FC = ({}:any) => {
       </div>
 
       {/* <div className="flex min-sm:flex-row  items-end justify-center gap-2 w-full max-sm:flex-col max-sm:items-center   mt-6"> */}
-      <div className="flex flex-col xl:flex-row lg:flex-row  lg:items-stretch justify-center gap-2 w-full sm:flex-col sm:items-center mt-6 bg-white relative">
+      <div className="flex flex-col xl:flex-row lg:flex-row  lg:items-stretch justify-start gap-2 w-full sm:flex-col sm:items-center mt-6 bg-white relative">
       {/* <div className="grid   md:grid-cols-3  grid-cols-1 w-full    mt-6"> */}
         {
           plansLength > 3 && (
@@ -291,13 +202,13 @@ const ChooseYourPlan: React.FC = ({}:any) => {
                         >
                           Gemini add-on available
                         </button>
-                        <button type="button" onClick={() => {
-                          if(location.state?.from === "home") {
-                            navigate('/subscribe-plan', { state: { ...location.state, plan: plan, period: `${
-                              isYearly ? 'Yearly' : 
-                              checkbox ? 'Monthly' :
-                              'Yearly Subscription with monthly billing'
-                            }`} })
+                        <button type="button" onClick={(e) => {
+                          if(userDetails?.workspace) {
+                            if(userDetails?.workspace?.workspace_status === "trial") {
+                              toast.warning("You cannot update your plan during trial period");
+                            } else {
+                              handleAddToCart(e, plan, isYearly, checkbox)
+                            }
                           } else {
                             navigate('/subscribe-plan', { state: { plan: plan, period: `${
                               isYearly ? 'Yearly' : 
@@ -305,13 +216,17 @@ const ChooseYourPlan: React.FC = ({}:any) => {
                               'Yearly Subscription with monthly billing'
                             }`, from: 'dashboard'} })
                           }
-                        }}className="bg-black text-white py-2 px-3 w-full sm:py-2 sm:px-4 rounded-lg">
-                          Start Trial
+                        }} className="bg-black text-white py-2 px-3 w-full sm:py-2 sm:px-4 rounded-lg">
+                          {
+                            userDetails?.workspace
+                            ? "Update Plan"
+                            : "Start Trial"
+                          }
                         </button>
                         {
                           isHovering === index && (
                             <div
-                              className="absolute w-full top-5 left-0 right-0"
+                              className="absolute w-full top-7 left-0 right-0"
                               onMouseEnter={() => setIsHovering(index)}
                               onMouseLeave={() => setIsHovering(null)}
                             >
@@ -324,7 +239,7 @@ const ChooseYourPlan: React.FC = ({}:any) => {
 
                       {/* Next Renewal Date */}
                       <div className="text-gray-500 text-xs sm:text-xs text-right mt-1">
-                        Next renewal date: {trialExpirationDate(plan?.trial_period)}
+                        Next renewal date: {trialExpirationDate(plan?.trial_period || 0)}
                       </div>
                     </div>
 
@@ -351,4 +266,4 @@ const ChooseYourPlan: React.FC = ({}:any) => {
   );
 };
 
-export default ChooseYourPlan;
+export default PlanCard;

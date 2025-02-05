@@ -42,8 +42,11 @@ export default function Header() {
 
   return (
     <header className={`bg-white flex text-black px-2 items-center justify-between z-50 fixed ${isAdmin ? "top-[70px]" : "top-0"} left-0 right-0 h-[70px]`}>
-      <a
-        href="#"
+      <button
+        type="button"
+        onClick={() => {
+          navigate('/home-page');
+        }}
         className="flex items-center justify-center"
       >
         <img
@@ -51,7 +54,7 @@ export default function Header() {
           alt="logo"
           className="sm:h-10 h-14 object-contain"
         />
-      </a>
+      </button>
 
       <div className="flex items-center space-x-4">
         {

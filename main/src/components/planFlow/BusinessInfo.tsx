@@ -28,7 +28,7 @@ const BusinessInfo: React.FC = () => {
 
   // console.log("userDetails...", userDetails);
 
-  // console.log("state....", location.state);
+  console.log("state....", location.state);
 
   useEffect(() => {
     if(!location.state) {
@@ -316,7 +316,11 @@ const BusinessInfo: React.FC = () => {
         // console.log("result...", result);
         await getProfileData();
         toast.success("Business Information updated successfully");
-        navigate("/choose-your-domain", {state: { ...location.state}})
+        if(location.state.from === "dashboard") {
+          navigate("/choose-your-domain", {state: { ...location.state}});
+        } else if(location.state.from === "home") {
+          navigate("/free-trial-page", {state: { ...location.state}});
+        }
       } catch (error) {
         setIsLoading(true);
         toast.error(error?.message || "Error updating Business Information");

@@ -30,6 +30,7 @@ export default function Footer() {
     try {
       const result = await dispatch(getLandingPageThunk()).unwrap();
       setFooter(result?.data?.footer);
+      console.log(result)
     } catch (error) {
       setFooter(initialFooter);
     }

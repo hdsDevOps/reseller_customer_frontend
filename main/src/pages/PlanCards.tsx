@@ -144,7 +144,7 @@ const PlanCard: React.FC = () => {
         currency: defaultCurrencySlice,
         product_name: item?.plan_name,
         product_type: "google workspace",
-        total_year: 1,
+        total_year: userDetails?.license_usage,
         plan_name_id: item?.id,
         workspace_status: "active",
         is_trial: true

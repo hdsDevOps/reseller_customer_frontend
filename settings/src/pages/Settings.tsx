@@ -251,7 +251,7 @@ const Settings = () => {
       <div className={`p-6 grid grid-cols-1`}>
         <h3 className='text-[#12A833] text-[28px] font-medium font-inter capitalize ml-[18px]'>settings</h3>
         
-        <p className='text-[#00163B] text-sm font-medium py-4 pt-7 tracking-wider ml-[14px] px-1 border-b-[3px] border-[#12A833] w-fit'>Add User Type</p>
+        <p className='text-[#00163B] text-sm font-medium py-4 pt-7 tracking-wider ml-[14px] px-1 border-b-[3px] border-[#12A833] w-fit'>User Type</p>
         
         <div className='bg-[#F9F9F9] py-3 flex min-sm:flex-row max-sm:flex-col justify-between px-6 mt-7 gap-2 max-sm:items-center'>
           <button

@@ -2,6 +2,7 @@ import { apiError } from "../constants/apiError.const";
 import axiosInstance from "../services/api.service";
 import axiosInstance2 from '../services/api.service2';
 import CustomError from "../customClass/CustomError.class";
+import axios from "axios";
 
 /**
  * Performs an asynchronous API call using Axios.
@@ -14,26 +15,20 @@ export async function getApiCall(endPoint: string): Promise<any | CustomError> {
     const fetchedData = await axiosInstance.get(endPoint);
     if (fetchedData.data?.status === 200 || fetchedData.data?.status === 201) {
       return fetchedData?.data;
-    } else if (
-      fetchedData.data?.status === 401 ||
-      fetchedData.data?.status === 400 ||
-      fetchedData.data?.status === 410
-    ) {
-      throw new CustomError(
-        apiError.TOKEN_EXPIRED,
-        fetchedData.data?.message || fetchedData.data?.msg
-      );
-    } else {
-      throw new CustomError(
-        apiError.DATA_NOT_FOUND,
-        fetchedData.data?.message || fetchedData.data?.msg
-      );
     }
+    throw new CustomError(
+      apiError.DATA_NOT_FOUND,
+      fetchedData.data?.message || fetchedData.data?.msg || "Unknown error"
+    );
   } catch (error: any) {
-    if (error instanceof CustomError) {
-      throw error;
+    if (error.response) {
+      // Extract API Error Message
+      const apiErrorMessage = error.response.data?.message || error.response.data?.error || 'Unknown API Error';
+      throw new Error(apiErrorMessage); // Throw the exact error message from API
+    } else {
+      // Handle Network or Other Errors
+      throw new Error(error.message || 'Network Error');
     }
-    throw new CustomError(apiError.API_CALL_FAILED, error?.message);
   }
 }
 
@@ -46,26 +41,20 @@ export async function postApiCall<T>(
     // console.log("data...", fetchedData);
     if (fetchedData.data?.status === 200 || fetchedData.data?.status === 201 || fetchedData?.status === 200 || fetchedData?.status === 201) {
       return fetchedData?.data;
-    } else if (
-      fetchedData.data?.status === 401 ||
-      fetchedData.data?.status === 400 ||
-      fetchedData.data?.status === 410
-    ) {
-      throw new CustomError(
-        apiError.TOKEN_EXPIRED,
-        fetchedData.data?.message || fetchedData.data?.msg
-      );
-    } else {
-      throw new CustomError(
-        apiError.DATA_NOT_FOUND,
-        fetchedData.data?.message || fetchedData.data?.msg
-      );
-    }
+    } 
+    throw new CustomError(
+      apiError.DATA_NOT_FOUND,
+      fetchedData.data?.message || fetchedData.data?.msg || "Unknown error"
+    );
   } catch (error: any) {
-    if (error instanceof CustomError) {
-      throw error;
+    if (error.response) {
+      // Extract API Error Message
+      const apiErrorMessage = error.response.data?.message || error.response.data?.error || 'Unknown API Error';
+      throw new Error(apiErrorMessage); // Throw the exact error message from API
+    } else {
+      // Handle Network or Other Errors
+      throw new Error(error.message || 'Network Error');
     }
-    throw new CustomError(apiError.API_CALL_FAILED, error?.message);
   }
 }
 

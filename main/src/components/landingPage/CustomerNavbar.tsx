@@ -56,39 +56,39 @@ export default function CustomerNavbar({width, closeNav, navOpen, header}: { wid
       <ul className="lg:flex lg:gap-4 lg:pl-0 pl-3 items-center justify-between">
         <li className="py-1 lg:py-0">
           <button className=" hover:font-bold" onClick={() => {
-            location.pathname.toLowerCase().includes('/home')
+            location.pathname.toLowerCase().includes('/home-page')
             ? handleScroll('plan_and_price')
-            : navigate('/home', {state: 'plan_and_price'}); 
+            : navigate('/home-page', {state: 'plan_and_price'}); 
             closeNav();
           }}>{header?.menu1}</button>
         </li>
         <li className="py-1 lg:py-0">
           <button className=" hover:font-bold" onClick={() => {
-            location.pathname.toLowerCase().includes('/home')
+            location.pathname.toLowerCase().includes('/home-page')
             ? handleScroll('about_us')
-            : navigate('/home', {state: 'about_us'});
+            : navigate('/home-page', {state: 'about_us'});
             closeNav();
           }}>{header?.menu2}</button>
         </li>
         <li className="py-1 lg:py-0">
           <button className=" hover:font-bold" onClick={() => {
-            location.pathname.toLowerCase().includes('/home')
+            location.pathname.toLowerCase().includes('/home-page')
             ? handleScroll('faqs')
-            : navigate('/home', {state: 'faqs'}); 
+            : navigate('/home-page', {state: 'faqs'}); 
             closeNav();
           }}>{header?.menu3}</button>
         </li>
         <li className="py-1 lg:py-0">
           <button className=" hover:font-bold" onClick={() => {
-            location.pathname.toLowerCase().includes('/home')
+            location.pathname.toLowerCase().includes('/home-page')
             ? handleScroll('resources')
-            : navigate('/home', {state: 'resources'});
+            : navigate('/home-page', {state: 'resources'});
             closeNav();
           }}>{header?.menu4}</button>
         </li>
         <li className="py-1 lg:py-0">
           <button className={`hover:font-bold ${location.pathname === '/ai' ? "font-bold" : ""}`} onClick={() => {
-            navigate('/ai');
+            navigate('/ai-page');
             closeNav();
           }}>{header?.menu5}</button>
         </li>
@@ -96,9 +96,9 @@ export default function CustomerNavbar({width, closeNav, navOpen, header}: { wid
       <div className="lg:flex lg:gap-10 items-center lg:pl-0 pl-3">
         <p className="my-2 lg:my-0">
           <button className=" hover:font-bold" onClick={() => {
-            location.pathname.toLowerCase().includes('/home')
+            location.pathname.toLowerCase().includes('/home-page')
             ? handleScroll('plan_and_price')
-            : navigate('/home', {state: 'plan_and_price'}); 
+            : navigate('/home-page', {state: 'plan_and_price'}); 
             handleScroll('contact_us');
             closeNav();
           }}>{header?.menu6}</button>
@@ -107,10 +107,11 @@ export default function CustomerNavbar({width, closeNav, navOpen, header}: { wid
           className="bg-gray-100 text-green-500 hover:bg-green-500 hover:text-white border-none px-4 py-2.5 rounded-lg font-semibold text-base my-2 lg:my-0"
           type="button"
           onClick={() => {
-            navigate('/login');
+            localStorage.clear();
+            navigate('/');
             closeNav();
           }}
-        >Login</button>
+        >Logout</button>
 
         <div className="relative flex flex-col my-2 lg:my-0">
           <div className="flex items-center gap-1.5 cursor-pointer" onClick={toggleDropdown}>

@@ -1,0 +1,23 @@
+.review-header {
+  /* flex max-[700px]:flex-col items-center justify-start min-[700px]:gap-10 max-[700px]:gap-2 mt-1 */
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  gap: 40px;
+  align-items: center;
+  margin-top: -10px;
+}
+
+.review-header-text {
+  /* min-[700px]:text-[30px] text-[20px] text-green-500 font-semibold */
+  font-size: 30px;
+  color: #12A833;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+}
+
+@media screen and (max-width: 700px) {
+  .review-header-text {
+    font-size: 20px;
+  }
+}

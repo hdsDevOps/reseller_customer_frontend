@@ -52,7 +52,7 @@ const BillingInvoice: React.FC = ({pdfRef, data}) => {
   const getBase64ImagePaystack = async() => {
     try {
       const result = await dispatch(getBase64ImageThunk({url: paystackImageUrl})).unwrap();
-      setStripeImage(result?.base64);
+      setPaystackImage(result?.base64);
     } catch (error) {
       setStripeImage("");
     }

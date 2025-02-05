@@ -26,7 +26,7 @@ const Subscribe: React.FC = () => {
     }
   })
 
-  // console.log("state...", location.state);
+  console.log("state...", location.state);
 
   useEffect(() => {
     if(!location.state) {

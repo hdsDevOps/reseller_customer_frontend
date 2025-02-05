@@ -16,6 +16,7 @@ import { currencyList } from '../components/CurrencyList';
 import StripeCheckout from "react-stripe-checkout";
 import { PaystackButton } from "react-paystack";
 import axios from 'axios';
+import './Review.css';
 
 const initialCartPrice = {
   total_year: 0,
@@ -673,7 +674,7 @@ function Review() {
           due_date: planExpiryDate,
         }],
         plan_name: usedPlan?.plan_name,
-        workspace_status: item?.wokrspace_status === "trial" ? "trial" : "active",
+        workspace_status: item?.workspace_status === "trial" ? "trial" : "active",
         is_trial: false,
         license_usage: item?.total_year
       })).unwrap();
@@ -1040,23 +1041,6 @@ function Review() {
               if(item?.product_type?.toLowerCase() === "google workspace") {
                 const workspaceSubscription = await addSubscriptionForWorkspace(item, result?.charge);
                 console.log(workspaceSubscription);
-                // await addBillingHistory(item, result?.charge, "Stripe", "google workspace", workspaceSubscription?.subscription_id);
-                // await dispatch(addBillingHistoryThunk({
-                //   user_id: customerId,
-                //   transaction_id: result?.charge?.balance_transaction,
-                //   date: todayDate,
-                //   invoice: result?.charge?.payment_method_details?.card?.network_transaction_id,
-                //   product_type: "google workspace",
-                //   description: `purchase google workspace ${item?.product_name} ${item?.total_year}`,
-                //   domain: item?.workspace_status === "trial"
-                //   ? cart?.find(item2 => item2?.product_type === "domain")?.product_name || ""
-                //   : domainsState?.find(item2 => item2?.domain_type === "primary")?.domain_name || "",
-                //   payment_method: "Stripe",
-                //   payment_status: "Success",
-                //   amount: `${currencyList?.find(item2 => item2?.name === defaultCurrencySlice)?.logo}${finalTotalPrice}`,
-                //   transaction_data: result?.charge,
-                //   subscription_id: domainSubscription?.subscription_id
-                // }));
                 if(item?.workspace_status === "trial") {
                   await dispatch(makeDefaultPaymentMethodThunk({user_id: customerId, payment_method_id: paymentMethodId}));
                   // const role = await dispatch(addSettingThunk({user_type: "Super Admin", user_id: customerId, permissions: superAdminPermissions})).unwrap();
@@ -1066,21 +1050,6 @@ function Review() {
                 }
               } else if(item?.product_type?.toLowerCase() === "domain") {
                 const domainSubscription = await addSubscriptionForDomain(item, result?.charge);
-                // await addBillingHistory(item, result?.charge, "Stripe", "domain", domainSubscription?.subscription_id);
-                // await dispatch(addBillingHistoryThunk({
-                //   user_id: customerId,
-                //   transaction_id: result?.charge?.balance_transaction,
-                //   date: todayDate,
-                //   invoice: result?.charge?.payment_method_details?.card?.network_transaction_id,
-                //   product_type: "domain",
-                //   description: `purchase domain ${item?.product_name}`,
-                //   domain: item?.product_name,
-                //   payment_method: "Stripe",
-                //   payment_status: "Success",
-                //   amount: `${currencyList?.find(item2 => item2?.name === defaultCurrencySlice)?.logo}${finalTotalPrice}`,
-                //   transaction_data: result?.charge,
-                //   subscription_id: domainSubscription?.subscription_id
-                // }));
                 const domainData = await dispatch(addNewDomainThunk({
                   customer_id: data?.customer_id,
                   domain_name: item?.product_name,
@@ -1240,7 +1209,7 @@ function Review() {
   return (
     <>
       <div className="flex flex-col w-full">
-        <div className="flex max-[700px]:flex-col items-center justify-start min-[700px]:gap-10 max-[700px]:gap-2 mt-8">
+        <div className="review-header">
           <button
             className="flex flex-row items-center justify-center gap-3"
             onClick={() => navigate(-1)}
@@ -1251,12 +1220,12 @@ function Review() {
               Back to previous page
             </h6>
           </button>
-          <h1 className="text-[30px] text-green-500 font-semibold ">
-            Review and checkout
-          </h1>
         </div>
 
         <div className='grid grid-cols-1 max-w-[961px] w-full mx-auto'>
+          <h1 className="review-header-text">
+            Review and checkout
+          </h1>
           <div className='grid grid-cols-1 max-w-[961px] w-full'>
             {
               cart?.map((item, index) => (
