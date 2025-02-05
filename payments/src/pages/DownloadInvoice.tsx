@@ -5,7 +5,7 @@ import { BiCheck } from "react-icons/bi";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { getPaymentMethodsThunk } from "store/user.thunk";
+import { getBase64ImageThunk, getPaymentMethodsThunk } from "store/user.thunk";
 import { currencyList } from "../components/CurrencyList";
 import {  } from "store/authSlice";
 import { Dialog, DialogPanel } from "@headlessui/react";
@@ -41,6 +41,38 @@ const DownloadInvoice: React.FC = () => {
   const [planExpiryDate, setPlanExpiryDate] = useState("");
   console.log({todayDate, domainExpiryDate, planExpiryDate});
   const [paymentMethods, setPaymentMethods] = useState([]);
+  
+  const [base64ImageLogo, setBase64ImageLogo] = useState("");
+  const [paymentMethodImage, setPaymentMethodImage] = useState("");
+
+  const getBase64ImageLogo = async() => {
+    try {
+      const result = await dispatch(getBase64ImageThunk({url: logo})).unwrap();
+      setBase64ImageLogo(result?.base64);
+    } catch (error) {
+      setBase64ImageLogo("");
+    }
+  };
+
+  useEffect(() => {
+    getBase64ImageLogo();
+  }, []);
+
+  const getBase64ImagePaymentMethod = async(url:string) => {
+    try {
+      const result = await dispatch(getBase64ImageThunk({url: url})).unwrap();
+      setPaymentMethodImage(result?.base64);
+    } catch (error) {
+      setPaymentMethodImage("");
+    }
+  };
+
+  useEffect(() => {
+    if(data?.payment_method !== null && paymentMethods?.length > 0 || data?.payment_method !== "" && paymentMethods?.length > 0 || data?.payment_method !== undefined && paymentMethods?.length > 0) {
+      const paymentGatewayImage = paymentMethods?.find(item => item?.method_name?.toLowerCase() === data?.payment_method?.toLowerCase())?.method_image;
+      getBase64ImagePaymentMethod(paymentGatewayImage);
+    }
+  }, [paymentMethods, data?.payment_method]);
 
   const getPaymentMethodsList = async() => {
     try {
@@ -182,7 +214,7 @@ const DownloadInvoice: React.FC = () => {
 
         <p className="mt-7 mb-5 font-inter font-normal text-base text-black">Your payment has been processed successfully.</p>
 
-        <div className="min-w-full bg-white shadow-lg rounded-[20px] p-8">
+        <div className="w-full max-w-[500px] bg-white shadow-lg rounded-[20px] p-8">
           <div className="flex flex-col">
             {/* Date */}
             <div className="flex justify-between py-[10px] items-center align-middle">
@@ -193,7 +225,7 @@ const DownloadInvoice: React.FC = () => {
             {/* Customer */}
             <div className="flex justify-between py-[10px]">
               <p className="font-inter font-normal text-base text-[#8A8A8A] text-left">Customer</p>
-              <p className="font-inter font-normal text-base text-black text-end !mt-0">{data?.product?.name}</p>
+              <p className="font-inter font-normal text-base text-black text-end !mt-0">{data?.body?.product?.name}</p>
             </div>
 
             {/* Reference ID */}
@@ -283,7 +315,7 @@ const DownloadInvoice: React.FC = () => {
                     className='relative h-40 bg-white overflow-hidden'
                   >
                     <div
-                      className='absolute top-0 w-full h-full bg-[#12A833] transform -skew-y-[11deg] origin-top-left z-10'
+                      style={{position: 'absolute', top: 0, width: "100%", height: "100%", backgroundColor: '#12A833', zIndex: '10', transform: 'skewY(-11deg)', transformOrigin: 'top left'}}
                     ></div>
                     <div
                       className='absolute top-0 right-0 w-[200px] h-[80%] bg-[#f4f4f6] opacity-50 transform -skew-y-[17deg] origin-top-left z-10'
@@ -310,7 +342,7 @@ const DownloadInvoice: React.FC = () => {
                         className='w-[60px] h-[60px] bg-white rounded-full border-4 border-white flex items-center justify-center shadow-lg'
                       >
                         <img
-                          src={logo}
+                          src={base64ImageLogo}
                           className='w-[51px] rounded-full object-cover'
                         />
                       </div>
@@ -331,7 +363,7 @@ const DownloadInvoice: React.FC = () => {
                   </div>
 
                   <div
-                    className='flex justify-between text-[#B3B7B8] px-20 py-5 w-full overflow-x-auto'
+                    className='flex justify-between text-[#B3B7B8] px-20 py-2 w-full overflow-x-auto'
                   >
                     <table className="w-full min-w-[400px]">
                       <tbody>
@@ -347,7 +379,7 @@ const DownloadInvoice: React.FC = () => {
                           <td className="font-inter font-normal text-sm items-start text-start content-start">Payment Method</td>
                            <td>
                             <img
-                              src={paymentMethods?.find(item => item?.method_name?.toLowerCase() === data?.payment_method?.toLowerCase())?.method_image}
+                              src={paymentMethodImage}
                               alt={data?.payment_method}
                               className="w-10 object-contain"
                             />
@@ -368,7 +400,7 @@ const DownloadInvoice: React.FC = () => {
                   </div>
 
                   <div
-                    className='flex justify-between text-[#B3B7B8] px-20 py-5 w-full overflow-x-auto'
+                    className='flex justify-between text-[#B3B7B8] px-20 py-2 w-full overflow-x-auto'
                   >
                     <table className="w-full min-w-[400px]">
                       <thead>

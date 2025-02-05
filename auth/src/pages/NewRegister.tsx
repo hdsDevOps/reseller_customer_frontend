@@ -35,7 +35,7 @@ const RegisterPage: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const [customer, setCustomer] = useState(initialCustomer);
-  // console.log("customer...", customer);
+  console.log("customer...", customer);
   const [showPassword, setShowPassword] = useState(false);
   const [showCPassword, setShowCPassword] = useState(false);
   const [password, setPassword] = useState("");
@@ -59,6 +59,7 @@ const RegisterPage: React.FC = () => {
   const [hereDropdownOpen, setHereDropdownOpen] = useState(false);
   const hereRef = useRef(null);
   const [hereData, setHereData] = useState<object|null>(null);
+  console.log("here data...", hereData);
   // console.log({address: customer?.address, hereData, hereAddress});
 
   useEffect(() => {
@@ -86,7 +87,7 @@ const RegisterPage: React.FC = () => {
     if(hereData !== null) {
       setCustomer({
         ...customer,
-        address: hereData?.title
+        address: hereData
       });
     } else {
       setCustomer({
@@ -134,7 +135,7 @@ const RegisterPage: React.FC = () => {
         setCustomer({
           ...customer,
           country: findCountry?.name,
-          address: hereData?.title,
+          address: hereData,
           zipcode: hereData?.address?.postalCode
         });
       }
@@ -240,8 +241,14 @@ const RegisterPage: React.FC = () => {
   
   const validateForm = () => {
     for (const key in customer) {
-      if (customer[key].trim() === '') {
-        return false;
+      if(key === "address") {
+        if(customer?.address === "" || customer?.address === null || customer?.address === undefined) {
+          return false;
+        }
+      } else {
+        if (customer[key].trim() === '') {
+          return false;
+        }
       }
     }
     return true;
@@ -516,7 +523,7 @@ const RegisterPage: React.FC = () => {
                           setHereData(null);
                         }}
                         placeholder={head?.placeholder}
-                        value={hereAddress || customer[head.name]}
+                        value={hereAddress || customer?.address?.title}
                         onFocus={() => {setHereDropdownOpen(true)}}
                       />
                       <IoMdArrowDropdown className={`absolute right-3 top-8 pointer-events-none ${hereDropdownOpen ? "rotate-180" : ""}`} />

@@ -1096,27 +1096,27 @@ function Review() {
                   renew_status: "auto renewal",
                   subscription_status: "auto renewal"
                 })).unwrap();
-                cart?.find((item) => item?.product_type === "google workspace")
-                ? cart?.find((item) => item?.product_type === "google workspace")?.workspace_status === "trial"
-                  ? await dispatch(addEmailsThunk({
-                    user_id: customerId,
-                    domain_id: domainData?.domain_id,
-                    emails: [
-                      {
-                        first_name: userData?.first_name,
-                        last_name: userData?.last_name,
-                        email: cart?.find((item) => item?.product_type === "google workspace")?.emails?.username,
-                        password: cart?.find((item) => item?.product_type === "google workspace")?.emails?.password,
-                      }
-                    ]
-                  })).unwrap()
-                  : ""
-                : "";
-                cart?.find((item) => item?.product_type === "google workspace")
-                ? cart?.find((item) => item?.product_type === "google workspace")?.workspace_status === "trial"
-                  ? await dispatch(makeEmailAdminThunk({domain_id: domainData?.domain_id, rec_id: cart?.find((item) => item?.product_type === "google workspace")?.emails?.username})).unwrap()
-                  : ""
-                : "";
+                // cart?.find((item) => item?.product_type === "google workspace")
+                // ? cart?.find((item) => item?.product_type === "google workspace")?.workspace_status === "trial"
+                //   ? await dispatch(addEmailsThunk({
+                //     user_id: customerId,
+                //     domain_id: domainData?.domain_id,
+                //     emails: [
+                //       {
+                //         first_name: userData?.first_name,
+                //         last_name: userData?.last_name,
+                //         email: cart?.find((item) => item?.product_type === "google workspace")?.emails?.username,
+                //         password: cart?.find((item) => item?.product_type === "google workspace")?.emails?.password,
+                //       }
+                //     ]
+                //   })).unwrap()
+                //   : ""
+                // : "";
+                // cart?.find((item) => item?.product_type === "google workspace")
+                // ? cart?.find((item) => item?.product_type === "google workspace")?.workspace_status === "trial"
+                //   ? await dispatch(makeEmailAdminThunk({domain_id: domainData?.domain_id, rec_id: cart?.find((item) => item?.product_type === "google workspace")?.emails?.username})).unwrap()
+                //   : ""
+                // : "";
                 await getDomains();
               }
             });
