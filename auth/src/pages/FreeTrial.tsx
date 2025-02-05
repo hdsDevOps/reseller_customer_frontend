@@ -55,7 +55,7 @@ const FreeTrial: React.FC = () => {
 
   const findAmount = async(array, defaultCurrencySlice) => {
     const data = await array?.find(item => item?.currency_code === defaultCurrencySlice)?.price;
-    console.log(data)
+    // console.log(data)
     const amount = await data?.find(item => item?.type === location.state.period)?.discount_price;
     // console.log(amount);
     setAmount(amount);

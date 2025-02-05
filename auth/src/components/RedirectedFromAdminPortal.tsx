@@ -19,7 +19,7 @@ function RedirectedFromAdminPortal() {
   useEffect(() => {
     const setCustomerIdTokenFromHordansoAdmin = async() => {
       if(tokenFromHordansoAdmin !== "" && tokenFromHordansoAdmin !== null && tokenFromHordansoAdmin !== undefined && customerIdFromHordansoAdmin !== "" && customerIdFromHordansoAdmin !== null && customerIdFromHordansoAdmin !== undefined && adminNameFromHordansoAdmin !== "" && adminNameFromHordansoAdmin !== null && adminNameFromHordansoAdmin !== undefined) {
-        console.log({token, customerId, adminName});
+        // console.log({token, customerId, adminName});
         try {
           await dispatch(setHordansoAdminDetailsToLSThunk({hordansoAdminStatus: true,hordansoAdminName:adminNameFromHordansoAdmin}));
           await dispatch(setUserIdToLSThunk(customerIdFromHordansoAdmin)).unwrap();
@@ -31,10 +31,10 @@ function RedirectedFromAdminPortal() {
           await dispatch(getUserAuthTokenFromLSThunk());
           await dispatch(getUserIdFromLSThunk());
         } catch (error) {
-          console.log("error");
+          // console.log("error");
         }
       } else {
-        console.log("no data");
+        // console.log("no data");
       }
     }
 

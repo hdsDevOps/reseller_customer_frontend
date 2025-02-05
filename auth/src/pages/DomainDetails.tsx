@@ -12,7 +12,7 @@ const DomainDetails: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
-  console.log("location state....", location.state);
+  // console.log("location state....", location.state);
   
   useEffect(() => {
     const section = document.getElementById("top_add_domain");
@@ -26,7 +26,7 @@ const DomainDetails: React.FC = () => {
   const [domainName, setDomainName] = useState("");
   const [domainExtension, setDomainExtension] = useState(".com");
   const [domainError, setDomainError] = useState(false);
-  console.log({domainName, domainExtension});
+  // console.log({domainName, domainExtension});
 
   // State for "Use a Domain You Own" form
   const [existingDomainName, setExistingDomainName] = useState("");
@@ -50,7 +50,7 @@ const DomainDetails: React.FC = () => {
       setDomainError(false);
       try {
         const result = await dispatch(domainAvailabilityThunk(domainName)).unwrap();
-        console.log("result...", result);
+        // console.log("result...", result);
         if(result?.availablity_status === "false") {
           if(location.state.from === "business_info") {
             navigate('/domainlist', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from, selectedDomain: domainName, result: result, type: 'new'}});
@@ -78,7 +78,7 @@ const DomainDetails: React.FC = () => {
       // navigate('/signin-domain');
       try {
         const result = await dispatch(checkDomainThunk( existingDomainName)).unwrap();
-        console.log("result...", result);
+        // console.log("result...", result);
         if(result?.available) {
           
           toast.warning("Domain is Still Available for Purchase , doesn't belong to anyone yet");

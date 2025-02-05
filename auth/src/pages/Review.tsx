@@ -17,6 +17,8 @@ import { RiCloseFill } from "react-icons/ri";
 import StripeCheckout from "react-stripe-checkout";
 import { PaystackButton } from "react-paystack";
 
+const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/hordanso-fixed-logo.png?alt=media&token=ecd5d548-0aa7-46d4-9757-c24cba11693c";
+
 const initialTaxForm = {
   tax_status: 'Business',
   pan_number: '',
@@ -31,7 +33,7 @@ const initialContact = {
 const Review = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  // console.log("location state...", location.state);
+  // // console.log("location state...", location.state);
   const dispatch = useAppDispatch();
     
   useEffect(() => {
@@ -44,25 +46,25 @@ const Review = () => {
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
   const [data, setData] = useState(location.state);
-  console.log("data...", data);
+  // console.log("data...", data);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentMethods, setPaymentMethods] = useState([]);
-  console.log("payment methods...", paymentMethods);
+  // console.log("payment methods...", paymentMethods);
   const [paymentMethodHover, setPaymentMethodHover] = useState(false);
 
   const [addressDetails, setAddressDetails] = useState(location.state.formData);
-  // console.log("addressDetails...", addressDetails);
+  // // console.log("addressDetails...", addressDetails);
   const [nameAndAddressHover, setNameAndAddressHover] = useState(false);
 
   const [planDate, setPlanDate] = useState(format(new Date(), "MMMM dd"));
 
   useEffect(() => {
     const today = new Date();
-    // console.log("today before...", today);
+    // // console.log("today before...", today);
     const trialPeriod = Number(data?.plan?.trial_period);
     
     today.setDate(today?.getDate() + trialPeriod);
-    // console.log("today after...", today);
+    // // console.log("today after...", today);
     
     setPlanDate(format(today, "MMMM dd"));
   }, [data?.period]);
@@ -88,7 +90,7 @@ const Review = () => {
   const [isChecked, setIsChecked] = useState(false);
 
   const plan = location.state?.plan;
-  // console.log("plan...", plan);
+  // // console.log("plan...", plan);
   
   const countryRef = useRef(null);
   const stateRef = useRef(null);
@@ -102,11 +104,11 @@ const Review = () => {
   const [country, setCountry] = useState({});
   const [state, setState] = useState({});
   const [city, setCity] = useState({});
-  // console.log({country, state, city});
-  // console.log("countries...", countries);
-  // console.log("states...", states);
-  // console.log("cities...", cities);
-  // console.log({countryName, stateName, cityName});
+  // // console.log({country, state, city});
+  // // console.log("countries...", countries);
+  // // console.log("states...", states);
+  // // console.log("cities...", cities);
+  // // console.log({countryName, stateName, cityName});
   const [taxForm, setTaxForm] = useState(initialTaxForm);
 
   const topForm = [
@@ -143,7 +145,7 @@ const Review = () => {
   const [processingModalOpen, setProcessingModalOpen] = useState(false);
 
   const [allDataFilled, setAllDataFilled] = useState(false);
-  console.log("allDataFilled....", allDataFilled);
+  // console.log("allDataFilled....", allDataFilled);
 
   useEffect(() => {
     if(
@@ -229,12 +231,12 @@ const Review = () => {
   const [countryDropdownOpen, setCountryDropdownOpen] = useState<Boolean>(false);
   const [stateDropdownOpen, setStateDropdownOpen] = useState<Boolean>(false);
   const [cityDropdownOpen, setCityDropdownOpen] = useState<Boolean>(false);
-  // console.log("isDropdownOpen", isDropdownOpen);
+  // // console.log("isDropdownOpen", isDropdownOpen);
   const [isNumberValid, setIsNumberValid] = useState(false);
-  // console.log({isNumberValid});
+  // // console.log({isNumberValid});
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [primaryContact, setPrimaryContact] = useState(initialContact);
-  // console.log("primaryContact...", primaryContact);
+  // // console.log("primaryContact...", primaryContact);
   
   const [domainPrice, setDomainPrice] = useState(0);
   const [primaryContactHover, setPrimaryContactHover] = useState(false);
@@ -317,11 +319,11 @@ const Review = () => {
     axios(config)
       .then(res => {
         setCountries(res.data);
-        // console.log(res.data);
+        // // console.log(res.data);
       })
       .catch(err => {
         setCountries([]);
-        console.log("error...", err);
+        // console.log("error...", err);
       })
   }, []);
   
@@ -340,7 +342,7 @@ const Review = () => {
       })
       .catch(err => {
         setStates([]);
-        console.log("error...", err);
+        // console.log("error...", err);
       })
     } else {
       setStates([]);
@@ -362,7 +364,7 @@ const Review = () => {
       })
       .catch(err => {
         setCitites([]);
-        console.log("error...", err);
+        // console.log("error...", err);
       })
     } else {
       setCitites([]);
@@ -404,7 +406,7 @@ const Review = () => {
     try {
       setProcessingModalOpen(true);
       const result = await dispatch(stripePayThunk(body)).unwrap();
-      console.log("result...", result);
+      // console.log("result...", result);
       if(result?.message === "Payment successful") {
         navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: result?.charge, currency: defaultCurrencySlice, date: new Date() }});
       } else {
@@ -462,7 +464,7 @@ const Review = () => {
     const responseData = await response;
     if (responseData.status) {
       setProcessingModalOpen(true);
-      // console.log(reference);
+      // // console.log(reference);
       navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: reference, currency: defaultCurrencySlice, date: new Date() }});
     } else {
       toast.error("Error on payment method");
@@ -471,7 +473,7 @@ const Review = () => {
   
   const handlePaystackCloseAction = () => {
     // implementation for  whatever you want to do when the Paystack dialog closed.
-    console.log('closed')
+    // console.log('closed')
   };
 
   const componentProps = {
@@ -926,7 +928,7 @@ const Review = () => {
                   <StripeCheckout
                     name='Hordanso'
                     description="Purchasing google workspace and domain"
-                    image="https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899"
+                    image={logo}
                     ComponentClass="div"
                     panelLabel="Submit"
                     // amount={data?.finalTotalPrice * 100}

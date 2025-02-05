@@ -5,10 +5,12 @@ import { toast } from "react-toastify";
 import { useAppDispatch } from "store/hooks";
 import { resendRegisterOtpThunk, verifyRegisterOtpThunk } from "store/user.thunk";
 
+const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/hordanso-fixed-logo.png?alt=media&token=ecd5d548-0aa7-46d4-9757-c24cba11693c";
+
 const OTP: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    console.log("state....", location.state);
+    // console.log("state....", location.state);
     const dispatch = useAppDispatch();
             
     useEffect(() => {
@@ -19,7 +21,7 @@ const OTP: React.FC = () => {
     }, []);
 
     const customerId = location.state.customer_id;
-    // console.log("customerId...", customerId);
+    // // console.log("customerId...", customerId);
     //931183
 
     useEffect(() => {
@@ -106,7 +108,7 @@ const OTP: React.FC = () => {
         e.preventDefault();
         try {
             const result = await dispatch(resendRegisterOtpThunk({customer_id: customerId})).unwrap();
-            console.log("result...", result);
+            // console.log("result...", result);
             toast.success(result?.message);
         } catch (error) {
             toast.error(error?.message || "Error resending otp");
@@ -123,7 +125,7 @@ const OTP: React.FC = () => {
                     customer_id: customerId,
                     otp: otp
                 })).unwrap();
-                console.log("result...", result);
+                // console.log("result...", result);
                 setToken(result?.token);
                 setShowModal(true);
             } catch (error) {
@@ -156,7 +158,7 @@ const OTP: React.FC = () => {
                 <div className="p-8 xsm-max:px-4 bg-[#F9FAFB] rounded-lg shadow-sm">
                     <div className="mb-12 flex items-center justify-center">
                         <img
-                            src="https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899"
+                            src={logo}
                             alt="logo"
                             className="mx-auto"
                         />

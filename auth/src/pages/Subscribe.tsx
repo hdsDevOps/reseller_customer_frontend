@@ -22,7 +22,7 @@ const Subscribe: React.FC = () => {
     }
   }, []);
 
-  // console.log("state...", location.state);
+  // // console.log("state...", location.state);
 
   useEffect(() => {
     if(!location.state) {
@@ -39,7 +39,7 @@ const Subscribe: React.FC = () => {
     const getIpData = async() => {
       const response = await fetch('https://geolocation-db.com/json/');
       const data = await response.json();
-      console.log("first...", data);
+      // console.log("first...", data);
       setIpCountry(data?.country_name);
     };
 
@@ -53,17 +53,17 @@ const Subscribe: React.FC = () => {
     email: "",
     phone_no: "",
   });
-  // console.log("form data...", formData);
+  // // console.log("form data...", formData);
   const [count, setCount] = useState(1);
   const [countryDropdownOpen, setCountryDropdownOpen] = useState<Boolean>(false);
   const countryRef = useRef(null);
   const [countryName, setCountryName] = useState("");
   const [countries, setCountries] = useState([]);
   const [country, setCountry] = useState({});
-  // console.log("countries...", countries);
-  // console.log("country...", country);
+  // // console.log("countries...", countries);
+  // // console.log("country...", country);
   const [isNumberValid, setIsNumberValid] = useState(false);
-  console.log({isNumberValid});
+  // console.log({isNumberValid});
   
   const handleClickOutsideCountry = (event: MouseEvent) => {
     if(countryRef.current && !countryRef.current.contains(event.target as Node)) {
@@ -95,11 +95,11 @@ const Subscribe: React.FC = () => {
     axios(config)
       .then(res => {
         setCountries(res.data);
-        // console.log(res.data);
+        // // console.log(res.data);
       })
       .catch(err => {
         setCountries([]);
-        console.log("error...", err);
+        // console.log("error...", err);
       })
   }, []);
 
@@ -211,7 +211,7 @@ const Subscribe: React.FC = () => {
           city: '',
           zipcode: ''
         })).unwrap();
-        console.log("result...", result);
+        // console.log("result...", result);
         navigate('/subscribeotp', { state: { ...location.state, formData: formData, customer_id: result?.customer_id, license_usage: count }});
       } catch (error) {
         toast.error(error?.message || "Error");

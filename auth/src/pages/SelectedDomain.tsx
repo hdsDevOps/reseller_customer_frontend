@@ -18,7 +18,7 @@ const SelectedDomain: React.FC = () => {
 
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
-  console.log(location.state);
+  // console.log(location.state);
   const domain = location.state.selectedDomain;
 
   if (!domain) {

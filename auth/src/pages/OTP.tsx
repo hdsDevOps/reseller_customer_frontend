@@ -11,6 +11,8 @@ import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { verifyLoginOtpThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, resendLoginOtpThunk, verifyForgetPasswordOtpThunk, resendForgetPasswordOtpThunk, resendRegisterOtpThunk, verifyRegisterOtpThunk, setStaffIdToLSThunk, getStaffIdFromLSThunk, verifyStaffLoginOtpThunk, setStaffStatusToLSThunk, getStaffStatusFromLSThunk, setRoleIdToLSThunk, getRoleIdFromLSThunk, addSettingWithoutLoginThunk, addStaffWithoutLoginThunk } from 'store/user.thunk';
 
+const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/hordanso-fixed-logo.png?alt=media&token=ecd5d548-0aa7-46d4-9757-c24cba11693c";
+
 const superAdminRolePermissions = [
   {
       name: "Dashboard",
@@ -64,7 +66,7 @@ const OTP: React.FC = () => {
   const email = location.state?.email;
   const mode = queryParams.get("mode");
 
-  console.log("state...", location.state);
+  // // console.log("state...", location.state);
   
   const otpRefs = useRef([]);
   const [otpValues, SetOptValues] = useState(["", "", "", "", "", "",]);
@@ -81,7 +83,7 @@ const OTP: React.FC = () => {
       } else if(location?.state?.from === "registration") {
         toast.success("OTP for verify your account has been sent.");
       } else {
-        console.log("ok")
+        // // console.log("ok")
       }
     } else {
       navigate('/home');
@@ -173,7 +175,7 @@ const OTP: React.FC = () => {
               otp: otp,
               staff_id: staffId
             })).unwrap();
-            console.log("result...", result);
+            // // console.log("result...", result);
             if(result?.status === 200) {
               try {
                 await dispatch(setUserAuthTokenToLSThunk({token: result?.token})).unwrap();
@@ -183,7 +185,7 @@ const OTP: React.FC = () => {
                 await dispatch(setRoleIdToLSThunk(location.state?.role_id || "")).unwrap();
                 // navigate('/dashboard', {state: {from: 'otp'}});
               } catch (error) {
-                console.log("Error on token");
+                // console.log("Error on token");
               } finally {
                 try {
                   await dispatch(getUserAuthTokenFromLSThunk()).unwrap();
@@ -193,7 +195,7 @@ const OTP: React.FC = () => {
                   await dispatch(getRoleIdFromLSThunk()).unwrap();
                   navigate('/dashboard', {state: {from: 'otp'}})
                 } catch (error) {
-                  console.log("Error on token")
+                  // console.log("Error on token")
                 }
               }
             }
@@ -202,7 +204,7 @@ const OTP: React.FC = () => {
               customer_id: customerId,
               otp: otp
             })).unwrap();
-            console.log("result...", result);
+            // console.log("result...", result);
             if(result?.status === 200) {
               try {
                 await dispatch(setUserAuthTokenToLSThunk({token: result?.token})).unwrap();
@@ -211,7 +213,7 @@ const OTP: React.FC = () => {
                 await dispatch(setStaffIdToLSThunk(staffId)).unwrap();
                 await dispatch(setStaffStatusToLSThunk(location.state.is_staff)).unwrap();
               } catch (error) {
-                console.log("Error on token");
+                // console.log("Error on token");
               } finally {
                 try {
                   await dispatch(getUserAuthTokenFromLSThunk()).unwrap();
@@ -220,7 +222,7 @@ const OTP: React.FC = () => {
                   await dispatch(getStaffStatusFromLSThunk()).unwrap();
                   navigate('/dashboard', {state: {from: 'otp'}})
                 } catch (error) {
-                  console.log("Error on token")
+                  // console.log("Error on token")
                 }
               }
             }
@@ -249,7 +251,7 @@ const OTP: React.FC = () => {
             email: email,
             otp: otp
           })).unwrap();
-          console.log("result...", result);
+          // console.log("result...", result);
           navigate("/resetpassword", {state: {email: email}});
         } catch (error) {
           
@@ -263,7 +265,7 @@ const OTP: React.FC = () => {
             customer_id: customerId,
             otp: otp
           })).unwrap();
-          console.log("result...", result);
+          // console.log("result...", result);
           if(result?.status === 200) {
             try {
               const role = await dispatch(addSettingWithoutLoginThunk({user_type: "Super Admin", user_id: location.state?.customer_id, permissions: superAdminRolePermissions, token: result?.token})).unwrap();
@@ -274,14 +276,14 @@ const OTP: React.FC = () => {
               await dispatch(setUserIdToLSThunk(customerId)).unwrap();
               // navigate('/dashboard', {state: {from: 'registration'}});
             } catch (error) {
-              console.log("Error on token");
+              // console.log("Error on token");
             } finally {
               try {
                 await dispatch(getUserAuthTokenFromLSThunk()).unwrap();
                 await dispatch(getUserIdFromLSThunk()).unwrap();
                 navigate('/dashboard', {state: {from: 'registration'}})
               } catch (error) {
-                console.log("Error on token")
+                // console.log("Error on token")
               }
             }
           }
@@ -303,19 +305,19 @@ const OTP: React.FC = () => {
     if(mode === "signin") {
       try {
         const result = await dispatch(resendLoginOtpThunk({customer_id: customerId})).unwrap();
-        console.log("result...", result);
+        // console.log("result...", result);
         
         toast.success("Please check your email for OTP.");
         setTimeLeft(120);
       } catch (error) {
-        console.log(error)
+        // console.log(error)
         
         toast.error("Error resending otp");
       }
     } else if(mode === "forgotpassword") {
       try {
         const result = await dispatch(resendForgetPasswordOtpThunk({email: email})).unwrap();
-        console.log("result...", result);
+        // console.log("result...", result);
         
         toast.success("Please check your email for OTP.");
         setTimeLeft(120);
@@ -325,7 +327,7 @@ const OTP: React.FC = () => {
     } else if(mode === "signup") {
       try {
         const result = await dispatch(resendRegisterOtpThunk({customer_id: customerId})).unwrap();
-        console.log("result...", result);
+        // console.log("result...", result);
         
         toast.success("Please check your email for OTP.");
         setTimeLeft(120);
@@ -355,7 +357,7 @@ const OTP: React.FC = () => {
             }`}
           >
             <img
-              src={process.env.BASE_URL + "/images/logo.jpeg"}
+              src={logo}
               alt="logo"
               className={mode !== "forgotpassword" ? "mx-auto" : ""}
             />

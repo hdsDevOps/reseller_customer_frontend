@@ -26,7 +26,7 @@ const Home: React.FC = () => {
       const result = await dispatch(getLandingPageThunk()).unwrap();
       setHomeData(result?.data);
     } catch (error) {
-      console.log("error", error);
+      // console.log("error", error);
       setHomeData({});
     }
   };

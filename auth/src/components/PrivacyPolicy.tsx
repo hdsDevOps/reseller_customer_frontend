@@ -30,7 +30,7 @@ function PrivacyPolicy() {
   ];
 
   const [privacyPolicyData, setPrivacyPolicyData] = useState("");
-  console.log("privacyPolicyData...", privacyPolicyData);
+  // console.log("privacyPolicyData...", privacyPolicyData);
 
   const getPrivacyPolicyData = async() => {
     try {

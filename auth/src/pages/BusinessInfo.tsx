@@ -25,7 +25,7 @@ const BusinessInfo: React.FC = () => {
   }
   }, []);
 
-  console.log("state....", location.state);
+  // console.log("state....", location.state);
 
   useEffect(() => {
     if(!location.state) {
@@ -34,18 +34,18 @@ const BusinessInfo: React.FC = () => {
   }, [location.state]);
 
   const [formData, setFormData] = useState(location.state.formData);
-  console.log("form data...", formData);
+  // console.log("form data...", formData);
   const region = location.state.formData.country;
   
   const [isNumberValid, setIsNumberValid] = useState(false);
-  console.log({isNumberValid});
+  // console.log({isNumberValid});
 
   const [address, setAddress] = useState("");
   // console.log("address...", address);
   const [addressList, setAddressList] = useState([]);
   // console.log("addressList...", addressList);
   const [addressObject, setAddressObject] = useState<object|null>(null);
-  console.log("addressObject...", addressObject);
+  // console.log("addressObject...", addressObject);
   const [isAddressDropdownOpen, setIsAddressDropdownOpen] = useState(false);
   
   const [stateName, setStateName] = useState("");
@@ -54,7 +54,7 @@ const BusinessInfo: React.FC = () => {
   const [states, setStates] = useState([]);
   const [cities, setCitites] = useState([]);
   const [country, setCountry] = useState({});
-  console.log("country...", country);
+  // console.log("country...", country);
   const [state, setState] = useState({});
   const [city, setCity] = useState({});
   // console.log({countries, states, cities});
@@ -115,7 +115,7 @@ const BusinessInfo: React.FC = () => {
       })
       .catch(err => {
         setCountries([]);
-        console.log("error...", err);
+        // console.log("error...", err);
       })
   }, []);
   
@@ -134,7 +134,7 @@ const BusinessInfo: React.FC = () => {
       })
       .catch(err => {
         setStates([]);
-        console.log("error...", err);
+        // console.log("error...", err);
       })
     } else {
       setStates([]);
@@ -156,7 +156,7 @@ const BusinessInfo: React.FC = () => {
       })
       .catch(err => {
         setCitites([]);
-        console.log("error...", err);
+        // console.log("error...", err);
       })
     } else {
       setCitites([]);
@@ -174,7 +174,7 @@ const BusinessInfo: React.FC = () => {
     if(addressObject !== null) {
       if(states?.length > 0) {
         const findState = states?.find(state => state?.name?.toLowerCase()?.includes(addressObject?.address?.state?.toLowerCase()));
-        console.log("findState...", findState);
+        // console.log("findState...", findState);
         setState(findState);
         setCity({});
         setStateName("");
@@ -192,7 +192,7 @@ const BusinessInfo: React.FC = () => {
     if(addressObject !== null) {
       if(cities?.length > 0) {
         const findCity = cities?.find(city => city?.name?.toLowerCase()?.includes(addressObject?.address?.city?.toLowerCase()));
-        console.log("findCity...", findCity);
+        // console.log("findCity...", findCity);
         setCity(findCity);
         setCityName("");
         setFormData({

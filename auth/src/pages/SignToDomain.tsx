@@ -16,7 +16,7 @@ const SignInForm: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
-  console.log("location state...", location.state);
+  // console.log("location state...", location.state);
                 
   useEffect(() => {
   const section = document.getElementById("top_signin_domain");
@@ -34,9 +34,9 @@ const SignInForm: React.FC = () => {
     username: `${location.state.formData.first_name?.toLowerCase()}.${location.state.formData.last_name?.toLowerCase()}`,
     password: "",
   });
-  // console.log("form data...", formData);
+  // // console.log("form data...", formData);
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
-  // console.log("recaptchaToken...", recaptchaToken);
+  // // console.log("recaptchaToken...", recaptchaToken);
   const [recaptchaValid, setRecaptchaValid] = useState<Boolean>(false);
 
   const [charCount, setCharCount] = useState({

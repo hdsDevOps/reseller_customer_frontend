@@ -73,7 +73,7 @@ const HeroSection = ({id}:any) => {
     try {
       const result = await dispatch(getBannerThunk()).unwrap();
       setBanner(result?.data);
-      console.log(result)
+      // console.log(result)
     } catch (error) {
       setBanner([]);
     }

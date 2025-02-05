@@ -17,7 +17,7 @@ import { plansAndPricesListThunk } from "store/user.thunk";
 const Summary: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  console.log("location state...", location.state);
+  // console.log("location state...", location.state);
   const dispatch = useAppDispatch();
   
   useEffect(() => {
@@ -30,7 +30,7 @@ const Summary: React.FC = () => {
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
   const [data, setData] = useState(location.state);
-  // console.log("data...", data);
+  // // console.log("data...", data);
 
   const initialEdit = {
     first_name: data.formData.first_name,
@@ -44,14 +44,14 @@ const Summary: React.FC = () => {
   };
 
   const [editData, setEditData] = useState(initialEdit);
-  // console.log("edit data...", editData);
+  // // console.log("edit data...", editData);
 
   const [openContactModal, setOpenContactModal] = useState(false);
   const [openBusinessModal, setOpenBusinessModal] = useState(false);
-  // console.log({openContactModal, openBusinessModal});
+  // // console.log({openContactModal, openBusinessModal});
 
   const [plan, setPlan] = useState({});
-  // console.log("plan...", plan);
+  // // console.log("plan...", plan);
 
   useEffect(() => {
     const getPlan = async() => {
@@ -78,11 +78,11 @@ const Summary: React.FC = () => {
   const [country, setCountry] = useState({});
   const [state, setState] = useState({});
   const [city, setCity] = useState({});
-  // console.log({country, state, city});
-  // console.log("countries...", countries);
-  // console.log("states...", states);
-  // console.log("cities...", cities);
-  // console.log({countryName, stateName, cityName});
+  // // console.log({country, state, city});
+  // // console.log("countries...", countries);
+  // // console.log("states...", states);
+  // // console.log("cities...", cities);
+  // // console.log({countryName, stateName, cityName});
 
   useEffect(() => {
     if(countries?.length > 0) {
@@ -101,9 +101,9 @@ const Summary: React.FC = () => {
   const [countryDropdownOpen, setCountryDropdownOpen] = useState<Boolean>(false);
   const [stateDropdownOpen, setStateDropdownOpen] = useState<Boolean>(false);
   const [cityDropdownOpen, setCityDropdownOpen] = useState<Boolean>(false);
-  // console.log("isDropdownOpen", isDropdownOpen);
+  // // console.log("isDropdownOpen", isDropdownOpen);
   const [isNumberValid, setIsNumberValid] = useState(false);
-  console.log({isNumberValid});
+  // console.log({isNumberValid});
   
   const handleClickOutsideCountry = (event: MouseEvent) => {
     if(countryRef.current && !countryRef.current.contains(event.target as Node)) {
@@ -181,11 +181,11 @@ const Summary: React.FC = () => {
     axios(config)
       .then(res => {
         setCountries(res.data);
-        // console.log(res.data);
+        // // console.log(res.data);
       })
       .catch(err => {
         setCountries([]);
-        console.log("error...", err);
+        // console.log("error...", err);
       })
   }, []);
   
@@ -204,7 +204,7 @@ const Summary: React.FC = () => {
       })
       .catch(err => {
         setStates([]);
-        console.log("error...", err);
+        // console.log("error...", err);
       })
     } else {
       setStates([]);
@@ -226,7 +226,7 @@ const Summary: React.FC = () => {
       })
       .catch(err => {
         setCitites([]);
-        console.log("error...", err);
+        // console.log("error...", err);
       })
     } else {
       setCitites([]);

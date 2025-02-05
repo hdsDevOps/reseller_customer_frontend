@@ -6,6 +6,8 @@ import { resetPasswordThunk } from 'store/user.thunk';
 import { useAppDispatch } from "store/hooks";
 import { toast } from "react-toastify";
 
+const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/hordanso-fixed-logo.png?alt=media&token=ecd5d548-0aa7-46d4-9757-c24cba11693c";
+
 const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -76,7 +78,7 @@ const ResetPassword: React.FC = () => {
         <div className="p-8 rounded-lg bg-[#F9FAFB]">
           <div className="mb-12">
             <img 
-            src={process.env.BASE_URL + "/images/logo.jpeg"}
+            src={logo}
              alt="logo" />
           </div>
           <h2 className="text-center font-inter text-2xl font-semibold mb-2">Reset your password</h2>

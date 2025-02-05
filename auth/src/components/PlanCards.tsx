@@ -16,7 +16,7 @@ const PlanCard: React.FC = ({plans, handleLeftPlan, handleRightPlan, plansLength
 
   const [isYearly, setIsYearly] = useState(false);
   const [checkbox, setCheckbox] = useState<null|string>(null);
-  console.log("checkbox...", checkbox);
+  // console.log("checkbox...", checkbox);
   const [currentPlans, setCurrentPlans] = useState([]);
   // console.log("plans...", currentPlans);
   const [initialIndex, setInitialIndex] = useState(0);

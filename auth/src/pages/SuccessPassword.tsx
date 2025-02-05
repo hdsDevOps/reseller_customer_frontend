@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
+const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/hordanso-fixed-logo.png?alt=media&token=ecd5d548-0aa7-46d4-9757-c24cba11693c";
+
 const SuccessPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -23,7 +25,7 @@ const SuccessPage: React.FC = () => {
       <div className="w-full max-w-[32rem] text-center bg-[#F9FAFB] p-10 xsm-max:px-2 rounded-lg shadow-sm flex items-center flex-col justify-center gap-12">
         <div className="mb-12 mt-6 flex justify-center">
           <img
-            src={process.env.BASE_URL + "/images/logo.jpeg"}
+            src={logo}
             alt="logo"
             className="max-w-full h-auto"
           />

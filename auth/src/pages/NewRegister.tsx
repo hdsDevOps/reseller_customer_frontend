@@ -35,7 +35,7 @@ const RegisterPage: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const [customer, setCustomer] = useState(initialCustomer);
-  console.log("customer...", customer);
+  // console.log("customer...", customer);
   const [showPassword, setShowPassword] = useState(false);
   const [showCPassword, setShowCPassword] = useState(false);
   const [password, setPassword] = useState("");
@@ -59,7 +59,7 @@ const RegisterPage: React.FC = () => {
   const [hereDropdownOpen, setHereDropdownOpen] = useState(false);
   const hereRef = useRef(null);
   const [hereData, setHereData] = useState<object|null>(null);
-  console.log("here data...", hereData);
+  // console.log("here data...", hereData);
   // console.log({address: customer?.address, hereData, hereAddress});
 
   useEffect(() => {
@@ -69,7 +69,7 @@ const RegisterPage: React.FC = () => {
       // console.log(data);
       if(data) {
         const findCountry = countries?.find(country => country?.name?.toLowerCase() === data?.country_name?.toLowerCase());
-        console.log(findCountry);
+        // console.log(findCountry);
         if(findCountry) {
           setCountry(findCountry);
           setCustomer({
@@ -129,7 +129,7 @@ const RegisterPage: React.FC = () => {
   useEffect(() => {
     if(hereData !== null && countries?.length > 0) {
       const findCountry = countries?.find(country => country?.name?.toLowerCase() === hereData?.address?.countryName?.toLowerCase());
-      console.log(findCountry)
+      // console.log(findCountry)
       if(findCountry) {
         setCountry(findCountry);
         setCustomer({
@@ -191,7 +191,7 @@ const RegisterPage: React.FC = () => {
       })
       .catch(err => {
         setCountries([]);
-        console.log("error...", err);
+        // console.log("error...", err);
       })
   }, []);
 
@@ -284,7 +284,7 @@ const RegisterPage: React.FC = () => {
               city: "",
               zipcode: customer?.zipcode
             })).unwrap();
-            console.log("result...", result);
+            // console.log("result...", result);
             navigate("/otp?mode=signup", { state: {customer_id: result?.customer_id, from: "registration", data: customer} });
           } catch (error) {
             

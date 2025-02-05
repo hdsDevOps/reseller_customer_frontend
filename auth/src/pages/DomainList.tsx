@@ -21,7 +21,7 @@ const DomainList: React.FC = () => {
 
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
-  console.log("location state...", location.state);
+  // console.log("location state...", location.state);
 
   const [newDomain, setNewDomain] = useState(location.state.selectedDomain);
   const [domainResult, setDomainResult] = useState(location.state.result);
@@ -32,7 +32,7 @@ const DomainList: React.FC = () => {
       const result = await dispatch(domainAvailabilityThunk(newDomain)).unwrap();
       setDomainResult(result);
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       setDomainResult(location.state.result);
     }
   };

@@ -23,12 +23,12 @@ const PlanandPrice = ({id}:any) => {
   const [basePlans, setBasePlans] = useState([]);
   // console.log("basePlans...", basePlans);
   const [plans, setPlans] = useState([]);
-  console.log("plans...", plans);
+  // console.log("plans...", plans);
 
   const [plansLength, setPlansLength] = useState(0);
   // console.log("plansLength...", plansLength);
   const [activePlans, setActivePlans] = useState([]);
-  console.log("activePlans...", activePlans);
+  // console.log("activePlans...", activePlans);
   const [activePlanIndex, setActivePlanIndex] = useState(0);
   // console.log("activePlanIndex...", activePlanIndex);
 
@@ -127,7 +127,7 @@ const PlanandPrice = ({id}:any) => {
     e.preventDefault();
     try {
       const result = await dispatch(domainAvailabilityThunk(domain)).unwrap();
-      console.log("result...", result);
+      // console.log("result...", result);
       navigate('/domainlist', {state: {selectedDomain: domain, result: result, from: 'home', type: 'new'}});
     } catch (error) {
       

@@ -55,7 +55,7 @@ const superAdminPermissions = [
   }
 ];
 
-const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899";
+const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/hordanso-fixed-logo.png?alt=media&token=ecd5d548-0aa7-46d4-9757-c24cba11693c";
 // const logo = "";
 const stripeImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/stripe.png?alt=media&token=23bd6672-665c-4dfb-9d75-155abd49dc58";
 const paystackImage = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/paystack.png?alt=media&token=8faf3870-4256-4810-9844-5fd3c147d7a3";
@@ -79,7 +79,7 @@ const DownloadInvoice: React.FC = () => {
   const pdfRef = useRef(null);
 
   const data = location.state;
-  console.log("data...", data);
+  // console.log("data...", data);
   const [disabled, setDisabled] = useState(true);
     
   const today = new Date();
@@ -92,7 +92,7 @@ const DownloadInvoice: React.FC = () => {
   const [todayDate, setTodayDate] = useState("");
   const [domainExpiryDate, setDomainExpiryDate] = useState("");
   const [planExpiryDate, setPlanExpiryDate] = useState("");
-  console.log({todayDate, domainExpiryDate, planExpiryDate});
+  // console.log({todayDate, domainExpiryDate, planExpiryDate});
   const [paymentMethods, setPaymentMethods] = useState([]);
   
   const [base64ImageLogo, setBase64ImageLogo] = useState("");
@@ -283,7 +283,7 @@ const DownloadInvoice: React.FC = () => {
           license_usage: data?.license_usage,
           token: data?.token
         })).unwrap();
-        console.log({domainSubscription, workspaceSubscription})
+        // console.log({domainSubscription, workspaceSubscription})
         const domainData = await dispatch(addNewDomainWithoutLoginThunk({
           customer_id: data?.customer_id,
           domain_name: data?.selectedDomain?.domain,
@@ -378,7 +378,7 @@ const DownloadInvoice: React.FC = () => {
         await dispatch(addStaffWithoutLoginThunk({user_id: data?.customer_id, first_name: data?.formData?.first_name, last_name: data?.formData?.last_name, email: data?.formData?.email, phone_no: data?.formData?.phone_no, user_type_id: role?.settingId, token: data?.token}));
         setDisabled(false);
       } catch (error) {
-        console.log("error");
+        // console.log("error");
         if(error?.message === "Error adding customer subscription"){
           handleGoToDashboard(e);
         }
@@ -388,7 +388,7 @@ const DownloadInvoice: React.FC = () => {
     if(data && todayDate && domainExpiryDate && planExpiryDate) {
       saveAllData();
     } else {
-      console.log("no data");
+      // console.log("no data");
     }
   }, [data, todayDate, domainExpiryDate, planExpiryDate])
 
@@ -401,14 +401,14 @@ const DownloadInvoice: React.FC = () => {
     } catch (error) {
               
       toast.error("Error purchasing");
-      console.log(error)
+      // console.log(error)
     } finally {
       try {
         await dispatch(getUserAuthTokenFromLSThunk()).unwrap();
         await dispatch(getUserIdFromLSThunk()).unwrap();
         navigate('/dashboard', {state: {from: 'subscribe'}})
       } catch (error) {
-        console.log("Error on token");
+        // console.log("Error on token");
       }
     }
   };

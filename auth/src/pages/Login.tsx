@@ -9,6 +9,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 
+const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/hordanso-fixed-logo.png?alt=media&token=ecd5d548-0aa7-46d4-9757-c24cba11693c";
+
 interface IFormInput {
   email: string;
   password: string;
@@ -67,7 +69,7 @@ const Login: React.FC = () => {
     setLoading(true);
     try {
       const result = await dispatch(makeUserLoginThunk(userDetails)).unwrap();
-      console.log("result...", result);
+      // console.log("result...", result);
       if(result?.message === "Login successful. Please check your email for OTP.") {
         navigate("/otp?mode=signin", { state: { customer_id: result?.customer_id, staff_id: result?.staff_id, is_staff: result?.is_staff, role_id: result?.role_id }});
       } else if(result?.message === "Login successful") {
@@ -79,7 +81,7 @@ const Login: React.FC = () => {
           await dispatch(setRoleIdToLSThunk(result?.role_id || "")).unwrap();
           // navigate('/dashboard', {state: {from: 'otp'}});
         } catch (error) {
-          console.log("Error on token");
+          // console.log("Error on token");
         } finally {
           setLoading(false);
           try {
@@ -91,7 +93,7 @@ const Login: React.FC = () => {
             await dispatch(getRoleIdFromLSThunk()).unwrap();
             navigate('/dashboard', {state: {from: 'otp'}});
           } catch (error) {
-            console.log("Error on token")
+            // console.log("Error on token")
           }
         }
       }
@@ -120,7 +122,7 @@ const Login: React.FC = () => {
           <div className="text-center">
             <div className="flex items-center justify-center">
               <img
-                src={process.env.BASE_URL + "/images/logo.jpeg"}
+                src={logo}
                 alt="logo"
               />
             </div>

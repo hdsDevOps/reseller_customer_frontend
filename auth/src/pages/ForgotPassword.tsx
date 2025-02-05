@@ -4,6 +4,8 @@ import { useAppDispatch } from "store/hooks";
 import { forgetPasswordThunk } from "store/user.thunk";
 import { toast } from 'react-toastify';
 
+const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/hordanso-fixed-logo.png?alt=media&token=ecd5d548-0aa7-46d4-9757-c24cba11693c";
+
 const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -36,7 +38,7 @@ const ForgotPassword: React.FC = () => {
       <div className="max-w-[32rem] space-y-8 bg-[#F9FAFB] p-10 rounded-2xl shadow-sm xsm-max:px-4">
         <div className="">
           <img 
-           src={process.env.BASE_URL + "/images/logo.jpeg"}
+           src={logo}
            alt="logo" />
         </div>
         <div>

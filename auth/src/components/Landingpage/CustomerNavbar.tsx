@@ -10,7 +10,7 @@ export default function CustomerNavbar({width, closeNav, navOpen, header}: { wid
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
-  console.log(location)
+  // console.log(location)
 
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
@@ -45,7 +45,7 @@ export default function CustomerNavbar({width, closeNav, navOpen, header}: { wid
   const setDefaultCurrencyNameOnSlice = async(name:string) => {
     try {
       const result = await dispatch(setDefaultCurrencySlice(name)).unwrap();
-      console.log("result...", result);
+      // console.log("result...", result);
     } catch (error) {
       // toast.error("Error setting default currency");
     }
