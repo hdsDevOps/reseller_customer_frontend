@@ -132,13 +132,13 @@ const VoucherCard: React.FC = () => {
               </div> */}
               <div
                 className={
-                  `absolute top-[10px] right-0 ${
+                  `absolute top-0 right-0 px-2 ${
                     coupon?.used_date !== null
                     ? "bg-[#12A833]"
                     : dateFormat(coupon?.expire_date)
                     ? "hidden"
                     : "bg-[#E02424]"
-                  } bg-[#12A833] text-white text-xs font-bold px-[25px] py-[5px] rotate-45 object-left-bottom uppercase z-20`
+                  } bg-[#12A833] text-white text-xs font-bold px-[25px] py-[5px]  object-left-bottom uppercase z-20`
                 }
               >
                 {

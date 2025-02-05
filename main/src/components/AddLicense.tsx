@@ -15,6 +15,8 @@ import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { format } from "date-fns";
 import './licenseUsage.css';
 
+const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/hordanso-fixed-logo.png?alt=media&token=ecd5d548-0aa7-46d4-9757-c24cba11693c";
+
 interface EmailModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -850,7 +852,7 @@ const EmailModal: React.FC<EmailModalProps> = ({ isOpen, onClose,getDomainsList,
                 <StripeCheckout
                   name='Hordanso'
                   description="Purchasing google workspace and domain"
-                  image="https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899"
+                  image={logo}
                   ComponentClass="div"
                   panelLabel="Submit"
                   // amount={data?.finalTotalPrice * 100}

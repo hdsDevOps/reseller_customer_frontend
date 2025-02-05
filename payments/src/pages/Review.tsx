@@ -18,6 +18,8 @@ import { PaystackButton } from "react-paystack";
 import axios from 'axios';
 import './Review.css';
 
+const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/hordanso-fixed-logo.png?alt=media&token=ecd5d548-0aa7-46d4-9757-c24cba11693c";
+
 const initialCartPrice = {
   total_year: 0,
   price: 0
@@ -1712,7 +1714,7 @@ function Review() {
                   <StripeCheckout
                     name='Hordanso'
                     description="Purchasing google workspace and domain"
-                    image="https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/logo.jpeg?alt=media&token=c210a6cb-a46f-462f-a00a-dfdff341e899"
+                    image={logo}
                     ComponentClass="div"
                     panelLabel="Submit"
                     // amount={data?.finalTotalPrice * 100}
