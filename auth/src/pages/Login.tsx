@@ -99,7 +99,7 @@ const Login: React.FC = () => {
       }
       // navigate("/otp?mode=signin");
     } catch (error) {
-      console.error("Login error:", error);
+      // console.error("Login error:", error);
       setLoading(false);
       if(error?.message === "Request failed with status code 500") {
         

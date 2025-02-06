@@ -688,7 +688,7 @@ const RegisterPage: React.FC = () => {
               data-testid="terms-conditions"
               type="button"
             >
-              Terms and conditions
+              Terms and condition
             </button>
           </div>
           <div>

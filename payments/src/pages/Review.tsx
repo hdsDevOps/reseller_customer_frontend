@@ -153,7 +153,7 @@ function Review() {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [usedPlan, setUsedPlan] = useState<object|null>(null);
-  // console.log("usedPlan...", usedPlan);
+  console.log("usedPlan...", usedPlan);
   const [processingModalOpen, setProcessingModalOpen] = useState(false);
   
   const [todayDate, setTodayDate] = useState("");
@@ -177,6 +177,7 @@ function Review() {
   const [preDiscountedPrice, setPreDiscountedPrice] = useState(0.00);
   const [paymentMethodHover, setPaymentMethodHover] = useState(false);
   const [nameAndAddressHover, setNameAndAddressHover] = useState(false);
+  console.log({discountedPrice, finalTotalPrice, taxAmount, totalPrice});
 
   const [hereObject, setHereObject] = useState<object|null>(null);
   const [hereSearch, setHereSearch] = useState("");
@@ -538,19 +539,32 @@ function Review() {
   const getPlan = async() => {
     const workspaceCart = cart?.find(item => item?.product_type === "google workspace");
     if(workspaceCart) {
-      try {
-        const result = await dispatch(plansAndPricesListThunk({subscription_id: workspaceCart?.plan_name_id})).unwrap();
-        setUsedPlan(result?.data[0]);
-        const amountArray = result?.data[0]?.amount_details;
-        const priceArray = amountArray?.find(amount => amount?.currency_code === defaultCurrencySlice)?.price;
-        const finalArray = priceArray?.find(price => price?.type?.toLowerCase() === workspaceCart?.payment_cycle?.toLowerCase());
-        setWorkspacePrice(finalArray?.discount_price);
-      } catch (error) {
-        setWorkspacePrice(0);
+      if(item?.workspace_status === "trial") {
+        try {
+          const result = await dispatch(plansAndPricesListThunk({subscription_id: workspaceCart?.plan_name_id})).unwrap();
+          console.log("result1...", result);
+          await setUsedPlan(result?.data[0]);
+          setWorkspacePrice(0);
+        } catch (error) {
+          setWorkspacePrice(0);
+        }
+      } else {
+        try {
+          const result = await dispatch(plansAndPricesListThunk({subscription_id: workspaceCart?.plan_name_id})).unwrap();
+          console.log("result2...", result);
+          await setUsedPlan(result?.data[0]);
+          const amountArray = result?.data[0]?.amount_details;
+          const priceArray = amountArray?.find(amount => amount?.currency_code === defaultCurrencySlice)?.price;
+          const finalArray = priceArray?.find(price => price?.type?.toLowerCase() === workspaceCart?.payment_cycle?.toLowerCase());
+          setWorkspacePrice(finalArray?.discount_price);
+        } catch (error) {
+          setWorkspacePrice(0);
+        }
       }
     } else {
       const result = await dispatch(plansAndPricesListThunk({subscription_id: userDetails?.plan_name_id})).unwrap();
-      setUsedPlan(result?.data[0]);
+      console.log("result3...", result);
+      await setUsedPlan(result?.data[0]);
       const amountArray = result?.data[0]?.amount_details;
       const priceArray = amountArray?.find(amount => amount?.currency_code === defaultCurrencySlice)?.price;
       const finalArray = priceArray?.find(price => price?.type?.toLowerCase() === workspaceCart?.payment_cycle?.toLowerCase());
@@ -1150,7 +1164,7 @@ function Review() {
             year: cart?.find(item => item?.product_type?.toLowerCase() === "domain")?.total_year || ""
           } : "",
           workspace: cart?.find((item) => item?.product_type === "google workspace") ? {
-            plan: usedPlan || "",
+            plan: usedPlan,
             license_usage: cart?.find((item) => item?.product_type === "google workspace")?.total_year,
             plan_period: cart?.find((item) => item?.product_type === "google workspace")?.payment_cycle,
             trial_plan: cart?.find((item) => item?.product_type === "google workspace")?.workspace_status === "trial" ? "yes" : "no"

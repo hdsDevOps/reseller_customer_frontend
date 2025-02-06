@@ -121,7 +121,7 @@ const TrialSummary: React.FC = () => {
 
         <p className="text-xs text-gray-500 mb-4">
           By clicking <span className="text-black">Start Free Trial</span> 
-            you agree to the{" "}
+          {" "}you agree to the{" "}
             <a href="#" className="text-green-600 cursor-pointer">
               Google Workspace Agreement, Google Workspace purchase Agreement
             </a>{" "}

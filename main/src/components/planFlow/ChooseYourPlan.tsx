@@ -276,7 +276,7 @@ const ChooseYourPlan: React.FC = ({}:any) => {
                           className="text-gray-700"
                         >
                           {isYearly
-                            ? `${currencyList.find(item => item.name === defaultCurrencySlice)?.logo}${getParticularAmount(plan?.amount_details, "Yearly")?.discount_price} per user / month`
+                            ? `${currencyList.find(item => item.name === defaultCurrencySlice)?.logo}${parseFloat((getParticularAmount(plan?.amount_details, "Yearly")?.discount_price/12).toFixed(2))} per user / month`
                             : `Or ${currencyList.find(item => item.name === defaultCurrencySlice)?.logo}${getParticularAmount(plan?.amount_details, "Monthly")?.discount_price} per user / month when billed monthly (without yearly commitment)`}
                         </label>
                       </div>
