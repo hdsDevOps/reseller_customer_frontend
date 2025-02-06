@@ -30,7 +30,7 @@ const Summary: React.FC = () => {
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
   const [data, setData] = useState(location.state);
-  // // console.log("data...", data);
+  // console.log("data...", data);
 
   const initialEdit = {
     first_name: data.formData.first_name,

@@ -1091,7 +1091,7 @@ const EmailList: React.FC = () => {
             </div>
           </div>
 
-          <div className="email-search">
+          {/* <div className="email-search">
             <div className="flex items-center space-x-1 relative" ref={searchRef}>
               <input
                 type="text"
@@ -1131,7 +1131,7 @@ const EmailList: React.FC = () => {
                 }}
               />
             </div>
-          </div>
+          </div> */}
 
           <div className="flex flex-col border-2 border-gray-200 rounded-md mt-2">
             <div className="email-header">

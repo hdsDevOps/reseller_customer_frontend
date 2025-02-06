@@ -137,11 +137,11 @@ const OTP: React.FC = () => {
     };
 
     const handleEditmail = () => {
-        navigate(-1);
+        navigate('/subscribe', {state: {...location.state, step: 2}});
     };
 
     const handleBack = () => {
-        navigate(-1);
+        navigate('/subscribe', {state: {...location.state, step: 2}});
     };
 
     const handleCloseModal = () => {

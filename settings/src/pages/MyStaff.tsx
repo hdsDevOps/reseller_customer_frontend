@@ -571,6 +571,7 @@ const MyStaff = () => {
                               onChange={handleChangeNewStaffData}
                               placeholder={form.placheholder}
                               value={newStaff[form.name]}
+                              disabled={isEdit}
                             />
                           </div>
                         )

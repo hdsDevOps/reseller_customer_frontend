@@ -537,13 +537,14 @@ function Review() {
   }, [cart, appliedVoucher, cartPrice]);
 
   const getPlan = async() => {
-    const workspaceCart = cart?.find(item => item?.product_type === "google workspace");
+    const workspaceCart = location.state?.cart?.find(item => item?.product_type === "google workspace");
+    console.log("workspaceCart...", workspaceCart);
     if(workspaceCart) {
-      if(item?.workspace_status === "trial") {
+      if(workspaceCart?.workspace_status === "trial") {
         try {
           const result = await dispatch(plansAndPricesListThunk({subscription_id: workspaceCart?.plan_name_id})).unwrap();
           console.log("result1...", result);
-          await setUsedPlan(result?.data[0]);
+          setUsedPlan(result?.data[0]);
           setWorkspacePrice(0);
         } catch (error) {
           setWorkspacePrice(0);
@@ -552,7 +553,7 @@ function Review() {
         try {
           const result = await dispatch(plansAndPricesListThunk({subscription_id: workspaceCart?.plan_name_id})).unwrap();
           console.log("result2...", result);
-          await setUsedPlan(result?.data[0]);
+          setUsedPlan(result?.data[0]);
           const amountArray = result?.data[0]?.amount_details;
           const priceArray = amountArray?.find(amount => amount?.currency_code === defaultCurrencySlice)?.price;
           const finalArray = priceArray?.find(price => price?.type?.toLowerCase() === workspaceCart?.payment_cycle?.toLowerCase());
@@ -564,7 +565,7 @@ function Review() {
     } else {
       const result = await dispatch(plansAndPricesListThunk({subscription_id: userDetails?.plan_name_id})).unwrap();
       console.log("result3...", result);
-      await setUsedPlan(result?.data[0]);
+      setUsedPlan(result?.data[0]);
       const amountArray = result?.data[0]?.amount_details;
       const priceArray = amountArray?.find(amount => amount?.currency_code === defaultCurrencySlice)?.price;
       const finalArray = priceArray?.find(price => price?.type?.toLowerCase() === workspaceCart?.payment_cycle?.toLowerCase());
@@ -574,7 +575,7 @@ function Review() {
 
   useEffect(() => {
     getPlan();
-  }, [cart, defaultCurrencySlice, userDetails]);
+  }, [location.state?.cart, defaultCurrencySlice, userDetails]);
 
   const getDomainPrice = () => {
     return 953.72;
@@ -1128,7 +1129,13 @@ function Review() {
         : "",
         payment_method: madePaymentMethod,
         payment_status: "Success",
-        amount: `${currencyList?.find(item2 => item2?.name === defaultCurrencySlice)?.logo}${finalTotalPrice}`,
+        amount: `${currencyList?.find(item2 => item2?.name === defaultCurrencySlice)?.logo}${
+          product_type?.toLowerCase() === "google workspace"
+          ? item?.workspace_status === "trial"
+            ? 0
+            : finalTotalPrice
+          : finalTotalPrice
+        }`,
         transaction_data: paymentResult,
         subscription_id: subscriptionId
       }));

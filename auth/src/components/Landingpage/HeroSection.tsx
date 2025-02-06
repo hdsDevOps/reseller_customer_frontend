@@ -186,7 +186,7 @@ const HeroSection = ({id}:any) => {
       </div>
       {
         banner?.length > 0 && (
-          <Carousel showThumbs={false} onChange={(currentIndex) => {setActiveBanner(currentIndex)}} renderArrowPrev={(onClickHandler, hasPrev) => customPrevArrow(onClickHandler, hasPrev)} renderArrowNext={(onClickHandler, hasNext) => CustomNextArrow(onClickHandler, hasNext)}>
+          <Carousel showThumbs={false} onChange={(currentIndex) => {setActiveBanner(currentIndex)}} renderArrowPrev={(onClickHandler, hasPrev) => customPrevArrow(onClickHandler, hasPrev)} renderArrowNext={(onClickHandler, hasNext) => CustomNextArrow(onClickHandler, hasNext)} autoPlay infiniteLoop>
             {
               banner?.map((item, index) => (
                 <div

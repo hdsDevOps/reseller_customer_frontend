@@ -36,6 +36,12 @@ const Subscribe: React.FC = () => {
   const [ipCountry, setIpCountry] = useState("");
 
   useEffect(() => {
+    if(location.state?.step === 2) {
+      setStep(2)
+    }
+  }, [location.state?.step]);
+
+  useEffect(() => {
     const getIpData = async() => {
       const response = await fetch('https://geolocation-db.com/json/');
       const data = await response.json();
@@ -53,6 +59,12 @@ const Subscribe: React.FC = () => {
     email: "",
     phone_no: "",
   });
+
+  useEffect(() => {
+    if(location.state?.formData) {
+      setFormData(location.state?.formData)
+    }
+  }, [location.state?.formData]);
   // // console.log("form data...", formData);
   const [count, setCount] = useState(1);
   const [countryDropdownOpen, setCountryDropdownOpen] = useState<Boolean>(false);
@@ -64,6 +76,12 @@ const Subscribe: React.FC = () => {
   // // console.log("country...", country);
   const [isNumberValid, setIsNumberValid] = useState(false);
   // console.log({isNumberValid});
+
+  useEffect(() => {
+    if(location.state?.formData?.phone_no === formData?.phone_no) {
+      setIsNumberValid(true);
+    }
+  }, [location.state?.formData?.phone_no, formData?.phone_no])
   
   const handleClickOutsideCountry = (event: MouseEvent) => {
     if(countryRef.current && !countryRef.current.contains(event.target as Node)) {
@@ -284,7 +302,7 @@ const Subscribe: React.FC = () => {
                 countryDropdownOpen && (
                   <div className="absolute mt-14 xl-custom:w-[28%] big:w-[27%] medium:w-[26%] md2:w-[26%] small-3:w-[94%] sm:w-[93%] small-2:w-[92%]  small-small:w-[90%] small:w-[88%] w-[85%] max-h-32 bg-[#E4E4E4] overflow-y-auto z-10 px-2 border border-[#8A8A8A1A] rounded-md">
                     {
-                      countries?.filter(name => name?.name.toLowerCase().includes(countryName.toLowerCase())).map((country, index) => (
+                      countries?.filter(name => name?.name?.toLowerCase()?.includes(countryName?.toLowerCase()))?.map((country, index) => (
                         <p
                           key={index}
                           className="py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer"
@@ -422,7 +440,7 @@ const Subscribe: React.FC = () => {
           <div className="relative w-full mb-2">
             <div className="relatve"></div>
             <PhoneInput
-              country={country?.iso2.toLowerCase() || "us"}
+              country={"us"}
               value={formData.phone_no}
               onChange={(inputPhone, countryData, event, formattedValue) => {
                 handlePhoneChange(inputPhone);

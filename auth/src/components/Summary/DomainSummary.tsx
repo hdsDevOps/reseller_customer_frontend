@@ -44,7 +44,7 @@ const DomainSummary = ({state, plan}:any) => {
 
   console.log("defaultCurrencySlice...", defaultCurrencySlice);
   // console.log("plan...", plan);
-  // console.log("state...", state);
+  console.log("state...", state);
 
   const [showVoucherInput, setShowVoucherInput] = useState(false);
   const [showAvailableVoucher, setShowAvailableVoucher] = useState(false);
@@ -68,6 +68,13 @@ const DomainSummary = ({state, plan}:any) => {
   const [filteredVouchers, setFilteredVouchers] = useState([...vouchers]);
   const [isLegalModalOpen, setIsLegalModalOpen] = useState(false);
   const [legalModalType, setLegalModalType] = useState("");
+
+  useEffect(() => {
+    if(state?.voucher) {
+      setAppliedVoucher(state?.voucher);
+      setSelectedVoucher(state?.voucher);
+    }
+  }, [state?.voucher]);
 
   const handleLegalModalClose = () => {
     setIsLegalModalOpen(false);

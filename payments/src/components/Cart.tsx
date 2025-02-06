@@ -638,7 +638,7 @@ const Cart = () => {
           <GoChevronLeft />
           <p className="text-green-500 text-md">Back to previous page</p>
         </div>
-        <form onSubmit={handleDomainSearch} className="relative flex gap-2 flex-grow md:max-w-[850px] w-full">
+        {/* <form onSubmit={handleDomainSearch} className="relative flex gap-2 flex-grow md:max-w-[850px] w-full">
           <div className="relative flex-grow">
             <input
               type="text"
@@ -649,22 +649,13 @@ const Cart = () => {
               onChange={e => {setDomain(e.target.value)}}
               required
             />
-            {/* <select
-              id="domain-select"
-              className="absolute top-0 right-2 h-full border-0 bg-transparent text-black font-semibold"
-              aria-label="Choose a domain extension"
-            >
-              <option value=".com">.com</option>
-              <option value=".co">.co</option>
-              <option value=".org">.org</option>
-            </select> */}
           </div>
           <button
             type="submit"
             className="bg-green-600 text-white p-2 rounded-lg text-sm sm:text-md md:text-lg">
             Search Domain
           </button>
-        </form>
+        </form> */}
       </div>
 
       <div className="grid-container">

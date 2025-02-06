@@ -360,9 +360,11 @@ const DomainList: React.FC = () => {
           <div className="domain-buttons">
             <button
               type='button'
-              disabled={isAdmin}
+              // disabled={isAdmin}
               onClick={() => navigate("/add-domain")}
-              className={`px-4 py-2 ${isAdmin ? "bg-[#8A8A8A80]" : "bg-green-600"} text-white font-medium rounded-md shadow-sm hover:bg-opacity-90 sm-max:text-xs`}
+              // className={`px-4 py-2 ${isAdmin ? "bg-[#8A8A8A80]" : "bg-green-600"} text-white font-medium rounded-md shadow-sm hover:bg-opacity-90 sm-max:text-xs`}
+              className={`px-4 py-2 bg-[#8A8A8A80] text-white font-medium rounded-md shadow-sm hover:bg-opacity-90 sm-max:text-xs`}
+              disabled
             >
               Add Existing Domain
             </button>
