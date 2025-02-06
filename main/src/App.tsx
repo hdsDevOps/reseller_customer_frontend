@@ -219,7 +219,7 @@ const App: React.FC = () => {
     try {
       await dispatch(removeUserAuthTokenFromLSThunk());
       // window.location.href=`${process.env.}`;
-      window.location.href=`http://localhost:4000/customers`;
+      window.location.href=`https://main.admin.gworkspace.withhordanso.com/customers`;
     } catch (error) {
       toast.error(error?.message || "Error exiting access");
     }
@@ -475,6 +475,35 @@ const App: React.FC = () => {
 
     getLandingPageData();
   }, []);
+
+  // useEffect(() => {
+  //   const checkUserExists = async () => {
+  //     console.log("called");
+  //     try {
+  //       const result = await dispatch(getProfileDataThunk({
+  //         user_id: customerId, 
+  //         staff_id: "", 
+  //         is_staff: false
+  //       })).unwrap();
+  //       console.log("result...", result);
+  //       if (!result?.customerData) {
+  //         await dispatch(removeUserAuthTokenFromLSThunk());
+  //       } else if(result?.customerData?.status === "inactive") {
+  //         await dispatch(removeUserAuthTokenFromLSThunk());
+  //       }
+  //     } catch (error) {
+  //       console.log("error...", error);
+  //       await dispatch(removeUserAuthTokenFromLSThunk());
+  //     }
+  //   };
+
+  //   const intervalId = setInterval(() => {
+  //     checkUserExists();
+  //   }, 300000);
+
+  //   return () => clearInterval(intervalId);
+
+  // }, [dispatch, customerId]);
 
   return (
     <Suspense fallback={<h2>Loading.....</h2>}>

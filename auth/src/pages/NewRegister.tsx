@@ -682,14 +682,17 @@ const RegisterPage: React.FC = () => {
               onChange={() => setTermsAccepted(!termsAccepted)}
               className="w-3 h-3"
             />
-            <button
-              onClick={() => setShowModal(true)}
-              className="font-medium text-green-500 hover:text-green-800"
-              data-testid="terms-conditions"
-              type="button"
-            >
-              Terms and condition
-            </button>
+            <p>
+              <span>I accept the{" "}</span>
+              <button
+                onClick={() => setShowModal(true)}
+                className="font-medium text-green-500 hover:text-green-800"
+                data-testid="terms-conditions"
+                type="button"
+              >
+                terms and conditions
+              </button>
+            </p>
           </div>
           <div>
             {showModal && (
