@@ -80,7 +80,7 @@ const Dashboard: React.FC = () => {
   const [subscriptionsList, setSubscriptionList] = useState([]);
   // console.log("subscriptionsList...", subscriptionsList);
   const [subscription, setSubscription] = useState<object | null>(null);
-  // console.log("subscription...", subscription);
+  console.log("subscription...", subscription);
   // console.log("user details...", userDetails);
 
   const [selectedDomain, setSelectedDomain] = useState<object|null>(null);
@@ -619,7 +619,7 @@ const Dashboard: React.FC = () => {
   const changeAutoRenewStatus = async(e) => {
     e.preventDefault();
     try {
-      const result = await dispatch(changeAutoRenewThunk({subscription_id: subscriptionId, status: "manual", product_type: "google workspace"})).unwrap();
+      const result = await dispatch(changeAutoRenewThunk({subscription_id: subscriptionId, status: subscription?.subscription_status === "auto renewal" ? "Manual" : "auto renewal", product_type: "google workspace"})).unwrap();
       // console.log("result....", result);
       
       toast.success("Auto Renew Status updated");
@@ -873,7 +873,9 @@ const Dashboard: React.FC = () => {
                                           setInvoiceData(null);
                                         }
                                       }}
-                                    >{list?.label}</li>
+                                    >{
+                                      subscription?.subscription_status === "auto renewal" ? list?.label : "Turn on auto-renew"
+                                    }</li>
                                   )
                                 } else {
                                   return (

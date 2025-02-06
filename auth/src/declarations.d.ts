@@ -86,6 +86,9 @@ declare module "store/user.thunk" {
   export const setHordansoAdminDetailsToLSThunk;
   export const removeHordansoAdminDetailsFromLSThunk;
   export const getBase64ImageThunk;
+  export const getUsncDataThunk;
+  export const getUsapDataThunk;
+  export const getPaymentMethodsWithoutLoginThunk;
 }
 
 
@@ -107,5 +110,6 @@ declare module 'store/reseller.thunk' {
 
   export const checkDomainThunk;
   export const domainAvailabilityThunk;
+  export const registerDomainThunk;
 }
 // checkDomainThunk

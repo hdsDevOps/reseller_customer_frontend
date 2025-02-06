@@ -639,3 +639,17 @@ export const getBase64ImageThunk = createAsyncThunk(
     return await userApis.getBase64ImageApi(url);
   }
 );
+
+export const getUsncDataThunk = createAsyncThunk(
+  "users/getUsncData",
+  async () => {
+    return await userApis.getUsncDataApi();
+  }
+);
+
+export const getUsapDataThunk = createAsyncThunk(
+  "users/getUsapData",
+  async () => {
+    return await userApis.getUsapDataApi();
+  }
+);

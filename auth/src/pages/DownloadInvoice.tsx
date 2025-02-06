@@ -11,6 +11,7 @@ import { setDefaultCurrencySlice } from "store/authSlice";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import html2canvas from 'html2canvas-pro';
 import jsPDF from "jspdf";
+import { registerDomainThunk } from "store/reseller.thunk";
 
 const superAdminPermissions = [
   {
@@ -79,7 +80,7 @@ const DownloadInvoice: React.FC = () => {
   const pdfRef = useRef(null);
 
   const data = location.state;
-  // console.log("data...", data);
+  console.log("data...", data);
   const [disabled, setDisabled] = useState(true);
     
   const today = new Date();
@@ -187,6 +188,27 @@ const DownloadInvoice: React.FC = () => {
           token: data?.token
         })).unwrap();
         const planData = await dispatch(plansAndPricesListThunk({subscription_id: data?.plan?.id})).unwrap();
+        const registerDomainToNamesilo = await dispatch(registerDomainThunk({
+          domain_name: data?.selectedDomain?.domain,
+          years: data?.selectedDomain?.duration,
+          whois_privacy: "0",
+          auto_renew: "1",
+          portfolio: "",
+          first_name: data?.formData?.first_name,
+          last_name: data?.formData?.last_name,
+          address: data?.formData?.address,
+          city: data?.cityObject?.name,
+          state: data?.stateObject?.iso2,
+          zip_code: data?.formData?.zipcode,
+          country: data?.country?.iso2,
+          email: data?.formData?.email,
+          phone_number: data?.phoneNumber,
+          company: data?.formData?.business_name,
+          usnc: data?.usNexusForm?.usnc,
+          usap: data?.usNexusForm?.usap,
+          customer_id: data?.customer_id
+        }));
+        // console.log("registerDomainToNamesilo...", registerDomainToNamesilo);
         const domainSubscription = await dispatch(addSubscriptionWithoutLoginThunk({
           product_type: "domain",
           payment_cycle: "Yearly",

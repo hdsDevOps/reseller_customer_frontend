@@ -41,6 +41,9 @@ declare module "store/reseller.thunk" {
   import { createAsyncThunk } from '@reduxjs/toolkit';
   export const checkDomainThunk;
   export const domainAvailabilityThunk;
+  export const registerDomainThunk;
+  export const activateAutoRenewThunk;
+  export const removeAutoRenewThunk;
 }
 
 declare module 'store/authSlice' {
@@ -112,4 +115,6 @@ declare module 'store/user.thunk' {
   export const getLandingPageThunk;
   export const getBase64ImageThunk;
   export const hereMapSearchThunk;
+  export const getUsncDataThunk;
+  export const getUsapDataThunk;
 }

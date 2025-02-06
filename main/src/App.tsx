@@ -261,30 +261,32 @@ const App: React.FC = () => {
       if(isAdmin) {
         await dispatch(setRolePermissionsSlice(hordansoAdminRolePermissions));
       } else {
-        try {
-          const result = await dispatch(getSettingsListThunk({user_type: "", user_id: customerId, sortdata: {sort_text: "", order: ""}})).unwrap();
-          // console.log("result...", result?.settings);
-          if(result) {
-            if(staffStatus) {
-              const permissions = result?.settings?.find(item => item?.id === roleId)?.permissions;
-              // console.log("premissions...", permissions);
-             if(permissions) {
-              await dispatch(setRolePermissionsSlice(permissions));
-             }
-            } else {
-              const permissions = result?.settings?.find(item => item?.user_type === "Super Admin")?.permissions;
-              // console.log("premissions...", permissions);
-              if(permissions) {
+        if(customerId) {
+          try {
+            const result = await dispatch(getSettingsListThunk({user_type: "", user_id: customerId, sortdata: {sort_text: "", order: ""}})).unwrap();
+            // console.log("result...", result?.settings);
+            if(result) {
+              if(staffStatus) {
+                const permissions = result?.settings?.find(item => item?.id === roleId)?.permissions;
+                // console.log("premissions...", permissions);
+               if(permissions) {
                 await dispatch(setRolePermissionsSlice(permissions));
+               }
+              } else {
+                const permissions = result?.settings?.find(item => item?.user_type === "Super Admin")?.permissions;
+                // console.log("premissions...", permissions);
+                if(permissions) {
+                  await dispatch(setRolePermissionsSlice(permissions));
+                }
               }
+            } else {
+              // console.log("premissions...", initialRolePermissions);
+                await dispatch(setRolePermissionsSlice(initialRolePermissions));
             }
-          } else {
-            // console.log("premissions...", initialRolePermissions);
-              await dispatch(setRolePermissionsSlice(initialRolePermissions));
+          } catch (error) {
+            // setRolePermissions(initialRolePermissions);
+            await dispatch(setRolePermissionsSlice(initialRolePermissions));
           }
-        } catch (error) {
-          // setRolePermissions(initialRolePermissions);
-          await dispatch(setRolePermissionsSlice(initialRolePermissions));
         }
       }
     };
@@ -373,17 +375,6 @@ const App: React.FC = () => {
 
     getProfileData();
   }, [token, customerId, staffId, staffStatus, dispatch, navigate]);
-
-  useEffect(() => {
-    const setResellerTokenValue = async() => {
-      try {
-        await dispatch(setResellerToken("eyJhbGciOiJSUzI1NiIsImtpZCI6IjFhYWMyNzEwOTkwNDljMGRmYzA1OGUwNjEyZjA4ZDA2YzMwYTA0MTUiLCJ0eXAiOiJKV1QifQ.eyJyb2xlIjoiY3VzdG9tZXIiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vcmVzZWxsZXItZmEwYmEiLCJhdWQiOiJyZXNlbGxlci1mYTBiYSIsImF1dGhfdGltZSI6MTczNDUxMjcyOSwidXNlcl9pZCI6Im5CUHBRSkJmbTlYYWp0ZGFWZEMxUU5OZ29JajEiLCJzdWIiOiJuQlBwUUpCZm05WGFqdGRhVmRDMVFOTmdvSWoxIiwiaWF0IjoxNzM0NTEyNzI5LCJleHAiOjE3MzQ1MTYzMjksImVtYWlsIjoiaGVzaGFtLnJlemFAc2NoZW1hcGhpYy5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJoZXNoYW0ucmV6YUBzY2hlbWFwaGljLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.CzDO7sFS-F9WbDtIM4MvMt3ug-0WH6O4_ng66FPoKgYVj2amuuy9aVdqfqgOm3o3jGoIZKaG2eahxNGkcifkrrWlv8x6l0EJ21ZrxjR0NEgE2oPiyyBq-PX9gcyVFF0XqqbUUuR_3GYG3LdnSq_twr-NH3k2gct3IR1r8avJml4kihfc_dlmYXBuYZGRc-YE8p-7auyjGwxv9OuLIELciO2yfglyRJE6WRVKLxBWPJVoJpU77hQ_7A6kniQq-2UPLdik70nkz0c0YMGqqoaCpT5RCEhyAFU3hLDmTxFkNKnjvjhkNkpYGzLWNmE97HN4qsS_rC4uoFFK86e_3YezAQ")).unwrap();
-      } catch (error) {
-        //
-      }
-    };
-    setResellerTokenValue();
-  }, []);
 
   useEffect(() => {
     const getCartItems = async() => {

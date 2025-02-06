@@ -27,7 +27,9 @@ const initialCustomer = {
   business_name: "",
   country: "",
   address: "",
-  zipcode: ""
+  zipcode: "",
+  state: "",
+  city: ""
 };
 
 const RegisterPage: React.FC = () => {
@@ -35,7 +37,7 @@ const RegisterPage: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const [customer, setCustomer] = useState(initialCustomer);
-  // console.log("customer...", customer);
+  console.log("customer...", customer);
   const [showPassword, setShowPassword] = useState(false);
   const [showCPassword, setShowCPassword] = useState(false);
   const [password, setPassword] = useState("");
@@ -49,10 +51,19 @@ const RegisterPage: React.FC = () => {
   const [countryDropdownOpen, setCountryDropdownOpen] = useState<Boolean>(false);
   const countryRef = useRef(null);
   const [countryName, setCountryName] = useState("");
+  const [stateName, setStateName] = useState("");
+  const [cityName, setCityName] = useState("");
   const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
   const [country, setCountry] = useState({});
+  const [state, setState] = useState({});
+  const [city, setCity] = useState({});
   // console.log("countries...", countries);
   // console.log("country...", country);
+  // console.log({countryName, stateName, cityName});
+  // console.log({country, state, city});
+  // console.log({countries, states, cities})
 
   const [hereAddressList, setHereAddressList] = useState([]);
   const [hereAddress, setHereAddress] = useState("");
@@ -138,9 +149,38 @@ const RegisterPage: React.FC = () => {
           address: hereData,
           zipcode: hereData?.address?.postalCode
         });
+        if(hereData !== null && states?.length > 0) {
+          const findState = states?.find(state => state?.name?.toLowerCase() === hereData?.address?.state?.toLowerCase());
+          // console.log(findCountry)
+          if(findState) {
+            setState(findState);
+            setCustomer({
+              ...customer,
+              country: findCountry?.name,
+              state: findState?.name,
+              address: hereData,
+              zipcode: hereData?.address?.postalCode
+            });
+            if(hereData !== null && cities?.length > 0) {
+              const findCity = cities?.find(city => city?.name?.toLowerCase() === hereData?.address?.city?.toLowerCase());
+              // console.log(findCountry)
+              if(findCity) {
+                setCity(findCity);
+                setCustomer({
+                  ...customer,
+                  country: findCountry?.name,
+                  state: findState?.name,
+                  city: findCity?.name,
+                  address: hereData,
+                  zipcode: hereData?.address?.postalCode
+                });
+              }
+            }
+          }
+        }
       }
     }
-  }, [hereData, countries]);
+  }, [hereData, countries, states, cities]);
 
   const getHereData = async() => {
     try {
@@ -194,6 +234,50 @@ const RegisterPage: React.FC = () => {
         // console.log("error...", err);
       })
   }, []);
+  
+  useEffect(() => {
+    if(country?.iso2 !== undefined) {
+      var config = {
+        method: 'get',
+        url: `https://api.countrystatecity.in/v1/countries/${country?.iso2}/states`,
+        headers: {
+          'X-CSCAPI-KEY': 'Nk5BN011UlE5QXZ6eXc1c05Id3VsSmVwMlhIWWNwYm41S1NRTmJHMA=='
+        }
+      };
+      axios(config)
+      .then(res => {
+        setStates(res?.data);
+      })
+      .catch(err => {
+        setStates([]);
+        console.log("error...", err);
+      })
+    } else {
+      setStates([]);
+    }
+  }, [country]);
+  
+  useEffect(() => {
+    if(country?.iso2 !== undefined && state?.iso2 !== undefined) {
+      var config = {
+        method: 'get',
+        url: `https://api.countrystatecity.in/v1/countries/${country?.iso2}/states/${state?.iso2}/cities`,
+        headers: {
+          'X-CSCAPI-KEY': 'Nk5BN011UlE5QXZ6eXc1c05Id3VsSmVwMlhIWWNwYm41S1NRTmJHMA=='
+        }
+      };
+      axios(config)
+      .then(res => {
+        setCities(res?.data);
+      })
+      .catch(err => {
+        setCities([]);
+        console.log("error...", err);
+      })
+    } else {
+      setCities([]);
+    }
+  }, [country, state]);
 
   const [loading, setLoading] = useState(false);
 
@@ -280,8 +364,8 @@ const RegisterPage: React.FC = () => {
               business_name: customer?.business_name,
               country: customer?.country,
               address: customer?.address,
-              state: "",
-              city: "",
+              state: customer?.state,
+              city: customer?.city,
               zipcode: customer?.zipcode
             })).unwrap();
             // console.log("result...", result);

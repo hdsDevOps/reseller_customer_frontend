@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { IoChevronBackSharp } from "react-icons/io5";
 import { AiOutlineCheck } from "react-icons/ai";
@@ -16,14 +16,28 @@ const SelectedDomain: React.FC = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if(!location.state?.selectedDomain) {
+      navigate('/');
+    }
+  }, [location.state]);
+
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
+  const [domainExtension, setDomainExtension] = useState("");
+  // console.log("domainExtension...", domainExtension);
 
   // console.log(location.state);
-  const domain = location.state.selectedDomain;
+  const domain = location.state?.selectedDomain;
 
-  if (!domain) {
-    return <div>No domain selected.</div>;
-  }
+  useEffect(() => {
+    const getDomainExtension = () => {
+      if(domain?.domain !== "" || domain?.domain !== null || domain?.domain !== undefined) {
+        setDomainExtension(domain?.domain?.split('.').slice(1).join('.'));
+      }
+    };
+
+    getDomainExtension();
+  }, [domain]);
 
   return (
     <div className="relative flex flex-col items-center justify-center w-full h-full gap-6 p-4" id="top_selected_domain">
@@ -40,19 +54,19 @@ const SelectedDomain: React.FC = () => {
         <div className="flex items-center justify-between w-full p-4 bg-white border border-black rounded-sm">
           <div className="text-lg font-semibold">{domain?.domain}</div>
           <div className="text-lg font-semibold">
-            <span className="font-normal text-green-500">Available</span> {currencyList.find(item => item.name === defaultCurrencySlice)?.logo}{domain?.price[defaultCurrencySlice]}/year
+            <span className="font-normal text-green-500">Available</span> {currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{domain?.price[defaultCurrencySlice]}/year
           </div>
         </div>
 
         <div className="mt-6 space-y-4">
           <div className="flex items-center gap-2 text-lg">
-            <AiOutlineCheck className="self-start text-green-500"/>
-            <p className="text-[16px]">You'll use this domain to set up Google Workspace, create professional email addresses like sales@dboss.live, and sign in to Gmail, Docs, Drive, Calendar, and more.</p>
+            
+            <p className="text-[16px] inline-block"><AiOutlineCheck className="self-start text-green-500 inline-block mr-1"/>You'll use this domain to set up Google Workspace, create professional email addresses like sales@dboss.live, and sign in to Gmail, Docs, Drive, Calendar, and more.</p>
           </div>
 
           <div className="flex items-center gap-2 text-lg">
-            <AiOutlineCheck className="text-green-500"/>
-            <p className="text-[16px]">You'll be able to purchase <strong>{domain.name}</strong> after creating your Google Workspace account.</p>
+            
+            <p className="text-[16px] inline-block"><AiOutlineCheck className="text-green-500 inline-block mr-1"/>You'll be able to purchase <strong>{domain?.name}</strong> after creating your Google Workspace account.</p>
           </div>
         </div>
 
@@ -75,8 +89,8 @@ const SelectedDomain: React.FC = () => {
         </button>
         <p className="self-start mt-1 text-xl font-bold text-green-600 cursor-pointer hover:underline"><a
           onClick={()=> {
-            location.state.from === "business_info"
-            ? navigate('/adddomain', {state: {customer_id: location.state.customer_id, formData: location.state.formData, license_usage: location.state.license_usage, plan: location.state.plan, period: location.state.period, token: location.state.token, from: location.state.from}})
+            location.state?.from === "business_info"
+            ? navigate('/adddomain', {state: {customer_id: location.state?.customer_id, formData: location.state?.formData, license_usage: location.state?.license_usage, plan: location.state?.plan, period: location.state?.period, token: location.state.token, from: location.state?.from}})
             : navigate("/adddomain")
           }}
         >Want to use a domain I already own</a></p>

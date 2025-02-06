@@ -316,6 +316,7 @@ const BusinessInfo: React.FC = () => {
         // console.log("result...", result);
         await getProfileData();
         toast.success("Business Information updated successfully");
+        setIsLoading(false);
         if(location.state.from === "dashboard") {
           navigate("/choose-your-domain", {state: { ...location.state}});
         } else if(location.state.from === "home") {
@@ -350,12 +351,12 @@ const BusinessInfo: React.FC = () => {
 
   return (
     <div className="h-full w-full flex flex-col justify-center items-center gap-6 p-4 relative">
-      {/* <p
+      <p
         className="flex items-center gap-1 text-green-600 cursor-pointer absolute left-4 top-2"
-        onClick={() => navigate(-1)}
+        onClick={() => navigate('/subscribe-plan', {state: {...location.state, step: 2}})}
       >
         <IoChevronBackSharp /> Back to previous page
-      </p> */}
+      </p>
 
       <form
         onSubmit={handleSubmit}

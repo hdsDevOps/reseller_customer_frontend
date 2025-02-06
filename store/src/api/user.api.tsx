@@ -959,6 +959,24 @@ async function getBase64ImageApi(url:string): Promise<any> {
   }
 };
 
+async function getUsncDataApi(): Promise<any> {
+  try {
+    const result = await getApiCall(endPoints.getUsncData);
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+async function getUsapDataApi(): Promise<any> {
+  try {
+    const result = await getApiCall(endPoints.getUsapData);
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 export const userApis = {
   userLoginApi,
   resendLoginOtpApi,
@@ -1054,4 +1072,7 @@ export const userApis = {
   hereMapSearchApi,
 
   getBase64ImageApi,
+
+  getUsncDataApi,
+  getUsapDataApi,
 };

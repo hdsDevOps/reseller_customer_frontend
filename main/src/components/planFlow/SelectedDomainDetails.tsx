@@ -39,13 +39,13 @@ const SelectedDomainDetails: React.FC = () => {
 
         <div className="mt-6 space-y-4">
           <div className="flex items-center gap-2 text-lg">
-            <AiOutlineCheck className="self-start text-green-500"/>
-            <p className="text-[16px]">You'll use this domain to set up Google Workspace, create professional email addresses like sales@dboss.live, and sign in to Gmail, Docs, Drive, Calendar, and more.</p>
+            
+            <p className="text-[16px] inline-block"><AiOutlineCheck className="self-start text-green-500 inline-block mr-1"/>You'll use this domain to set up Google Workspace, create professional email addresses like sales@dboss.live, and sign in to Gmail, Docs, Drive, Calendar, and more.</p>
           </div>
 
           <div className="flex items-center gap-2 text-lg">
-            <AiOutlineCheck className="text-green-500"/>
-            <p className="text-[16px]">You'll be able to purchase <strong>{domain.name}</strong> after creating your Google Workspace account.</p>
+            
+            <p className="text-[16px] inline-block"><AiOutlineCheck className="text-green-500 inline-block mr-1"/>You'll be able to purchase <strong>{domain?.name}</strong> after creating your Google Workspace account.</p>
           </div>
         </div>
 

@@ -103,9 +103,18 @@ export const endPoints = {
 
     // change image to base64
     getBase64Image: 'customerservices/customer/api/v1/create_base64',
+
+    // usnc usnp
+    getUsncData: 'customerservices/domain/api/v1/get_usnc',
+    getUsapData: 'customerservices/domain/api/v1/get_usap',
 };
 
 export const resellerEndPoints = {
     checkDomain: 'api/v1/domain/check-availability/?domain_name=',
     domainAvailability: 'api/v1/domain/check-availability/?domain_name=',
+    registerDomain: 'api/v1/domain/register-domain',
+    getDomainInfo: '/api/v1/domain/domain-info',
+    renewDomain: '/api/v1/domain/domain-renewal',
+    activateAutoRenew: '/api/v1/domain/activate-auto-renew',
+    removeAutoRenew: '/api/v1/domain/remove-auto-renew'
 };

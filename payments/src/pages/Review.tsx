@@ -6,7 +6,7 @@ import { TbInfoTriangleFilled } from "react-icons/tb";
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { format } from "date-fns";
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { addBillingHistoryThunk, addEmailsThunk, addNewDomainThunk, addSettingThunk, addStaffThunk, addSubscriptionThunk, addToCartThunk, getDomainsListThunk, getPaymentMethodsThunk, getProfileDataThunk, hereMapSearchThunk, makeDefaultPaymentMethodThunk, makeEmailAdminThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk, stripePayThunk, udpateProfileDataThunk, useVoucherThunk } from 'store/user.thunk';
+import { addBillingHistoryThunk, addEmailsThunk, addNewDomainThunk, addSettingThunk, addStaffThunk, addSubscriptionThunk, addToCartThunk, getDomainsListThunk, getPaymentMethodsThunk, getProfileDataThunk, getUsapDataThunk, getUsncDataThunk, hereMapSearchThunk, makeDefaultPaymentMethodThunk, makeEmailAdminThunk, plansAndPricesListThunk, removeUserAuthTokenFromLSThunk, stripePayThunk, udpateProfileDataThunk, useVoucherThunk } from 'store/user.thunk';
 import { setCart, setDomains, setUserDetails, staffStatus, staffId, domainsState } from 'store/authSlice';
 import { toast } from 'react-toastify';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
@@ -17,8 +17,14 @@ import StripeCheckout from "react-stripe-checkout";
 import { PaystackButton } from "react-paystack";
 import axios from 'axios';
 import './Review.css';
+import { registerDomainThunk } from 'store/reseller.thunk';
 
 const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/hordanso-fixed-logo.png?alt=media&token=ecd5d548-0aa7-46d4-9757-c24cba11693c";
+
+const initialUsNexusForm = {
+  usnc: "",
+  usap: ""
+};
 
 const initialCartPrice = {
   total_year: 0,
@@ -72,8 +78,8 @@ function Review() {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
-  const { customerId, domainsState, userDetails, defaultCurrencySlice } = useAppSelector(state => state.auth);
-  console.log("domainsState...", domainsState);
+  const { customerId, domainsState, userDetails, defaultCurrencySlice, cartState } = useAppSelector(state => state.auth);
+  // console.log("domainsState...", domainsState);
   const [isChecked, setIsChecked] = useState(false);
   const [userData, setUserData] = useState(userDetails);
   console.log("userDetails...", userData);
@@ -88,8 +94,15 @@ function Review() {
   const cart = location.state?.cart;
   // console.log("cart...", cart);
   const appliedVoucher = location.state.voucher_code;
-  console.log("appliedVoucher...", appliedVoucher);
+  // console.log("appliedVoucher...", appliedVoucher);
   const [paymentMethodId, setPaymentMethodId] = useState("");
+
+  const [usncData, setUsncData] = useState([]);
+  const [usapData, setUsapData] = useState([]);
+  
+  const [isUsDomain, setIsUsDomain] = useState<Boolean>(false);
+  const [domainExtension, setDomainExtension] = useState<string>("");
+  console.log({domainExtension})
 
   const initialData = {
     customer_id: customerId,
@@ -124,17 +137,23 @@ function Review() {
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCitites] = useState([]);
+  const [citiesArray, setCititesArray] = useState([]);
   const [country, setCountry] = useState({});
   const [state, setState] = useState({});
   const [city, setCity] = useState({});
+  const [stateObject, setStateObject] = useState({});
+  const [cityObject, setCityObject] = useState({});
+  const [usNexusForm, setUsNexusForm] = useState<object>(initialUsNexusForm);
+  console.log({usNexusForm});
+  console.log({country, stateObject, cityObject});
 
   const [primaryContact, setPrimaryContact] = useState(initialPrimaryContact);
-  console.log("primaryContact...", primaryContact);
+  // console.log("primaryContact...", primaryContact);
   const [primaryContactHover, setPrimaryContactHover] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [usedPlan, setUsedPlan] = useState<object|null>(null);
-  console.log("usedPlan...", usedPlan);
+  // console.log("usedPlan...", usedPlan);
   const [processingModalOpen, setProcessingModalOpen] = useState(false);
   
   const [todayDate, setTodayDate] = useState("");
@@ -146,12 +165,12 @@ function Review() {
   const [stateDropdownOpen, setStateDropdownOpen] = useState<Boolean>(false);
   const [cityDropdownOpen, setCityDropdownOpen] = useState<Boolean>(false);
   const [cartPrice, setCartPrice] = useState([initialCartPrice]);
-  console.log("cartPrice...", cartPrice);
+  // console.log("cartPrice...", cartPrice);
   const [workspacePrice, setWorkspacePrice] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
   // console.log("total price...", totalPrice);
   const [finalTotalPrice, setFinalTotalPrice] = useState(0.00);
-  console.log("finalTotalPrice...", finalTotalPrice);
+  // console.log("finalTotalPrice...", finalTotalPrice);
   const [taxAmount, setTaxAmount] = useState(8.25);
   const [taxedPrice, setTaxedPrice] = useState(0.00);
   const [discountedPrice, setDiscountedPrice] = useState(0.00);
@@ -164,6 +183,40 @@ function Review() {
   const [isHereDropdownOpen, setIsHereDropdownOpen] = useState(false);
   const [hereList, setHereList] = useState([]);
   const hereRef = useRef(null);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  console.log({phoneNumber});
+
+  useEffect(() => {
+    const removePrefix = (number, prefix) => {
+      return number?.startsWith(prefix) ? number?.slice(prefix?.length) : number;
+    }
+    if(userDetails) {
+      if(country?.phonecode) {
+        setPhoneNumber(removePrefix(userDetails?.phone_no, country?.phonecode));
+      }
+    }
+  }, [userDetails?.phone_no, country?.phonecode]);
+
+  useEffect(() => {
+    const getDomainExtension = () => {
+      if(location.state?.cart?.length > 0) {
+        const findDomain = cart?.find(item => item?.product_type === "domain");
+        if(findDomain) {
+          setDomainExtension(findDomain?.product_name?.split('.').slice(1).join('.'));
+        }
+      }
+    };
+
+    getDomainExtension();
+  }, [location.state?.cart]);
+
+  useEffect(() => {
+    if(domainExtension === "us") {
+      setIsUsDomain(true);
+    } else {
+      setIsUsDomain(false);
+    }
+  }, [domainExtension]);
 
   useEffect(() => {
     if(typeof userDetails?.address === "object") {
@@ -182,6 +235,66 @@ function Review() {
   const [primaryDomain, setPrimaryDomain] = useState<object|null>(null);
   console.log("primaryDomain...", primaryDomain);
   const [allDataFilled, setAllDataFilled] = useState(false);
+
+  const updateUsNexusForm = (e) => {
+    setUsNexusForm({
+      ...usNexusForm,
+      [e.target.name]: e.target.value,
+    })
+  };
+
+  useEffect(() => {
+    if(states?.length > 0) {
+      const stateData = states?.find(item => item?.name === userDetails?.state);
+      setStateObject(stateData);
+    };
+  }, [states, userDetails?.state]);
+
+  useEffect(() => {
+    if(citiesArray?.length > 0) {
+      const cityData = citiesArray?.find(item => item?.name === userDetails?.city);
+      setCityObject(cityData);
+    };
+  }, [citiesArray, userDetails?.city]);
+  
+  useEffect(() => {
+    if(country?.iso2 !== undefined && stateObject?.iso2 !== undefined) {
+      var config = {
+        method: 'get',
+        url: `https://api.countrystatecity.in/v1/countries/${country?.iso2}/states/${stateObject?.iso2}/cities`,
+        headers: {
+          'X-CSCAPI-KEY': 'Nk5BN011UlE5QXZ6eXc1c05Id3VsSmVwMlhIWWNwYm41S1NRTmJHMA=='
+        }
+      };
+      axios(config)
+      .then(res => {
+        setCititesArray(res.data);
+      })
+      .catch(err => {
+        setCititesArray([]);
+        // console.log("error...", err);
+      })
+    } else {
+      setCititesArray([]);
+    }
+  }, [country, stateObject]);
+
+  useEffect(() => {
+    const getUsncUsapData = async() => {
+      try {
+        const result = await dispatch(getUsncDataThunk()).unwrap();
+        setUsncData(result?.data);
+        const result2 = await dispatch(getUsapDataThunk()).unwrap();
+        setUsapData(result2?.data);
+      } catch (error) {
+        setUsncData([]);
+        setUsapData([]);
+      }
+    }
+
+    getUsncUsapData();
+  }, []);
+
 
   useEffect(() => {
     if(
@@ -251,7 +364,7 @@ function Review() {
     if(states?.length > 0 && userDetails?.business_state) {
       const findState = states?.find(item => item?.name === userData?.business_state);
       if(findState){
-        setCountry(findState);
+        setState(findState);
       }
     }
   }, [states, userDetails?.business_state]);
@@ -260,7 +373,7 @@ function Review() {
     if(countries?.length > 0 && userDetails?.business_city) {
       const findCity = countries?.find(item => item?.name === userData?.business_city);
       if(findCity) {
-        setCountry(findCity);
+        setCity(findCity);
       }
     }
   }, [countries, userDetails?.business_city]);
@@ -740,6 +853,26 @@ function Review() {
       license_usage: userData?.license_usage || cart?.find(item => item?.product_type === "google workspace")?.total_year
     };
     try {
+      const registerDomainToNamesilo = await dispatch(registerDomainThunk({
+        domain_name: item?.product_name,
+        years: item?.total_year,
+        whois_privacy: "0",
+        auto_renew: "1",
+        portfolio: "",
+        first_name: userData?.first_name,
+        last_name: userData?.last_name,
+        address: userData?.address?.title,
+        city: cityObject?.name,
+        state: stateObject?.iso2,
+        zip_code: userData?.zipcode,
+        country: country?.iso2,
+        email: userDetails?.email,
+        phone_number: phoneNumber,
+        company: userData?.business_name,
+        usnc: usNexusForm?.usnc,
+        usap: usNexusForm?.usap,
+        customer_id: customerId
+      }));
       const subResult = await dispatch(addSubscriptionThunk(data)).unwrap();
       console.log("result2...", subResult);
       if(subResult) {
@@ -1038,7 +1171,6 @@ function Review() {
         if(result?.message === "Payment successful") {
           setTimeout(async() => {
             // navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: result?.charge}});
-            await updateProfileData();
             cart?.map(async(item) => {
               if(item?.product_type?.toLowerCase() === "google workspace") {
                 const workspaceSubscription = await addSubscriptionForWorkspace(item, result?.charge);
@@ -1091,9 +1223,10 @@ function Review() {
                 await getDomains();
               }
             });
+            await updateProfileData();
             await updateCart();
             await setProcessingModalOpen(false);
-            await navigate('/download-invoice-pdf', {state : {result, prevCart, body, payment_method: "Stripe", amount_details: {finalTotalPrice, totalPrice, taxAmount, taxedPrice, discountedPrice}, region: userDetails?.country}});
+            await navigate('/download-invoice-pdf', {state : {result, prevCart, body, payment_method: "Stripe", amount_details: {finalTotalPrice, totalPrice, taxAmount, taxedPrice, discountedPrice}, region: userDetails?.country, }});
           }, 3000);
         } else {
           toast.error("Error on payment method");
@@ -1525,6 +1658,49 @@ function Review() {
                         )
                       }
                     })
+                  }
+
+                  {
+                    isUsDomain && (
+                      <React.Fragment>
+                        <div className='relative w-full flex flex-col h-[58px] mt-2'>
+                          <label className='absolute -mt-[10px] ml-4 font-inter font-normal text-sm text-[#8A8A8A] bg-white'>Nexus Category</label>
+                          <select
+                            className={`border border-[#E4E4E4] px-3 py-1 w-full rounded-[10px] font-inter font-normal text-base ${
+                              usNexusForm?.usnc === "" ? "text-[#8A8A8A]" : "text-[#1E1E1E]"
+                            } h-[45px]`}
+                            name="usnc"
+                            value={usNexusForm?.usnc}
+                            onChange={updateUsNexusForm}
+                          >
+                            <option value="" selected className="text-[#8A8A8A]">Select your nexus category</option>
+                            {
+                              usncData?.map((usnc, index) => (
+                                <option key={index} value={usnc?.abbreviation} className="text-[#1E1E1E]">{usnc?.description}</option>
+                              ))
+                            }
+                          </select>
+                        </div>
+                        <div className='relative w-full flex flex-col h-[58px] mt-2'>
+                          <label className='absolute -mt-[10px] ml-4 font-inter font-normal text-sm text-[#8A8A8A] bg-white'>Application Purpose</label>
+                          <select
+                            className={`border border-[#E4E4E4] px-3 py-1 w-full rounded-[10px] font-inter font-normal text-base ${
+                              usNexusForm?.usap === "" ? "text-[#8A8A8A]" : "text-[#1E1E1E]"
+                            } h-[45px]`}
+                            name="usap"
+                            value={usNexusForm?.usap}
+                            onChange={updateUsNexusForm}
+                          >
+                            <option value="" selected className="text-[#8A8A8A]">Select your application purposes</option>
+                            {
+                              usapData?.map((usap, index) => (
+                                <option key={index} value={usap?.abbreviation} className="text-[#1E1E1E]">{usap?.description}</option>
+                              ))
+                            }
+                          </select>
+                        </div>
+                      </React.Fragment>
+                    )
                   }
                 </div>
 

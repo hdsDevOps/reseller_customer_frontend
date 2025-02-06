@@ -9,7 +9,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { BiSolidEditAlt } from "react-icons/bi";
 import { TbInfoTriangleFilled } from "react-icons/tb";
-import { getPaymetnMethodsThunk, paystackPayThunk, plansAndPricesListThunk, stripePayThunk, udpateBusinessDataThunk } from "store/user.thunk";
+import { getPaymentMethodsThunk, getPaymentMethodsWithoutLoginThunk, getPaymetnMethodsThunk, getUsapDataThunk, getUsncDataThunk, paystackPayThunk, plansAndPricesListThunk, stripePayThunk, udpateBusinessDataThunk } from "store/user.thunk";
 import { format } from "date-fns";
 import { currencyList } from "../components/CurrencyList";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
@@ -18,6 +18,11 @@ import StripeCheckout from "react-stripe-checkout";
 import { PaystackButton } from "react-paystack";
 
 const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/hordanso-fixed-logo.png?alt=media&token=ecd5d548-0aa7-46d4-9757-c24cba11693c";
+
+const initialUsNexusForm = {
+  usnc: "",
+  usap: ""
+};
 
 const initialTaxForm = {
   tax_status: 'Business',
@@ -33,7 +38,7 @@ const initialContact = {
 const Review = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  // // console.log("location state...", location.state);
+  // console.log("location state...", location.state);
   const dispatch = useAppDispatch();
     
   useEffect(() => {
@@ -57,6 +62,10 @@ const Review = () => {
   const [nameAndAddressHover, setNameAndAddressHover] = useState(false);
 
   const [planDate, setPlanDate] = useState(format(new Date(), "MMMM dd"));
+
+  const [usncData, setUsncData] = useState([]);
+  const [usapData, setUsapData] = useState([]);
+  // console.log({usncData, usapData});
 
   useEffect(() => {
     const today = new Date();
@@ -92,6 +101,12 @@ const Review = () => {
   const plan = location.state?.plan;
   // // console.log("plan...", plan);
   
+  const [isUsDomain, setIsUsDomain] = useState<Boolean>(false);
+  const [domainExtension, setDomainExtension] = useState<string>("");
+  // console.log("domainExtension...", domainExtension);
+
+  // console.log(location.state);
+  
   const countryRef = useRef(null);
   const stateRef = useRef(null);
   const cityRef = useRef(null);
@@ -101,15 +116,21 @@ const Review = () => {
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCitites] = useState([]);
+  const [citiesArray, setCititesArray] = useState([]);
   const [country, setCountry] = useState({});
   const [state, setState] = useState({});
   const [city, setCity] = useState({});
-  // // console.log({country, state, city});
-  // // console.log("countries...", countries);
-  // // console.log("states...", states);
-  // // console.log("cities...", cities);
-  // // console.log({countryName, stateName, cityName});
+  const [stateObject, setStateObject] = useState({});
+  const [cityObject, setCityObject] = useState({});
+  // console.log({country, state, city});
+  // console.log("countries...", countries);
+  // console.log("states...", states);
+  // console.log("cities...", cities);
+  // console.log({countryName, stateName, cityName});
+  // console.log({country, stateObject, cityObject});
   const [taxForm, setTaxForm] = useState(initialTaxForm);
+  const [usNexusForm, setUsNexusForm] = useState<object>(initialUsNexusForm);
+  // console.log("usNexusForm...", usNexusForm);
 
   const topForm = [
     { label: 'Tax status', name: 'tax_status', placeholder: 'Select your text status', type: 'select', },
@@ -131,6 +152,47 @@ const Review = () => {
     const amount = priceArray?.find(item => item?.type === period)?.discount_price;
     return amount;
   };
+
+  useEffect(() => {
+    const getDomainExtension = () => {
+      if(location.state?.selectedDomain?.domain !== "" || location.state?.selectedDomain?.domain !== null || location.state?.selectedDomain?.domain !== undefined) {
+        setDomainExtension(location.state?.selectedDomain?.domain?.split('.').slice(1).join('.'));
+      }
+    };
+
+    getDomainExtension();
+  }, [location.state?.selectedDomain]);
+
+  useEffect(() => {
+    if(domainExtension === "us") {
+      setIsUsDomain(true);
+    } else {
+      setIsUsDomain(false);
+    }
+  }, [domainExtension]);
+
+  const updateUsNexusForm = (e) => {
+    setUsNexusForm({
+      ...usNexusForm,
+      [e.target.name]: e.target.value,
+    })
+  };
+
+  useEffect(() => {
+    const getUsncUsapData = async() => {
+      try {
+        const result = await dispatch(getUsncDataThunk()).unwrap();
+        setUsncData(result?.data);
+        const result2 = await dispatch(getUsapDataThunk()).unwrap();
+        setUsapData(result2?.data);
+      } catch (error) {
+        setUsncData([]);
+        setUsapData([]);
+      }
+    }
+
+    getUsncUsapData();
+  }, []);
 
   const today = new Date();
   const formattedDate = format(today, 'MMMM dd, yyyy');
@@ -157,7 +219,18 @@ const Review = () => {
       data?.formData?.business_state !== "" && data?.formData?.business_state?.trim() !== "" && data?.formData?.business_state !== null && data?.formData?.business_state?.trim() !== undefined &&
       data?.formData?.business_city !== "" && data?.formData?.business_city?.trim() !== "" && data?.formData?.business_city !== null && data?.formData?.business_city?.trim() !== undefined
     ) {
-      setAllDataFilled(true);
+      if(isUsDomain) {
+        if(
+          usNexusForm?.usnc === "" || usNexusForm?.usnc?.trim() === "" || usNexusForm?.usnc === null || usNexusForm?.usnc === undefined ||
+          usNexusForm?.usap === "" || usNexusForm?.usap?.trim() === "" || usNexusForm?.usap === null || usNexusForm?.usap === undefined
+        ) {
+          setAllDataFilled(false);
+        } else {
+          setAllDataFilled(true);
+        }
+      } else {
+        setAllDataFilled(true);
+      }
     } else {
       setAllDataFilled(false);
     }
@@ -215,10 +288,24 @@ const Review = () => {
     };
   }, [states, data?.formData?.business_state]);
 
+  useEffect(() => {
+    if(states?.length > 0) {
+      const stateData = states?.find(item => item?.name === data?.formData?.state);
+      setStateObject(stateData);
+    };
+  }, [states, data?.formData?.state]);
+
+  useEffect(() => {
+    if(citiesArray?.length > 0) {
+      const cityData = citiesArray?.find(item => item?.name === data?.formData?.city);
+      setCityObject(cityData);
+    };
+  }, [citiesArray, data?.formData?.city]);
+
   const getPaymentMethodsList = async() => {
     try {
-      const result = await dispatch(getPaymetnMethodsThunk()).unwrap();
-      setPaymentMethods(result?.data);
+      const result = await dispatch(getPaymentMethodsWithoutLoginThunk({user_id: data?.customer_id, token: data?.token})).unwrap();
+      setPaymentMethods(result?.paymentMethods);
     } catch (error) {
       setPaymentMethods([]);
     }
@@ -240,6 +327,19 @@ const Review = () => {
   
   const [domainPrice, setDomainPrice] = useState(0);
   const [primaryContactHover, setPrimaryContactHover] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  console.log({phoneNumber});
+
+  useEffect(() => {
+    const removePrefix = (number, prefix) => {
+      return number?.startsWith(prefix) ? number?.slice(prefix?.length) : number;
+    }
+    if(location.state) {
+      if(country?.phonecode) {
+        setPhoneNumber(removePrefix(location.state?.formData?.phone_no, country?.phonecode));
+      }
+    }
+  }, [location.state?.formData?.phone_no, country?.phonecode]);
 
   useEffect(() => {
     setDomainPrice(data?.selectedDomain?.price[defaultCurrencySlice]);
@@ -370,6 +470,28 @@ const Review = () => {
       setCitites([]);
     }
   }, [country, state]);
+  
+  useEffect(() => {
+    if(country?.iso2 !== undefined && stateObject?.iso2 !== undefined) {
+      var config = {
+        method: 'get',
+        url: `https://api.countrystatecity.in/v1/countries/${country?.iso2}/states/${stateObject?.iso2}/cities`,
+        headers: {
+          'X-CSCAPI-KEY': 'Nk5BN011UlE5QXZ6eXc1c05Id3VsSmVwMlhIWWNwYm41S1NRTmJHMA=='
+        }
+      };
+      axios(config)
+      .then(res => {
+        setCititesArray(res.data);
+      })
+      .catch(err => {
+        setCititesArray([]);
+        // console.log("error...", err);
+      })
+    } else {
+      setCititesArray([]);
+    }
+  }, [country, stateObject]);
 
   const toggleCheckbox = () => {
     setIsChecked(!isChecked);
@@ -408,7 +530,7 @@ const Review = () => {
       const result = await dispatch(stripePayThunk(body)).unwrap();
       // console.log("result...", result);
       if(result?.message === "Payment successful") {
-        navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: result?.charge, currency: defaultCurrencySlice, date: new Date() }});
+        navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: result?.charge, currency: defaultCurrencySlice, date: new Date(), country, stateObject, cityObject, usNexusForm, phoneNumber }});
       } else {
         toast.error("Error on payment method");
       }
@@ -428,7 +550,6 @@ const Review = () => {
     channels: ['card']
   };
 
-  
   const body = {
     reference: (new Date()).getTime().toString(),
     email: data?.formData?.email,
@@ -465,7 +586,7 @@ const Review = () => {
     if (responseData.status) {
       setProcessingModalOpen(true);
       // // console.log(reference);
-      navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: reference, currency: defaultCurrencySlice, date: new Date() }});
+      navigate('/download-invoice', {state: {...data, payment_method: paymentMethod, payment_result: reference, currency: defaultCurrencySlice, date: new Date(), country, stateObject, cityObject, usNexusForm, phoneNumber }});
     } else {
       toast.error("Error on payment method");
     }
@@ -626,13 +747,13 @@ const Review = () => {
                           ref={stateRef}
                         >
                           <label
-                            className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
+                            className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] text-[#8A8A8A] bg-white w-fit px-2'
                           >Business State</label>
                           <input
                             type="text"
                             name="business_state"
                             required
-                            className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                            className='text-base border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
                             onChange={(e) => {
                               setAddressDetails({
                                 ...addressDetails,
@@ -685,13 +806,13 @@ const Review = () => {
                           ref={cityRef}
                         >
                           <label
-                            className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
+                            className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] text-[#8A8A8A] bg-white w-fit px-2'
                           >Business City</label>
                           <input
                             type="text"
                             name="business_city"
                             required
-                            className='border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                            className='text-base border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
                             onChange={(e) => {
                               setAddressDetails({
                                 ...addressDetails,
@@ -753,6 +874,49 @@ const Review = () => {
                       )
                     }
                   })
+                }
+
+                {
+                  isUsDomain && (
+                    <React.Fragment>
+                      <div className='relative w-full flex flex-col h-[58px] mt-2'>
+                        <label className='absolute -mt-[10px] ml-4 font-inter font-normal text-sm text-[#8A8A8A] bg-white'>Nexus Category</label>
+                        <select
+                          className={`border border-[#E4E4E4] px-3 py-1 w-full rounded-[10px] font-inter font-normal text-base ${
+                            usNexusForm?.usnc === "" ? "text-[#8A8A8A]" : "text-[#1E1E1E]"
+                          } h-[45px]`}
+                          name="usnc"
+                          value={usNexusForm?.usnc}
+                          onChange={updateUsNexusForm}
+                        >
+                          <option value="" selected className="text-[#8A8A8A]">Select your nexus category</option>
+                          {
+                            usncData?.map((usnc, index) => (
+                              <option key={index} value={usnc?.abbreviation} className="text-[#1E1E1E]">{usnc?.description}</option>
+                            ))
+                          }
+                        </select>
+                      </div>
+                      <div className='relative w-full flex flex-col h-[58px] mt-2'>
+                        <label className='absolute -mt-[10px] ml-4 font-inter font-normal text-sm text-[#8A8A8A] bg-white'>Application Purpose</label>
+                        <select
+                          className={`border border-[#E4E4E4] px-3 py-1 w-full rounded-[10px] font-inter font-normal text-base ${
+                            usNexusForm?.usap === "" ? "text-[#8A8A8A]" : "text-[#1E1E1E]"
+                          } h-[45px]`}
+                          name="usap"
+                          value={usNexusForm?.usap}
+                          onChange={updateUsNexusForm}
+                        >
+                          <option value="" selected className="text-[#8A8A8A]">Select your application purposes</option>
+                          {
+                            usapData?.map((usap, index) => (
+                              <option key={index} value={usap?.abbreviation} className="text-[#1E1E1E]">{usap?.description}</option>
+                            ))
+                          }
+                        </select>
+                      </div>
+                    </React.Fragment>
+                  )
                 }
 
                 <div className="flex flex-col items-start justify-start w-full gap-2 mb-4">

@@ -16,6 +16,7 @@ import { toast } from "react-toastify";
 import { setCart, setCurrentPageNumberSlice, setItemsPerPageSlice, setPaymentDetailsFilterSlice } from "store/authSlice";
 import './pagination.css';
 import ReactPaginate from "react-paginate";
+import { activateAutoRenewThunk, removeAutoRenewThunk } from "store/reseller.thunk";
 
 interface RangeType<T> {
   label: string;
@@ -90,7 +91,7 @@ const PaymentDetails: React.FC = () => {
   const dispatch = useAppDispatch();
   const { customerId, paymentDetailsFilterSlice, itemsPerPageSlice, currentPageNumber, userDetails, defaultCurrencySlice, cartState, rolePermission, isAdmin } = useAppSelector(state => state.auth);
 
-  console.log("customer id...", customerId);
+  // console.log("customer id...", customerId);
   
   useEffect(() => {
     const checkPermission = (label:String) => {
@@ -136,9 +137,9 @@ const PaymentDetails: React.FC = () => {
   };
 
   const [paymentDetails, setPaymentDetails]= useState([]);
-  console.log("payment details...", paymentDetails);
+  // console.log("payment details...", paymentDetails);
   const [filter, setFilter] = useState(paymentDetailsFilterSlice === null ? initialFilter : paymentDetailsFilterSlice);
-  console.log("filter...", filter);
+  // console.log("filter...", filter);
   const [range, setRange] = useState<[Date | null, Date | null]|null>(null);
   const [domains, setDomains] = useState([]);
   // console.log("domains...", domains);
@@ -151,12 +152,14 @@ const PaymentDetails: React.FC = () => {
   const [modalType, setModalType] = useState("");
   const [cancelReason, setCancelReason] = useState(inititalCancel);
   const [invoiceData, setInvoiceData] = useState({});
-  console.log("invoiceData...",invoiceData);
+  // console.log("invoiceData...",invoiceData);
   const pdfRef = useRef(null);
   const [paymentMethods, setPaymentMethods] = useState([]);
-  console.log("paymentMethods...", paymentMethods);
+  // console.log("paymentMethods...", paymentMethods);
   const [subscriptionId, setSubscriptionId] = useState("");
   const [selectedDomain, setSelectedDomain] = useState(paymentDetailsFilterSlice === null ? "" : paymentDetailsFilterSlice?.domain_name);
+  const [selectedSubscriptionData, setSelectedSubscriptionData] = useState<object|null>(null);
+  console.log("selectedSubscriptionData...", selectedSubscriptionData)
 
   const showListTable = [
     { label: "Update Plan", type: "link", link: "/upgrade-plan", },
@@ -179,9 +182,9 @@ const PaymentDetails: React.FC = () => {
   // console.log({currentPage, totalPages, lenght: currentItems?.length});
 
   const [billingHistoryList, setBillingHistoryList] = useState([]);
-  console.log("billingHistoryList...", billingHistoryList);
+  // console.log("billingHistoryList...", billingHistoryList);
   const [billingHistoryData, setBillingHistoryData] = useState<object|null>(null);
-  console.log("billingHistoryData...", billingHistoryData);
+  // console.log("billingHistoryData...", billingHistoryData);
   const [renewalStatus, setRenewalStatus] = useState(false);
 
   const [activePlan, setActivePlan] = useState<object|null>(null);
@@ -189,7 +192,7 @@ const PaymentDetails: React.FC = () => {
   const [base64ImageLogo, setBase64ImageLogo] = useState("");
   // console.log("base64ImageLogo...", base64ImageLogo);
   const [paymentMethodImage, setPaymentMethodImage] = useState("");
-  console.log("paymentMethodImage...", paymentMethodImage);
+  // console.log("paymentMethodImage...", paymentMethodImage);
 
   const getBase64ImageLogo = async() => {
     try {
@@ -648,9 +651,21 @@ const PaymentDetails: React.FC = () => {
   const changeAutoRenewStatus = async(e) => {
     e.preventDefault();
     try {
-      const result = await dispatch(changeAutoRenewThunk({subscription_id: subscriptionId, status: "Manual", product_type: "google workspace"})).unwrap();
-      console.log("result....", result);
-      toast.success("Auto Renew Status updated");
+      if(selectedSubscriptionData?.product_type === "google workspace") {
+        await dispatch(changeAutoRenewThunk({subscription_id: subscriptionId, status: selectedSubscriptionData?.subscription_status === "auto renewal" ? "Manual" : "auto renewal", product_type: "google workspace"})).unwrap();
+        // console.log("result....", result);
+        toast.success("Auto Renew Status updated");
+      } else if(selectedSubscriptionData?.product_type === "domain") {
+        await dispatch(changeAutoRenewThunk({subscription_id: subscriptionId, status: selectedSubscriptionData?.subscription_status === "auto renewal" ? "Manual" : "auto renewal", product_type: "domain"})).unwrap();
+        if(selectedSubscriptionData?.subscription_status === "auto renewal") {
+          const result = await dispatch(removeAutoRenewThunk({domain_name: selectedSubscriptionData?.domain[0]})).unwrap();
+          console.log("result....", result);
+        } else if(selectedSubscriptionData?.subscription_status === "Manual") {
+          const result = await dispatch(activateAutoRenewThunk({domain_name: selectedSubscriptionData?.domain[0]})).unwrap();
+          console.log("result....", result);
+        }
+        toast.success("Auto Renew Status updated");
+      }
     } catch (error) {
       toast.error(error?.message || "Auto Renew Status updation failed");
       // toast.error(error?.message || "Error making default payment method");
@@ -667,6 +682,7 @@ const PaymentDetails: React.FC = () => {
       setIsModalOpen(false);
       setModalType("");
       setSubscriptionId("");
+      setSelectedSubscriptionData(null);
     }
   };
 
@@ -1006,6 +1022,19 @@ const PaymentDetails: React.FC = () => {
                                           >Transfer Domain</li>
                                         )
                                       }
+                                    } else if(list?.label === "Turn off auto-renew") {
+                                      return (
+                                        <li
+                                          key={idx}
+                                          className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
+                                          onClick={() => {
+                                            setIsModalOpen(true);
+                                            setModalType(list?.label);
+                                            setSubscriptionId(detail?.id);
+                                            setSelectedSubscriptionData(detail);
+                                          }}
+                                        >{detail?.subscription_status === "auto renewal" ? list?.label : "Turn on auto-renew"}</li>
+                                      )
                                     } else {
                                       return (
                                         <li
@@ -1015,6 +1044,7 @@ const PaymentDetails: React.FC = () => {
                                             setIsModalOpen(true);
                                             setModalType(list?.label);
                                             setSubscriptionId(detail?.id);
+                                            setSelectedSubscriptionData(detail);
                                             if(list?.label === "View Invoice") {
                                               setInvoiceData(detail);
                                             } else {
@@ -1037,7 +1067,7 @@ const PaymentDetails: React.FC = () => {
                       }
                     </React.Fragment>
                   )
-                } else {
+                } else if(detail?.product_type === "domain")  {
                   return (
                     <React.Fragment key={index}>
                       <tr className="text-xs text-gray-400 relative">
@@ -1208,6 +1238,19 @@ const PaymentDetails: React.FC = () => {
                                           >Transfer Domain</li>
                                         )
                                       }
+                                    } else if(list?.label === "Turn off auto-renew") {
+                                      return (
+                                        <li
+                                          key={idx}
+                                          className="font-inter font-normal text-sm text-[#262626] px-[10px] py-[5px] text-nowrap cursor-pointer"
+                                          onClick={() => {
+                                            setIsModalOpen(true);
+                                            setModalType(list?.label);
+                                            setSubscriptionId(detail?.id);
+                                            setSelectedSubscriptionData(detail);
+                                          }}
+                                        >{detail?.subscription_status === "auto renewal" ? list?.label : "Turn on auto-renew"}</li>
+                                      )
                                     } else {
                                       return (
                                         <li
@@ -1217,6 +1260,7 @@ const PaymentDetails: React.FC = () => {
                                             setIsModalOpen(true);
                                             setModalType(list?.label);
                                             setSubscriptionId(detail?.id);
+                                            setSelectedSubscriptionData(detail);
                                             if(list?.label === "View Invoice") {
                                               setInvoiceData(detail);
                                             } else {
@@ -1779,6 +1823,7 @@ const PaymentDetails: React.FC = () => {
               setIsModalOpen(false);
               setModalType("");
               setSubscriptionId("");
+              setSelectedSubscriptionData(null);
             }}
           >
             <div className="fixed inset-0 bg-black bg-opacity-50 z-40 w-screen overflow-y-auto mt-16">
@@ -1791,7 +1836,11 @@ const PaymentDetails: React.FC = () => {
                     <DialogTitle
                       as="h3"
                       className="min-[440px]:text-[28px] max-[440px]:text-[19px] font-semibold text-gray-900"
-                    >Turn Off Auto-Renew</DialogTitle>
+                    >{
+                      selectedSubscriptionData?.subscription_status === "auto renewal"
+                      ? "Turn Off Auto-Renew"
+                      : "Turn On Auto-Renew"
+                    }</DialogTitle>
                     <button
                       type='button'
                       className='text-3xl text-black'
@@ -1799,6 +1848,7 @@ const PaymentDetails: React.FC = () => {
                         setIsModalOpen(false);
                         setModalType("");
                         setSubscriptionId("");
+                        setSelectedSubscriptionData(null);
                       }}
                     ><X /></button>
                   </div>
@@ -1808,7 +1858,11 @@ const PaymentDetails: React.FC = () => {
                   >
                     <p
                       className="font-inter font-medium min-[440px]:text-xl max-[440px]:text-base text-[#222222] text-left"
-                    >Are you sure want to turn off your Auto-Renew?</p>
+                    >Are you sure want to {
+                      selectedSubscriptionData?.subscription_status === "auto renewal"
+                      ? "turn off"
+                      : "turn on"
+                    } your Auto-Renew?</p>
                   </div>
 
                   <div
@@ -1826,6 +1880,7 @@ const PaymentDetails: React.FC = () => {
                         setIsModalOpen(false);
                         setModalType("");
                         setSubscriptionId("");
+                        setSelectedSubscriptionData(null);
                       }}
                     >Cancel</button>
                   </div>
