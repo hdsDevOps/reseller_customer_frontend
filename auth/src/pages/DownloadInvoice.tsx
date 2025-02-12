@@ -5,7 +5,7 @@ import { BiCheck } from "react-icons/bi";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { addBillingHistoryThunk, addEmailsWithoutLoginThunk, addNewDomainWithoutLoginThunk, addSettingWithoutLoginThunk, addStaffWithoutLoginThunk, addSubscriptionWithoutLoginThunk, getBase64ImageThunk, getPaymentMethodsWithoutLoginThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, makeDefaultPaymentMethodThunk, makeDefaultPaymentMethodWithoutLoginThunk, makeEmailAdminWithoutLoginThunk, plansAndPricesListThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, udpateBusinessDataThunk } from "store/user.thunk";
+import { addBillingHistoryThunk, addEmailsWithoutLoginThunk, addNewDomainWithoutLoginThunk, addSubscriptionWithoutLoginThunk, getBase64ImageThunk, getPaymentMethodsWithoutLoginThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, makeDefaultPaymentMethodThunk, makeDefaultPaymentMethodWithoutLoginThunk, makeEmailAdminWithoutLoginThunk, plansAndPricesListThunk, setUserAuthTokenToLSThunk, setUserIdToLSThunk, udpateBusinessDataThunk } from "store/user.thunk";
 import { currencyList } from "../components/CurrencyList";
 import { setDefaultCurrencySlice } from "store/authSlice";
 import { Dialog, DialogPanel } from "@headlessui/react";
@@ -359,7 +359,7 @@ const DownloadInvoice: React.FC = () => {
           domain: data?.selectedDomain?.domain,
           payment_method: data?.payment_method,
           payment_status: "Success",
-          amount: `${currencyList?.find(item => item?.name === data?.currency)?.logo}${data?.selectedDomain?.price[data?.currency]}`,
+          amount: `${currencyList?.find(item => item?.name === data?.currency)?.logo}${data?.finalTotalPrice}`,
           transaction_data: data?.payment_result,
           subscription_id: domainSubscription?.subscription_id
         }));
@@ -395,9 +395,6 @@ const DownloadInvoice: React.FC = () => {
         const defaultPaymentId = methods?.paymentMethods?.find(item => item?.method_name === data?.payment_method)?.id;
         // console.log(defaultPaymentId);
         await dispatch(makeDefaultPaymentMethodWithoutLoginThunk({user_id: data?.customer_id, payment_method_id: defaultPaymentId, token: data?.token}));
-        const role = await dispatch(addSettingWithoutLoginThunk({user_type: "Super Admin", user_id: data?.customer_id, permissions: superAdminPermissions, token: data?.token})).unwrap();
-        // settingId
-        await dispatch(addStaffWithoutLoginThunk({user_id: data?.customer_id, first_name: data?.formData?.first_name, last_name: data?.formData?.last_name, email: data?.formData?.email, phone_no: data?.formData?.phone_no, user_type_id: role?.settingId, token: data?.token}));
         setDisabled(false);
       } catch (error) {
         // console.log("error");

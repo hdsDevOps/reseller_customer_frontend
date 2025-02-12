@@ -87,7 +87,7 @@ export default function CustomerNavbar({width, closeNav, navOpen, header}: { wid
           }}>{header?.menu4}</button>
         </li>
         <li className="py-1 lg:py-0">
-          <button className={`hover:font-bold ${location.pathname === '/ai' ? "font-bold" : ""}`} onClick={() => {
+          <button className={`hover:font-bold ${location.pathname === '/ai' ? "font-bold text-[#12A833]" : ""}`} onClick={() => {
             navigate('/ai');
             closeNav();
           }}>{header?.menu5}</button>
@@ -95,7 +95,7 @@ export default function CustomerNavbar({width, closeNav, navOpen, header}: { wid
       </ul>
       <div className="lg:flex lg:gap-10 items-center lg:pl-0 pl-3">
         <p className="my-2 lg:my-0">
-          <button className=" hover:font-bold" onClick={() => {
+          <button className="hover:font-bold" onClick={() => {
             location.pathname.toLowerCase().includes('/home')
             ? handleScroll('plan_and_price')
             : navigate('/home', {state: 'plan_and_price'}); 
@@ -110,6 +110,7 @@ export default function CustomerNavbar({width, closeNav, navOpen, header}: { wid
             navigate('/login');
             closeNav();
           }}
+          cypress-name="login-button"
         >Login</button>
 
         <div className="relative flex flex-col my-2 lg:my-0">
