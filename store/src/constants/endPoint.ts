@@ -112,7 +112,7 @@ export const endPoints = {
 export const resellerEndPoints = {
     checkDomain: 'api/v1/domain/check-availability/?domain_name=',
     domainAvailability: 'api/v1/domain/check-availability/?domain_name=',
-    registerDomain: 'api/v1/domain/register-domain',
+    registerDomain: 'api/v1/domain/register-domain/',
     getDomainInfo: '/api/v1/domain/domain-info',
     renewDomain: '/api/v1/domain/domain-renewal',
     activateAutoRenew: '/api/v1/domain/activate-auto-renew',
