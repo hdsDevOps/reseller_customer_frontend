@@ -177,6 +177,7 @@ const SelectedDomain: React.FC = () => {
             <button
               className="self-start flex items-center gap-1 text-green-500 border-2 border-green-500 hover:bg-green-500 hover:text-white transition duration-200 ease-in-out py-2 px-4 rounded-lg mt-4 text-xs sm:text-sm md:text-lg"
               onClick={(e) => addToCart(e)}
+              cypress-name="go-to-make-domain-user-pass"
             >
               Add to Cart <MdOutlineAddShoppingCart />
             </button>

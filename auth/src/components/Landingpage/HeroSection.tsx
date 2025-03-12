@@ -186,13 +186,14 @@ const HeroSection = ({id}:any) => {
       </div>
       {
         banner?.length > 0 && (
-          <Carousel showThumbs={false} onChange={(currentIndex) => {setActiveBanner(currentIndex)}} renderArrowPrev={(onClickHandler, hasPrev) => customPrevArrow(onClickHandler, hasPrev)} renderArrowNext={(onClickHandler, hasNext) => CustomNextArrow(onClickHandler, hasNext)} autoPlay infiniteLoop>
+          <Carousel showThumbs={false} onChange={(currentIndex) => {setActiveBanner(currentIndex)}} renderArrowPrev={(onClickHandler, hasPrev) => customPrevArrow(onClickHandler, hasPrev)} renderArrowNext={(onClickHandler, hasNext) => CustomNextArrow(onClickHandler, hasNext)} autoPlay infiniteLoop cypress-name="banner-parent">
             {
-              banner?.map((item, index) => (
+              banner && banner?.map((item, index) => (
                 <div
                   className={`banner-item w-full grid grid-cols-5 relative pb-4`}
                   style={{backgroundImage: `url('${item?.background_image}')`, backgroundSize: 'cover', backgroundPosition: 'center'}}
                   key={index}
+                  cypress-name={`banner-item-${index+1}`}
                 >
                   <div className="col-span-5 lg:col-span-3 flex flex-col relative">
                     <div className="banner-blur"></div>
@@ -243,6 +244,7 @@ const HeroSection = ({id}:any) => {
                         type="button"
                         className="font-inter font-semibold text-base text-white my-8 px-3 py-[10px] rounded-[10px] bg-[#12A833] ml-0 w-fit" 
                         onClick={() => {window.location.href=`${item?.button_url}`}}
+                        cypress-name={`banner-button-${index+1}`}
                       >{item?.button_title}</button>
 
                       {

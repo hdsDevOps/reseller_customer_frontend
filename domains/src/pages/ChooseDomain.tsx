@@ -126,7 +126,7 @@ const BuyDomain: React.FC = () => {
                       <tr className="hover:bg-gray-100">
                         <td className="py-2 px-4">{location.state.result?.available?.domain?.domain}</td>
                         <td className="py-2 px-4">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{location.state.result?.available?.domain?.price[defaultCurrencySlice]}/year</td>
-                        <td className="py-2 px-4 text-right" onClick={() => {navigate('/domain-details', { state: { domain: location.state.result?.available?.domain }})}}>
+                        <td className="py-2 px-4 text-right" onClick={() => {navigate('/domain-details', { state: { domain: location.state.result?.available?.domain }})}} cypress-name="domain-selector-button">
                           <GoArrowRight className="text-green-500 cursor-pointer text-xl" />
                         </td>
                       </tr>
@@ -138,7 +138,7 @@ const BuyDomain: React.FC = () => {
                         <tr key={index} className="hover:bg-gray-100">
                           <td className="py-2 px-4">{domainList?.domain}</td>
                           <td className="py-2 px-4">{currencyList?.find(item => item?.name === defaultCurrencySlice)?.logo}{domainList?.price[defaultCurrencySlice]}/year</td>
-                          <td className="py-2 px-4 text-right" onClick={() => {navigate('/domain-details', { state: { domain: domainList }})}}>
+                          <td className="py-2 px-4 text-right" onClick={() => {navigate('/domain-details', { state: { domain: domainList }})}} cypress-name="domain-selector-button">
                             <GoArrowRight className="text-green-500 cursor-pointer text-xl" />
                           </td>
                         </tr>

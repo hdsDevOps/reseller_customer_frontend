@@ -13,7 +13,7 @@ const flagList = [
   {flag: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/european-flag.png?alt=media&token=bb4a2892-0544-4e13-81a6-88c3477a2a64', name: 'EUR', logo: '€',},
   {flag: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/australia-flag.png?alt=media&token=5a2db638-131e-49c7-be83-d0c84db8d440', name: 'AUD', logo: 'A$',},
   {flag: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/us-flag.png?alt=media&token=c8bc35ae-de58-4a91-bf00-05a3fc9dd85a', name: 'USD', logo: '$',},
-  {flag: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/nigeria-flag.png?alt=media&token=80438147-6c10-4b4b-8cf9-181c7c8ad4d2', name: 'NGN', logo: 'N₦',},
+  {flag: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/nigeria-flag.png?alt=media&token=80438147-6c10-4b4b-8cf9-181c7c8ad4d2', name: 'NGN', logo: '₦',},
   {flag: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/england-flag.png?alt=media&token=64f093ef-b2a9-4b35-b510-a5943039ae5c', name: 'GBP', logo: '£',},
   {flag: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/canada-flag.png?alt=media&token=4f660f4d-0f72-495c-bad4-7b8681f1c936', name: 'CAD', logo: 'C$',},
   {flag: 'https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/India-flag.png?alt=media&token=2c9bf400-34b3-42ae-9f2b-1548c32d0345', name: 'INR', logo: '₹',},
@@ -22,7 +22,7 @@ const flagList = [
 const DropdownMenu = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { userDetails, defaultCurrencySlice, rolePermission, customerId, roleId } = useAppSelector(state => state.auth);
+  const { userDetails, defaultCurrencySlice, rolePermission, customerId, roleId, staffStatus, staffDetails } = useAppSelector(state => state.auth);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState(defaultCurrencySlice);
   // console.log("first...", defaultCurrencySlice);
@@ -63,6 +63,7 @@ const DropdownMenu = () => {
       <button
         onClick={toggleDropdown}
         className="bg-transparent hover:bg-opacity-90 rounded-md p-2 flex items-center"
+        cypress-name="dropdown-menu"
       >
         <ChevronDown
           className={`transition-transform text-gray-600 ${
@@ -75,8 +76,15 @@ const DropdownMenu = () => {
           <li className="flex items-center space-x-2 p-2 cursor-default">
             <span className="w-8 h-8 rounded-full bg-[#FF7272] text-white flex items-center justify-center text-xs font-bold">
               {
-                userDetails?.profile_image
-                ? (
+                staffStatus ? staffDetails?.profile_image ? (
+                  <img
+                    src={staffDetails?.profile_image}
+                    alt="Profile"
+                    className="w-4 h-4 rounded-full border-2 border-gray-300 object-cover cursor-pointer"
+                  />
+                ) : (
+                  <p className="font-medium">{getInitials(staffDetails?.first_name || "J")}{getInitials(staffDetails?.last_name || "D")}</p>
+                ) : userDetails?.profile_image ? (
                   <img
                     src={userDetails?.profile_image}
                     alt="Profile"
@@ -89,9 +97,9 @@ const DropdownMenu = () => {
             </span>
             <div className="text-xs overflow-hidden whitespace-nowrap">
               
-              <p className="font-medium">{userDetails?.first_name} {userDetails?.last_name}</p>
+              <p className="font-medium">{staffStatus ? `${staffDetails?.first_name} ${staffDetails?.last_name}` : `${userDetails?.first_name} ${userDetails?.last_name}`}</p>
               <p className="text-gray-500 text-[10px]">
-                {userDetails?.email}
+                {staffStatus ? staffDetails?.email : userDetails?.email}
               </p>
             </div>
           </li>
@@ -104,6 +112,7 @@ const DropdownMenu = () => {
                   setIsOpen(false);
                 }}
                 className="cursor-pointer"
+                cypress-name="Profile"
               >
                 <a
                   className="flex items-center space-x-2 p-2 hover:bg-gray-100 text-xs"

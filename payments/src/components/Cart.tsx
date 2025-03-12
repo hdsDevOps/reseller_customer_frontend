@@ -1058,6 +1058,7 @@ const Cart = () => {
                     type="button"
                     disabled={cart.length > 0 ? false : true}
                     onClick={() => {navigate('/review-and-check-out', { state: { cart, price: {totalPrice, finalTotalPrice, taxAmount, discountedPrice}, voucher_code: appliedVoucher } })}}
+                    cypress-name="cart-submit-purchase"
                   >
                     <FaLock /> Submit Purchase
                   </button>

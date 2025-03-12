@@ -70,6 +70,7 @@ const MyStaff = () => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [newStaff, setNewStaff] = useState(initialStaff);
+  const [prevPhoneNumber, setPrevPhoneNumber] = useState<string|null>(null);
   console.log("new staff...", newStaff);
   const modalRef = useRef();
   const [userTypes, setUserTypes] = useState([]);
@@ -83,6 +84,12 @@ const MyStaff = () => {
   const [deleteId, setDeleteId] = useState("");
   const [isNumberValid, setIsNumberValid] = useState(false);
   // console.log({isNumberValid});
+
+  useEffect(() => {
+    if(prevPhoneNumber === newStaff?.phone_no) {
+      setIsNumberValid(true);
+    }
+  }, [prevPhoneNumber, newStaff?.phone_no]);
 
   const backgroundColors = ['bg-[#23B7E5]', 'bg-[#96D869]', 'bg-[#FD7E95]',];
   
@@ -248,6 +255,7 @@ const MyStaff = () => {
         setShowModal(false);
         setIsEdit(false);
         setNewStaff(initialStaff);
+        setPrevPhoneNumber(null);
       }
     } else {
       toast.warning("Form inputs cannot be empty.");
@@ -288,6 +296,7 @@ const MyStaff = () => {
         setShowModal(false);
         setIsEdit(false);
         setNewStaff(initialStaff);
+        setPrevPhoneNumber(null);
       }
     } else {
       toast.warning("Form inputs cannot be empty.");
@@ -353,8 +362,10 @@ const MyStaff = () => {
             setShowModal(true);
             setIsEdit(false);
             setNewStaff(initialStaff);
+            setPrevPhoneNumber(null);
           }}
           className={`${isAdmin ? "bg-[#8A8A8A]" : "bg-[#12A833]"} text-[#F0F0F3] font-bold px-4 py-[10px] font-inter rounded-md max-w-40`}
+          cypress-name="add-staff"
         >Add Staff</button>
         <div className='flex items-center min-sm:flex-row max-sm:flex-col gap-2'>
           <div className='max-w-[315px] flex flex-col relative' ref={dropdownRef}>
@@ -468,8 +479,10 @@ const MyStaff = () => {
                               setShowModal(true);
                               setIsEdit(true);
                               setNewStaff(staff);
+                              setPrevPhoneNumber(staff?.phone_no);
                             }}
                             disabled={isAdmin}
+                            cypress-name="edit-button"
                           ><BiSolidEditAlt className={`${isAdmin ? "text-[#8A8A8A80]" : "text-gray-900 hover:text-gray-600"} w-4 h-4`} /></button>
                           <button
                             type='button'
@@ -503,6 +516,7 @@ const MyStaff = () => {
           setShowModal(false);
           setIsEdit(false);
           setNewStaff(initialStaff);
+          setPrevPhoneNumber(null);
         }}
       >
         <div className="fixed inset-0 bg-black bg-opacity-50 z-10 w-screen overflow-y-auto mt-16">
@@ -526,6 +540,7 @@ const MyStaff = () => {
                         setShowModal(false);
                         setIsEdit(false);
                         setNewStaff(initialStaff);
+                        setPrevPhoneNumber(null);
                       }}
                     >+</button>
                   </div>
@@ -665,6 +680,7 @@ const MyStaff = () => {
                       setShowModal(false);
                       setIsEdit(false);
                       setNewStaff(initialStaff);
+                      setPrevPhoneNumber(null);
                     }}
                   >Cancel</button>
                 </div>

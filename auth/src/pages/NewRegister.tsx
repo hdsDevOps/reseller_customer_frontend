@@ -477,33 +477,6 @@ const RegisterPage: React.FC = () => {
                       </button>
                     </div>
                   )
-                } else if(head.type === "select") {
-                  return (
-                    <div
-                      key={index}
-                      className='flex flex-col px-2 mb-2  sm:col-span-1 col-span-2'
-                    >
-                      <label
-                        className='float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] bg-white w-fit px-2'
-                      >{head.label}</label>
-                      {/* <input
-                        type="text"
-                        name={head.name}
-                        required
-                        className='border border-[#E4E4E4] rounded-[10px] h-[54px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
-                        // onChange={updateCustomer}
-                        placeholder={head?.placeholder}
-                      /> */}
-                      <select
-                        name={head.name}
-                        required={head.required}
-                        className="border border-[#E4E4E4] rounded-[10px] h-[54px] mt-[-9px] pl-2"
-                      >
-                        <option selected disabled>{head.placeholder}</option>
-                        <option>United States</option>
-                      </select>
-                    </div>
-                  )
                 } else if(head.type === "dropdown") {
                   if(head.name === "country") {
                     return (
@@ -577,6 +550,10 @@ const RegisterPage: React.FC = () => {
                             setIsNumberValid(false);
                           }
                         }}
+                        inputProps={{
+                          required: true,
+                          name: 'phone_no'
+                        }}
                         inputClass="!w-full !outline-none !border-0"
                         dropdownClass="peer"
                         containerClass="relative !outline-none !w-full !border !border-[#E4E4E4] !rounded-[10px]"
@@ -613,7 +590,7 @@ const RegisterPage: React.FC = () => {
                       <IoMdArrowDropdown className={`absolute right-3 top-8 pointer-events-none ${hereDropdownOpen ? "rotate-180" : ""}`} />
                       {
                         hereDropdownOpen && (
-                          <div className="w-[95.5%] max-h-32 absolute mt-16 bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#C9C9C9]">
+                          <div className="w-[95.5%] max-h-32 absolute mt-16 bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#C9C9C9]" cypress-name="address-dropdown">
                             {
                               hereAddressList?.map((address, idx) => (
                                 <p

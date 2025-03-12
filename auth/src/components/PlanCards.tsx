@@ -206,7 +206,7 @@ const PlanCard: React.FC = ({plans, handleLeftPlan, handleRightPlan, plansLength
                           isYearly ? 'Yearly' : 
                           checkbox ? 'Monthly' :
                           'Yearly Subscription with monthly billing'
-                        }`} })}}className="bg-black text-white py-2 px-3 w-full sm:py-2 sm:px-4 rounded-lg">
+                        }`} })}}className="bg-black text-white py-2 px-3 w-full sm:py-2 sm:px-4 rounded-lg" cypress-name="start-trial-button">
                           Start Trial
                         </button>
                         {

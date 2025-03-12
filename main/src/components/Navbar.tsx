@@ -116,7 +116,7 @@ const Sidebar = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { userDetails, roleId, customerId, rolePermission, isAdmin } = useAppSelector(state => state.auth);
+  const { userDetails, roleId, customerId, rolePermission, isAdmin, staffStatus, staffDetails } = useAppSelector(state => state.auth);
   const [isOpen, setIsOpen] = useState(false);
   const [username] = useState("Robert Clive"); // Replace with actual username
   const [email] = useState("roberclive@domain.co.in"); // Replace with actual email
@@ -185,8 +185,17 @@ const Sidebar = () => {
       <div className="p-[14px] flex-1 mt-2">
         <div className="bg-[#DAE8FF] shadow-sm p-[6px] rounded-md flex items-center gap-2 my-[10px]">
           {
-            userDetails?.profile_image
-            ? (
+            staffStatus ? staffDetails?.profile_image ? (
+              <img
+                src={staffDetails?.profile_image}
+                alt="Profile"
+                className="w-10 h-10 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full border-2 border-gray-300 object-cover cursor-pointer"
+              />
+            ) : (
+              <button className="relative p-2 bg-[#FF7272] hover:bg-opacity-90 rounded-full" type="button">
+                <p className="text-white">{getInitials(staffDetails?.first_name || "J")}{getInitials(staffDetails?.last_name || "D")}</p>
+              </button>
+            ) : userDetails?.profile_image ? (
               <img
                 src={userDetails?.profile_image}
                 alt="Profile"
@@ -200,8 +209,10 @@ const Sidebar = () => {
           }
           <div className={`flex items-center gap-2 overflow-hidden ${isOpen ? "flex" : "hidden  sm:flex"}`}>
             <div className="flex flex-col text-xs ml-2">
-              <span className="font-medium text-gray-600">{userDetails?.first_name}&nbsp;{userDetails?.last_name}</span>
-              <span className="text-gray-400">{userDetails?.email}</span>
+              <span className="font-medium text-gray-600">{
+                staffStatus ? `${staffDetails?.first_name} ${staffDetails?.last_name}` : `${userDetails?.first_name} ${userDetails?.last_name}`
+              }</span>
+              <span className="text-gray-400">{staffStatus ? staffDetails?.email : userDetails?.email}</span>
             </div>
           </div>
         </div>
@@ -218,7 +229,7 @@ const Sidebar = () => {
                         style={{ marginLeft: "1rem" }}
                       ></div>
                     )}
-                    <Link to={link?.path} className="flex items-center gap-2 w-full">
+                    <Link to={link?.path} className="flex items-center gap-2 w-full" cypress-name={link?.label}>
                       {React.cloneElement(link?.icon, {
                         className: `w-4 h-4 text-black ${
                           isOpen ? "w-5 h-5" : "w-4 h-4 text-black"
@@ -249,6 +260,7 @@ const Sidebar = () => {
           className="flex items-center gap-2 w-full p-2 rounded hover:bg-[#DCEBDFCC] text-green-500"
           // onClick={handleLogout}
           onClick={() => {setLogOutModal(true)}}
+          cypress-name="log-out-button"
         >
           <LogOut
             className={`w-5 h-5 ${
@@ -294,6 +306,7 @@ const Sidebar = () => {
                   type="button"
                   className="rounded-md bg-green-500 px-4 py-2 text-sm font-medium text-white hover:bg-green-600 focus:outline-none"
                   onClick={handleLogout}
+                  cypress-name="log-out-customer-portal"
                 >
                   Yes
                 </button>

@@ -118,6 +118,7 @@ const DomainList: React.FC = () => {
                         <GoArrowRight
                           className="text-green-500 cursor-pointer text-xl"
                           onClick={() => handleDomainClick(domainResult?.available?.domain)}
+                          cypress-name="domain-selector-button"
                         />
                       </td>
                     </tr>
@@ -132,6 +133,7 @@ const DomainList: React.FC = () => {
                         <GoArrowRight
                           className="text-green-500 cursor-pointer text-xl"
                           onClick={() => handleDomainClick(domainList)}
+                          cypress-name="domain-selector-button"
                         />
                       </td>
                     </tr>

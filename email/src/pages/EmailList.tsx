@@ -1079,16 +1079,14 @@ const EmailList: React.FC = () => {
   };
 
   return (
-    <div>
-      <main>
+    // <div>
+      <>
         <div className="flex flex-col gap-2 sm:gap-4">
-          <div className="flex items-center justify-start">
-            <div>
-              <h2 className="text-green-500 text-sm sm:text-2xl">Email</h2>
-              <p className="text-sm sm:text-md md:text-lg">
-                Set up your email accounts here and you can add users and edit your admin details.
-              </p>
-            </div>
+          <div className="flex flex-col justify-start">
+            <h2 className="text-green-500 text-sm sm:text-2xl">Email</h2>
+            <p className="text-sm sm:text-md md:text-lg">
+              Set up your email accounts here and you can add users and edit your admin details.
+            </p>
           </div>
 
           {/* <div className="email-search">
@@ -1211,6 +1209,7 @@ const EmailList: React.FC = () => {
                       onClick={() => setIsModalOpen(true)}
                       type="button"
                       disabled={isAdmin}
+                      cypress-name="add-new-email-user-button"
                     >
                       Add Email
                     </button>
@@ -1390,7 +1389,7 @@ const EmailList: React.FC = () => {
         {
           isModalOpen && (
             <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50 z-50">
-              <div className="bg-gray-100 rounded-xl shadow-md p-6 w-11/12 max-w-3xl relative" ref={modalRef}>
+              <div className="bg-gray-100 rounded-xl shadow-md p-6 w-11/12 max-w-3xl relative" ref={modalRef} cypress-name="add-email-modal">
                 <div className="flex items-center justify-between mb-4">
                   <h1 className="text-2xl font-bold">Add Email</h1>
                   <div className="flex items-center">
@@ -1407,6 +1406,7 @@ const EmailList: React.FC = () => {
                           toast.warning("You have reached your maximum license usage.")
                         }
                       }}
+                      cypress-name="add-email-plus-button"
                     >
                       <CirclePlus size={28} />
                     </button>
@@ -1416,7 +1416,7 @@ const EmailList: React.FC = () => {
                   {
                     newEmails?.map((email, index) => (
                       
-                      <div className="flex" key={index}>
+                      <div className="flex" key={index} cypress-name="add-email-user-form">
                         <div className="bg-white p-4 rounded-xl shadow-inner flex-grow max-w-2xl border">
                           <div className="grid grid-cols-2 gap-4">
                             <div className="relative sm:col-span-1 col-span-2">
@@ -1522,6 +1522,7 @@ const EmailList: React.FC = () => {
                     aria-label="Delete"
                     className="px-4 py-2 md:px-3 sm-max:px-2 sm-max:text-xs bg-green-600 text-white font-medium rounded-md hover:bg-opacity-90"
                     onClick={handleEmailSubmit}
+                    cypress-name="save-email-users"
                   >
                     Submit
                   </button>
@@ -2133,8 +2134,8 @@ const EmailList: React.FC = () => {
             </div>
           )
         }
-      </main>
-    </div>
+      </>
+    // </div>
   );
 };
 

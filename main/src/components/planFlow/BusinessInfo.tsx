@@ -310,8 +310,8 @@ const BusinessInfo: React.FC = () => {
           business_state: userDetails?.business_state,
           business_city: userDetails?.business_city,
           zipcode: formData?.zipcode,
-          staff_id: staffId,
-          is_staff: staffStatus
+          staff_id: "",
+          is_staff: false
         })).unwrap();
         // console.log("result...", result);
         await getProfileData();
@@ -411,7 +411,7 @@ const BusinessInfo: React.FC = () => {
           </label>
           {
             isAddressDropdownOpen && (
-              <div className='w-full max-h-32 absolute mt-0 bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+              <div className='w-full max-h-32 absolute mt-0 bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md' cypress-name="address-dropdown">
                 {
                   addressList?.map((addressItem, idx) => (
                     <p

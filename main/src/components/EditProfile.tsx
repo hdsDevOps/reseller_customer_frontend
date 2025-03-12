@@ -840,7 +840,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
               >Address</label>
               {
                 isHereDropdownOpen && hereMapList?.length > 0 && (
-                  <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md'>
+                  <div className='w-full max-h-32 absolute bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md' cypress-name="address-dropdown">
                     {
                       hereMapList?.map((item, idx) => (
                         <p
@@ -1198,7 +1198,7 @@ const EditProfile = ({handleCloseShowModal}:EditProfileProps,) => {
           
           <div className='flex items-center justify-between mt-3 px-6'>
             <button
-              type='submit' 
+              type='submit'
               className='text-white text-center bg-[#12A833] py-2 px-4 rounded-xl w-36  mb-4'
             >Update</button>
           </div>

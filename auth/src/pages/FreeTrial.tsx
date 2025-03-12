@@ -142,7 +142,7 @@ const FreeTrial: React.FC = () => {
             </a>.
         </p>
 
-        <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg" onClick={()=>navigate('/gemini-add', { state: { ...location.state, plan: plan, } })}>
+        <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg" onClick={()=>navigate('/gemini-add', { state: { ...location.state, plan: plan, } })} cypress-name="start-free-trial-button">
           Start Free Trial
         </button>
       </div>

@@ -9,7 +9,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { BiSolidEditAlt } from "react-icons/bi";
 import { TbInfoTriangleFilled } from "react-icons/tb";
-import { getPaymentMethodsThunk, getPaymentMethodsWithoutLoginThunk, getPaymetnMethodsThunk, getUsapDataThunk, getUsncDataThunk, paystackPayThunk, plansAndPricesListThunk, stripePayThunk, udpateBusinessDataThunk } from "store/user.thunk";
+import { getPaymentMethodsThunk, getPaymentMethodsWithoutLoginThunk, getPaymetnMethodsThunk, getUsapDataThunk, getUsncDataThunk, hereMapSearchThunk, paystackPayThunk, plansAndPricesListThunk, stripePayThunk, udpateBusinessDataThunk } from "store/user.thunk";
 import { format } from "date-fns";
 import { currencyList } from "../components/CurrencyList";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
@@ -51,15 +51,22 @@ const Review = () => {
   const { defaultCurrencySlice } = useAppSelector(state => state.auth);
 
   const [data, setData] = useState(location.state);
-  // console.log("data...", data);
+  console.log("data...", data);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentMethods, setPaymentMethods] = useState([]);
   // console.log("payment methods...", paymentMethods);
   const [paymentMethodHover, setPaymentMethodHover] = useState(false);
 
   const [addressDetails, setAddressDetails] = useState(location.state.formData);
-  // // console.log("addressDetails...", addressDetails);
+  console.log("addressDetails...", addressDetails);
   const [nameAndAddressHover, setNameAndAddressHover] = useState(false);
+  const [address, setAddress] = useState("");
+  // console.log("address...", address);
+  const [addressList, setAddressList] = useState([]);
+  // console.log("addressList...", addressList);
+  const [addressObject, setAddressObject] = useState<object|null>(null);
+  // console.log("addressObject...", addressObject);
+  const [isAddressDropdownOpen, setIsAddressDropdownOpen] = useState(false);
 
   const [planDate, setPlanDate] = useState(format(new Date(), "MMMM dd"));
 
@@ -110,6 +117,7 @@ const Review = () => {
   const countryRef = useRef(null);
   const stateRef = useRef(null);
   const cityRef = useRef(null);
+  const addressRef = useRef(null);
   const [countryName, setCountryName] = useState("");
   const [stateName, setStateName] = useState("");
   const [cityName, setCityName] = useState("");
@@ -131,6 +139,39 @@ const Review = () => {
   const [taxForm, setTaxForm] = useState(initialTaxForm);
   const [usNexusForm, setUsNexusForm] = useState<object>(initialUsNexusForm);
   // console.log("usNexusForm...", usNexusForm);
+
+  useEffect(() => {
+    if(addressObject !== null) {
+      if(states?.length > 0) {
+        const findState = states?.find(state => state?.name?.toLowerCase()?.includes(addressObject?.address?.state?.toLowerCase()));
+        // console.log("findState...", findState);
+        setState(findState);
+        setCity({});
+        setStateName("");
+        setCityName("");
+        setAddressDetails({
+          ...addressDetails,
+          state: findState?.name,
+          city: ''
+        });
+      }
+    }
+  }, [addressObject, states]);
+
+  useEffect(() => {
+    if(addressObject !== null) {
+      if(cities?.length > 0) {
+        const findCity = cities?.find(city => city?.name?.toLowerCase()?.includes(addressObject?.address?.city?.toLowerCase()));
+        // console.log("findCity...", findCity);
+        setCity(findCity);
+        setCityName("");
+        setAddressDetails({
+          ...addressDetails,
+          city: findCity?.name
+        });
+      }
+    }
+  }, [addressObject, cities]);
 
   const topForm = [
     { label: 'Tax status', name: 'tax_status', placeholder: 'Select your text status', type: 'select', },
@@ -208,13 +249,38 @@ const Review = () => {
 
   const [allDataFilled, setAllDataFilled] = useState(false);
   // console.log("allDataFilled....", allDataFilled);
+  
+  useEffect(() => {
+    if(addressList?.length > 0 && address?.length > 0) {
+      setIsAddressDropdownOpen(true);
+    } else {
+      setIsAddressDropdownOpen(false);
+    }
+  }, [addressList, address]);
+
+  const findAddress = async() => {
+    try {
+      const result = await dispatch(hereMapSearchThunk({address: address})).unwrap();
+      // console.log("result...", result);
+      setAddressList(result?.data?.items);
+    } catch (error) {
+      setAddressList([]);
+      // console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if(address?.length > 0) {
+      findAddress();
+    }
+  }, [address]);
 
   useEffect(() => {
     if(
       data?.formData?.business_name !== "" && data?.formData?.business_name?.trim() !== "" && data?.formData?.business_name !== null && data?.formData?.business_name !== undefined &&
       data?.formData?.first_name !== "" && data?.formData?.first_name?.trim() !== "" && data?.formData?.first_name !== null && data?.formData?.first_name !== undefined &&
       data?.formData?.last_name !== "" && data?.formData?.last_name?.trim() !== "" && data?.formData?.last_name !== null && data?.formData?.last_name?.trim() !== undefined &&
-      data?.formData?.address !== "" && data?.formData?.address?.trim() !== "" && data?.formData?.address !== null && data?.formData?.address?.trim() !== undefined &&
+      data?.formData?.address !== "" && data?.formData?.address !== "" && data?.formData?.address !== null && data?.formData?.address !== undefined &&
       data?.formData?.zipcode !== "" && data?.formData?.zipcode?.trim() !== "" && data?.formData?.zipcode !== null && data?.formData?.zipcode?.trim() !== undefined &&
       data?.formData?.business_state !== "" && data?.formData?.business_state?.trim() !== "" && data?.formData?.business_state !== null && data?.formData?.business_state?.trim() !== undefined &&
       data?.formData?.business_city !== "" && data?.formData?.business_city?.trim() !== "" && data?.formData?.business_city !== null && data?.formData?.business_city?.trim() !== undefined
@@ -772,7 +838,7 @@ const Review = () => {
                           />
                           {
                             stateDropdownOpen && (
-                              <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md max-h-32 overflow-auto'>
+                              <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md max-h-32 overflow-auto' cypress-name="business-state-dropdown">
                                 {
                                   states?.filter(name => name?.name.toLowerCase().includes(stateName.toLowerCase())).map((state, idx) => (
                                     <p
@@ -828,7 +894,7 @@ const Review = () => {
                           />
                           {
                             cityDropdownOpen && (
-                              <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md max-h-32 overflow-auto'>
+                              <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md max-h-32 overflow-auto' cypress-name="business-city-dropdown">
                                 {
                                   cities?.filter(name => name?.name.toLowerCase().includes(cityName.toLowerCase())).map((city, idx) => (
                                     <p
@@ -845,6 +911,58 @@ const Review = () => {
                                         setCityDropdownOpen(false);
                                       }}
                                     >{city?.name}</p>
+                                  ))
+                                }
+                              </div>
+                            )
+                          }
+                        </div>
+                      )
+                    } else if(form.name === "address") {
+                      return (
+                        <div
+                          className='flex flex-col mb-2 w-full mx-auto relative'
+                          ref={addressRef}
+                        >
+                          <label
+                            htmlFor="address"
+                            className="float-left text-sm font-normal text-custom-gray ml-[18px] z-[1] text-[#8A8A8A] bg-white w-fit px-2"
+                          >
+                            Street Name
+                          </label>
+                          <input
+                            name="address"
+                            type="text"
+                            placeholder="Enter your street address"
+                            value={addressDetails?.address?.address?.label || address}
+                            onChange={(e) => {
+                              setAddressDetails({
+                                ...addressDetails,
+                                address: ""
+                              });
+                              setAddress(e.target.value);
+                            }}
+                            className="text-base border border-[#E4E4E4] rounded-[10px] h-[45px] mt-[-9px] pl-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                          {
+                            isAddressDropdownOpen && (
+                              <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md max-h-32 overflow-auto' cypress-name="address-dropdown">
+                                {
+                                  addressList?.map((addressItem, idx) => (
+                                    <p
+                                      key={idx}
+                                      className="py-1 border-b border-[#C9C9C9] last:border-0 cursor-pointer"
+                                      onClick={() => {
+                                        setAddressDetails({
+                                          ...addressDetails,
+                                          address: addressItem,
+                                          zipcode: addressItem?.address?.postalCode,
+                                        });
+                                        setAddressObject(addressItem);
+                                        setAddress("");
+                                        setIsAddressDropdownOpen(false);
+                                      }}
+                                    >{addressItem?.address?.label}</p>
                                   ))
                                 }
                               </div>
@@ -1088,7 +1206,7 @@ const Review = () => {
             allDataFilled
             ? paymentMethod?.toLowerCase() === "stripe"
               ? (
-                <button type="button" className="w-[30%] px-2 py-2 mb-5 ml-5 font-medium text-white bg-green-500 rounded-[10px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 mx-auto">
+                <button type="button" className="w-[30%] px-2 py-2 mb-5 ml-5 font-medium text-white bg-green-500 rounded-[10px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 mx-auto" cypress-name="stripe-checkout-button">
                   <StripeCheckout
                     name='Hordanso'
                     description="Purchasing google workspace and domain"

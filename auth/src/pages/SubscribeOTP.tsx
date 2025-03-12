@@ -3,9 +3,52 @@ import { IoChevronBackSharp } from "react-icons/io5";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAppDispatch } from "store/hooks";
-import { resendRegisterOtpThunk, verifyRegisterOtpThunk } from "store/user.thunk";
+import { addSettingWithoutLoginThunk, addStaffWithoutLoginThunk, resendRegisterOtpThunk, verifyRegisterOtpThunk } from "store/user.thunk";
 
 const logo = "https://firebasestorage.googleapis.com/v0/b/dev-hds-gworkspace.firebasestorage.app/o/hordanso-fixed-logo.png?alt=media&token=ecd5d548-0aa7-46d4-9757-c24cba11693c";
+
+const superAdminPermissions = [
+  {
+    name: "Dashboard",
+    value: true
+  },
+  {
+    name: "Profile",
+    value: true
+  },
+  {
+    name: "Domain",
+    value: true
+  },
+  {
+    name: "Payment Subscription",
+    value: true
+  },
+  {
+    name: "Email",
+    value: true
+  },
+  {
+    name: "Payment Method",
+    value: true
+  },
+  {
+    name: "Vouchers",
+    value: true
+  },
+  {
+    name: "My Staff",
+    value: true
+  },
+  {
+    name: "Billing History",
+    value: true
+  },
+  {
+    name: "Settings",
+    value: true
+  }
+];
 
 const OTP: React.FC = () => {
     const navigate = useNavigate();
@@ -128,6 +171,9 @@ const OTP: React.FC = () => {
                 // console.log("result...", result);
                 setToken(result?.token);
                 setShowModal(true);
+                const role = await dispatch(addSettingWithoutLoginThunk({user_type: "Super Admin", user_id: customerId, permissions: superAdminPermissions, token: result?.token})).unwrap();
+                // settingId
+                await dispatch(addStaffWithoutLoginThunk({user_id: customerId, first_name: location.state?.formData?.first_name, last_name: location.state?.formData?.last_name, email: location.state?.formData?.email, phone_no: location.state?.formData?.phone_no, user_type_id: role?.settingId, token: result?.token}));
             } catch (error) {
                 toast.error(error?.message || "Error verifying OTP");
             }
@@ -234,6 +280,7 @@ const OTP: React.FC = () => {
                             <button
                                 onClick={handleCloseModal}
                                 className="bg-green-600 text-white px-4 py-2 rounded-[10px]"
+                                cypress-name="subscribe-opt-success-modal-button"
                             >
                                 Continue
                             </button>

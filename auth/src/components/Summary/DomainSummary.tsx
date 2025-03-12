@@ -408,6 +408,7 @@ const DomainSummary = ({state, plan}:any) => {
             className="flex items-center justify-center w-full gap-3 py-3 mt-6 font-semibold text-center text-white bg-green-600 rounded-md"
             type="button"
             onClick={(e) => {handleSubmitPurchase(e)}}
+            cypress-name="submit-purchase-button"
           >
             <PiLockKeyFill className="text-[20px]" /> Submit Purchase
           </button>

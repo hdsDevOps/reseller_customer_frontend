@@ -340,8 +340,8 @@ function Review() {
         business_state: userData?.business_state,
         business_city: userData?.business_city,
         zipcode: userData?.zipcode,
-        staff_id: staffId,
-        is_staff: staffStatus
+        staff_id: "",
+        is_staff: false
       })).unwrap();
       // console.log("result...", result);
       await getProfileData();
@@ -1053,8 +1053,8 @@ function Review() {
           business_state: userData?.business_state,
           business_city: userData?.business_city,
           zipcode: userData?.zipcode,
-          staff_id: staffId,
-          is_staff: staffStatus
+          staff_id: "",
+          is_staff: false
         })).unwrap();
       } catch (error) {
         //
@@ -1528,7 +1528,7 @@ function Review() {
                             />
                             {
                               stateDropdownOpen && (
-                                <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md max-h-32 overflow-auto'>
+                                <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md max-h-32 overflow-auto' cypress-name="business-state-dropdown">
                                   {
                                     states?.filter(name => name?.name.toLowerCase().includes(stateName.toLowerCase())).map((state, idx) => (
                                       <p
@@ -1584,7 +1584,7 @@ function Review() {
                             />
                             {
                               cityDropdownOpen && (
-                                <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md max-h-32 overflow-auto'>
+                                <div className='w-full bg-[#E4E4E4] overflow-y-auto z-[10] px-2 border border-[#8A8A8A1A] rounded-md max-h-32 overflow-auto' cypress-name="business-city-dropdown">
                                   {
                                     cities?.filter(name => name?.name.toLowerCase().includes(cityName.toLowerCase())).map((city, idx) => (
                                       <p
@@ -1907,6 +1907,7 @@ function Review() {
                 <button
                   className="w-[30%] px-2 py-2 mb-5 ml-5 font-medium text-white bg-green-500 rounded-[10px] hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 mx-auto"
                   type="button"
+                  cypress-name="stripe-checkout-button"
                 >
                   <StripeCheckout
                     name='Hordanso'

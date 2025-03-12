@@ -84,6 +84,7 @@ const SelectedDomain: React.FC = () => {
             ? navigate("/signin-domain", {state: location.state})
             : navigate("/plans", {state: { ...location.state }})
           }}
+          cypress-name="go-to-make-domain-user-pass"
         >
           Next
         </button>

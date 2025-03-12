@@ -916,6 +916,7 @@ const Dashboard: React.FC = () => {
                   type="button"
                   className="max-w-[220px] bg-[#12A833] rounded-[10px] font-plus-jakarta-sans font-bold small:text-base text-sm text-white gap-1 items-center flex justify-center small:px-4 px-1 py-2 mt-3 mb-2"
                   onClick={() => {navigate('/choose-your-plan')}}
+                  cypress-name="add-subscription-button"
                 >
                   <Plus />
                   <span>Add Subscription</span>
@@ -936,7 +937,7 @@ const Dashboard: React.FC = () => {
           ? (<></>)
           : activeStatus
           ? (
-            <div>
+            <div style={{marginTop: '20px'}}>
               <div className="">
                 <BusinessEmail data={selectedDomain} getDomainsList={getDomainsList} />
               </div>
@@ -945,7 +946,7 @@ const Dashboard: React.FC = () => {
           )
           : userDetails?.workspace
           ? (
-            <div className="relative pointer-events-none">
+            <div className="relative pointer-events-none" style={{marginTop: '20px'}}>
               <div className="pointer-events-none">
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 font-inter font-semibold text-[40px] text-[#E02424] z-20">Expired !!!</div>
                 <div className="absolute bg-gray-400 bg-opacity-50 z-10 top-0 left-0 bottom-0 right-0 backdrop-blur-sm"></div>

@@ -263,8 +263,8 @@ const Subscribe: React.FC = () => {
             ? userDetails?.zipcode
             : ""
           }`,
-          staff_id: staffId,
-          is_staff: staffStatus
+          staff_id: "",
+          is_staff: false
         })).unwrap();
         console.log("result...", result);
         await getProfileData();
@@ -387,6 +387,7 @@ const Subscribe: React.FC = () => {
               type="button"
               onClick={increment}
               className="w-1/3 h-full flex items-center justify-center border-l border-transparent bg-transparent hover:bg-green-100 transition duration-200 ease-in-out"
+              cypress-name="increase-license-usage"
             >
               <TfiPlus className="text-green-600 text-2xl" />
             </button>
@@ -403,6 +404,7 @@ const Subscribe: React.FC = () => {
                   ? "bg-gray-300 cursor-not-allowed"
                   : "bg-green-600 hover:bg-green-700"
               }`}
+              cypress-name="subscribe-step-1-button"
             >
               { isLoading ? "Loading..." : "Next"}
             </button>
@@ -493,6 +495,10 @@ const Subscribe: React.FC = () => {
                 } else {
                   setIsNumberValid(false);
                 }
+              }}
+              inputProps={{
+                required: true,
+                name: 'phone_no'
               }}
               inputClass="react-tel-input outline-none"
               dropdownClass="peer"

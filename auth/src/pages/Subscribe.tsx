@@ -325,34 +325,36 @@ const Subscribe: React.FC = () => {
           </div>
 
           <div className="flex items-center w-3/5 gap-20 xsm-max:flex-col xsm-max:gap-10 xsm-max:w-full">
-          <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-semibold xsm-max:text-[18px]">
-              Number of employees, including you
-            </h1>
-            <p className="text-sm">
-              Your first {location?.state?.plan?.trial_period} days are at no charge (limited to 10 users)
-            </p>
-          </div>
-
-          <div className="flex items-center justify-center border-2 rounded-md  w-1/5 h-11 border-green-600 xsm-max:w-full">
-            <button
-              type="button"
-              onClick={decrement}
-              className="w-1/3 h-full flex items-center justify-center border-r border-transparent bg-transparent hover:bg-green-100 transition duration-200 ease-in-out"
-            >
-              <TfiMinus className="text-green-600 text-2xl" />
-            </button>
-            <div className="w-1/3 h-full flex items-center justify-center bg-gray-300 text-gray-700 text-lg font-medium">
-              {count}
+            <div className="flex flex-col gap-1">
+              <h1 className="text-2xl font-semibold xsm-max:text-[18px]">
+                Number of employees, including you
+              </h1>
+              <p className="text-sm">
+                Your first {location?.state?.plan?.trial_period} days are at no charge (limited to 10 users)
+              </p>
             </div>
-            <button
-              type="button"
-              onClick={increment}
-              className="w-1/3 h-full flex items-center justify-center border-l border-transparent bg-transparent hover:bg-green-100 transition duration-200 ease-in-out"
-            >
-              <TfiPlus className="text-green-600 text-2xl" />
-            </button>
-          </div>
+
+            <div className="flex items-center justify-center border-2 rounded-md  w-1/5 h-11 border-green-600 xsm-max:w-full">
+              <button
+                type="button"
+                onClick={decrement}
+                className="w-1/3 h-full flex items-center justify-center border-r border-transparent bg-transparent hover:bg-green-100 transition duration-200 ease-in-out"
+                cypress-name="decrease-license-usage"
+              >
+                <TfiMinus className="text-green-600 text-2xl" />
+              </button>
+              <div className="w-1/3 h-full flex items-center justify-center bg-gray-300 text-gray-700 text-lg font-medium">
+                {count}
+              </div>
+              <button
+                type="button"
+                onClick={increment}
+                className="w-1/3 h-full flex items-center justify-center border-l border-transparent bg-transparent hover:bg-green-100 transition duration-200 ease-in-out"
+                cypress-name="increase-license-usage"
+              >
+                <TfiPlus className="text-green-600 text-2xl" />
+              </button>
+            </div>
           </div>
 
           <div className=" mt-6">
@@ -365,6 +367,7 @@ const Subscribe: React.FC = () => {
                   ? "bg-gray-300 cursor-not-allowed"
                   : "bg-green-600 hover:bg-green-700"
               }`}
+              cypress-name="go-to-step-2"
             >
               { isLoading ? "Loading..." : "Next"}
             </button>
@@ -454,6 +457,10 @@ const Subscribe: React.FC = () => {
                 } else {
                   setIsNumberValid(false);
                 }
+              }}
+              inputProps={{
+                required: true,
+                name: 'phone_no'
               }}
               inputClass="react-tel-input outline-none"
               dropdownClass="peer"

@@ -130,6 +130,7 @@ const DomainDetails: React.FC = () => {
                   className={`flex-1 border-2 ${domainError ? 'border-red-500' : 'border-gray-200'} bg-transparent rounded-md p-3 focus:border-blue-500 focus:outline-none`}
                   value={domainName}
                   onChange={handleInputChange}
+                  cypress-name="new-domain-input-field"
                 />
                 {/* <select
                   className="p-3 bg-transparent border-2 border-gray-200 rounded-md focus:border-blue-500 focus:outline-none"
@@ -153,6 +154,7 @@ const DomainDetails: React.FC = () => {
                 type="button"
                 className="px-4 py-2 text-white transition duration-200 ease-in-out bg-green-600 rounded-md hover:bg-green-700"
                 onClick={handleToDomain}
+                cypress-name="new-domain-search-button"
               >
                 Next
               </button>

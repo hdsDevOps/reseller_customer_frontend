@@ -373,6 +373,7 @@ const DomainList: React.FC = () => {
               onClick={() => navigate("/buy-domain")}
               disabled={isAdmin}
               className={`px-4 py-2 ${isAdmin ? "bg-[#8A8A8A80]" : "bg-green-600"} text-white font-medium rounded-md shadow-sm hover:bg-opacity-90 sm-max:text-xs`}
+              cypress-name="buy-new-domain-button"
             >
               Buy Domain
             </button>

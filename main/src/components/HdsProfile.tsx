@@ -309,10 +309,9 @@ const HdsProfile = () => {
                 </div>
             </div>
             {/* {showModal && <HdsCropPicture handleCloseModal={closeModal}/>} */}
-            <button onClick={onShowModal}
-             className='bg-transparent border-2 rounded-lg cursor-pointer
-             border-[#12A833] px-[20px] py-1 font-sm capitalize text-center text-[#12A833] small:mt-0 mt-3'>edit</button>
-             {showEditModal && <EditProfile handleCloseShowModal={handleCloseShowModal}/>}
+            <button onClick={onShowModal} className='bg-transparent border-2 rounded-lg cursor-pointer
+             border-[#12A833] px-[20px] py-1 font-sm text-center text-[#12A833] small:mt-0 mt-3' cypress-name="edit-profile-modal-open">Edit</button>
+            {showEditModal && <EditProfile handleCloseShowModal={handleCloseShowModal}/>}
         </div>
         <h4 className='text-[#14213D] font-medium text-3xl pt-3'>
             <span className='capitalize'>{profileDetails?.first_name || "John"}</span>

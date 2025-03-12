@@ -22,7 +22,7 @@ const ForgotPassword: React.FC = () => {
       navigate("/otp?mode=forgotpassword", {state: {email, from: 'forgot'}});
     } catch (error) {
               
-      toast.error("Please enter a valid email");
+      toast.error(error?.message || "Please enter a valid email");
       setLoading(false);
     }
     // navigate

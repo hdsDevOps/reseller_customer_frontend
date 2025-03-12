@@ -59,6 +59,7 @@ const SelectedDomainDetails: React.FC = () => {
           className="self-start px-4 py-2 mt-4 text-white bg-green-600 rounded-lg"
           // onClick={() => navigate('/signin-domain', { state: { selectedDomain: domain } })}
           onClick={()=> {navigate("/how-you-will-sign-in-to-domain", {state: { ...location.state }})}}
+          cypress-name='continue-with-selected-domain'
         >
           Next
         </button>

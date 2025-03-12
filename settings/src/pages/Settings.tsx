@@ -257,6 +257,7 @@ const Settings = () => {
           <button
             onClick={() => {setIsModalOpen(true)}}
             className='bg-[#12A833] text-[#F0F0F3] font-bold px-4 py-[10px] font-inter rounded-md max-w-40'
+            cypress-name="add-user-type"
           > Add User Type</button>
           {/* <div className='flex items-center'>
             <div className='max-w-[315px] flex flex-col relative' ref={dropdownRef}>
@@ -348,6 +349,7 @@ const Settings = () => {
                           <div className='flex justify-center gap-3'>
                             <button
                               type='button'
+                              cypress-name="edit-button"
                               onClick={() => {
                                 setIsModalOpen(true);
                                 setIsEdit(true);
@@ -450,7 +452,7 @@ const Settings = () => {
                           >{list}</h5>
                           <div className="transition-transform duration-1000 ease-in-out flex justify-center ml-5 mt-[3px]">
                             {/* {notificationToggle()} */}
-                            <label className="relative cursor-pointer">
+                            <label className="relative cursor-pointer" cypress-name={list}>
                               <input
                                 type="checkbox"
                                 className="sr-only peer"

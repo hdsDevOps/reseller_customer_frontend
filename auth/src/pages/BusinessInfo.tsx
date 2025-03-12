@@ -293,7 +293,7 @@ const BusinessInfo: React.FC = () => {
   useEffect(() => {
     if(
       formData?.business_name === "" || formData?.business_name?.trim() === "" ||
-      formData?.address === "" || formData?.address?.trim() === "" ||
+      formData?.address === "" || formData?.address === null || formData?.address === undefined ||
       formData?.city?.trim() === "" ||
       formData?.state?.trim() === "" ||
       formData?.zipcode === "" || formData?.zipcode?.trim() === "" ||
@@ -348,8 +348,8 @@ const BusinessInfo: React.FC = () => {
           <input
             name="address"
             type="text"
-            placeholder="123 Main St"
-            value={formData?.address || address}
+            placeholder="Enter your street address"
+            value={formData?.address?.address?.label || address}
             onChange={(e) => {
               setFormData({
                 ...formData,
@@ -367,7 +367,7 @@ const BusinessInfo: React.FC = () => {
           </label>
           {
             isAddressDropdownOpen && (
-              <div className='w-full max-h-32 absolute mt-0 bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md'>
+              <div className='w-full max-h-32 absolute mt-0 bg-[#E4E4E4] overflow-y-auto z-[100] px-2 border border-[#8A8A8A1A] rounded-md' cypress-name="address-dropdown">
                 {
                   addressList?.map((addressItem, idx) => (
                     <p
@@ -376,7 +376,7 @@ const BusinessInfo: React.FC = () => {
                       onClick={() => {
                         setFormData({
                           ...formData,
-                          address: addressItem?.address?.label,
+                          address: addressItem,
                           zipcode: addressItem?.address?.postalCode,
                         });
                         setAddressObject(addressItem);

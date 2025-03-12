@@ -13,7 +13,7 @@ export default function Header() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const { userDetails, cartState, defaultCurrencySlice, notificationsList, isAdmin, rolePermission } = useAppSelector(state => state.auth);
+  const { userDetails, cartState, defaultCurrencySlice, notificationsList, isAdmin, rolePermission, staffStatus, staffDetails } = useAppSelector(state => state.auth);
 
   const[showNotification,setShowNotfication] = useState(false);
   const [width, setWidth] = useState(window.innerWidth);
@@ -72,7 +72,7 @@ export default function Header() {
 
         {
           !isAdmin && (
-            <button className="relative p-2 bg-[#DCEBDFCC] hover:bg-opacity-90 rounded-md" onClick={()=> navigate('/add-cart')}>
+            <button className="relative p-2 bg-[#DCEBDFCC] hover:bg-opacity-90 rounded-md" onClick={()=> navigate('/add-cart')} cypress-name="go-to-cart-button">
               <ShoppingCart className="w-6 h-6 text-black" />
               <span className="absolute top-0 right-0 flex items-center justify-center w-3 h-3 bg-black text-white rounded-full text-[8px] font-semibold">
                 {cartState?.length || 0}
@@ -82,7 +82,20 @@ export default function Header() {
         }
         <div className="flex items-center justify-center space-x-2">
           {
-            userDetails?.profile_image
+            staffStatus ? staffDetails?.profile_image
+            ? (
+              <button className="relative p-2 hover:bg-opacity-90 rounded-full">
+                <img
+                  src={staffDetails?.profile_image}
+                  alt="Profile"
+                  className="w-8 h-8 rounded-full border-2 border-gray-300 object-cover cursor-pointer"
+                />
+              </button>
+            ) : (
+              <button className="relative p-2 bg-[#FF7272] hover:bg-opacity-90 rounded-full" type="button">
+                <p className="text-white">{getInitials(staffDetails?.first_name || "J")}{getInitials(staffDetails?.last_name || "D")}</p>
+              </button>
+            ) : userDetails?.profile_image
             ? (
               <button className="relative p-2 hover:bg-opacity-90 rounded-full">
                 <img

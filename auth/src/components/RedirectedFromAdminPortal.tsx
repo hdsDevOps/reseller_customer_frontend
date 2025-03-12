@@ -21,6 +21,7 @@ function RedirectedFromAdminPortal() {
       if(tokenFromHordansoAdmin !== "" && tokenFromHordansoAdmin !== null && tokenFromHordansoAdmin !== undefined && customerIdFromHordansoAdmin !== "" && customerIdFromHordansoAdmin !== null && customerIdFromHordansoAdmin !== undefined && adminNameFromHordansoAdmin !== "" && adminNameFromHordansoAdmin !== null && adminNameFromHordansoAdmin !== undefined) {
         // console.log({token, customerId, adminName});
         try {
+          await localStorage.clear();
           await dispatch(setHordansoAdminDetailsToLSThunk({hordansoAdminStatus: true,hordansoAdminName:adminNameFromHordansoAdmin}));
           await dispatch(setUserIdToLSThunk(customerIdFromHordansoAdmin)).unwrap();
           await dispatch(setUserAuthTokenToLSThunk({token: tokenFromHordansoAdmin})).unwrap();
