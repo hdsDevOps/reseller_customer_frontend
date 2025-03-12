@@ -10,7 +10,7 @@ const App = () => (
     <div>Language: TypeScript</div>
     <div>CSS: Tailwind</div>
   </div>
-)
+) 
 const rootElement = document.getElementById('app')
 if (!rootElement) throw new Error('Failed to find the root element')
 
