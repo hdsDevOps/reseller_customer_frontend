@@ -1,0 +1,40 @@
+.no-internet-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  gap: 8px;
+}
+
+.no-internet-container i {
+  font-size: 32px;
+}
+
+.no-internet-container h4 {
+  font-family: "Inter", sans-serif;
+  font-size: 24px;
+  font-weight: 300;
+  color: black;
+}
+
+.no-internet-container p {
+  font-family: "Inter", sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: black;
+}
+
+.no-internet-container button {
+  width: fit-content;
+  height: fit-content;
+  background-color: transparent;
+  border: none;
+  color: #12A833;
+  transition: all 0.15s ease-in-out;
+}
+
+.no-internet-container button:hover {
+  color: #12a832ae;
+}

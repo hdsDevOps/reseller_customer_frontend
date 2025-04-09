@@ -1,11 +1,11 @@
 // src/index.tsx
-import React, { Suspense, useEffect, useState } from "react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter, useLocation, useNavigate } from "react-router-dom";
 import ReduxProvider from "store/ReduxProvider";
 import UserAuth from "./hoc/UserAuth.hoc";
 import MainApp from "./pages";
-import AuthApp from "auth/AuthApp";
+// import AuthApp from "auth/AuthApp";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { getCartThunk, getDomainsListThunk, getHordansoAdminDetailsFromLSThunk, getLandingPageThunk, getNotificationsListThunk, getPaymentMethodsThunk, getProfileDataThunk, getRoleIdFromLSThunk, getSettingsListThunk, getStaffIdFromLSThunk, getStaffStatusFromLSThunk, getUserAuthTokenFromLSThunk, getUserIdFromLSThunk, removeUserAuthTokenFromLSThunk, savedCardsListThunk } from 'store/user.thunk';
 import { setCart, setCustomerId, setDefaultCurrencySlice, setDomains, setMetaDataSlice, setNotificationsListSlice, setPaymentMethodsState, setResellerToken, setRoleIdSlice, setRolePermissionsSlice, setSaveCards, setStaffDetails, setStaffId, setStaffStatus, setTokenDetails, setUserDetails } from 'store/authSlice';
@@ -15,6 +15,11 @@ import { HelmetProvider, Helmet } from 'react-helmet-async';
 import countryToCurrency, { Currencies, Countries } from "country-to-currency";
 import { currencyList } from "./components/CurrencyList";
 import { toast, ToastContainer } from "react-toastify";
+import { ErrorBoundary } from "react-error-boundary";
+import NoInternetPage from "./components/NoInternetPage";
+
+const AuthApp = lazy(() => import("auth/AuthApp"));
+
  
 const initialRolePermissions = [
   {
@@ -150,6 +155,36 @@ const App: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { token, customerId, staffId, staffStatus, resellerToken, userDetails, metaDataSlice, defaultCurrencySlice, domainsState, notificationsList, roleId, rolePermission, isAdmin, adminName, expirationTimeSlice } = useAppSelector((state) => state.auth);
+
+const [isOnline, setIsOnline] = useState<Boolean>(navigator.onLine);
+
+  useEffect(() => {
+    setIsOnline(navigator.onLine);
+
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // const isOnline = useNetworkStatus();
+  // if (!isOnline) return (
+  //   <div className="no_inter_container">
+  //     <div>
+  //         <i className="bi bi-wifi-off font_100"></i>
+  //     </div>
+  //     <h1 style={{ marginBottom: '5px' }}>Check your internet connection</h1>
+  //     <div>
+  //         <h4 style={{ margin: '0' }}> It appears to be disconnected</h4>
+  //     </div>
+  //   </div>
+  // );
   
   // console.log({ customerId, token, isAdmin, adminName });
   // console.log({rolePermission});
@@ -307,8 +342,10 @@ const App: React.FC = () => {
       }
     };
 
-    getIpData();
-  } , []);
+    if(isOnline) {
+      getIpData();
+    }
+  } , [isOnline]);
 
   useEffect(() => {
     const getUserDetails = async () => {
@@ -505,6 +542,21 @@ const App: React.FC = () => {
 
   // }, [dispatch, customerId]);
 
+  if (!isOnline) {
+    return (
+      // <div className="no_inter_container">
+      //   <div>
+      //     <i className="bi bi-wifi-off font_100"></i>
+      //   </div>
+      //   <h1 style={{ marginBottom: '5px' }}>Check your internet connection</h1>
+      //   <div>
+      //     <h4 style={{ margin: '0' }}> It appears to be disconnected</h4>
+      //   </div>
+      // </div>
+      <NoInternetPage />
+    )
+  }
+  
   return (
     <Suspense fallback={<h2>Loading.....</h2>}>
       {
@@ -522,10 +574,15 @@ const App: React.FC = () => {
           </Helmet>
         )
       }
-      {token ? <MainApp /> : <AuthApp />}
+      {
+        token
+        ? <MainApp />
+        : <AuthApp />
+      }
       {/* <MainApp /> */}
     </Suspense>
   );
+  
 };
 
 const rootElement = document.getElementById("app");

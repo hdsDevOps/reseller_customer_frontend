@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
-import Navbar from "../components/Navbar";
-import Header from "../components/Header";
+// import Navbar from "../components/Navbar";
+// import Header from "../components/Header";
+
 import DomainApp from "domains/DomainApp";
 import PaymentApp from "payments/PaymentApp";
-
 import HistoryApp from "billinghistory/HistoryApp";
 import SettingsApp from "settings/SettingsApp";
-import HdsProfile from "../components/HdsProfile";
-import EmailApp from "email/EmailApp";        
+import EmailApp from "email/EmailApp";
+
+import HdsProfile from "../components/HdsProfile";     
 import PlanCard from "./PlanCards";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from "react-toastify";
@@ -28,6 +29,15 @@ import GeminiSummary from "../components/planFlow/GeminiSummary";
 import AdminHeader from "../components/AdminHeader";
 import LadningPage from "./LadningPage";
 import LandingApp from "./LandingApp";
+
+const Navbar = lazy(() => import("../components/Navbar"));
+const Header = lazy(() => import("../components/Header"));
+
+// const DomainApp = lazy(() => import("domains/DomainApp"));
+// const PaymentApp = lazy(() => import("payments/PaymentApp"));
+// const HistoryApp = lazy(() => import("billinghistory/HistoryApp"));
+// const SettingsApp = lazy(() => import("settings/SettingsApp"));
+// const EmailApp = lazy(() => import("email/EmailApp"));
 
 const routes = [
   { path: "/", element: <Dashboard /> },
@@ -71,11 +81,13 @@ const MainApp: React.FC = () => {
               ))}
             </Routes>
             <LandingApp />
+
             <DomainApp />
             <SettingsApp/>
             <PaymentApp />
             <HistoryApp />
             <EmailApp />
+
             <div className="absolute bottom-0 left-0 right-0 w-full">
               <Footer />
             </div>
