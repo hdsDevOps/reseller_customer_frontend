@@ -5,7 +5,7 @@ import { Base_URL } from "../../../Constant";
 const Resources = ({resouces}:any) => {
   // console.log("resources...", resouces);
   return (
-    <section className="sm:px-16 px-4 w-full bg-top bg-cover" style={{ backgroundImage: `url(${Base_URL}/images/AboutUsSpiral.png)` }}>
+    <section className="sm:!px-[70px] px-[10px] w-full bg-top bg-cover" style={{ backgroundImage: `url(${Base_URL}/images/AboutUsSpiral.png)` }}>
       <h2 className="text-greenbase font-semibold text-4xl flex justify-center mt-[4rem]">
         Resources
       </h2>

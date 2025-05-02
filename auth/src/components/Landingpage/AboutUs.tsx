@@ -31,7 +31,7 @@ const AboutUs = ({aboutUs, id}:any) => {
       <div className="w-full bg-cover bg-center"
       >
         <div className="grid-custom items-center lg:flex-row w-full">
-          <div className="pb-11  w-full sm:pt-8 my-2 px-2 pl-5">
+          <div className="pb-11  w-full sm:pt-8 my-2 sm:!px-[70px] px-[10px]">
             <h2 className="font-semibold text-3xl text-greenbase">
               {aboutUs?.block1?.content_title}
             </h2>
@@ -49,7 +49,7 @@ const AboutUs = ({aboutUs, id}:any) => {
             alt="Aboutus"
             className="lg:w-1/2 w-full object-cover"
           />
-          <div className="pb-11 lg:w-1/2 w-full sm:pt-8 px-2 pl-5">
+          <div className="pb-11 lg:w-1/2 w-full sm:pt-8 sm:!px-[70px] px-[10px]">
             <h2 className="font-semibold text-3xl text-greenbase">
               {aboutUs?.block2?.content_title}
             </h2>

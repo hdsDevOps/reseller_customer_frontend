@@ -33,7 +33,7 @@ const ProductivityAndCollaboration = ({plans}:any) => {
     return (
         <section className="min-w-full my-5 bg-white">
             <div className="w-full relative">
-                <div className="w-full grid grid-cols-12 sticky top-20 bg-white z-10">
+                <div className="w-full grid grid-cols-12 sticky lg:!top-[75px] top-[50px] bg-white z-10">
                     <div className="medium:col-span-6 col-span-12"></div>
                     {
                         plans?.length > 0 && plans?.map((plan, index) => {

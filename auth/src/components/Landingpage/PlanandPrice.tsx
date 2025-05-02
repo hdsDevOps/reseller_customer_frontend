@@ -136,13 +136,13 @@ const PlanandPrice = ({id}:any) => {
   };
 
   return (
-    <section className="w-full ms:px-16 px-4 max-w-screen-2xl mx-auto" id={id}>
+    <section className="plan-price-section" id={id}>
       {
         plans?.length > 0 && (
           <>
             <form onSubmit={handleDomainSearch} className="py-[4.175rem] flex flex-col md:flex-row justify-center gap-4 items-center mx-auto">
               <div className="relative flex justify-center flex-1 w-full bg-white">
-                <input className="bg-transparent border py-6 px-10  w-full rounded-md shadow-md font-normal text-2x" placeholder="Type your desired domain here." onChange={e => {setDomain(e.target.value)}} name="domain" value={domain} />
+                <input className="bg-transparent border py-6 px-10  w-full rounded-md shadow-md font-normal text-2x h-[76px]" placeholder="Type your desired domain here." onChange={e => {setDomain(e.target.value)}} name="domain" value={domain} />
                 {/* <div className="flex justify-center items-center absolute top-5 right-[2rem]">
                   <select onChange={handleDomainChange} name="domain_extension" value={domain?.domain_extension}>
                     <option value=".com">.com</option>
@@ -154,7 +154,7 @@ const PlanandPrice = ({id}:any) => {
                   </select>
                 </div> */}
               </div>
-              <button className="px-4 py-6 text-lg font-semibold text-white rounded-md bg-greenbase" type="submit">Search Domain</button>
+              <button className="px-4 py-6 text-lg font-semibold text-white rounded-md bg-greenbase h-[76px]" type="submit">Search Domain</button>
             </form>
             <PlanCard plans={activePlans} handleLeftPlan={() => handleLeftPlan()} handleRightPlan={() => handleRightPlan()} plansLength={plansLength} />
             <div className="flex flex-col items-center justify-center mx-auto mt-10">

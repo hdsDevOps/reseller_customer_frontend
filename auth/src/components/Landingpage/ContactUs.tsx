@@ -86,7 +86,7 @@ const ContactUs = ({contact, id}:any) => {
 
 
   return (
-    <section className="w-full max-w-screen-2xl mx-auto px-16 py-14" id={id}>
+    <section className="w-full max-w-screen-2xl mx-auto sm:!px-[70px] px-[10px] py-14" id={id}>
       <div className="text-center mb-8">
         <h2 className="text-4xl font-semibold text-greenbase">Contact Us</h2>
         <p className="font-normal text-2xl mt-4">

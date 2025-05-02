@@ -38,6 +38,33 @@
   }
 }
 
+.navbar {
+  /* w-full flex items-center py-2 px-[70px] relative bg-white */
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 8px 70px;
+  position: relative;
+  background-color: white;
+}
+
+.plan-price-section {
+  /* w-full md:px-[70px] px-4 max-w-screen-2xl mx-auto */
+  width: 100%;
+  padding: 0 70px;
+}
+
+@media screen and (max-width: 640px) {
+  .navbar {
+    padding: 8px 10px;
+  }
+  
+  .plan-price-section {
+    padding: 0 10px;
+  }
+}
+
 .promotion-div-data {
   width: 100% !important;
   height: 100% !important;
@@ -93,7 +120,6 @@
 }
 
 .banner-paragraph {
-  /* "!font-inter !font-normal !text-lg !text-white py-2 text-left !inline-block items-start w-full break-words" style={{minHeight: "100px"}} */
   font-family: 'Inter', sans-serif;
   font-weight: 400;
   font-size: 18px;
@@ -112,7 +138,6 @@
 }
 
 .banner-paragraph-text {
-  /* !inline-block w-full break-words */
   display: inline;
   word-break: break-word;
   font-family: 'Inter', sans-serif !important;
@@ -127,7 +152,6 @@
 }
 
 .banner-paragraph-icon {
-  /* text-[#12A833] w-6 h-6 ml-2 !inline-block cursor-pointer */
   color: #12A833;
   width: 24px;
   height: 24px;
@@ -158,13 +182,13 @@
   width: 100%;
   height: 100%;
   z-index: 10;
-  padding: 50px 40px;
+  padding: 50px 70px;
   display: flex;
   flex-direction: column;
   justify-content: left;
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 640px) {
   .banner-container {
     padding: 20px 10px;
   }

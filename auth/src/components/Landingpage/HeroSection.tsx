@@ -200,15 +200,15 @@ const HeroSection = ({id}:any) => {
                     <div className="banner-container">
                       <h3 className="banner-header">{item?.title}</h3>
 
-                      <p className="banner-paragraph">
-                        <span
+                      <div className="banner-paragraph">
+                        <p
                           className="banner-pargraph-text"
                           dangerouslySetInnerHTML={{
                             __html: item?.description?.length > 240 
                             ? `${item.description.substring(0, 240)}...` 
                             : item?.description
                           }}
-                        ></span>
+                        ></p>
                         {
                           item?.show_video_status && (
                             <LuTvMinimalPlay
@@ -220,7 +220,7 @@ const HeroSection = ({id}:any) => {
                             />
                           )
                         }
-                      </p>
+                      </div>
 
                       <div className="sm:mt-[80px] mt-[40px] flex gap-[10px] sm:h-[50px] h-[30px] w-full max-w-[500px]">
                         {
@@ -236,7 +236,7 @@ const HeroSection = ({id}:any) => {
                       </div>
                       {
                         getAmountByCurrency(item?.currency_details)?.amount && (
-                          <h4 className="font-inter font-extrabold text-2xl text-white sm:mt-14 mt-8 text-left">Starting at {currencyList.find(item => item.name === defaultCurrencySlice)?.logo}{getAmountByCurrency(item?.currency_details)?.amount}/mth</h4>
+                          <h4 className="font-inter font-extrabold text-2xl text-white sm:mt-14 mt-8 text-left">Starting at {currencyList.find(item => item.name === defaultCurrencySlice)?.logo}{getAmountByCurrency(item?.currency_details)?.amount}/month</h4>
                         )
                       }
 

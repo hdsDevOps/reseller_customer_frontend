@@ -6,6 +6,7 @@ import CustomerNavbar from "./Landingpage/CustomerNavbar";
 import { IoMdClose } from "react-icons/io";
 import { useAppDispatch } from "store/hooks";
 import { getLandingPageThunk } from "store/user.thunk";
+import '../styles/styles.css';
 
 const initialHeader = {
   menu1: 'Plan & Price',
@@ -89,7 +90,7 @@ export default function Header() {
 
 
   return (
-    <nav className="w-full flex items-center py-2 px-10 relative bg-white" id="home">
+    <nav className="w-full flex items-center py-2 sm:!px-[70px] px-[10px] relative bg-white" id="home">
       <button
         type="button"
         onClick={() => {

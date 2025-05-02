@@ -58,8 +58,8 @@ export default function Footer() {
   return (
     <footer className="bg-black !w-full">
       <div className=" flex flex-col gap-10 xl:justify-center xl:items-center pt-20 pb-2 px-[2rem] mx-auto sm:justify-start sm:flex-start">
-        <div className="grid grid-cols-4 gap-10 items-centerw">
-          <div className="flex flex-col gap-2 col-span-4 sm:col-span-2 lg:col-span-1  ">
+        <div className="grid grid-cols-4 gap-10 items-start">
+          <div className="flex flex-col gap-2 col-span-4 sm:col-span-2 lg:col-span-1 items-center ">
             <div className="flex flex-col gap-2">
               <p className="text-white font-semibold">MARKETING</p>
               <progress
@@ -79,7 +79,7 @@ export default function Footer() {
               }
             </ul>
           </div>
-          <div className="flex flex-col gap-2 col-span-4 sm:col-span-2 lg:col-span-1  ">
+          <div className="flex flex-col gap-2 col-span-4 sm:col-span-2 lg:col-span-1 items-center ">
             <div className="flex flex-col gap-2">
               <p className="text-white font-semibold">WEBSITES</p>
               <progress
@@ -99,8 +99,8 @@ export default function Footer() {
               }
             </ul>
           </div>
-          <div className="flex flex-col gap-2 col-span-4 sm:col-span-2 lg:col-span-1  ">
-            <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 col-span-4 sm:col-span-2 lg:col-span-1 items-center ">
+            <div className="flex flex-col gap-2 w-full">
               <p className="text-white font-semibold">CONTACT US</p>
               <progress
                 className="progress w-52 h-0.5"
@@ -122,7 +122,7 @@ export default function Footer() {
               </div> */}
             </div>
           </div>
-          <div className="flex flex-col gap-2 col-span-4 sm:col-span-2 lg:col-span-1  ">
+          <div className="flex flex-col gap-2 col-span-4 sm:col-span-2 lg:col-span-1 items-center ">
             <div className="flex flex-col gap-2">
               <p className="text-white font-semibold">LEARNING AND SUPPORT</p>
               <progress

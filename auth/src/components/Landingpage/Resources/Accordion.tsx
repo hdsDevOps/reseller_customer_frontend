@@ -9,13 +9,13 @@ interface AccordionItemProps {
 }
 
 const dottedline = (
-  <svg height="4" width="100%" className="mt-4">
+  <svg height="2" width="100%" className="mt-4">
     <line
       x1="0"
       y1="0"
       x2="100%"
       y2="0"
-      style={{ stroke: "#12A833", strokeWidth: 4, strokeDasharray: "8, 4" }}
+      style={{ stroke: "#12A833", strokeWidth: 2, strokeDasharray: "4, 2" }}
     />
   </svg>
 );
