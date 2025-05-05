@@ -53,7 +53,7 @@ export default function CustomerNavbar({width, closeNav, navOpen, header}: { wid
 
   return (
     <div className={`flex lg:flex-row flex-col justify-between lg:gap-0 gap-2 w-full bg-white lg:bg-transparent ${width<1024 ? "z-[1000] absolute -mt-1" : ""}`}>
-      <ul className="lg:flex lg:gap-4 lg:pl-0 pl-3 items-center justify-between">
+      <ul className="lg:flex lg:gap-4 lg:pl-0 sm:pl-[70px] pl-3 items-center justify-between">
         <li className="py-1 lg:py-0">
           <button className=" hover:font-bold" onClick={() => {
             location.pathname.toLowerCase().includes('/home')
@@ -93,7 +93,7 @@ export default function CustomerNavbar({width, closeNav, navOpen, header}: { wid
           }}>{header?.menu5}</button>
         </li>
       </ul>
-      <div className="lg:flex lg:gap-10 items-center lg:pl-0 pl-3">
+      <div className="lg:flex lg:gap-10 items-center lg:pl-0 sm:pl-[70px] pl-3">
         <p className="my-2 lg:my-0">
           <button className="hover:font-bold" onClick={() => {
             location.pathname.toLowerCase().includes('/home')

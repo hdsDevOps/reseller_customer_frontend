@@ -100,7 +100,7 @@ export default function Footer() {
             </ul>
           </div>
           <div className="flex flex-col gap-2 col-span-4 sm:col-span-2 lg:col-span-1 items-center ">
-            <div className="flex flex-col gap-2 w-full">
+            <div className="flex flex-col gap-2">
               <p className="text-white font-semibold">CONTACT US</p>
               <progress
                 className="progress w-52 h-0.5"
@@ -108,7 +108,7 @@ export default function Footer() {
                 max="100"
               ></progress>
             </div>
-            <div className="flex flex-col gap-10">
+            <div className="flex flex-col gap-10 w-52">
               <div className="text-[#BDBDBD] text-base font-medium flex flex-col gap-1" dangerouslySetInnerHTML={{__html: footer?.contact_us_section_data?.value}}>
               </div>
               {/* <div className="flex gap-1">
